@@ -41,7 +41,7 @@ ezResult ezFontImporter::Import(const ezString& inputFile, const ezFontImportOpt
 
   FT_Face face;
 
-  FT_Error error = FT_New_Memory_Face(m_Library, fileBuffer.GetData(), (FT_Long)fileSize, 0, &face);
+  FT_Error error = FT_New_Memory_Face(m_Library, fileBuffer.GetData(), fileSize, 0, &face);
 
   if (error == FT_Err_Unknown_File_Format)
   {
@@ -134,7 +134,7 @@ ezResult ezFontImporter::Import(const ezString& inputFile, const ezFontImportOpt
 
     // Add missing glyph
     {
-      error = FT_Load_Glyph(face, (FT_UInt)0, loadFlags);
+      error = FT_Load_Glyph(face, (FT_ULong)0, loadFlags);
       if (error)
       {
         ezLog::Error("Failed to load a character");
@@ -195,7 +195,7 @@ ezResult ezFontImporter::Import(const ezString& inputFile, const ezFontImportOpt
         }
         else
         {
-          error = FT_Load_Glyph(face, (FT_UInt)0, loadFlags);
+          error = FT_Load_Glyph(face, 0, loadFlags);
         }
         if (error)
         {
