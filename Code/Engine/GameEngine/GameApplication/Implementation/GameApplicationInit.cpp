@@ -212,6 +212,11 @@ void ezGameApplication::Init_SetupDefaultResources()
   {
     ezResourceManager::AllowResourceTypeAcquireDuringUpdateContent<ezDecalAtlasResource, ezTexture2DResource>();
   }
+
+  // Font
+  {
+    //ezResourceManager::AllowResourceTypeAcquireDuringUpdateContent<ezFontResource, ezTexture2DResource>();
+  }
 }
 
 ezString GetRendererNameFromCommandLine()
