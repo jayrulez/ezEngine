@@ -215,7 +215,7 @@ void ezGameApplication::Init_SetupDefaultResources()
 
   // Font
   {
-    //ezResourceManager::AllowResourceTypeAcquireDuringUpdateContent<ezFontResource, ezTexture2DResource>();
+    ezResourceManager::AllowResourceTypeAcquireDuringUpdateContent<ezFontResource, ezTexture2DResource>();
   }
 }
 
