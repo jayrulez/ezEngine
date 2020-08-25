@@ -347,7 +347,7 @@ void ezTextSprite::UpdateBounds()
       }
     }
   }
-  m_Bounds = ezRectI32(min.x, min.y, max.x - min.x, max.y - min.y);
+  m_Bounds = ezRectI32((ezInt32)min.x, (ezInt32)min.y, (ezInt32)(max.x - min.x), (ezInt32)(max.y - min.y));
 }
 
 void ezTextSprite::ClearMesh()

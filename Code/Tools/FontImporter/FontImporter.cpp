@@ -41,7 +41,7 @@ ezResult ezFontImporter::Import(const ezString& inputFile, const ezFontImportOpt
 
   FT_Face face;
 
-  FT_Error error = FT_New_Memory_Face(m_Library, fileBuffer.GetData(), fileSize, 0, &face);
+  FT_Error error = FT_New_Memory_Face(m_Library, fileBuffer.GetData(), (FT_Long)fileSize, 0, &face);
 
   if (error == FT_Err_Unknown_File_Format)
   {
