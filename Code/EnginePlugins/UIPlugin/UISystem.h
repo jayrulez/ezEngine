@@ -4,6 +4,14 @@
 #include <Foundation/Communication/Event.h>
 #include <Foundation/Containers/DynamicArray.h>
 #include <Core/Input/InputManager.h>
+
+#include <UIPlugin/TGUI/Backend/Backend.hpp>
+#include <UIPlugin/TGUI/Backend/BackendFont.hpp>
+#include <UIPlugin/TGUI/Backend/BackendText.hpp>
+#include <UIPlugin/TGUI/Backend/BackendTexture.hpp>
+#include <UIPlugin/TGUI/Backend/BackendRenderTarget.hpp>
+#include <UIPlugin/TGUI/Backend/Gui.hpp>
+
 #include <UIPlugin/UIPluginDLL.h>
 
 class EZ_UIPLUGIN_DLL ezUISystem
