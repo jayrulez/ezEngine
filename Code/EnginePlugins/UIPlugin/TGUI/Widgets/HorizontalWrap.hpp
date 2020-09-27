@@ -26,7 +26,8 @@
 #ifndef TGUI_HORIZONTAL_WRAP_HPP
 #define TGUI_HORIZONTAL_WRAP_HPP
 
-#include <TGUI/Widgets/BoxLayout.hpp>
+#include <UIPlugin/TGUI/Widgets/BoxLayout.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +37,7 @@ namespace tgui
     /// @brief Container that automatically arranges children in lines, adding a new line when a horizontal line is full
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API HorizontalWrap : public BoxLayout
+    class EZ_UIPLUGIN_DLL HorizontalWrap : public BoxLayout
     {
     public:
         typedef std::shared_ptr<HorizontalWrap> Ptr; //!< Shared widget pointer

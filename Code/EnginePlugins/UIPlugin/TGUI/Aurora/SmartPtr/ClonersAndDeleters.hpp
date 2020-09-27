@@ -29,7 +29,7 @@
 #ifndef AURORA_PTRFUNCTORS_HPP
 #define AURORA_PTRFUNCTORS_HPP
 
-#include <TGUI/Aurora/Meta/Templates.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Templates.hpp>
 
 
 namespace aurora

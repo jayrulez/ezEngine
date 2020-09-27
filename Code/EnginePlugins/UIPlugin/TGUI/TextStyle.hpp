@@ -26,8 +26,9 @@
 #ifndef TGUI_TEXT_STYLE_HPP
 #define TGUI_TEXT_STYLE_HPP
 
-#include <TGUI/String.hpp>
+#include <UIPlugin/TGUI/String.hpp>
 #include <string>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -54,7 +55,7 @@ namespace tgui
     ///   tgui::TextStyle (or multiple combined with | operator) or a string representation as argument.
     /// - Storing no style at all. Some style settings may be optionally set and can thus remain unspecified.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API TextStyles
+    class EZ_UIPLUGIN_DLL TextStyles
     {
     public:
 

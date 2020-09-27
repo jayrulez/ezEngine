@@ -27,12 +27,13 @@
 #define TGUI_OBJECT_CONVERTER_HPP
 
 
-#include <TGUI/TextStyle.hpp>
-#include <TGUI/Variant.hpp>
-#include <TGUI/Outline.hpp>
-#include <TGUI/Texture.hpp>
-#include <TGUI/Color.hpp>
-#include <TGUI/Font.hpp>
+#include <UIPlugin/TGUI/TextStyle.hpp>
+#include <UIPlugin/TGUI/Variant.hpp>
+#include <UIPlugin/TGUI/Outline.hpp>
+#include <UIPlugin/TGUI/Texture.hpp>
+#include <UIPlugin/TGUI/Color.hpp>
+#include <UIPlugin/TGUI/Font.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +45,7 @@ namespace tgui
     /// @brief Implicit converter for settable properties
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API ObjectConverter
+    class EZ_UIPLUGIN_DLL ObjectConverter
     {
     public:
         enum class Type

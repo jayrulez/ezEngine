@@ -63,7 +63,7 @@ std::unique_ptr<T> makeUnique(Args&&... args)
 // Unoptimized fallback for compilers that don't support variadic templates, emulated by preprocessor metaprogramming
 #else // AURORA_HAS_VARIADIC_TEMPLATES
 
-#include <TGUI/Aurora/SmartPtr/Detail/Factories.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/Detail/Factories.hpp>
 
 // Define metafunction to generate overloads for aurora::CopiedPtr
 #define AURORA_DETAIL_UNIQUEPTR_FACTORY(n) AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, n)

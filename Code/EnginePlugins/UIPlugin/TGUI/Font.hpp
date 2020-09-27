@@ -26,12 +26,13 @@
 #ifndef TGUI_FONT_HPP
 #define TGUI_FONT_HPP
 
-#include <TGUI/String.hpp>
-#include <TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
 #include <cstdint>
 #include <string>
 #include <cstddef>
 #include <memory>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +44,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Information about a glyph in the font
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    struct TGUI_API FontGlyph
+    struct EZ_UIPLUGIN_DLL FontGlyph
     {
         float     advance = 0;  //!< Offset to move horizontally to the next character
         FloatRect bounds;       //!< Bounding rectangle of the glyph, in coordinates relative to the baseline
@@ -52,7 +53,7 @@ namespace tgui
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class TGUI_API Font
+    class EZ_UIPLUGIN_DLL Font
     {
     public:
 

@@ -27,13 +27,14 @@
 #define TGUI_SEPARATOR_LINE_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API SeparatorLineRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL SeparatorLineRenderer : public WidgetRenderer
     {
     public:
 

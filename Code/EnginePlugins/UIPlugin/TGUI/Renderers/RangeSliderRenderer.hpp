@@ -27,13 +27,14 @@
 #define TGUI_RANGE_SLIDER_RENDERER_HPP
 
 
-#include <TGUI/Renderers/SliderRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/SliderRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API RangeSliderRenderer : public SliderRenderer
+    class EZ_UIPLUGIN_DLL RangeSliderRenderer : public SliderRenderer
     {
     public:
 

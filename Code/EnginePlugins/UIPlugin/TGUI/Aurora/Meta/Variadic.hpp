@@ -29,7 +29,7 @@
 #ifndef AURORA_VARIADIC_HPP
 #define AURORA_VARIADIC_HPP
 
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 #include <utility> // std::forward()
 

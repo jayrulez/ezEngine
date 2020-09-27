@@ -28,26 +28,27 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/Signal.hpp>
-#include <TGUI/Font.hpp>
-#include <TGUI/Sprite.hpp>
-#include <TGUI/Layout.hpp>
-#include <TGUI/String.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/Duration.hpp>
-#include <TGUI/Cursor.hpp>
-#include <TGUI/Event.hpp>
-#include <TGUI/Any.hpp>
-#include <TGUI/BackendRenderTarget.hpp>
-#include <TGUI/Loading/Theme.hpp>
-#include <TGUI/Loading/DataIO.hpp>
-#include <TGUI/Loading/Serializer.hpp>
-#include <TGUI/Loading/Deserializer.hpp>
-#include <TGUI/Renderers/WidgetRenderer.hpp>
-#include <TGUI/Aurora/SmartPtr/CopiedPtr.hpp>
-#include <TGUI/Aurora/Tools/Downcast.hpp>
+#include <UIPlugin/TGUI/Signal.hpp>
+#include <UIPlugin/TGUI/Font.hpp>
+#include <UIPlugin/TGUI/Sprite.hpp>
+#include <UIPlugin/TGUI/Layout.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Duration.hpp>
+#include <UIPlugin/TGUI/Cursor.hpp>
+#include <UIPlugin/TGUI/Event.hpp>
+#include <UIPlugin/TGUI/Any.hpp>
+#include <UIPlugin/TGUI/BackendRenderTarget.hpp>
+#include <UIPlugin/TGUI/Loading/Theme.hpp>
+#include <UIPlugin/TGUI/Loading/DataIO.hpp>
+#include <UIPlugin/TGUI/Loading/Serializer.hpp>
+#include <UIPlugin/TGUI/Loading/Deserializer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/CopiedPtr.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Downcast.hpp>
 
 #include <unordered_set>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,7 +67,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief The parent class for every widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Widget : public std::enable_shared_from_this<Widget>
+    class EZ_UIPLUGIN_DLL Widget : public std::enable_shared_from_this<Widget>
     {
     public:
 

@@ -27,17 +27,13 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/Core.hpp>
-#include <TGUI/AllWidgets.hpp>
+#include <UIPlugin/TGUI/Core.hpp>
+#include <UIPlugin/TGUI/AllWidgets.hpp>
 
-#include <TGUI/GuiBase.hpp>
-#include <TGUI/Backend.hpp>
-#include <TGUI/Loading/Deserializer.hpp>
-#include <TGUI/Loading/Serializer.hpp>
-
-#if TGUI_BUILD_WITH_SFML
-    #include <TGUI/Backends/SFML.hpp>
-#endif
+#include <UIPlugin/TGUI/GuiBase.hpp>
+#include <UIPlugin/TGUI/Backend.hpp>
+#include <UIPlugin/TGUI/Loading/Deserializer.hpp>
+#include <UIPlugin/TGUI/Loading/Serializer.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

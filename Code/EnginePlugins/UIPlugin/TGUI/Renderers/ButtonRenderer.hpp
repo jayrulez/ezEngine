@@ -27,13 +27,14 @@
 #define TGUI_BUTTON_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API ButtonRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL ButtonRenderer : public WidgetRenderer
     {
     public:
 

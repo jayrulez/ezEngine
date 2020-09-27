@@ -27,13 +27,14 @@
 #define TGUI_TEXT_AREA_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API TextAreaRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL TextAreaRenderer : public WidgetRenderer
     {
     public:
 

@@ -26,8 +26,9 @@
 #ifndef TGUI_BOX_LAYOUT_HPP
 #define TGUI_BOX_LAYOUT_HPP
 
-#include <TGUI/Widgets/Group.hpp>
-#include <TGUI/Renderers/BoxLayoutRenderer.hpp>
+#include <UIPlugin/TGUI/Widgets/Group.hpp>
+#include <UIPlugin/TGUI/Renderers/BoxLayoutRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +38,7 @@ namespace tgui
     /// @brief Abstract class for box layout containers
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API BoxLayout : public Group
+    class EZ_UIPLUGIN_DLL BoxLayout : public Group
     {
     public:
 

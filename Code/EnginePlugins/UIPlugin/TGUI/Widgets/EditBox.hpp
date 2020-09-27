@@ -26,11 +26,12 @@
 #define TGUI_EDIT_BOX_HPP
 
 
-#include <TGUI/Widgets/ClickableWidget.hpp>
-#include <TGUI/Renderers/EditBoxRenderer.hpp>
-#include <TGUI/Rect.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
+#include <UIPlugin/TGUI/Renderers/EditBoxRenderer.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
 #include <regex>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,7 @@ namespace tgui
     /// An edit box is a single line input field. It has options like setting a password character or displaying a default text.
     /// If you are looking for something with multiple lines, word-wrap and a scrollbar then check out the TextArea class.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API EditBox : public ClickableWidget
+    class EZ_UIPLUGIN_DLL EditBox : public ClickableWidget
     {
     public:
 
@@ -71,10 +72,10 @@ namespace tgui
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         struct Validator
         {
-            static TGUI_API const char* All;   //!< Accept any input
-            static TGUI_API const char* Int;   //!< Accept negative and positive integers
-            static TGUI_API const char* UInt;  //!< Accept only positive integers
-            static TGUI_API const char* Float; //!< Accept decimal numbers
+            static EZ_UIPLUGIN_DLL const char* All;   //!< Accept any input
+            static EZ_UIPLUGIN_DLL const char* Int;   //!< Accept negative and positive integers
+            static EZ_UIPLUGIN_DLL const char* UInt;  //!< Accept only positive integers
+            static EZ_UIPLUGIN_DLL const char* Float; //!< Accept decimal numbers
         };
 
 

@@ -27,8 +27,9 @@
 #define TGUI_GROUP_HPP
 
 
-#include <TGUI/Container.hpp>
-#include <TGUI/Renderers/GroupRenderer.hpp>
+#include <UIPlugin/TGUI/Container.hpp>
+#include <UIPlugin/TGUI/Renderers/GroupRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +41,7 @@ namespace tgui
     /// Invisible container used to group widgets.
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Group : public Container
+    class EZ_UIPLUGIN_DLL Group : public Container
     {
     public:
 

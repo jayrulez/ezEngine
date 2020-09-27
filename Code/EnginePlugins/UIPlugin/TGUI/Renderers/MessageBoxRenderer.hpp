@@ -27,13 +27,14 @@
 #define TGUI_MESSAGE_BOX_RENDERER_HPP
 
 
-#include <TGUI/Renderers/ChildWindowRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/ChildWindowRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API MessageBoxRenderer : public ChildWindowRenderer
+    class EZ_UIPLUGIN_DLL MessageBoxRenderer : public ChildWindowRenderer
     {
     public:
 

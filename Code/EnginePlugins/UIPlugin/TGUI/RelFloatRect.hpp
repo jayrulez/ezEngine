@@ -27,8 +27,8 @@
 #define TGUI_REL_FLOAT_RECT_HPP
 
 
-#include <TGUI/AbsoluteOrRelativeValue.hpp>
-#include <TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/AbsoluteOrRelativeValue.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

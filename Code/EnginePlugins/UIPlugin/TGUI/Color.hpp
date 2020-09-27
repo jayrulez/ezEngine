@@ -26,15 +26,12 @@
 #ifndef TGUI_COLOR_HPP
 #define TGUI_COLOR_HPP
 
-#include <TGUI/String.hpp>
-#include <TGUI/Vertex.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPlugin/TGUI/Vertex.hpp>
 #include <cstdint>
 #include <string>
 #include <map>
-
-#if TGUI_BUILD_WITH_SFML
-    #include <SFML/Graphics/Color.hpp>
-#endif
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +45,7 @@ namespace tgui
     ///   even a serialized string as argument.
     /// - Storing no color at all. Some colors may be optionally set and can thus remain unspecified.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Color
+    class EZ_UIPLUGIN_DLL Color
     {
     public:
 
@@ -76,22 +73,6 @@ namespace tgui
             m_alpha{0}
         {
         }
-
-#if TGUI_BUILD_WITH_SFML
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Creates the object from an sf::Color
-        ///
-        /// @param color  Color to set
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        TGUI_CONSTEXPR Color(const sf::Color& color) :
-            m_isSet{true},
-            m_red  {color.r},
-            m_green{color.g},
-            m_blue {color.b},
-            m_alpha{color.a}
-        {
-        }
-#endif
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Creates the object from an the RGB or RGBA values
@@ -140,18 +121,6 @@ namespace tgui
         {
             return m_isSet;
         }
-
-#if TGUI_BUILD_WITH_SFML
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Converts this object into an sf::Color object
-        ///
-        /// @return The color stored in this object, or the default color if no color was set
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        operator sf::Color() const
-        {
-            return sf::Color(m_red, m_green, m_blue, m_alpha);
-        }
-#endif
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Converts this object into a Vertex::Color object

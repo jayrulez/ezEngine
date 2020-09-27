@@ -23,12 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Loading/Deserializer.hpp>
-#include <TGUI/Loading/DataIO.hpp>
-#include <TGUI/Renderers/WidgetRenderer.hpp>
-#include <TGUI/Backend.hpp>
-#include <TGUI/BackendFont.hpp>
-#include <TGUI/Global.hpp>
+#include <UIPlugin/TGUI/Loading/Deserializer.hpp>
+#include <UIPlugin/TGUI/Loading/DataIO.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Backend.hpp>
+#include <UIPlugin/TGUI/BackendFont.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
 #include <cstdint>
 
 namespace tgui

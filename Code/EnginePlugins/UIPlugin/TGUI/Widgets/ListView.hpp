@@ -27,11 +27,12 @@
 #define TGUI_LIST_VIEW_HPP
 
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Renderers/ListViewRenderer.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Renderers/ListViewRenderer.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
 #include <set>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,7 @@ namespace tgui
     ///
     /// When no columns are added, the list view acts like a ListBox with a few extra functionalities.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API ListView : public Widget
+    class EZ_UIPLUGIN_DLL ListView : public Widget
     {
       public:
 

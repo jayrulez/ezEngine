@@ -27,10 +27,11 @@
 #define TGUI_TEXT_AREA_HPP
 
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Renderers/TextAreaRenderer.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Renderers/TextAreaRenderer.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,7 @@ namespace tgui
     /// A text area is a multi-line input box which supports word-wrap and a vertical scrollbar.
     /// If you are looking for a single line input field then check out the EditBox class.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API TextArea : public Widget
+    class EZ_UIPLUGIN_DLL TextArea : public Widget
     {
     public:
 

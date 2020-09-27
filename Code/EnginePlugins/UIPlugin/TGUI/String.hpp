@@ -26,18 +26,16 @@
 #ifndef TGUI_STRING_HPP
 #define TGUI_STRING_HPP
 
-#include <TGUI/Config.hpp>
-#include <TGUI/Utf.hpp>
+#include <UIPlugin/TGUI/Config.hpp>
+#include <UIPlugin/TGUI/Utf.hpp>
 #include <string>
 #include <vector>
 #include <cstring>
 #include <locale>
 #include <ostream>
 #include <sstream>
+#include <UIPluginDLL.h>
 
-#if TGUI_BUILD_WITH_SFML
-    #include <SFML/System/String.hpp>
-#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -46,13 +44,13 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Checks if a character is a whitespace character (space, tab, carriage return or line feed)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API bool isWhitespace(char character);
+    EZ_UIPLUGIN_DLL bool isWhitespace(char character);
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Checks if a character is a whitespace character (space, tab, carriage return or line feed)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API bool isWhitespace(char32_t character);
+    EZ_UIPLUGIN_DLL bool isWhitespace(char32_t character);
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +68,7 @@ namespace tgui
     /// Data is stored in UTF-32, so any parameter or operator using a different encoding will have to convert the string
     /// internally and may be slightly slower than the variants that use UTF-32.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API String
+    class EZ_UIPLUGIN_DLL String
     {
     private:
         std::u32string m_string;
@@ -256,19 +254,6 @@ namespace tgui
         explicit String(std::wstring::const_iterator first, std::wstring::const_iterator last);
         explicit String(std::u16string::const_iterator first, std::u16string::const_iterator last);
         explicit String(std::u32string::const_iterator first, std::u32string::const_iterator last);
-
-#if TGUI_BUILD_WITH_SFML
-        // This constructor has to be explicit or it will cause MSVC to no longer compile code that performs sf::String + std::string
-        explicit String(const sf::String& str)
-            : m_string{reinterpret_cast<const char32_t*>(str.toUtf32().c_str())}
-        {
-        }
-
-        explicit operator sf::String() const
-        {
-            return sf::String::fromUtf32(m_string.begin(), m_string.end());
-        }
-#endif
 
         explicit operator std::string() const;
         explicit operator std::wstring() const;
@@ -890,10 +875,10 @@ namespace tgui
         return String(left.m_string + std::move(right.m_string));
     }
 
-    TGUI_API std::basic_ostream<char>& operator<<(std::basic_ostream<char>& os, const String& str);
-    TGUI_API std::basic_ostream<wchar_t>& operator<<(std::basic_ostream<wchar_t>& os, const String& str);
-    //TGUI_API std::basic_ostream<char16_t>& operator<<(std::basic_ostream<char16_t>& os, const String& str);
-    //TGUI_API std::basic_ostream<char32_t>& operator<<(std::basic_ostream<char32_t>& os, const String& str);
+    EZ_UIPLUGIN_DLL std::basic_ostream<char>& operator<<(std::basic_ostream<char>& os, const String& str);
+    EZ_UIPLUGIN_DLL std::basic_ostream<wchar_t>& operator<<(std::basic_ostream<wchar_t>& os, const String& str);
+    //EZ_UIPLUGIN_DLL std::basic_ostream<char16_t>& operator<<(std::basic_ostream<char16_t>& os, const String& str);
+    //EZ_UIPLUGIN_DLL std::basic_ostream<char32_t>& operator<<(std::basic_ostream<char32_t>& os, const String& str);
 
 
     // UTF-8 function are defined in the header so that they can be enabled/disabled based on

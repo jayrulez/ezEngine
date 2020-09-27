@@ -23,13 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Widgets/ChildWindow.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/GuiBase.hpp>
-
-#if TGUI_BUILD_WITH_SFML
-    #include <SFML/Config.hpp>
-#endif
+#include <UIPlugin/TGUI/Widgets/ChildWindow.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/GuiBase.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1088,20 +1084,6 @@ namespace tgui
 
     void ChildWindow::mouseEnteredWidget()
     {
-#if TGUI_BUILD_WITH_SFML && (SFML_VERSION_MAJOR == 2) && (SFML_VERSION_MINOR < 6)
-        if (m_resizable && (m_mouseCursor != Cursor::Type::Arrow))
-        {
-            // Container::mouseEnteredWidget() can't be called from here because of a bug in SFML < 2.6.
-            // Calling the function from the base class would set the mouse cursor that was requested. If the mouse is on top
-            // of the borders then we need to replace it with a resize cursor afterwards. These cursor changes would occus out
-            // of order though, causing the wrong cursor to show up when the mouse enters a border from the outside.
-            m_mouseHover = true;
-            onMouseEnter.emit(this);
-            m_currentChildWindowMouseCursor = Cursor::Type::Arrow;
-            return;
-        }
-#endif
-
         Container::mouseEnteredWidget();
 
         // If the child window has a custom mouse cursor then the Container::mouseEnteredWidget() would have switched to it.

@@ -27,8 +27,9 @@
 #define TGUI_DESERIALIZER_HPP
 
 
-#include <TGUI/ObjectConverter.hpp>
+#include <UIPlugin/TGUI/ObjectConverter.hpp>
 #include <vector>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /// @brief Deserializes a settable property
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Deserializer
+    class EZ_UIPLUGIN_DLL Deserializer
     {
     public:
         using DeserializeFunc = std::function<ObjectConverter(const String&)>;

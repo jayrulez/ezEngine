@@ -27,9 +27,10 @@
 #define TGUI_TAB_CONTAINER_HPP
 
 
-#include <TGUI/SubwidgetContainer.hpp>
-#include <TGUI/Widgets/Tabs.hpp>
-#include <TGUI/Widgets/Panel.hpp>
+#include <UIPlugin/TGUI/SubwidgetContainer.hpp>
+#include <UIPlugin/TGUI/Widgets/Tabs.hpp>
+#include <UIPlugin/TGUI/Widgets/Panel.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,7 @@ namespace tgui
     /// A tab container widget is a control that allow user to switch between panels via tabs.
     /// If you are looking for something without holding panels then check out the Tabs class.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API TabContainer : public SubwidgetContainer
+    class EZ_UIPLUGIN_DLL TabContainer : public SubwidgetContainer
     {
     public:
 

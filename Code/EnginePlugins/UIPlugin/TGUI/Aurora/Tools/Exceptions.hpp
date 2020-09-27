@@ -29,7 +29,7 @@
 #ifndef AURORA_EXCEPTIONS_HPP
 #define AURORA_EXCEPTIONS_HPP
 
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 #include <stdexcept>
 #include <string>

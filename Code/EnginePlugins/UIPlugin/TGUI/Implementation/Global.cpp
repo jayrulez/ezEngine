@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Global.hpp>
-#include <TGUI/Duration.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
+#include <UIPlugin/TGUI/Duration.hpp>
 #include <functional>
 #include <sstream>
 #include <locale>

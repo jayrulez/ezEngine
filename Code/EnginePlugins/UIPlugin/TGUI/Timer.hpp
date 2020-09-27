@@ -26,13 +26,14 @@
 #ifndef TGUI_TIMER_HPP
 #define TGUI_TIMER_HPP
 
-#include <TGUI/Config.hpp>
-#include <TGUI/Duration.hpp>
-#include <TGUI/Optional.hpp>
+#include <UIPlugin/TGUI/Config.hpp>
+#include <UIPlugin/TGUI/Duration.hpp>
+#include <UIPlugin/TGUI/Optional.hpp>
 
 #include <functional>
 #include <memory>
 #include <vector>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +48,7 @@ namespace tgui
     /// This timer is not intended to be used when high accuracy is required.
     /// If the callback is e.g. a millisecond too late then this extra time is NOT subtracted from the next scheduled time.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Timer : public std::enable_shared_from_this<Timer>
+    class EZ_UIPLUGIN_DLL Timer : public std::enable_shared_from_this<Timer>
     {
     public:
 

@@ -27,8 +27,8 @@
 #define TGUI_SUBWIDGET_CONTAINER_HPP
 
 
-#include <TGUI/Widgets/Group.hpp>
-#include <TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Group.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,7 @@ namespace tgui
     ///
     /// Subwidgets need to be added to the m_container member. Widgets in this container will get drawn and receive events.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SubwidgetContainer : public Widget
+    class EZ_UIPLUGIN_DLL SubwidgetContainer : public Widget
     {
     public:
 

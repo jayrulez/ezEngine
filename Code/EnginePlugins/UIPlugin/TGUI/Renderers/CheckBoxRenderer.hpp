@@ -27,13 +27,14 @@
 #define TGUI_CHECK_BOX_RENDERER_HPP
 
 
-#include <TGUI/Renderers/RadioButtonRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/RadioButtonRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API CheckBoxRenderer : public RadioButtonRenderer
+    class EZ_UIPLUGIN_DLL CheckBoxRenderer : public RadioButtonRenderer
     {
     public:
         using RadioButtonRenderer::RadioButtonRenderer;

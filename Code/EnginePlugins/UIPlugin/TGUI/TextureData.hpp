@@ -28,14 +28,15 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/Rect.hpp>
-#include <TGUI/Optional.hpp>
-#include <TGUI/SvgImage.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/Optional.hpp>
+#include <UIPlugin/TGUI/SvgImage.hpp>
 
-#include <TGUI/BackendTexture.hpp>
+#include <UIPlugin/TGUI/BackendTexture.hpp>
 
 #include <memory>
 #include <string>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +45,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Used by the Texture class
-    struct TGUI_API TextureData
+    struct EZ_UIPLUGIN_DLL TextureData
     {
         // Either svgImage or backendTexture MUST have a value
         Optional<SvgImage> svgImage;
@@ -54,7 +55,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Wrapper around TextureData to be used in TextureManager
-    struct TGUI_API TextureDataHolder
+    struct EZ_UIPLUGIN_DLL TextureDataHolder
     {
         std::shared_ptr<TextureData> data;
         String  filename;

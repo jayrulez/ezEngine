@@ -27,9 +27,10 @@
 #define TGUI_RADIO_BUTTON_HPP
 
 
-#include <TGUI/Renderers/RadioButtonRenderer.hpp>
-#include <TGUI/Widgets/ClickableWidget.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Renderers/RadioButtonRenderer.hpp>
+#include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Radio button widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API RadioButton : public ClickableWidget
+    class EZ_UIPLUGIN_DLL RadioButton : public ClickableWidget
     {
     public:
 

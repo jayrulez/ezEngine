@@ -23,12 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Texture.hpp>
-#include <TGUI/Global.hpp>
-#include <TGUI/Backend.hpp>
-#include <TGUI/Exception.hpp>
-#include <TGUI/TextureManager.hpp>
-#include <TGUI/BackendTexture.hpp>
+#include <UIPlugin/TGUI/Texture.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
+#include <UIPlugin/TGUI/Backend.hpp>
+#include <UIPlugin/TGUI/Exception.hpp>
+#include <UIPlugin/TGUI/TextureManager.hpp>
+#include <UIPlugin/TGUI/BackendTexture.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,18 +48,8 @@ namespace tgui
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#if TGUI_BUILD_WITH_SFML
-    Texture::Texture(const sf::Texture& texture, const UIntRect& partRect, const UIntRect& middlePart)
-    {
-        load(texture, partRect, middlePart);
-    }
-#endif
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Texture::Texture(const Texture& other) :
-#if TGUI_BUILD_WITH_SFML
-        m_shader          {other.m_shader},
-#endif
         m_data            {other.m_data},
         m_color           {other.m_color},
         m_partRect        {other.m_partRect},
@@ -75,9 +65,6 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Texture::Texture(Texture&& other) noexcept :
-#if TGUI_BUILD_WITH_SFML
-        m_shader          {std::move(other.m_shader)},
-#endif
         m_data            {std::move(other.m_data)},
         m_color           {std::move(other.m_color)},
         m_partRect        {std::move(other.m_partRect)},
@@ -107,9 +94,6 @@ namespace tgui
         {
             Texture temp{other};
 
-#if TGUI_BUILD_WITH_SFML
-            std::swap(m_shader,           temp.m_shader);
-#endif
             std::swap(m_data,             temp.m_data);
             std::swap(m_color,            temp.m_color);
             std::swap(m_partRect,         temp.m_partRect);
@@ -128,9 +112,6 @@ namespace tgui
     {
         if (this != &other)
         {
-#if TGUI_BUILD_WITH_SFML
-            m_shader           = std::move(other.m_shader);
-#endif
             m_data             = std::move(other.m_data);
             m_color            = std::move(other.m_color);
             m_partRect         = std::move(other.m_partRect);
@@ -189,27 +170,6 @@ namespace tgui
         setTextureData(data, partRect, middleRect);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#if TGUI_BUILD_WITH_SFML
-    void Texture::load(const sf::Texture& texture, const UIntRect& partRect, const UIntRect& middleRect)
-    {
-        if (getData() && (m_destructCallback != nullptr))
-        {
-            m_destructCallback(getData());
-            m_destructCallback = nullptr;
-        }
-
-        m_data = nullptr;
-        auto data = std::make_shared<TextureData>();
-        data->backendTexture = getBackend()->createTexture();
-        data->backendTexture->loadFromPixelData(texture.getSize(), texture.copyToImage().getPixelsPtr()); /// TODO: Allow reusing data based on address of input texture?
-
-        m_id = "";
-        setTextureData(data, partRect, middleRect);
-    }
-#endif
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     const String& Texture::getId() const
     {
         return m_id;
@@ -266,22 +226,6 @@ namespace tgui
         return m_color;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#if TGUI_BUILD_WITH_SFML
-    void Texture::setShader(sf::Shader* shader)
-    {
-        m_shader = shader;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    sf::Shader* Texture::getShader() const
-    {
-        return m_shader;
-    }
-#endif
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     UIntRect Texture::getMiddleRect() const
     {
         return m_middleRect;
@@ -321,9 +265,6 @@ namespace tgui
         return (m_id == right.m_id)
             && (!m_id.empty() || (m_data == right.m_data))
             && (m_middleRect == right.m_middleRect)
-#if TGUI_BUILD_WITH_SFML
-            && (m_shader == right.m_shader)
-#endif
             && (m_color == right.m_color);
     }
 

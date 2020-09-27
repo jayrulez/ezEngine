@@ -29,11 +29,11 @@
 #ifndef AURORA_SINGLEDISPATCHER_HPP
 #define AURORA_SINGLEDISPATCHER_HPP
 
-#include <TGUI/Aurora/Dispatch/DispatchTraits.hpp>
-#include <TGUI/Aurora/Tools/NonCopyable.hpp>
-#include <TGUI/Aurora/Tools/Exceptions.hpp>
-#include <TGUI/Aurora/Meta/Templates.hpp>
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Dispatch/DispatchTraits.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/NonCopyable.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Exceptions.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Templates.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 #include <unordered_map>
 #include <functional>
@@ -215,5 +215,5 @@ class SingleDispatcher : private NonCopyable
 
 } // namespace aurora
 
-#include <TGUI/Aurora/Dispatch/Detail/SingleDispatcher.inl>
+#include <UIPlugin/TGUI/Aurora/Dispatch/Detail/SingleDispatcher.inl>
 #endif // AURORA_SINGLEDISPATCHER_HPP

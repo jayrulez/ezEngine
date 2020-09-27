@@ -26,7 +26,8 @@
 #ifndef TGUI_HORIZONTAL_LAYOUT_HPP
 #define TGUI_HORIZONTAL_LAYOUT_HPP
 
-#include <TGUI/Widgets/BoxLayoutRatios.hpp>
+#include <UIPlugin/TGUI/Widgets/BoxLayoutRatios.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +38,7 @@ namespace tgui
     ///
     /// The children are positioned side by side.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API HorizontalLayout : public BoxLayoutRatios
+    class EZ_UIPLUGIN_DLL HorizontalLayout : public BoxLayoutRatios
     {
     public:
         typedef std::shared_ptr<HorizontalLayout> Ptr; //!< Shared widget pointer

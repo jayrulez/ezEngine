@@ -26,12 +26,13 @@
 #ifndef TGUI_BACKEND_RENDER_TARGET_HPP
 #define TGUI_BACKEND_RENDER_TARGET_HPP
 
-#include <TGUI/Rect.hpp>
-#include <TGUI/Color.hpp>
-#include <TGUI/Sprite.hpp>
-#include <TGUI/Text.hpp>
-#include <TGUI/Outline.hpp>
-#include <TGUI/RenderStates.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/Color.hpp>
+#include <UIPlugin/TGUI/Sprite.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Outline.hpp>
+#include <UIPlugin/TGUI/RenderStates.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +45,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Base class for render targets
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API BackendRenderTargetBase
+    class EZ_UIPLUGIN_DLL BackendRenderTargetBase
     {
     public:
 

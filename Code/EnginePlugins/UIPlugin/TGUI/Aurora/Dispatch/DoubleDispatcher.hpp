@@ -29,12 +29,12 @@
 #ifndef AURORA_DOUBLEDISPATCHER_HPP
 #define AURORA_DOUBLEDISPATCHER_HPP
 
-#include <TGUI/Aurora/Dispatch/DispatchTraits.hpp>
-#include <TGUI/Aurora/Tools/NonCopyable.hpp>
-#include <TGUI/Aurora/Tools/Exceptions.hpp>
-#include <TGUI/Aurora/Tools/Hash.hpp>
-#include <TGUI/Aurora/Meta/Templates.hpp>
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Dispatch/DispatchTraits.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/NonCopyable.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Exceptions.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Hash.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Templates.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 #include <unordered_map>
 #include <functional>
@@ -253,5 +253,5 @@ class DoubleDispatcher : private NonCopyable
 
 } // namespace aurora
 
-#include <TGUI/Aurora/Dispatch/Detail/DoubleDispatcher.inl>
+#include <UIPlugin/TGUI/Aurora/Dispatch/Detail/DoubleDispatcher.inl>
 #endif // AURORA_DOUBLEDISPATCHER_HPP

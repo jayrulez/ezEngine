@@ -47,7 +47,7 @@
 #ifndef AURORA_PREPROCESSOR_HPP
 #define AURORA_PREPROCESSOR_HPP
 
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 
 /// @addtogroup Meta

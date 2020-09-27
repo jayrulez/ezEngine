@@ -23,13 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/ToolTip.hpp>
-#include <TGUI/Container.hpp>
-#include <TGUI/Animation.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/GuiBase.hpp>
-#include <TGUI/Loading/WidgetFactory.hpp>
-#include <TGUI/SignalManager.hpp>
+#include <UIPlugin/TGUI/ToolTip.hpp>
+#include <UIPlugin/TGUI/Container.hpp>
+#include <UIPlugin/TGUI/Animation.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/GuiBase.hpp>
+#include <UIPlugin/TGUI/Loading/WidgetFactory.hpp>
+#include <UIPlugin/TGUI/SignalManager.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

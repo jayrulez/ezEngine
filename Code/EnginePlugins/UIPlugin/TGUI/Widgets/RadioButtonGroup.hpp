@@ -27,8 +27,9 @@
 #define TGUI_RADIO_BUTTON_GROUP_HPP
 
 
-#include <TGUI/Widgets/Group.hpp>
-#include <TGUI/Widgets/RadioButton.hpp>
+#include <UIPlugin/TGUI/Widgets/Group.hpp>
+#include <UIPlugin/TGUI/Widgets/RadioButton.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /// @brief Can be used as parent of radio buttons so that different groups of radio buttons can be isolated
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API RadioButtonGroup : public Group
+    class EZ_UIPLUGIN_DLL RadioButtonGroup : public Group
     {
     public:
 

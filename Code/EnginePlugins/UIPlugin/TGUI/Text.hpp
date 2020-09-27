@@ -26,11 +26,12 @@
 #ifndef TGUI_TEXT_HPP
 #define TGUI_TEXT_HPP
 
-#include <TGUI/Font.hpp>
-#include <TGUI/Color.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/TextStyle.hpp>
-#include <TGUI/RenderStates.hpp>
+#include <UIPlugin/TGUI/Font.hpp>
+#include <UIPlugin/TGUI/Color.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/TextStyle.hpp>
+#include <UIPlugin/TGUI/RenderStates.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +41,7 @@ namespace tgui
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class TGUI_API Text
+    class EZ_UIPLUGIN_DLL Text
     {
     public:
 

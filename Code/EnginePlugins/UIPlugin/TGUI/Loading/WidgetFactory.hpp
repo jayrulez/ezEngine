@@ -27,9 +27,10 @@
 #define TGUI_WIDGET_FACTORY_HPP
 
 
-#include <TGUI/Widget.hpp>
-#include <TGUI/Loading/DataIO.hpp>
+#include <UIPlugin/TGUI/Widget.hpp>
+#include <UIPlugin/TGUI/Loading/DataIO.hpp>
 #include <functional>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +38,7 @@ namespace tgui
 {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class TGUI_API WidgetFactory
+    class EZ_UIPLUGIN_DLL WidgetFactory
     {
     public:
 

@@ -26,8 +26,9 @@
 #ifndef TGUI_OUTLINE_HPP
 #define TGUI_OUTLINE_HPP
 
-#include <TGUI/Vector2.hpp>
-#include <TGUI/AbsoluteOrRelativeValue.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/AbsoluteOrRelativeValue.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +36,7 @@ namespace tgui
 {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class TGUI_API Outline
+    class EZ_UIPLUGIN_DLL Outline
     {
     public:
 

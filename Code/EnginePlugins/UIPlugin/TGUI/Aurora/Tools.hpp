@@ -29,15 +29,15 @@
 #ifndef AURORA_MODULE_TOOLS_HPP
 #define AURORA_MODULE_TOOLS_HPP
 
-#include <TGUI/Aurora/Tools/Algorithms.hpp>
-#include <TGUI/Aurora/Tools/Downcast.hpp>
-#include <TGUI/Aurora/Tools/Exceptions.hpp>
-#include <TGUI/Aurora/Tools/ForEach.hpp>
-#include <TGUI/Aurora/Tools/Hash.hpp>
-#include <TGUI/Aurora/Tools/NamedTuple.hpp>
-#include <TGUI/Aurora/Tools/NonCopyable.hpp>
-#include <TGUI/Aurora/Tools/SafeBool.hpp>
-#include <TGUI/Aurora/Tools/Swap.hpp>
-#include <TGUI/Aurora/Tools/Typeid.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Algorithms.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Downcast.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Exceptions.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/ForEach.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Hash.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/NamedTuple.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/NonCopyable.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/SafeBool.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Swap.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Typeid.hpp>
 
 #endif // AURORA_MODULE_TOOLS_HPP

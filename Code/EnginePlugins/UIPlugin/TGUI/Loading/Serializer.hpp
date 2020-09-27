@@ -27,7 +27,8 @@
 #define TGUI_SERIALIZER_HPP
 
 
-#include <TGUI/ObjectConverter.hpp>
+#include <UIPlugin/TGUI/ObjectConverter.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +38,7 @@ namespace tgui
     /// @brief Serializes an settable property
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Serializer
+    class EZ_UIPLUGIN_DLL Serializer
     {
     public:
         using SerializeFunc = std::function<String(ObjectConverter&&)>;

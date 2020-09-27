@@ -27,16 +27,16 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/Animation.hpp>
-#include <TGUI/Cursor.hpp>
-#include <TGUI/Timer.hpp>
-#include <TGUI/Widget.hpp>
-#include <TGUI/ToolTip.hpp>
-#include <TGUI/Container.hpp>
-#include <TGUI/SubwidgetContainer.hpp>
+#include <UIPlugin/TGUI/Animation.hpp>
+#include <UIPlugin/TGUI/Cursor.hpp>
+#include <UIPlugin/TGUI/Timer.hpp>
+#include <UIPlugin/TGUI/Widget.hpp>
+#include <UIPlugin/TGUI/ToolTip.hpp>
+#include <UIPlugin/TGUI/Container.hpp>
+#include <UIPlugin/TGUI/SubwidgetContainer.hpp>
 
-#include <TGUI/Loading/Theme.hpp>
-#include <TGUI/Loading/WidgetFactory.hpp>
+#include <UIPlugin/TGUI/Loading/Theme.hpp>
+#include <UIPlugin/TGUI/Loading/WidgetFactory.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

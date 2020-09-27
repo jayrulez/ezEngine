@@ -27,13 +27,14 @@
 #define TGUI_PROGRESS_BAR_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API ProgressBarRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL ProgressBarRenderer : public WidgetRenderer
     {
     public:
 

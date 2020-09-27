@@ -27,9 +27,10 @@
 #define TGUI_PROGRESS_BAR_HPP
 
 
-#include <TGUI/Renderers/ProgressBarRenderer.hpp>
-#include <TGUI/Widgets/ClickableWidget.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Renderers/ProgressBarRenderer.hpp>
+#include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Progress bar widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API ProgressBar : public ClickableWidget
+    class EZ_UIPLUGIN_DLL ProgressBar : public ClickableWidget
     {
     public:
 

@@ -27,13 +27,14 @@
 #define TGUI_PANEL_RENDERER_HPP
 
 
-#include <TGUI/Renderers/GroupRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/GroupRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API PanelRenderer : public GroupRenderer
+    class EZ_UIPLUGIN_DLL PanelRenderer : public GroupRenderer
     {
     public:
 

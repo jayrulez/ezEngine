@@ -25,7 +25,7 @@
 #ifndef TGUI_OPTIONAL_HPP
 #define TGUI_OPTIONAL_HPP
 
-#include <TGUI/Config.hpp>
+#include <UIPlugin/TGUI/Config.hpp>
 
 #if TGUI_COMPILED_WITH_CPP_VER >= 17
     #include <optional>

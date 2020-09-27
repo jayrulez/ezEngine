@@ -26,7 +26,8 @@
 #ifndef TGUI_VERTICAL_LAYOUT_HPP
 #define TGUI_VERTICAL_LAYOUT_HPP
 
-#include <TGUI/Widgets/BoxLayoutRatios.hpp>
+#include <UIPlugin/TGUI/Widgets/BoxLayoutRatios.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +38,7 @@ namespace tgui
     ///
     /// The children are stacked vertically.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API VerticalLayout : public BoxLayoutRatios
+    class EZ_UIPLUGIN_DLL VerticalLayout : public BoxLayoutRatios
     {
     public:
         typedef std::shared_ptr<VerticalLayout> Ptr; //!< Shared widget pointer

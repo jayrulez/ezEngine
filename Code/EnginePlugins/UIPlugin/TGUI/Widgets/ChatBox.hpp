@@ -27,11 +27,12 @@
 #define TGUI_CHAT_BOX_HPP
 
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Renderers/ChatBoxRenderer.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Renderers/ChatBoxRenderer.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
 #include <deque>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +40,7 @@ namespace tgui
 {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class TGUI_API ChatBox : public Widget
+    class EZ_UIPLUGIN_DLL ChatBox : public Widget
     {
     public:
 

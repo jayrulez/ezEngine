@@ -27,9 +27,10 @@
 #define TGUI_SPIN_BUTTON_HPP
 
 
-#include <TGUI/Renderers/SpinButtonRenderer.hpp>
-#include <TGUI/Widgets/ClickableWidget.hpp>
-#include <TGUI/Timer.hpp>
+#include <UIPlugin/TGUI/Renderers/SpinButtonRenderer.hpp>
+#include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
+#include <UIPlugin/TGUI/Timer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Spin button widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SpinButton : public ClickableWidget
+    class EZ_UIPLUGIN_DLL SpinButton : public ClickableWidget
     {
     public:
 

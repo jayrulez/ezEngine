@@ -27,10 +27,11 @@
 #define TGUI_LIST_BOX_HPP
 
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Renderers/ListBoxRenderer.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Renderers/ListBoxRenderer.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +40,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief List box widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API ListBox : public Widget
+    class EZ_UIPLUGIN_DLL ListBox : public Widget
     {
       public:
 

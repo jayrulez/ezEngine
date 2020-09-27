@@ -29,7 +29,8 @@
 
 #include <string>
 #include <stdexcept>
-#include <TGUI/String.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,7 @@ namespace tgui
     #pragma warning(disable:4275)
 #endif
 
-    class TGUI_API Exception : public std::runtime_error {
+    class EZ_UIPLUGIN_DLL Exception : public std::runtime_error {
     public:
         explicit Exception(const String& argument) :
             std::runtime_error(argument.toAnsiString())

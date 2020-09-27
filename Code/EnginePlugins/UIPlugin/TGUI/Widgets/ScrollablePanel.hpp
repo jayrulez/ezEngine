@@ -26,10 +26,11 @@
 #ifndef TGUI_SCROLLABLE_PANEL_HPP
 #define TGUI_SCROLLABLE_PANEL_HPP
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Widgets/Panel.hpp>
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Renderers/ScrollablePanelRenderer.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Panel.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Renderers/ScrollablePanelRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Group of widgets that has a background color and optional borders.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API ScrollablePanel : public Panel
+    class EZ_UIPLUGIN_DLL ScrollablePanel : public Panel
     {
     public:
 

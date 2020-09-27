@@ -27,7 +27,7 @@
 #ifndef TGUI_ANY_HPP
 #define TGUI_ANY_HPP
 
-#include <TGUI/Config.hpp>
+#include <UIPlugin/TGUI/Config.hpp>
 #include <type_traits>
 #include <utility>
 #include <typeinfo>

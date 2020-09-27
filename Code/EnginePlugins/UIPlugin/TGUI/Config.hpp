@@ -30,19 +30,6 @@
 // Detect the platform, to enable platform-specific code
 #if defined(_WIN32)
     #define TGUI_SYSTEM_WINDOWS // Windows
-#elif defined(__APPLE__) && defined(__MACH__)
-    #include "TargetConditionals.h"
-    #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-        #define TGUI_SYSTEM_IOS // iOS
-    #elif TARGET_OS_MAC
-        #define TGUI_SYSTEM_MACOS // macOS
-    #endif
-#elif defined(__unix__)
-    #if defined(__ANDROID__)
-        #define TGUI_SYSTEM_ANDROID // Android
-    #else //if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
-        #define TGUI_SYSTEM_LINUX // Linux or BSD
-    #endif
 #endif
 
 // TGUI will link in the same way as SFML, unless TGUI_DYNAMIC or TGUI_STATIC is defined
@@ -54,28 +41,15 @@
 
 #ifndef TGUI_STATIC
     #ifdef TGUI_SYSTEM_WINDOWS
-        // Windows compilers need specific (and different) keywords for export and import
-        #ifdef TGUI_EXPORTS
-            #define TGUI_API __declspec(dllexport)
-        #else
-            #define TGUI_API __declspec(dllimport)
-        #endif
-
 		// For Visual C++ compilers, we also need to turn off the annoying C4251 warning
         #ifdef _MSC_VER
             #pragma warning(disable: 4251)
         #endif
-    #else
-        #define TGUI_API __attribute__ ((__visibility__ ("default")))
     #endif
-#else
-    // Static build doesn't need import/export macros
-    #define TGUI_API
-    #define TGUI_API
 #endif
 
 // Enables code that uses SFML
-#define TGUI_BUILD_WITH_SFML 1
+#define TGUI_BUILD_WITH_SFML 0
 
 // Define that specifies the mininmum c++ support in both the TGUI code and user code.
 // This constant can be lower than the actual c++ standard version used to compile with,

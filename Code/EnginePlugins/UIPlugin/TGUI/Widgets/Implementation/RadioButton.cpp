@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Widgets/RadioButton.hpp>
-#include <TGUI/Container.hpp>
+#include <UIPlugin/TGUI/Widgets/RadioButton.hpp>
+#include <UIPlugin/TGUI/Container.hpp>
 
 namespace tgui
 {

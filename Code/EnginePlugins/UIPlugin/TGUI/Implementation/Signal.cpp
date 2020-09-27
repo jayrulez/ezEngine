@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Signal.hpp>
-#include <TGUI/Widget.hpp>
-#include <TGUI/Widgets/ChildWindow.hpp>
+#include <UIPlugin/TGUI/Signal.hpp>
+#include <UIPlugin/TGUI/Widget.hpp>
+#include <UIPlugin/TGUI/Widgets/ChildWindow.hpp>
 
 #include <set>
 

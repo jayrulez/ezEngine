@@ -29,8 +29,8 @@
 #ifndef AURORA_MODULE_SMARTPTR_HPP
 #define AURORA_MODULE_SMARTPTR_HPP
 
-#include <TGUI/Aurora/SmartPtr/CopiedPtr.hpp>
-#include <TGUI/Aurora/SmartPtr/MakeUnique.hpp>
-#include <TGUI/Aurora/SmartPtr/ClonersAndDeleters.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/CopiedPtr.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/MakeUnique.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/ClonersAndDeleters.hpp>
 
 #endif // AURORA_MODULE_SMARTPTR_HPP

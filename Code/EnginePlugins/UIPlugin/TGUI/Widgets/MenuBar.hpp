@@ -27,10 +27,11 @@
 #define TGUI_MENU_BAR_HPP
 
 
-#include <TGUI/Widget.hpp>
-#include <TGUI/Renderers/MenuBarRenderer.hpp>
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Widget.hpp>
+#include <UIPlugin/TGUI/Renderers/MenuBarRenderer.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Menu bar widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API MenuBar : public Widget
+    class EZ_UIPLUGIN_DLL MenuBar : public Widget
     {
     public:
 

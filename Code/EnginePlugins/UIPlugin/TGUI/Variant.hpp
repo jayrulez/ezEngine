@@ -29,8 +29,8 @@
 #if TGUI_COMPILED_WITH_CPP_VER >= 17
     #include <variant>
 #else
-    #include <TGUI/Any.hpp>
-    #include <TGUI/Exception.hpp>
+    #include <UIPlugin/TGUI/Any.hpp>
+    #include <UIPlugin/TGUI/Exception.hpp>
 #endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

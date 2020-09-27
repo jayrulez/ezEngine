@@ -27,13 +27,14 @@
 #define TGUI_THEME_LOADER_HPP
 
 
-#include <TGUI/String.hpp>
-#include <TGUI/Loading/DataIO.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPlugin/TGUI/Loading/DataIO.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 #include <map>
 #include <set>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +43,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Base class for theme loader implementations
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API BaseThemeLoader
+    class EZ_UIPLUGIN_DLL BaseThemeLoader
     {
     public:
 
@@ -114,7 +115,7 @@ namespace tgui
     ///
     /// On first access, the entire file will be cached, the next times the cached map is simply returned.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API DefaultThemeLoader : public BaseThemeLoader
+    class EZ_UIPLUGIN_DLL DefaultThemeLoader : public BaseThemeLoader
     {
     public:
 

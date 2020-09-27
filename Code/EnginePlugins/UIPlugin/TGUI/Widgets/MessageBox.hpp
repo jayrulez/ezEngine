@@ -27,10 +27,11 @@
 #define TGUI_MESSAGE_BOX_HPP
 
 
-#include <TGUI/Widgets/Label.hpp>
-#include <TGUI/Widgets/Button.hpp>
-#include <TGUI/Widgets/ChildWindow.hpp>
-#include <TGUI/Renderers/MessageBoxRenderer.hpp>
+#include <UIPlugin/TGUI/Widgets/Label.hpp>
+#include <UIPlugin/TGUI/Widgets/Button.hpp>
+#include <UIPlugin/TGUI/Widgets/ChildWindow.hpp>
+#include <UIPlugin/TGUI/Renderers/MessageBoxRenderer.hpp>
+#include <UIPluginDLL.h>
 
 #undef MessageBox  // windows.h defines MessageBox when NOMB isn't defined before including windows.h
 
@@ -41,7 +42,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Message box widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API MessageBox : public ChildWindow
+    class EZ_UIPLUGIN_DLL MessageBox : public ChildWindow
     {
     public:
 

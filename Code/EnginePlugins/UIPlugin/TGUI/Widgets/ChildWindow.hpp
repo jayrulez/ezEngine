@@ -27,11 +27,12 @@
 #define TGUI_CHILD_WINDOW_HPP
 
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Container.hpp>
-#include <TGUI/Widgets/Button.hpp>
-#include <TGUI/Renderers/ChildWindowRenderer.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Container.hpp>
+#include <UIPlugin/TGUI/Widgets/Button.hpp>
+#include <UIPlugin/TGUI/Renderers/ChildWindowRenderer.hpp>
 #include <limits>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +41,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Child window widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API ChildWindow : public Container
+    class EZ_UIPLUGIN_DLL ChildWindow : public Container
     {
     public:
 

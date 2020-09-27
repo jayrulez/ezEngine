@@ -27,13 +27,14 @@
 #define TGUI_CHILD_WINDOW_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API ChildWindowRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL ChildWindowRenderer : public WidgetRenderer
     {
     public:
 

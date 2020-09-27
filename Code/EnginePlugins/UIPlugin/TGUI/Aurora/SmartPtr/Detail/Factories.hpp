@@ -28,7 +28,7 @@
 #ifndef AURORA_FACTORIES_HPP
 #define AURORA_FACTORIES_HPP
 
-#include <TGUI/Aurora/Meta/Preprocessor.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Preprocessor.hpp>
 
 
 #define AURORA_DETAIL_TYPENAME(n) typename A ## n

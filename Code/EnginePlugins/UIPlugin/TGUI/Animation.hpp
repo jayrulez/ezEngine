@@ -26,10 +26,11 @@
 #ifndef TGUI_ANIMATION_HPP
 #define TGUI_ANIMATION_HPP
 
-#include <TGUI/Vector2.hpp>
-#include <TGUI/Duration.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Duration.hpp>
 #include <functional>
 #include <memory>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +60,7 @@ namespace tgui
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        class TGUI_API Animation
+        class EZ_UIPLUGIN_DLL Animation
         {
         public:
             enum class Type
@@ -98,7 +99,7 @@ namespace tgui
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        class TGUI_API MoveAnimation : public Animation
+        class EZ_UIPLUGIN_DLL MoveAnimation : public Animation
         {
         public:
             MoveAnimation(std::shared_ptr<Widget> widget, Vector2f start, Vector2f end, Duration duration, std::function<void()> finishedCallback = nullptr);
@@ -114,7 +115,7 @@ namespace tgui
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        class TGUI_API ResizeAnimation : public Animation
+        class EZ_UIPLUGIN_DLL ResizeAnimation : public Animation
         {
         public:
             ResizeAnimation(std::shared_ptr<Widget> widget, Vector2f start, Vector2f end, Duration duration, std::function<void()> finishedCallback = nullptr);
@@ -130,7 +131,7 @@ namespace tgui
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        class TGUI_API FadeAnimation : public Animation
+        class EZ_UIPLUGIN_DLL FadeAnimation : public Animation
         {
         public:
             FadeAnimation(std::shared_ptr<Widget> widget, float start, float end, Duration duration, std::function<void()> finishedCallback = nullptr);

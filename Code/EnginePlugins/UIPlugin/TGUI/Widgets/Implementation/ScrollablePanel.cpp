@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Widgets/ScrollablePanel.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/Keyboard.hpp>
+#include <UIPlugin/TGUI/Widgets/ScrollablePanel.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Keyboard.hpp>
 
 #include <cmath>
 

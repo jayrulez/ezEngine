@@ -26,10 +26,11 @@
 #ifndef TGUI_TREE_VIEW_HPP
 #define TGUI_TREE_VIEW_HPP
 
-#include <TGUI/CopiedSharedPtr.hpp>
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Renderers/TreeViewRenderer.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Renderers/TreeViewRenderer.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Tree view widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API TreeView : public Widget
+    class EZ_UIPLUGIN_DLL TreeView : public Widget
     {
     public:
 

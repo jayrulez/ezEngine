@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Widgets/Scrollbar.hpp>
-#include <TGUI/Widgets/TextArea.hpp>
-#include <TGUI/Keyboard.hpp>
+#include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
+#include <UIPlugin/TGUI/Widgets/TextArea.hpp>
+#include <UIPlugin/TGUI/Keyboard.hpp>
 
 #include <cmath>
 

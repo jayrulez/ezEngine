@@ -29,9 +29,9 @@
 #ifndef AURORA_MODULE_META_HPP
 #define AURORA_MODULE_META_HPP
 
-#include <TGUI/Aurora/Meta/Preprocessor.hpp>
-#include <TGUI/Aurora/Meta/Templates.hpp>
-#include <TGUI/Aurora/Meta/Tuple.hpp>
-#include <TGUI/Aurora/Meta/Variadic.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Preprocessor.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Templates.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Tuple.hpp>
+#include <UIPlugin/TGUI/Aurora/Meta/Variadic.hpp>
 
 #endif // AURORA_MODULE_META_HPP

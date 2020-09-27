@@ -23,13 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Container.hpp>
-#include <TGUI/ToolTip.hpp>
-#include <TGUI/GuiBase.hpp>
-#include <TGUI/Widgets/RadioButton.hpp>
-#include <TGUI/SubwidgetContainer.hpp>
-#include <TGUI/Loading/WidgetFactory.hpp>
-#include <TGUI/Filesystem.hpp>
+#include <UIPlugin/TGUI/Container.hpp>
+#include <UIPlugin/TGUI/ToolTip.hpp>
+#include <UIPlugin/TGUI/GuiBase.hpp>
+#include <UIPlugin/TGUI/Widgets/RadioButton.hpp>
+#include <UIPlugin/TGUI/SubwidgetContainer.hpp>
+#include <UIPlugin/TGUI/Loading/WidgetFactory.hpp>
+#include <UIPlugin/TGUI/Filesystem.hpp>
 
 #include <fstream>
 

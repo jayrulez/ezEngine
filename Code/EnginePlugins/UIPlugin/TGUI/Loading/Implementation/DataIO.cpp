@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Loading/DataIO.hpp>
-#include <TGUI/Global.hpp>
-#include <TGUI/String.hpp>
+#include <UIPlugin/TGUI/Loading/DataIO.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
+#include <UIPlugin/TGUI/String.hpp>
 
 #include <cctype>
 #include <algorithm>

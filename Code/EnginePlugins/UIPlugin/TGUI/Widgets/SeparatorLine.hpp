@@ -26,8 +26,9 @@
 #ifndef TGUI_SEPARATOR_LINE_HPP
 #define TGUI_SEPARATOR_LINE_HPP
 
-#include <TGUI/Widgets/ClickableWidget.hpp>
-#include <TGUI/Renderers/SeparatorLineRenderer.hpp>
+#include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
+#include <UIPlugin/TGUI/Renderers/SeparatorLineRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +45,7 @@ namespace tgui
     /// separator->setSize("90%", 2);
     /// @endcode
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SeparatorLine : public ClickableWidget
+    class EZ_UIPLUGIN_DLL SeparatorLine : public ClickableWidget
     {
     public:
 

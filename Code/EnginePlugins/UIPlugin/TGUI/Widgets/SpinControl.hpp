@@ -27,9 +27,10 @@
 #define TGUI_SPIN_CONTROL_HPP
 
 
-#include <TGUI/SubwidgetContainer.hpp>
-#include <TGUI/Widgets/SpinButton.hpp>
-#include <TGUI/Widgets/EditBox.hpp>
+#include <UIPlugin/TGUI/SubwidgetContainer.hpp>
+#include <UIPlugin/TGUI/Widgets/SpinButton.hpp>
+#include <UIPlugin/TGUI/Widgets/EditBox.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Spin control widget
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SpinControl : public SubwidgetContainer
+    class EZ_UIPLUGIN_DLL SpinControl : public SubwidgetContainer
     {
     public:
 

@@ -22,11 +22,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/GuiBase.hpp>
-#include <TGUI/Backend.hpp>
-#include <TGUI/ToolTip.hpp>
-#include <TGUI/Timer.hpp>
-#include <TGUI/BackendRenderTarget.hpp>
+#include <UIPlugin/TGUI/GuiBase.hpp>
+#include <UIPlugin/TGUI/Backend.hpp>
+#include <UIPlugin/TGUI/ToolTip.hpp>
+#include <UIPlugin/TGUI/Timer.hpp>
+#include <UIPlugin/TGUI/BackendRenderTarget.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -27,13 +27,14 @@
 #define TGUI_COMBO_BOX_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API ComboBoxRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL ComboBoxRenderer : public WidgetRenderer
     {
     public:
 

@@ -29,11 +29,11 @@
 #ifndef AURORA_COPIEDPTR_HPP
 #define AURORA_COPIEDPTR_HPP
 
-#include <TGUI/Aurora/SmartPtr/ClonersAndDeleters.hpp>
-#include <TGUI/Aurora/SmartPtr/Detail/PtrOwner.hpp>
-#include <TGUI/Aurora/Tools/SafeBool.hpp>
-#include <TGUI/Aurora/Tools/Swap.hpp>
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/ClonersAndDeleters.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/Detail/PtrOwner.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/SafeBool.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Swap.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -341,7 +341,7 @@ CopiedPtr<T> makeCopied(Args&&... args)
 // Unoptimized fallback for compilers that don't support variadic templates, emulated by preprocessor metaprogramming
 #else  // AURORA_HAS_VARIADIC_TEMPLATES
 
-#include <TGUI/Aurora/SmartPtr/Detail/Factories.hpp>
+#include <UIPlugin/TGUI/Aurora/SmartPtr/Detail/Factories.hpp>
 
 // Define metafunction to generate overloads for aurora::CopiedPtr
 #define AURORA_DETAIL_COPIEDPTR_FACTORY(n) AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, n)

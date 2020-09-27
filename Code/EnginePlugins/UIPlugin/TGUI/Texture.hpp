@@ -28,23 +28,19 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/TextureData.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/String.hpp>
-#include <TGUI/Color.hpp>
-#include <TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/TextureData.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPlugin/TGUI/Color.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
 #include <functional>
-
-#if TGUI_BUILD_WITH_SFML
-    #include <SFML/Graphics/Texture.hpp>
-    #include <SFML/Graphics/Shader.hpp>
-#endif
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API Texture
+    class EZ_UIPLUGIN_DLL Texture
     {
     public:
 
@@ -94,23 +90,6 @@ namespace tgui
                 const UIntRect& middlePart = UIntRect(0, 0, 0, 0),
                 bool smooth = true);
 
-#if TGUI_BUILD_WITH_SFML
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Constructor that created the texture from an existing sf::Texture
-        ///
-        /// @param texture    Existing texture to copy
-        /// @param partRect   Load only part of the image. Pass an empty rectangle if you want to load the full image
-        /// @param middlePart Choose the middle part of the image for 9-slice scaling (relative to the part defined by partRect)
-        ///
-        /// The texture will be copied, you do not have to keep the sf::Texture alive after calling this function.
-        ///
-        /// This constructor just calls the corresponding load function.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        Texture(const sf::Texture& texture,
-                const UIntRect& partRect = UIntRect(0, 0, 0, 0),
-                const UIntRect& middlePart = UIntRect(0, 0, 0, 0));
-#endif
-
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Copy constructor
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,22 +129,6 @@ namespace tgui
                   const UIntRect& partRect = {},
                   const UIntRect& middleRect = {},
                   bool smooth = true);
-
-#if TGUI_BUILD_WITH_SFML
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Creates the texture from an existing sf::Texture
-        ///
-        /// @param texture    Existing texture to copy
-        /// @param partRect   Load only part of the texture. Don't pass this parameter if you want to load the full image
-        /// @param middleRect Choose the middle part of the image for 9-slice scaling (relative to the part defined by partRect)
-        ///
-        /// The texture will be copied, you do not have to keep the sf::Texture alive after calling this function.
-        ///
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        void load(const sf::Texture& texture,
-                  const UIntRect& partRect = {},
-                  const UIntRect& middleRect = {});
-#endif
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Returns the id that was used to load the texture (for the default loader, the id is the filename)
@@ -235,21 +198,6 @@ namespace tgui
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         const Color& getColor() const;
-
-#if TGUI_BUILD_WITH_SFML
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Sets the shader used to draw the texture
-        /// @param shader  New shader to use
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        void setShader(sf::Shader* shader);
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Returns the shader used to draw the texture
-        /// @return Shader currently being use to draw the texture
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        sf::Shader* getShader() const;
-#endif
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Returns the middle rect of the texture which is used for 9-slice scaling
@@ -367,10 +315,6 @@ namespace tgui
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private:
-
-#if TGUI_BUILD_WITH_SFML
-        sf::Shader* m_shader = nullptr;
-#endif
 
         std::shared_ptr<TextureData> m_data = nullptr;
         Color m_color = Color::White;

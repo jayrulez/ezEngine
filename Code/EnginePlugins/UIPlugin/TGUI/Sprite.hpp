@@ -26,17 +26,14 @@
 #ifndef TGUI_SPRITE_HPP
 #define TGUI_SPRITE_HPP
 
-#include <TGUI/Texture.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/Rect.hpp>
-#include <TGUI/Color.hpp>
-#include <TGUI/RenderStates.hpp>
+#include <UIPlugin/TGUI/Texture.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Rect.hpp>
+#include <UIPlugin/TGUI/Color.hpp>
+#include <UIPlugin/TGUI/RenderStates.hpp>
 #include <vector>
 #include <memory>
-
-#if TGUI_BUILD_WITH_SFML
-    #include <SFML/Graphics/Shader.hpp>
-#endif
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -45,7 +42,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /// @internal
-    class TGUI_API Sprite
+    class EZ_UIPLUGIN_DLL Sprite
     {
     public:
 
@@ -281,10 +278,6 @@ namespace tgui
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private:
-
-#if TGUI_BUILD_WITH_SFML
-        sf::Shader* m_shader = nullptr;
-#endif
         Vector2f    m_size;
         Texture     m_texture;
         std::shared_ptr<BackendTextureBase> m_svgTexture;

@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/SvgImage.hpp>
-#include <TGUI/BackendTexture.hpp>
+#include <UIPlugin/TGUI/SvgImage.hpp>
+#include <UIPlugin/TGUI/BackendTexture.hpp>
 
 #define NANOSVG_IMPLEMENTATION
 #include "TGUI/extlibs/nanosvg/nanosvg.h"

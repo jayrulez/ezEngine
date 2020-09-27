@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Text.hpp>
-#include <TGUI/Backend.hpp>
-#include <TGUI/BackendText.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Backend.hpp>
+#include <UIPlugin/TGUI/BackendText.hpp>
 #include <algorithm>
 #include <vector>
 #include <cmath>

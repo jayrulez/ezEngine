@@ -26,12 +26,13 @@
 #ifndef TGUI_FILESYSTEM_HPP
 #define TGUI_FILESYSTEM_HPP
 
-#include <TGUI/String.hpp>
+#include <UIPlugin/TGUI/String.hpp>
 #include <vector>
 
 #ifdef TGUI_USE_STD_FILESYSTEM
     #include <filesystem>
 #endif
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,14 +44,14 @@ namespace tgui
     /// When TGUI is built with c++17 support then std::filesystem is used on newer compilers.
     /// Otherwise, POSIX or Windows-specific code is used to implement the functionality.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Filesystem
+    class EZ_UIPLUGIN_DLL Filesystem
     {
     public:
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Object to represent paths on a filesystem
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        class TGUI_API Path
+        class EZ_UIPLUGIN_DLL Path
         {
         public:
 

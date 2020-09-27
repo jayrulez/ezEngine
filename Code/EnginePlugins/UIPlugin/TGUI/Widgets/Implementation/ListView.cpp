@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Widgets/ListView.hpp>
-#include <TGUI/Keyboard.hpp>
+#include <UIPlugin/TGUI/Widgets/ListView.hpp>
+#include <UIPlugin/TGUI/Keyboard.hpp>
 #include <cmath>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2241,7 +2241,7 @@ namespace tgui
         unsigned int maxWidth = 0;
 
         if (!m_headerVisible || m_columns.empty())
-            maxWidth = m_maxItemWidth;
+            maxWidth = (unsigned int)m_maxItemWidth;
         else
         {
             float columnsWidth = 0;

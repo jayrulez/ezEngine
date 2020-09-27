@@ -29,9 +29,9 @@
 #ifndef AURORA_OPTIONAL_HPP
 #define AURORA_OPTIONAL_HPP
 
-#include <TGUI/Aurora/Config.hpp>
-#include <TGUI/Aurora/Tools/SafeBool.hpp>
-#include <TGUI/Aurora/Tools/Swap.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/SafeBool.hpp>
+#include <UIPlugin/TGUI/Aurora/Tools/Swap.hpp>
 
 #include <type_traits> // std::aligned_storage
 #include <cassert>

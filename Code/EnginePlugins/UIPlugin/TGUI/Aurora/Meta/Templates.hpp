@@ -29,7 +29,7 @@
 #ifndef AURORA_TEMPLATES_HPP
 #define AURORA_TEMPLATES_HPP
 
-#include <TGUI/Aurora/Config.hpp>
+#include <UIPlugin/TGUI/Aurora/Config.hpp>
 
 #include <type_traits>
 

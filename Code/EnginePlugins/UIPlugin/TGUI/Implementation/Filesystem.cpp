@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Filesystem.hpp>
+#include <UIPlugin/TGUI/Filesystem.hpp>
 #include <cstdlib> // getenv
 #if !defined(TGUI_SYSTEM_WINDOWS)
     #include <unistd.h> // getuid
@@ -32,7 +32,7 @@
 
 #if !defined(TGUI_USE_STD_FILESYSTEM)
     #if defined(TGUI_SYSTEM_WINDOWS)
-        #include <TGUI/WindowsInclude.hpp>
+        #include <UIPlugin/TGUI/WindowsInclude.hpp>
     #else
         #include <sys/types.h>
         #include <sys/stat.h>

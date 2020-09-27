@@ -26,14 +26,15 @@
 #ifndef TGUI_VERTEX_HPP
 #define TGUI_VERTEX_HPP
 
-#include <TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
 #include <cstdint>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    struct TGUI_API Vertex
+    struct EZ_UIPLUGIN_DLL Vertex
     {
         struct Color
         {

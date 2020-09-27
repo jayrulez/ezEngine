@@ -26,9 +26,10 @@
 #ifndef TGUI_ABSOLUTE_OR_RELATIVE_VALUE_HPP
 #define TGUI_ABSOLUTE_OR_RELATIVE_VALUE_HPP
 
-#include <TGUI/Global.hpp>
-#include <TGUI/String.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
+#include <UIPlugin/TGUI/String.hpp>
 #include <type_traits>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +40,7 @@ namespace tgui
     ///
     /// You don't have to explicitly create an instance of this class, numbers and strings are implicitly cast.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API AbsoluteOrRelativeValue
+    class EZ_UIPLUGIN_DLL AbsoluteOrRelativeValue
     {
     public:
 
@@ -173,7 +174,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Helper class to create an AbsoluteOrRelativeValue object containing a relative value without using a string
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    struct TGUI_API RelativeValue : AbsoluteOrRelativeValue
+    struct EZ_UIPLUGIN_DLL RelativeValue : AbsoluteOrRelativeValue
     {
         explicit TGUI_CONSTEXPR RelativeValue(float ratio)
         {

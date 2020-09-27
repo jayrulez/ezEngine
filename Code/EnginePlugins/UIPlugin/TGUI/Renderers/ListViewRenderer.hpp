@@ -27,13 +27,14 @@
 #define TGUI_LIST_VIEW_RENDERER_HPP
 
 
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API ListViewRenderer : public WidgetRenderer
+    class EZ_UIPLUGIN_DLL ListViewRenderer : public WidgetRenderer
     {
     public:
 

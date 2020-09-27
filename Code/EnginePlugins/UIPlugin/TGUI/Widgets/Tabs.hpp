@@ -27,9 +27,10 @@
 #define TGUI_TAB_HPP
 
 
-#include <TGUI/Widget.hpp>
-#include <TGUI/Renderers/TabsRenderer.hpp>
-#include <TGUI/Text.hpp>
+#include <UIPlugin/TGUI/Widget.hpp>
+#include <UIPlugin/TGUI/Renderers/TabsRenderer.hpp>
+#include <UIPlugin/TGUI/Text.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,7 @@ namespace tgui
     /// If you are looking for something that allow holds multiple panels,
     /// displayed one panel at a time then check out the TabContainer class.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Tabs : public Widget
+    class EZ_UIPLUGIN_DLL Tabs : public Widget
     {
     public:
 

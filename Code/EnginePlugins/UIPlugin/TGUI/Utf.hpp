@@ -26,7 +26,7 @@
 #ifndef TGUI_UTF_HPP
 #define TGUI_UTF_HPP
 
-#include <TGUI/Config.hpp>
+#include <UIPlugin/TGUI/Config.hpp>
 #include <string>
 #include <array>
 

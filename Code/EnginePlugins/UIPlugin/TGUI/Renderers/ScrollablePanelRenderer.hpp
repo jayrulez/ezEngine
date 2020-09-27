@@ -27,13 +27,14 @@
 #define TGUI_SCROLLABLE_PANEL_RENDERER_HPP
 
 
-#include <TGUI/Renderers/PanelRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/PanelRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API ScrollablePanelRenderer : public PanelRenderer
+    class EZ_UIPLUGIN_DLL ScrollablePanelRenderer : public PanelRenderer
     {
     public:
 

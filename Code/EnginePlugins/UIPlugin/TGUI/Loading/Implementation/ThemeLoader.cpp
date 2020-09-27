@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#include <TGUI/Loading/ThemeLoader.hpp>
-#include <TGUI/Loading/Deserializer.hpp>
-#include <TGUI/Global.hpp>
+#include <UIPlugin/TGUI/Loading/ThemeLoader.hpp>
+#include <UIPlugin/TGUI/Loading/Deserializer.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
 
 #include <sstream>
 #include <fstream>

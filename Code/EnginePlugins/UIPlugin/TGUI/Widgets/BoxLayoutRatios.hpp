@@ -26,7 +26,8 @@
 #ifndef TGUI_BOX_LAYOUT_RATIOS_HPP
 #define TGUI_BOX_LAYOUT_RATIOS_HPP
 
-#include <TGUI/Widgets/BoxLayout.hpp>
+#include <UIPlugin/TGUI/Widgets/BoxLayout.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +37,7 @@ namespace tgui
     /// @brief Abstract class for box layout containers
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API BoxLayoutRatios : public BoxLayout
+    class EZ_UIPLUGIN_DLL BoxLayoutRatios : public BoxLayout
     {
     public:
 

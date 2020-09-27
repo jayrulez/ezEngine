@@ -27,13 +27,14 @@
 #define TGUI_BOX_LAYOUT_RENDERER_HPP
 
 
-#include <TGUI/Renderers/GroupRenderer.hpp>
+#include <UIPlugin/TGUI/Renderers/GroupRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
 {
-    class TGUI_API BoxLayoutRenderer : public GroupRenderer
+    class EZ_UIPLUGIN_DLL BoxLayoutRenderer : public GroupRenderer
     {
     public:
 

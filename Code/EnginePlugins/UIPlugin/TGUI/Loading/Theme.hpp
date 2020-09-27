@@ -26,8 +26,9 @@
 #ifndef TGUI_THEME_HPP
 #define TGUI_THEME_HPP
 
-#include <TGUI/Loading/ThemeLoader.hpp>
-#include <TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPlugin/TGUI/Loading/ThemeLoader.hpp>
+#include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +38,7 @@ namespace tgui
     /// @brief This class can be used to manage the widget renderers
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Theme
+    class EZ_UIPLUGIN_DLL Theme
     {
     public:
 

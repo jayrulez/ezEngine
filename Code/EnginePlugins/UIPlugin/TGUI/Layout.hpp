@@ -26,12 +26,13 @@
 #ifndef TGUI_LAYOUT_HPP
 #define TGUI_LAYOUT_HPP
 
-#include <TGUI/Config.hpp>
-#include <TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Config.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
 #include <type_traits>
 #include <functional>
 #include <memory>
 #include <string>
+#include <UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +47,7 @@ namespace tgui
     ///
     /// You don't have to create an instance of this class, numbers are implicitly cast to this class.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Layout
+    class EZ_UIPLUGIN_DLL Layout
     {
     public:
 
@@ -256,7 +257,7 @@ namespace tgui
     ///
     /// You don't have to explicitly create an instance of this class, sf::Vector2f and tgui::Vector2f are implicitly converted.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Layout2d
+    class EZ_UIPLUGIN_DLL Layout2d
     {
     public:
 
@@ -346,57 +347,57 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Unary minus operator for the Layout class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout operator-(Layout right);
+    EZ_UIPLUGIN_DLL Layout operator-(Layout right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief + operator for the Layout class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout operator+(Layout left, Layout right);
+    EZ_UIPLUGIN_DLL Layout operator+(Layout left, Layout right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief - operator for the Layout class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout operator-(Layout left, Layout right);
+    EZ_UIPLUGIN_DLL Layout operator-(Layout left, Layout right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief * operator for the Layout class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout operator*(Layout left, Layout right);
+    EZ_UIPLUGIN_DLL Layout operator*(Layout left, Layout right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief / operator for the Layout class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout operator/(Layout left, Layout right);
+    EZ_UIPLUGIN_DLL Layout operator/(Layout left, Layout right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Unary minus operator for the Layout2d class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout2d operator-(Layout2d right);
+    EZ_UIPLUGIN_DLL Layout2d operator-(Layout2d right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief + operator for the Layout2d class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout2d operator+(Layout2d left, Layout2d right);
+    EZ_UIPLUGIN_DLL Layout2d operator+(Layout2d left, Layout2d right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief - operator for the Layout2d class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout2d operator-(Layout2d left, Layout2d right);
+    EZ_UIPLUGIN_DLL Layout2d operator-(Layout2d left, Layout2d right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief * operator for the Layout2d class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout2d operator*(Layout2d left, const Layout& right);
+    EZ_UIPLUGIN_DLL Layout2d operator*(Layout2d left, const Layout& right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief * operator for the Layout2d class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout2d operator*(const Layout& left, Layout2d right);
+    EZ_UIPLUGIN_DLL Layout2d operator*(const Layout& left, Layout2d right);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief / operator for the Layout2d class
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API Layout2d operator/(Layout2d left, const Layout& right);
+    EZ_UIPLUGIN_DLL Layout2d operator/(Layout2d left, const Layout& right);
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -404,52 +405,52 @@ namespace tgui
     inline namespace bind_functions
     {
         /// @brief Bind to the x position of the widget
-        TGUI_API Layout bindLeft(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout bindLeft(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the y position of the widget
-        TGUI_API Layout bindTop(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout bindTop(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the width of the widget
-        TGUI_API Layout bindWidth(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout bindWidth(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the height of the widget
-        TGUI_API Layout bindHeight(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout bindHeight(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the inner width of the container widget
-        TGUI_API Layout bindInnerWidth(std::shared_ptr<Container> container);
+        EZ_UIPLUGIN_DLL Layout bindInnerWidth(std::shared_ptr<Container> container);
 
         /// @brief Bind to the inner height of the container widget
-        TGUI_API Layout bindInnerHeight(std::shared_ptr<Container> container);
+        EZ_UIPLUGIN_DLL Layout bindInnerHeight(std::shared_ptr<Container> container);
 
         /// @brief Bind to the right position of the widget
-        TGUI_API Layout bindRight(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout bindRight(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the bottom of the widget
-        TGUI_API Layout bindBottom(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout bindBottom(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the position of the widget
-        TGUI_API Layout2d bindPosition(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout2d bindPosition(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the size of the widget
-        TGUI_API Layout2d bindSize(std::shared_ptr<Widget> widget);
+        EZ_UIPLUGIN_DLL Layout2d bindSize(std::shared_ptr<Widget> widget);
 
         /// @brief Bind to the inner size of the container widget
-        TGUI_API Layout2d bindInnerSize(std::shared_ptr<Container> container);
+        EZ_UIPLUGIN_DLL Layout2d bindInnerSize(std::shared_ptr<Container> container);
 
         /// @brief Bind to the width of the gui view
-        TGUI_API Layout bindWidth(GuiBase& gui);
+        EZ_UIPLUGIN_DLL Layout bindWidth(GuiBase& gui);
 
         /// @brief Bind to the height of the gui view
-        TGUI_API Layout bindHeight(GuiBase& gui);
+        EZ_UIPLUGIN_DLL Layout bindHeight(GuiBase& gui);
 
         /// @brief Bind to the size of the gui view
-        TGUI_API Layout2d bindSize(GuiBase& gui);
+        EZ_UIPLUGIN_DLL Layout2d bindSize(GuiBase& gui);
 
         /// @brief Bind to the minimum value of two layouts
-        TGUI_API Layout bindMin(const Layout& value1, const Layout& value2);
+        EZ_UIPLUGIN_DLL Layout bindMin(const Layout& value1, const Layout& value2);
 
         /// @brief Bind to the maximum value of two layouts
-        TGUI_API Layout bindMax(const Layout& value1, const Layout& value2);
+        EZ_UIPLUGIN_DLL Layout bindMax(const Layout& value1, const Layout& value2);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

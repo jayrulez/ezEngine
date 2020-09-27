@@ -28,11 +28,11 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <TGUI/Global.hpp>
-#include <TGUI/String.hpp>
-#include <TGUI/Color.hpp>
-#include <TGUI/Vector2.hpp>
-#include <TGUI/Animation.hpp>
+#include <UIPlugin/TGUI/Global.hpp>
+#include <UIPlugin/TGUI/String.hpp>
+#include <UIPlugin/TGUI/Color.hpp>
+#include <UIPlugin/TGUI/Vector2.hpp>
+#include <UIPlugin/TGUI/Animation.hpp>
 #include <type_traits>
 #include <functional>
 #include <typeindex>
@@ -40,6 +40,7 @@
 #include <vector>
 #include <deque>
 #include <map>
+#include <UIPluginDLL.h>
 
 #undef MessageBox  // windows.h defines MessageBox when NOMB isn't defined before including windows.h
 
@@ -53,7 +54,7 @@ namespace tgui
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief Signal to which the user can subscribe to get callbacks from
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API Signal
+    class EZ_UIPLUGIN_DLL Signal
     {
     public:
 
@@ -461,7 +462,7 @@ namespace tgui
     /// Optional unbound parameters:
     /// - ChildWindow::Ptr
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SignalChildWindow : public Signal
+    class EZ_UIPLUGIN_DLL SignalChildWindow : public Signal
     {
     public:
 
@@ -550,7 +551,7 @@ namespace tgui
     /// - String (item text)
     /// - String, String (item text and item id)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SignalItem : public Signal
+    class EZ_UIPLUGIN_DLL SignalItem : public Signal
     {
     public:
 
@@ -663,7 +664,7 @@ namespace tgui
     /// - bool (true for showing and false for hiding)
     /// - ShowAnimationType, bool
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SignalAnimation : public Signal
+    class EZ_UIPLUGIN_DLL SignalAnimation : public Signal
     {
     public:
 
@@ -774,7 +775,7 @@ namespace tgui
     /// - String (text of the leaf)
     /// - std::vector<String> (texts of hierarchy from root to leaf)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class TGUI_API SignalItemHierarchy : public Signal
+    class EZ_UIPLUGIN_DLL SignalItemHierarchy : public Signal
     {
     public:
 
