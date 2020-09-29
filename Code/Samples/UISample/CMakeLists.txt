@@ -11,12 +11,12 @@ ez_link_target_dx11(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
-  RendererCore
+  GameEngine
   RendererDX11
-  System
+  UIPlugin
 )
 
 add_dependencies(${PROJECT_NAME}
   InspectorPlugin
-  UIPlugin
+  ShaderCompilerHLSL
 )

@@ -31,7 +31,7 @@
 #include <UIPlugin/TGUI/Widgets/Button.hpp>
 #include <UIPlugin/TGUI/Widgets/ChildWindow.hpp>
 #include <UIPlugin/TGUI/Renderers/MessageBoxRenderer.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 #undef MessageBox  // windows.h defines MessageBox when NOMB isn't defined before including windows.h
 

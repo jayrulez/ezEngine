@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/Config.hpp>
 #include <UIPlugin/TGUI/ObjectConverter.hpp>
 #include <UIPlugin/TGUI/Loading/DataIO.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

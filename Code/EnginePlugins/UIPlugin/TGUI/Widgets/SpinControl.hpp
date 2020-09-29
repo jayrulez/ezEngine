@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/SubwidgetContainer.hpp>
 #include <UIPlugin/TGUI/Widgets/SpinButton.hpp>
 #include <UIPlugin/TGUI/Widgets/EditBox.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

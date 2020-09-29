@@ -31,7 +31,7 @@
 #include <UIPlugin/TGUI/Vector2.hpp>
 #include <UIPlugin/TGUI/TextStyle.hpp>
 #include <UIPlugin/TGUI/RenderStates.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

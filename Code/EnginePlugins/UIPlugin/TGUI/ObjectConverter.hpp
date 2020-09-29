@@ -33,7 +33,7 @@
 #include <UIPlugin/TGUI/Texture.hpp>
 #include <UIPlugin/TGUI/Color.hpp>
 #include <UIPlugin/TGUI/Font.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

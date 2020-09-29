@@ -31,6 +31,7 @@
 #include <RendererFoundation/Device/SwapChain.h>
 #include <System/Window/Window.h>
 #include <Texture/Image/ImageConversion.h>
+#include <UIPlugin/UISystem.h>
 
 class UISampleWindow : public ezWindow
 {
@@ -165,8 +166,47 @@ public:
       m_hDepthStencilState = m_pDevice->CreateDepthStencilState(DepthStencilStateDesc);
       EZ_ASSERT_DEV(!m_hDepthStencilState.IsInvalidated(), "Couldn't create depth-stencil state!");
     }
+
+    SetupUI();
   }
 
+  static void Login(tgui::EditBox::Ptr username, tgui::EditBox::Ptr password)
+  {
+    ezLog::Debug("Username: {}", username->getText().c_str());
+    ezLog::Debug("Password: {}", password->getText().c_str());
+  }
+
+  void SetupUI()
+  {
+    std::shared_ptr<tgui::Gui> gui = ezUISystem::GetSingleton()->GetGui();
+
+    // Create the username edit box
+    // We set a relative position and size
+    // In case it isn't obvious, the default text is the text that is displayed when the edit box is empty
+    auto editBoxUsername = tgui::EditBox::create();
+    editBoxUsername->setSize({"66.67%", "12.5%"});
+    editBoxUsername->setPosition({"16.67%", "16.67%"});
+    editBoxUsername->setDefaultText("Username");
+    gui->add(editBoxUsername);
+
+    // Create the password edit box
+    // We copy the previous edit box here and keep the same size
+    auto editBoxPassword = tgui::EditBox::copy(editBoxUsername);
+    editBoxPassword->setPosition({"16.67%", "41.6%"});
+    editBoxPassword->setPasswordCharacter('*');
+    editBoxPassword->setDefaultText("Password");
+    gui->add(editBoxPassword);
+
+    // Create the login button
+    auto button = tgui::Button::create("Login");
+    button->setSize({"50%", "16.67%"});
+    button->setPosition({"25%", "70%"});
+    gui->add(button);
+
+    // Call the login function when the button is pressed and pass the edit boxes that we created as parameters
+    // The "&" in front of "login" can be removed on newer compilers, but is kept here for compatibility with GCC < 8.
+    button->onPress(&UISample::Login, editBoxUsername, editBoxPassword);
+  }
 
   ApplicationExecution Run() override
   {

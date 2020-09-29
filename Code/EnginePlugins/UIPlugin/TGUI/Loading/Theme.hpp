@@ -28,7 +28,7 @@
 
 #include <UIPlugin/TGUI/Loading/ThemeLoader.hpp>
 #include <UIPlugin/TGUI/Renderers/WidgetRenderer.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

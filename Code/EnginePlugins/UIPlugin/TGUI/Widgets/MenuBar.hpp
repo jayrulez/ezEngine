@@ -31,7 +31,7 @@
 #include <UIPlugin/TGUI/Renderers/MenuBarRenderer.hpp>
 #include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

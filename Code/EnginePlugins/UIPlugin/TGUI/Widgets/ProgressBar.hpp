@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/Renderers/ProgressBarRenderer.hpp>
 #include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

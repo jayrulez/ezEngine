@@ -32,7 +32,7 @@
 #include <UIPlugin/TGUI/Text.hpp>
 #include <UIPlugin/TGUI/Outline.hpp>
 #include <UIPlugin/TGUI/RenderStates.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

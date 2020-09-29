@@ -29,7 +29,7 @@
 #include <UIPlugin/TGUI/Config.hpp>
 #include <UIPlugin/TGUI/Vector2.hpp>
 #include <UIPlugin/TGUI/Duration.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

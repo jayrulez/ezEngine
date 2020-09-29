@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/Widget.hpp>
 #include <UIPlugin/TGUI/Renderers/TabsRenderer.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

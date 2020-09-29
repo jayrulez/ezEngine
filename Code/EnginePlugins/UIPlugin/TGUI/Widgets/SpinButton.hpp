@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/Renderers/SpinButtonRenderer.hpp>
 #include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
 #include <UIPlugin/TGUI/Timer.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

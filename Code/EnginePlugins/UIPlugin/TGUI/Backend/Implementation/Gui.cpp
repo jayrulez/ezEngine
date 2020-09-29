@@ -30,8 +30,7 @@
 #include <UIPlugin/TGUI/Backend/Backend.hpp>
 #include <UIPlugin/TGUI/Backend/BackendRenderTarget.hpp>
 
-#include <UIPlugin/TGUI/Event.hpp>
-
+#include <RendererCore/RenderWorld/RenderWorld.h>
 #include <thread>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +38,10 @@
 namespace tgui
 {
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  static bool ConvertEventDataToEvent(const ezInputManager::InputEventData& eventData, Event& event)
+  {
+    return false;
+  }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   Gui::Gui()
@@ -49,33 +51,46 @@ namespace tgui
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  Gui::Gui(ezWindowBase* window)
+  Gui::Gui(ezView* view)
   {
     init();
-    setWindow(window);
+    setView(view);
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  void Gui::setWindow(ezWindowBase* window)
+  void Gui::setView(ezView* view)
   {
+    std::shared_ptr<Backend> backend = std::dynamic_pointer_cast<Backend>(getBackend());
+    m_renderTarget = backend->createGuiRenderTarget(this, view);
+
+    updateContainerSize();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   bool Gui::handleEvent(const ezInputManager::InputEventData& eventData)
   {
+
+    if (eventData.m_EventType != ezInputManager::InputEventData::InputSlotChanged)
+      return false;
+
     Event event;
-    event.type = Event::Type::MouseButtonPressed;
-    event.mouseButton = {Event::MouseButton::Left, 0, 0};
+    if (!ConvertEventDataToEvent(eventData, event))
+      return false;
 
     return handleEvent(event);
   }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   void Gui::draw()
   {
+    if (m_drawUpdatesTime)
+      updateTime();
+
+    EZ_ASSERT_ALWAYS(m_renderTarget != nullptr, "Gui must be given an ezView (either at construction or via setView function) before calling draw()");
+    m_renderTarget->drawGui(m_container);
   }
 
   void Gui::init()
@@ -93,6 +108,15 @@ namespace tgui
 
   void Gui::updateContainerSize()
   {
+    EZ_ASSERT_ALWAYS(m_renderTarget != nullptr, "Gui must be given an ezView (either at construction or via setView function) before calling updateContainerSize()");
+
+    ezRectFloat viewPort = m_renderTarget->getView()->GetViewport();
+
+    m_viewport.updateParentSize({viewPort.width, viewPort.height});
+    m_view.updateParentSize({m_viewport.getWidth(), m_viewport.getHeight()});
+    m_renderTarget->setView(m_view.getRect(), m_viewport.getRect());
+    m_container->setSize(Vector2f{m_view.getWidth(), m_view.getHeight()});
+
     GuiBase::updateContainerSize();
   }
 

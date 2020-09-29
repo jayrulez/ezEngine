@@ -32,7 +32,7 @@
 #include <UIPlugin/TGUI/Renderers/ListViewRenderer.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
 #include <set>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -29,7 +29,7 @@
 
 #include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
 #include <UIPlugin/TGUI/Renderers/PictureRenderer.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

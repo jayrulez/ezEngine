@@ -32,7 +32,7 @@
 #include <UIPlugin/TGUI/Renderers/ChatBoxRenderer.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
 #include <deque>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

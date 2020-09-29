@@ -29,7 +29,7 @@
 
 #include <UIPlugin/TGUI/Renderers/CheckBoxRenderer.hpp>
 #include <UIPlugin/TGUI/Widgets/RadioButton.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

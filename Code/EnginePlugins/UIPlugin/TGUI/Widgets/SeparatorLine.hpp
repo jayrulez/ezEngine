@@ -28,7 +28,7 @@
 
 #include <UIPlugin/TGUI/Widgets/ClickableWidget.hpp>
 #include <UIPlugin/TGUI/Renderers/SeparatorLineRenderer.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

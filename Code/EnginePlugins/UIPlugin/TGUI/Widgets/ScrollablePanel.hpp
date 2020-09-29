@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/Widgets/Panel.hpp>
 #include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
 #include <UIPlugin/TGUI/Renderers/ScrollablePanelRenderer.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

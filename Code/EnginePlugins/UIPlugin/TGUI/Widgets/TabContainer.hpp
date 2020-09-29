@@ -30,7 +30,7 @@
 #include <UIPlugin/TGUI/SubwidgetContainer.hpp>
 #include <UIPlugin/TGUI/Widgets/Tabs.hpp>
 #include <UIPlugin/TGUI/Widgets/Panel.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

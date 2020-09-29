@@ -32,7 +32,7 @@
 #include <UIPlugin/TGUI/Widgets/Button.hpp>
 #include <UIPlugin/TGUI/Renderers/ChildWindowRenderer.hpp>
 #include <limits>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

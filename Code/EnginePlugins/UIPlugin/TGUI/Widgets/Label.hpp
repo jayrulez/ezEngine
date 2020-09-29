@@ -32,7 +32,7 @@
 #include <UIPlugin/TGUI/CopiedSharedPtr.hpp>
 #include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

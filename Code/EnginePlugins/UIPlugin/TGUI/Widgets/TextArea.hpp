@@ -31,7 +31,7 @@
 #include <UIPlugin/TGUI/Widgets/Scrollbar.hpp>
 #include <UIPlugin/TGUI/Renderers/TextAreaRenderer.hpp>
 #include <UIPlugin/TGUI/Text.hpp>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

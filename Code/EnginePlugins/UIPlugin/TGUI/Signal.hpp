@@ -40,7 +40,7 @@
 #include <vector>
 #include <deque>
 #include <map>
-#include <UIPluginDLL.h>
+#include <UIPlugin/UIPluginDLL.h>
 
 #undef MessageBox  // windows.h defines MessageBox when NOMB isn't defined before including windows.h
 
