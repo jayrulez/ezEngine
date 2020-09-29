@@ -31,7 +31,7 @@
 #include <RendererFoundation/Device/SwapChain.h>
 #include <System/Window/Window.h>
 #include <Texture/Image/ImageConversion.h>
-#include <UIPlugin/UISystem.h>
+#include <TGUIPlugin/UISystem.h>
 
 class UISampleWindow : public ezWindow
 {

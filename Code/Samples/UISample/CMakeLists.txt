@@ -13,7 +13,7 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
   GameEngine
   RendererDX11
-  UIPlugin
+  TGUIPlugin
 )
 
 add_dependencies(${PROJECT_NAME}
