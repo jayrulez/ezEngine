@@ -1,7 +1,7 @@
 #pragma once
 
 #if __has_include("vulkan/vulkan.h")
-//#define WICKEDENGINE_BUILD_VULKAN
+#define WICKEDENGINE_BUILD_VULKAN
 #endif // HAS VULKAN
 
 #ifdef WICKEDENGINE_BUILD_VULKAN

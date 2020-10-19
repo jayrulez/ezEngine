@@ -1,6 +1,7 @@
 #include <RHI/Vulkan/GraphicsDevice_Vulkan.h>
 
 #ifdef WICKEDENGINE_BUILD_VULKAN
+
 #pragma comment(lib,"vulkan-1.lib")
 
 #include <RHI/Utility/spirv_reflect.hpp>
@@ -2858,8 +2859,8 @@ using namespace Vulkan_Internal;
 		}
 
 		swapChainExtent = { static_cast<uint32_t>(RESOLUTIONWIDTH), static_cast<uint32_t>(RESOLUTIONHEIGHT) };
-		swapChainExtent.width = std::max(swapChainSupport.capabilities.minImageExtent.width, std::min(swapChainSupport.capabilities.maxImageExtent.width, swapChainExtent.width));
-		swapChainExtent.height = std::max(swapChainSupport.capabilities.minImageExtent.height, std::min(swapChainSupport.capabilities.maxImageExtent.height, swapChainExtent.height));
+		swapChainExtent.width = ezMath::Max(swapChainSupport.capabilities.minImageExtent.width, ezMath::Min(swapChainSupport.capabilities.maxImageExtent.width, swapChainExtent.width));
+		swapChainExtent.height = ezMath::Max(swapChainSupport.capabilities.minImageExtent.height, ezMath::Min(swapChainSupport.capabilities.maxImageExtent.height, swapChainExtent.height));
 
 
 		uint32_t imageCount = BACKBUFFER_COUNT;
@@ -3285,7 +3286,7 @@ using namespace Vulkan_Internal;
 
 		if (pTexture->desc.MipLevels == 0)
 		{
-			pTexture->desc.MipLevels = (uint32_t)log2(std::max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
+			pTexture->desc.MipLevels = (uint32_t)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
 		}
 
 		VmaAllocationCreateInfo allocInfo = {};
@@ -3446,8 +3447,8 @@ using namespace Vulkan_Internal;
 						1
 					};
 
-					width = std::max(1u, width / 2);
-					height = std::max(1u, height / 2);
+					width = ezMath::Max(1u, width / 2);
+					height = ezMath::Max(1u, height / 2);
 
 					copyRegions.push_back(copyRegion);
 
@@ -4577,7 +4578,7 @@ using namespace Vulkan_Internal;
 		VkBufferCreateInfo bufferInfo = {};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = memrequirements.memoryRequirements.size + 
-			std::max(memrequirements_scratch_build.memoryRequirements.size, memrequirements_scratch_update.memoryRequirements.size);
+			ezMath::Max(memrequirements_scratch_build.memoryRequirements.size, memrequirements_scratch_update.memoryRequirements.size);
 		bufferInfo.usage = VK_BUFFER_USAGE_RAY_TRACING_BIT_KHR | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		assert(features_1_2.bufferDeviceAddress == VK_TRUE);
 		bufferInfo.usage |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
@@ -5184,7 +5185,7 @@ using namespace Vulkan_Internal;
 			srv_desc.flags = 0;
 			srv_desc.format = _ConvertFormat(desc.Format);
 			srv_desc.offset = Align(offset, device_properties.properties.limits.minTexelBufferOffsetAlignment); // damn, if this needs alignment, that could break a lot of things! (index buffer, index offset?)
-			srv_desc.range = std::min(size, (uint64_t)desc.ByteWidth - srv_desc.offset);
+			srv_desc.range = ezMath::Min(size, (uint64_t)desc.ByteWidth - srv_desc.offset);
 
 			VkBufferView view;
 			res = vkCreateBufferView(device, &srv_desc, nullptr, &view);
@@ -5941,8 +5942,8 @@ using namespace Vulkan_Internal;
 		for(uint32_t i = 0; i < numRects; ++i) {
 			scissors[i].extent.width = abs(rects[i].right - rects[i].left);
 			scissors[i].extent.height = abs(rects[i].top - rects[i].bottom);
-			scissors[i].offset.x = std::max(0, rects[i].left);
-			scissors[i].offset.y = std::max(0, rects[i].top);
+			scissors[i].offset.x = ezMath::Max(0, rects[i].left);
+			scissors[i].offset.y = ezMath::Max(0, rects[i].top);
 		}
 		vkCmdSetScissor(GetDirectCommandList(cmd), 0, numRects, scissors);
 	}
@@ -6204,7 +6205,7 @@ using namespace Vulkan_Internal;
 				VkImageCopy copy = {};
 				copy.extent.width = dst_desc.Width;
 				copy.extent.height = dst_desc.Height;
-				copy.extent.depth = std::max(1u, dst_desc.Depth);
+				copy.extent.depth = ezMath::Max(1u, dst_desc.Depth);
 
 				copy.srcOffset.x = 0;
 				copy.srcOffset.y = 0;
@@ -6264,7 +6265,7 @@ using namespace Vulkan_Internal;
 			VkBufferCopy copy = {};
 			copy.srcOffset = 0;
 			copy.dstOffset = 0;
-			copy.size = (VkDeviceSize)std::min(src_desc.ByteWidth, dst_desc.ByteWidth);
+			copy.size = (VkDeviceSize)ezMath::Min(src_desc.ByteWidth, dst_desc.ByteWidth);
 
 			vkCmdCopyBuffer(GetDirectCommandList(cmd),
 				internal_state_src->resource,
@@ -6284,7 +6285,7 @@ using namespace Vulkan_Internal;
 		}
 		auto internal_state = to_internal(buffer);
 
-		dataSize = std::min((int)buffer->desc.ByteWidth, dataSize);
+		dataSize = ezMath::Min((int)buffer->desc.ByteWidth, dataSize);
 		dataSize = (dataSize >= 0 ? dataSize : buffer->desc.ByteWidth);
 
 
@@ -6776,7 +6777,7 @@ using namespace Vulkan_Internal;
 			switch (rootsig_internal->last_tables[cmd][remap.space]->resources[remap.rangeIndex].binding)
 			{
 			case ROOT_CONSTANTBUFFER:
-				bufferInfo.range = std::min(buffer->desc.ByteWidth, device_properties.properties.limits.maxUniformBufferRange);
+				bufferInfo.range = ezMath::Min(buffer->desc.ByteWidth, device_properties.properties.limits.maxUniformBufferRange);
 				write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 				break;
 			case ROOT_RAWBUFFER:

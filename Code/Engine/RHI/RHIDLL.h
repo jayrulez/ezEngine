@@ -32,6 +32,7 @@
 
 #ifdef _WIN32
 
+#  define NOMINMAX 1
 #  define WIN32_LEAN_AND_MEAN
 #  include <SDKDDKVer.h>
 #  include <windows.h>
@@ -111,7 +112,7 @@ namespace wiGraphics
         head = next;
         result = true;
       }
-      lock.m_lock.Unlock();
+      //lock.m_lock.Unlock();
       return result;
     }
 
@@ -128,7 +129,7 @@ namespace wiGraphics
         tail = (tail + 1) % capacity;
         result = true;
       }
-      lock.m_lock.Unlock();
+      //lock.m_lock.Unlock();
       return result;
     }
 
