@@ -1,6 +1,6 @@
 #pragma once
-#include "CommonInclude.h"
-#include "wiGraphics.h"
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
 
 #include <memory>
 

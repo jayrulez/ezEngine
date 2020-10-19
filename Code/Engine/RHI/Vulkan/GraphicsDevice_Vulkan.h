@@ -1,16 +1,14 @@
 #pragma once
 
 #if __has_include("vulkan/vulkan.h")
-#define WICKEDENGINE_BUILD_VULKAN
+//#define WICKEDENGINE_BUILD_VULKAN
 #endif // HAS VULKAN
 
 #ifdef WICKEDENGINE_BUILD_VULKAN
-#include "CommonInclude.h"
-#include "wiGraphicsDevice.h"
-#include "wiPlatform.h"
-#include "wiSpinLock.h"
-#include "wiContainers.h"
-#include "wiGraphicsDevice_SharedInternals.h"
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
+#include <RHI/GraphicsDevice.h>
+#include <RHI/GraphicsDevice_SharedInternals.h>
 
 #ifdef _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -211,7 +209,7 @@ namespace wiGraphics
 		static PFN_vkCmdDrawMeshTasksIndirectNV cmdDrawMeshTasksIndirectNV;
 
 	public:
-		GraphicsDevice_Vulkan(wiPlatform::window_type window, bool fullscreen = false, bool debuglayer = false);
+		GraphicsDevice_Vulkan(RHIWindowType window, bool fullscreen = false, bool debuglayer = false);
 		virtual ~GraphicsDevice_Vulkan();
 
 		bool CreateBuffer(const GPUBufferDesc *pDesc, const SubresourceData* pInitialData, GPUBuffer *pBuffer) override;
@@ -333,8 +331,8 @@ namespace wiGraphics
 			std::deque<std::pair<uint32_t, uint64_t>> destroyer_queries_occlusion;
 			std::deque<std::pair<uint32_t, uint64_t>> destroyer_queries_timestamp;
 
-			wiContainers::ThreadSafeRingBuffer<uint32_t, timestamp_query_count> free_timestampqueries;
-			wiContainers::ThreadSafeRingBuffer<uint32_t, occlusion_query_count> free_occlusionqueries;
+			ThreadSafeRingBuffer<uint32_t, timestamp_query_count> free_timestampqueries;
+			ThreadSafeRingBuffer<uint32_t, occlusion_query_count> free_occlusionqueries;
 
 			~AllocationHandler()
 			{

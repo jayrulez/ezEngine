@@ -5,9 +5,9 @@
 #endif // HAS DX11
 
 #ifdef WICKEDENGINE_BUILD_DX11
-#include "CommonInclude.h"
-#include "wiGraphicsDevice.h"
-#include "wiPlatform.h"
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
+#include <RHI/GraphicsDevice.h>
 
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
@@ -78,7 +78,7 @@ namespace wiGraphics
 		std::shared_ptr<EmptyResourceHandle> emptyresource;
 
 	public:
-		GraphicsDevice_DX11(wiPlatform::window_type window, bool fullscreen = false, bool debuglayer = false);
+		GraphicsDevice_DX11(RHIWindowType window, bool fullscreen = false, bool debuglayer = false);
 
 		bool CreateBuffer(const GPUBufferDesc *pDesc, const SubresourceData* pInitialData, GPUBuffer *pBuffer) override;
 		bool CreateTexture(const TextureDesc* pDesc, const SubresourceData *pInitialData, Texture *pTexture) override;

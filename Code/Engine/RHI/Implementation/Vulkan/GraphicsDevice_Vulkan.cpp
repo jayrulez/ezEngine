@@ -1,17 +1,15 @@
-#include "wiGraphicsDevice_Vulkan.h"
+#include <RHI/Vulkan/GraphicsDevice_Vulkan.h>
 
 #ifdef WICKEDENGINE_BUILD_VULKAN
 #pragma comment(lib,"vulkan-1.lib")
 
-#include "Utility/spirv_reflect.hpp"
+#include <RHI/Utility/spirv_reflect.hpp>
 
-#include "wiGraphicsDevice_SharedInternals.h"
-#include "wiHelper.h"
-#include "wiBackLog.h"
-#include "wiVersion.h"
+#include <RHI/GraphicsDevice_SharedInternals.h>
+#include <Foundation/Logging/Log.h>
 
 #define VMA_IMPLEMENTATION
-#include "Utility/vk_mem_alloc.h"
+#include <RHI/Utility/vk_mem_alloc.h>
 
 #include <sstream>
 #include <vector>
@@ -19,11 +17,6 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
-
-#ifdef SDL2
-#include <SDL2/SDL_vulkan.h>
-#include "sdl2.h"
-#endif
 
 // Enabling ray tracing might crash RenderDoc:
 #define ENABLE_RAYTRACING_EXTENSION
@@ -2171,7 +2164,7 @@ using namespace Vulkan_Internal;
 	}
 
 	// Engine functions
-	GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(wiPlatform::window_type window, bool fullscreen, bool debuglayer)
+  GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscreen, bool debuglayer)
 	{
 		DESCRIPTOR_MANAGEMENT = true;
 		TOPLEVEL_ACCELERATION_STRUCTURE_INSTANCE_SIZE = sizeof(VkAccelerationStructureInstanceKHR);
@@ -2201,7 +2194,7 @@ using namespace Vulkan_Internal;
 		appInfo.pApplicationName = "Wicked Engine Application";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.pEngineName = "Wicked Engine";
-		appInfo.engineVersion = VK_MAKE_VERSION(wiVersion::GetMajor(), wiVersion::GetMinor(), wiVersion::GetRevision());
+		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.apiVersion = VK_API_VERSION_1_2;
 
 		// Enumerate available extensions:
@@ -2232,7 +2225,7 @@ using namespace Vulkan_Internal;
 		bool enableValidationLayers = debuglayer;
 		
 		if (enableValidationLayers && !checkValidationLayerSupport()) {
-			wiHelper::messageBox("Vulkan validation layer requested but not available!");
+			ezLog::SeriousWarning("Vulkan validation layer requested but not available!");
 			enableValidationLayers = false;
 		}
 		else if (enableValidationLayers)
@@ -2282,11 +2275,6 @@ using namespace Vulkan_Internal;
 			if (!CreateWin32SurfaceKHR || CreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
 				assert(0);
 			}
-#elif SDL2
-			if (!SDL_Vulkan_CreateSurface(window, instance, &surface))
-			{
-				throw sdl2::SDLError("Error creating a vulkan surface");
-			}
 #else
 #error WICKEDENGINE VULKAN DEVICE ERROR: PLATFORM NOT SUPPORTED
 #endif // _WIN32
@@ -2300,8 +2288,7 @@ using namespace Vulkan_Internal;
 			assert(res == VK_SUCCESS);
 
 			if (deviceCount == 0) {
-				wiHelper::messageBox("failed to find GPUs with Vulkan support!");
-				assert(0);
+				EZ_REPORT_FAILURE("failed to find GPUs with Vulkan support!");
 			}
 
 			std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -2337,8 +2324,7 @@ using namespace Vulkan_Internal;
 			}
 
 			if (physicalDevice == VK_NULL_HANDLE) {
-				wiHelper::messageBox("failed to find a suitable GPU!");
-				assert(0);
+				EZ_REPORT_FAILURE("failed to find a suitable GPU!");
 			}
 
 			queueIndices = findQueueFamilies(physicalDevice, surface);
@@ -2778,7 +2764,7 @@ using namespace Vulkan_Internal;
 			occlusions_to_reset.reserve(occlusion_query_count);
 		}
 
-		wiBackLog::post("Created GraphicsDevice_Vulkan");
+		ezLog::Info("Created GraphicsDevice_Vulkan");
 	}
 	GraphicsDevice_Vulkan::~GraphicsDevice_Vulkan()
 	{
@@ -4139,19 +4125,19 @@ using namespace Vulkan_Internal;
 		pso->desc = *pDesc;
 
 		pso->hash = 0;
-		wiHelper::hash_combine(pso->hash, pDesc->ms);
-		wiHelper::hash_combine(pso->hash, pDesc->as);
-		wiHelper::hash_combine(pso->hash, pDesc->vs);
-		wiHelper::hash_combine(pso->hash, pDesc->ps);
-		wiHelper::hash_combine(pso->hash, pDesc->hs);
-		wiHelper::hash_combine(pso->hash, pDesc->ds);
-		wiHelper::hash_combine(pso->hash, pDesc->gs);
-		wiHelper::hash_combine(pso->hash, pDesc->il);
-		wiHelper::hash_combine(pso->hash, pDesc->rs);
-		wiHelper::hash_combine(pso->hash, pDesc->bs);
-		wiHelper::hash_combine(pso->hash, pDesc->dss);
-		wiHelper::hash_combine(pso->hash, pDesc->pt);
-		wiHelper::hash_combine(pso->hash, pDesc->sampleMask);
+    RHIHelper::hash_combine(pso->hash, pDesc->ms);
+    RHIHelper::hash_combine(pso->hash, pDesc->as);
+    RHIHelper::hash_combine(pso->hash, pDesc->vs);
+    RHIHelper::hash_combine(pso->hash, pDesc->ps);
+    RHIHelper::hash_combine(pso->hash, pDesc->hs);
+    RHIHelper::hash_combine(pso->hash, pDesc->ds);
+    RHIHelper::hash_combine(pso->hash, pDesc->gs);
+    RHIHelper::hash_combine(pso->hash, pDesc->il);
+    RHIHelper::hash_combine(pso->hash, pDesc->rs);
+    RHIHelper::hash_combine(pso->hash, pDesc->bs);
+    RHIHelper::hash_combine(pso->hash, pDesc->dss);
+    RHIHelper::hash_combine(pso->hash, pDesc->pt);
+    RHIHelper::hash_combine(pso->hash, pDesc->sampleMask);
 
 		if (pDesc->rootSignature == nullptr)
 		{
@@ -4232,11 +4218,11 @@ using namespace Vulkan_Internal;
 		renderpass->desc = *pDesc;
 
 		renderpass->hash = 0;
-		wiHelper::hash_combine(renderpass->hash, pDesc->attachments.size());
+    RHIHelper::hash_combine(renderpass->hash, pDesc->attachments.size());
 		for (auto& attachment : pDesc->attachments)
 		{
-			wiHelper::hash_combine(renderpass->hash, attachment.texture->desc.Format);
-			wiHelper::hash_combine(renderpass->hash, attachment.texture->desc.SampleCount);
+      RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.Format);
+      RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.SampleCount);
 		}
 
 		VkResult res;
@@ -6087,10 +6073,10 @@ using namespace Vulkan_Internal;
 	void GraphicsDevice_Vulkan::BindPipelineState(const PipelineState* pso, CommandList cmd)
 	{
 		size_t pipeline_hash = 0;
-		wiHelper::hash_combine(pipeline_hash, pso->hash);
+		RHIHelper::hash_combine(pipeline_hash, pso->hash);
 		if (active_renderpass[cmd] != nullptr)
 		{
-			wiHelper::hash_combine(pipeline_hash, active_renderpass[cmd]->hash);
+			RHIHelper::hash_combine(pipeline_hash, active_renderpass[cmd]->hash);
 		}
 		if (prev_pipeline_hash[cmd] == pipeline_hash)
 		{

@@ -1,5 +1,4 @@
-#include "wiGraphicsDevice.h"
-#include "wiPlatform.h"
+#include <RHI/GraphicsDevice.h>
 
 #ifdef _WIN32
 // These will let the driver select the dedicated GPU in favour of the integrated one:
@@ -200,9 +199,9 @@ bool GraphicsDevice::IsFormatStencilSupport(FORMAT value) const
 
 float GraphicsDevice::GetScreenWidth() const
 {
-	return (float)GetResolutionWidth() / wiPlatform::GetDPIScaling();
+	return (float)GetResolutionWidth() / 1/*wiPlatform::GetDPIScaling()*/;
 }
 float GraphicsDevice::GetScreenHeight() const
 {
-	return (float)GetResolutionHeight() / wiPlatform::GetDPIScaling();
+	return (float)GetResolutionHeight() / 1/*wiPlatform::GetDPIScaling()*/;
 }

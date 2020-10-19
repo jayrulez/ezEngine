@@ -1,15 +1,11 @@
-#include "wiGraphicsDevice_DX12.h"
+#include <RHI/DX12/GraphicsDevice_DX12.h>
 
 #ifdef WICKEDENGINE_BUILD_DX12
 
-#include "wiGraphicsDevice_SharedInternals.h"
-#include "wiHelper.h"
-#include "wiMath.h"
-#include "ResourceMapping.h"
-#include "wiBackLog.h"
-
-#include "Utility/d3dx12.h"
-#include "Utility/D3D12MemAlloc.h"
+#include <RHI/GraphicsDevice_SharedInternals.h>
+#include <RHI/DX12/d3dx12.h>
+#include <RHI/DX12/D3D12MemAlloc.h>
+#include <Foundation/Logging/Log.h>
 
 #include <pix.h>
 #include <dxcapi.h>
@@ -1339,9 +1335,10 @@ using namespace DX12_Internal;
 			if (heap.heapDesc.NumDescriptors <= allocation)
 			{
 				// grow rate is controlled here:
-				allocation = std::max(512u, allocation);
-				allocation = wiMath::GetNextPowerOfTwo(allocation);
-				allocation = std::min(1000000u, allocation);
+				allocation = ezMath::Max(512u, allocation);
+
+				allocation = ezMath::PowerOfTwo_Ceil(allocation);
+				allocation = ezMath::Min(1000000u, allocation);
 
 				// Issue destruction of the old heap:
 				device->allocationhandler->destroylocker.lock();
@@ -1384,9 +1381,9 @@ using namespace DX12_Internal;
 			if (heap.heapDesc.NumDescriptors <= allocation)
 			{
 				// grow rate is controlled here:
-				allocation = std::max(512u, allocation);
-				allocation = wiMath::GetNextPowerOfTwo(allocation);
-				allocation = std::min(2048u, allocation);
+				allocation = ezMath::Max(512u, allocation);
+				allocation = ezMath::PowerOfTwo_Ceil(allocation);
+				allocation = ezMath::Min(2048u, allocation);
 
 				// Issue destruction of the old heap:
 				device->allocationhandler->destroylocker.lock();
@@ -2003,7 +2000,7 @@ using namespace DX12_Internal;
 	}
 
 	// Engine functions
-	GraphicsDevice_DX12::GraphicsDevice_DX12(wiPlatform::window_type window, bool fullscreen, bool debuglayer)
+  GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, bool debuglayer)
 	{
 		DESCRIPTOR_MANAGEMENT = true;
 		SHADER_IDENTIFIER_SIZE = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
@@ -2049,11 +2046,7 @@ using namespace DX12_Internal;
 		hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&device));
 		if (FAILED(hr))
 		{
-			std::stringstream ss("");
-			ss << "Failed to create the graphics device! ERROR: " << std::hex << hr;
-			wiHelper::messageBox(ss.str(), "Error!");
-			assert(0);
-			wiPlatform::Exit();
+      EZ_REPORT_FAILURE("Failed to create the graphics device! ERROR: {}", hr/*todo: std::hex*/);
 		}
 
 		D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
@@ -2121,9 +2114,7 @@ using namespace DX12_Internal;
 
 		if (FAILED(hr))
 		{
-			wiHelper::messageBox("Failed to create a swapchain for the graphics device!", "Error!");
-			assert(0);
-			wiPlatform::Exit();
+      EZ_REPORT_FAILURE("Failed to create a swapchain for the graphics device!");
 		}
 
 		hr = _swapChain.As(&swapChain);
@@ -2316,7 +2307,7 @@ using namespace DX12_Internal;
 			assert(SUCCEEDED(hr));
 		}
 
-		wiBackLog::post("Created GraphicsDevice_DX12");
+		ezLog::Info("Created GraphicsDevice_DX12");
 	}
 	GraphicsDevice_DX12::~GraphicsDevice_DX12()
 	{
@@ -2626,14 +2617,14 @@ using namespace DX12_Internal;
 
 		if (pTexture->desc.MipLevels == 0)
 		{
-			pTexture->desc.MipLevels = (uint32_t)log2(std::max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
+			pTexture->desc.MipLevels = (uint32_t)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
 		}
 
 
 		// Issue data copy on request:
 		if (pInitialData != nullptr)
 		{
-			uint32_t dataCount = pDesc->ArraySize * std::max(1u, pDesc->MipLevels);
+			uint32_t dataCount = pDesc->ArraySize * ezMath::Max(1u, pDesc->MipLevels);
 			std::vector<D3D12_SUBRESOURCE_DATA> data(dataCount);
 			for (uint32_t slice = 0; slice < dataCount; ++slice)
 			{
@@ -3027,19 +3018,19 @@ using namespace DX12_Internal;
 		pso->desc = *pDesc;
 
 		pso->hash = 0;
-		wiHelper::hash_combine(pso->hash, pDesc->ms);
-		wiHelper::hash_combine(pso->hash, pDesc->as);
-		wiHelper::hash_combine(pso->hash, pDesc->vs);
-		wiHelper::hash_combine(pso->hash, pDesc->ps);
-		wiHelper::hash_combine(pso->hash, pDesc->hs);
-		wiHelper::hash_combine(pso->hash, pDesc->ds);
-		wiHelper::hash_combine(pso->hash, pDesc->gs);
-		wiHelper::hash_combine(pso->hash, pDesc->il);
-		wiHelper::hash_combine(pso->hash, pDesc->rs);
-		wiHelper::hash_combine(pso->hash, pDesc->bs);
-		wiHelper::hash_combine(pso->hash, pDesc->dss);
-		wiHelper::hash_combine(pso->hash, pDesc->pt);
-		wiHelper::hash_combine(pso->hash, pDesc->sampleMask);
+		RHIHelper::hash_combine(pso->hash, pDesc->ms);
+    RHIHelper::hash_combine(pso->hash, pDesc->as);
+    RHIHelper::hash_combine(pso->hash, pDesc->vs);
+    RHIHelper::hash_combine(pso->hash, pDesc->ps);
+    RHIHelper::hash_combine(pso->hash, pDesc->hs);
+    RHIHelper::hash_combine(pso->hash, pDesc->ds);
+    RHIHelper::hash_combine(pso->hash, pDesc->gs);
+    RHIHelper::hash_combine(pso->hash, pDesc->il);
+    RHIHelper::hash_combine(pso->hash, pDesc->rs);
+    RHIHelper::hash_combine(pso->hash, pDesc->bs);
+    RHIHelper::hash_combine(pso->hash, pDesc->dss);
+    RHIHelper::hash_combine(pso->hash, pDesc->pt);
+    RHIHelper::hash_combine(pso->hash, pDesc->sampleMask);
 
 		if (pDesc->rootSignature == nullptr)
 		{
@@ -3162,11 +3153,11 @@ using namespace DX12_Internal;
 		renderpass->desc = *pDesc;
 
 		renderpass->hash = 0;
-		wiHelper::hash_combine(renderpass->hash, pDesc->attachments.size());
+    RHIHelper::hash_combine(renderpass->hash, pDesc->attachments.size());
 		for (auto& attachment : pDesc->attachments)
 		{
-			wiHelper::hash_combine(renderpass->hash, attachment.texture->desc.Format);
-			wiHelper::hash_combine(renderpass->hash, attachment.texture->desc.SampleCount);
+      RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.Format);
+      RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.SampleCount);
 		}
 
 
@@ -3365,7 +3356,7 @@ using namespace DX12_Internal;
 		internal_state->srv = srv_desc;
 
 		GPUBufferDesc scratch_desc;
-		scratch_desc.ByteWidth = (uint32_t)std::max(internal_state->info.ScratchDataSizeInBytes, internal_state->info.UpdateScratchDataSizeInBytes);
+		scratch_desc.ByteWidth = (uint32_t)ezMath::Max(internal_state->info.ScratchDataSizeInBytes, internal_state->info.UpdateScratchDataSizeInBytes);
 
 		return CreateBuffer(&scratch_desc, nullptr, &internal_state->scratch);
 	}
@@ -3439,7 +3430,9 @@ using namespace DX12_Internal;
 			internal_state->exports.emplace_back();
 			D3D12_EXPORT_DESC& export_desc = internal_state->exports.back();
 			internal_state->export_strings.emplace_back();
-			wiHelper::StringConvert(x.function_name, internal_state->export_strings.back());
+
+			RHIHelper::StringConvert(x.function_name, internal_state->export_strings.back());
+
 			export_desc.Name = internal_state->export_strings.back().c_str();
 			library_desc.pExports = &export_desc;
 
@@ -3450,7 +3443,8 @@ using namespace DX12_Internal;
 		for (auto& x : pDesc->hitgroups)
 		{
 			internal_state->group_strings.emplace_back();
-			wiHelper::StringConvert(x.name, internal_state->group_strings.back());
+
+			RHIHelper::StringConvert(x.name, internal_state->group_strings.back());
 
 			if (x.type == ShaderHitGroup::GENERAL)
 				continue;
@@ -3864,7 +3858,7 @@ using namespace DX12_Internal;
 						{
 							srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
 							srv_desc.TextureCubeArray.First2DArrayFace = firstSlice;
-							srv_desc.TextureCubeArray.NumCubes = std::min(texture->desc.ArraySize, sliceCount) / 6;
+							srv_desc.TextureCubeArray.NumCubes = ezMath::Min(texture->desc.ArraySize, sliceCount) / 6;
 							srv_desc.TextureCubeArray.MostDetailedMip = firstMip;
 							srv_desc.TextureCubeArray.MipLevels = mipCount;
 						}
@@ -4185,7 +4179,7 @@ using namespace DX12_Internal;
 				srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 				srv_desc.Buffer.FirstElement = (UINT)offset / sizeof(uint32_t);
 				srv_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
-				srv_desc.Buffer.NumElements = std::min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
+				srv_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
 			}
 			else if (desc.MiscFlags & RESOURCE_MISC_BUFFER_STRUCTURED)
 			{
@@ -4193,7 +4187,7 @@ using namespace DX12_Internal;
 				srv_desc.Format = DXGI_FORMAT_UNKNOWN;
 				srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 				srv_desc.Buffer.FirstElement = (UINT)offset / desc.StructureByteStride;
-				srv_desc.Buffer.NumElements = std::min((UINT)size, desc.ByteWidth - (UINT)offset) / desc.StructureByteStride;
+				srv_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / desc.StructureByteStride;
 				srv_desc.Buffer.StructureByteStride = desc.StructureByteStride;
 			}
 			else
@@ -4203,7 +4197,7 @@ using namespace DX12_Internal;
 				srv_desc.Format = _ConvertFormat(desc.Format);
 				srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 				srv_desc.Buffer.FirstElement = offset / stride;
-				srv_desc.Buffer.NumElements = std::min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
+				srv_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
 			}
 
 			if (internal_state->srv.ViewDimension == D3D12_SRV_DIMENSION_UNKNOWN)
@@ -4228,14 +4222,14 @@ using namespace DX12_Internal;
 				uav_desc.Format = DXGI_FORMAT_R32_TYPELESS;
 				uav_desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
 				uav_desc.Buffer.FirstElement = (UINT)offset / sizeof(uint32_t);
-				uav_desc.Buffer.NumElements = std::min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
+				uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
 			}
 			else if (desc.MiscFlags & RESOURCE_MISC_BUFFER_STRUCTURED)
 			{
 				// This is a Structured Buffer
 				uav_desc.Format = DXGI_FORMAT_UNKNOWN;
 				uav_desc.Buffer.FirstElement = (UINT)offset / desc.StructureByteStride;
-				uav_desc.Buffer.NumElements = std::min((UINT)size, desc.ByteWidth - (UINT)offset) / desc.StructureByteStride;
+				uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / desc.StructureByteStride;
 				uav_desc.Buffer.StructureByteStride = desc.StructureByteStride;
 			}
 			else
@@ -4244,7 +4238,7 @@ using namespace DX12_Internal;
 				uint32_t stride = GetFormatStride(desc.Format);
 				uav_desc.Format = _ConvertFormat(desc.Format);
 				uav_desc.Buffer.FirstElement = (UINT)offset / stride;
-				uav_desc.Buffer.NumElements = std::min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
+				uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
 			}
 
 			if (internal_state->uav.ViewDimension == D3D12_UAV_DIMENSION_UNKNOWN)
@@ -4269,7 +4263,7 @@ using namespace DX12_Internal;
 		D3D12_SHADING_RATE _rate = _ConvertShadingRate(rate);
 		if (!features_6.AdditionalShadingRatesSupported)
 		{
-			_rate = std::min(_rate, D3D12_SHADING_RATE_2X2);
+			_rate = ezMath::Min(_rate, D3D12_SHADING_RATE_2X2);
 		}
 		*(uint8_t*)dest = _rate;
 	}
@@ -4586,8 +4580,8 @@ using namespace DX12_Internal;
 
 	void GraphicsDevice_DX12::SetName(GPUResource* pResource, const char* name)
 	{
-		wchar_t text[256];
-		if (wiHelper::StringConvert(name, text) > 0)
+    ezStringWChar text(name);
+		if (text.GetElementCount() > 0)
 		{
 			auto internal_state = to_internal(pResource);
 			if (internal_state->resource != nullptr)
@@ -4800,7 +4794,7 @@ using namespace DX12_Internal;
 		HRESULT hr = directQueue->Signal(frameFence.Get(), FRAMECOUNT);
 
 		// Determine the last frame that we should not wait on:
-		const uint64_t lastFrameToAllowLatency = std::max(uint64_t(BACKBUFFER_COUNT - 1u), FRAMECOUNT) - (BACKBUFFER_COUNT - 1);
+		const uint64_t lastFrameToAllowLatency = ezMath::Max(uint64_t(BACKBUFFER_COUNT - 1u), FRAMECOUNT) - (BACKBUFFER_COUNT - 1);
 
 		// Wait if too many frames are being incomplete:
 		if (frameFence->GetCompletedValue() < lastFrameToAllowLatency)
@@ -5198,10 +5192,10 @@ using namespace DX12_Internal;
 	void GraphicsDevice_DX12::BindPipelineState(const PipelineState* pso, CommandList cmd)
 	{
 		size_t pipeline_hash = 0;
-		wiHelper::hash_combine(pipeline_hash, pso->hash);
+    RHIHelper::hash_combine(pipeline_hash, pso->hash);
 		if (active_renderpass[cmd] != nullptr)
 		{
-			wiHelper::hash_combine(pipeline_hash, active_renderpass[cmd]->hash);
+      RHIHelper::hash_combine(pipeline_hash, active_renderpass[cmd]->hash);
 		}
 		if (prev_pipeline_hash[cmd] == pipeline_hash)
 		{
@@ -5335,7 +5329,7 @@ using namespace DX12_Internal;
 			return;
 		}
 
-		dataSize = std::min((int)buffer->desc.ByteWidth, dataSize);
+		dataSize = ezMath::Min((int)buffer->desc.ByteWidth, dataSize);
 		dataSize = (dataSize >= 0 ? dataSize : buffer->desc.ByteWidth);
 
 		if (buffer->desc.Usage == USAGE_DYNAMIC && buffer->desc.BindFlags & BIND_CONSTANT_BUFFER)
@@ -5802,8 +5796,8 @@ using namespace DX12_Internal;
 
 	void GraphicsDevice_DX12::EventBegin(const char* name, CommandList cmd)
 	{
-		wchar_t text[128];
-		if (wiHelper::StringConvert(name, text) > 0)
+		ezStringWChar text(name);
+		if (text.GetElementCount() > 0)
 		{
 			PIXBeginEvent(GetDirectCommandList(cmd), 0xFF000000, text);
 		}
@@ -5814,8 +5808,8 @@ using namespace DX12_Internal;
 	}
 	void GraphicsDevice_DX12::SetMarker(const char* name, CommandList cmd)
 	{
-		wchar_t text[128];
-		if (wiHelper::StringConvert(name, text) > 0)
+		ezStringWChar text;
+		if (text.GetElementCount() > 0)
 		{
 			PIXSetMarker(GetDirectCommandList(cmd), 0xFFFF0000, text);
 		}

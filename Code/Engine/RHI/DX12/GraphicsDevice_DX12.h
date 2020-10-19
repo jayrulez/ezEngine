@@ -1,18 +1,15 @@
 #pragma once
 
 #if __has_include("d3d12.h")
-#define WICKEDENGINE_BUILD_DX12
+//#define WICKEDENGINE_BUILD_DX12
 #endif // HAS DX12
 
 #ifdef WICKEDENGINE_BUILD_DX12
-#include "CommonInclude.h"
-#include "wiGraphicsDevice.h"
-#include "wiPlatform.h"
-#include "wiSpinLock.h"
-#include "wiContainers.h"
-#include "wiGraphicsDevice_SharedInternals.h"
-
-#include "Utility/D3D12MemAlloc.h"
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
+#include <RHI/GraphicsDevice.h>
+#include <RHI/GraphicsDevice_SharedInternals.h>
+#include <RHI/DX12/D3D12MemAlloc.h>
 
 #include <dxgi1_4.h>
 #include <d3d12.h>
@@ -173,7 +170,7 @@ namespace wiGraphics
 		std::atomic<CommandList> cmd_count{ 0 };
 
 	public:
-		GraphicsDevice_DX12(wiPlatform::window_type window, bool fullscreen = false, bool debuglayer = false);
+    GraphicsDevice_DX12(RHIWindowType window, bool fullscreen = false, bool debuglayer = false);
 		virtual ~GraphicsDevice_DX12();
 
 		bool CreateBuffer(const GPUBufferDesc *pDesc, const SubresourceData* pInitialData, GPUBuffer *pBuffer) override;
@@ -287,8 +284,8 @@ namespace wiGraphics
 			std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12StateObject>, uint64_t>> destroyer_stateobjects;
 			std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>, uint64_t>> destroyer_descriptorHeaps;
 
-			wiContainers::ThreadSafeRingBuffer<uint32_t, timestamp_query_count> free_timestampqueries;
-			wiContainers::ThreadSafeRingBuffer<uint32_t, occlusion_query_count> free_occlusionqueries;
+			ThreadSafeRingBuffer<uint32_t, timestamp_query_count> free_timestampqueries;
+			ThreadSafeRingBuffer<uint32_t, occlusion_query_count> free_occlusionqueries;
 
 			~AllocationHandler()
 			{
