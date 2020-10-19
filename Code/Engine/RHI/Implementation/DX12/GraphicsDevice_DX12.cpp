@@ -2,6 +2,7 @@
 
 #ifdef WICKEDENGINE_BUILD_DX12
 
+#include <Foundation/Basics/Platform/Win/HResultUtils.h>
 #include <RHI/GraphicsDevice_SharedInternals.h>
 #include <RHI/DX12/d3dx12.h>
 #include <RHI/DX12/D3D12MemAlloc.h>
@@ -28,6 +29,7 @@
 #include <sstream>
 #include <algorithm>
 #include <wincodec.h>
+#include <tchar.h>
 
 using namespace Microsoft::WRL;
 
@@ -2026,7 +2028,7 @@ using namespace DX12_Internal;
 		if (debuglayer)
 		{
 			// Enable the debug layer.
-			HMODULE dx12 = LoadLibraryEx(L"d3d12.dll",
+			HMODULE dx12 = LoadLibraryEx(_T("d3d12.dll"),
 				nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 			auto pD3D12GetDebugInterface =
 				reinterpret_cast<PFN_D3D12_GET_DEBUG_INTERFACE>(
@@ -2046,7 +2048,7 @@ using namespace DX12_Internal;
 		hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&device));
 		if (FAILED(hr))
 		{
-      EZ_REPORT_FAILURE("Failed to create the graphics device! ERROR: {}", hr/*todo: std::hex*/);
+      EZ_REPORT_FAILURE("Failed to create the graphics device! ERROR: {}", ezHRESULTtoString(hr)/*todo: std::hex*/);
 		}
 
 		D3D12MA::ALLOCATOR_DESC allocatorDesc = {};

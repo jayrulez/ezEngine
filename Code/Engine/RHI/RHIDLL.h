@@ -32,10 +32,8 @@
 
 #ifdef _WIN32
 
-#  define NOMINMAX 1
-#  define WIN32_LEAN_AND_MEAN
+#include <Foundation/Basics/Platform/Win/IncludeWindows.h>
 #  include <SDKDDKVer.h>
-#  include <windows.h>
 
 #  if WINAPI_FAMILY == WINAPI_FAMILY_APP
 #    define PLATFORM_UWP
