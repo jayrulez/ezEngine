@@ -171,13 +171,6 @@ public:
   /// </summary>
   ezEnum<RHIPixelFormat> GetFormat() const { return Format; }
 
-  /// <summary>
-  /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
-  /// tools.
-  /// </summary>
-  virtual ezString GetName() const = 0;
-  virtual void SetName(const ezString& name) = 0;
-
 private:
   RHITextureView(const RHITextureViewDescription& description)
   {
@@ -190,7 +183,7 @@ private:
   }
 
 private:
-  RHITexture* Target;
+  RHITexture* Target = nullptr;
   unsigned int BaseMipLevel = 0;
   unsigned int MipLevels = 0;
   unsigned int BaseArrayLayer = 0;

@@ -13,7 +13,7 @@ struct EZ_RHI_DLL RHIBlendAttachmentDescription : public ezHashableStruct<RHIBle
   /// <summary>
   /// Controls whether blending is enabled for the color attachment.
   /// </summary>
-  bool BlendEnabled;
+  bool BlendEnabled = false;
   /// <summary>
   /// Controls the source color's influence on the blend result.
   /// </summary>
@@ -25,7 +25,7 @@ struct EZ_RHI_DLL RHIBlendAttachmentDescription : public ezHashableStruct<RHIBle
   /// <summary>
   /// Controls the function used to combine the source and destination color factors.
   /// </summary>
-  ezEnum<RHIBlendFunction> ColorFunction;
+  ezEnum<RHIBlendFunction> ColorFunction = RHIBlendFunction::Add;
   /// <summary>
   /// Controls the source alpha's influence on the blend result.
   /// </summary>

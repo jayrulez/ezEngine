@@ -111,13 +111,6 @@ public:
   virtual ezUInt32 GetSize() const = 0;
 
   /// <summary>
-  /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
-  /// tools.
-  /// </summary>
-  virtual ezString GetName() const = 0;
-  virtual void SetName(const ezString& name) = 0;
-
-  /// <summary>
   /// A bitmask indicating how this instance is permitted to be used.
   /// </summary>
   virtual ezBitflags<RHIBufferUsage> GetUsage() const = 0;

@@ -161,11 +161,4 @@ class RHIResourceLayout : public RHIDeviceResource
     }
 #endif
   }
-
-  /// <summary>
-  /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
-  /// tools.
-  /// </summary>
-  virtual ezString GetName() const = 0;
-  virtual void SetName(const ezString& name) = 0;
 };

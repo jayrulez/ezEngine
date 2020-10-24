@@ -146,7 +146,8 @@ struct EZ_RHI_DLL RHIBlendFunction // : byte
     /// <summary>
     /// The maximum of source and destination is selected.
     /// </summary>
-    Maximum
+    Maximum,
+    Default = Add
   };
 };
 
@@ -742,6 +743,108 @@ struct EZ_RHI_DLL RHIResourceKind // : byte
     /// A <see cref="RHISampler"/>.
     /// </summary>
     Sampler
+  };
+};
+
+/// <summary>
+/// An addressing mode for texture coordinates.
+/// </summary>
+struct EZ_RHI_DLL RHISamplerAddressMode // : byte
+{
+  using StorageType = ezUInt8;
+  enum Enum
+  {
+    /// <summary>
+    /// Texture coordinates are wrapped upon overflow.
+    /// </summary>
+    Wrap,
+    /// <summary>
+    /// Texture coordinates are mirrored upon overflow.
+    /// </summary>
+    Mirror,
+    /// <summary>
+    /// Texture coordinates are clamped to the maximum or minimum values upon overflow.
+    /// </summary>
+    Clamp,
+    /// <summary>
+    /// Texture coordinates that overflow return the predefined border color defined in
+    /// <see cref="SamplerDescription.BorderColor"/>.
+    /// </summary>
+    Border,
+    Default = Wrap
+  };
+};
+
+/// <summary>
+/// A constant color that is sampled when <see cref="SamplerAddressMode.Border"/> is used.
+/// </summary>
+struct EZ_RHI_DLL RHISamplerBorderColor // : byte
+{
+  using StorageType = ezUInt8;
+  enum Enum
+  {
+    /// <summary>
+    /// Transparent Black (0, 0, 0, 0)
+    /// </summary>
+    TransparentBlack,
+    /// <summary>
+    /// Opaque Black (0, 0, 0, 1)
+    /// </summary>
+    OpaqueBlack,
+    /// <summary>
+    /// Opaque White (1, 1, 1, 1)
+    /// </summary>
+    OpaqueWhite,
+    Default = TransparentBlack
+  };
+};
+
+/// <summary>
+/// Determines how texture values are sampled from a texture.
+/// </summary>
+struct EZ_RHI_DLL RHISamplerFilter // : byte
+{
+  using StorageType = ezUInt8;
+  enum Enum
+  {
+    /// <summary>
+    /// Point sampling is used for minification, magnification, and mip-level sampling.
+    /// </summary>
+    MinPoint_MagPoint_MipPoint,
+    /// <summary>
+    /// Point sampling is used for minification and magnification; linear interpolation is used for mip-level sampling.
+    /// </summary>
+    MinPoint_MagPoint_MipLinear,
+    /// <summary>
+    /// Point sampling is used for minification and mip-level sampling; linear interpolation is used for mip-level sampling.
+    /// </summary>
+    MinPoint_MagLinear_MipPoint,
+    /// <summary>
+    /// Point sampling is used for minification; linear interpolation is used for magnification and mip-level sampling.
+    /// </summary>
+    MinPoint_MagLinear_MipLinear,
+    /// <summary>
+    /// Linear interpolation is used for minifcation; point sampling is used for magnification and mip-level sampling.
+    /// </summary>
+    MinLinear_MagPoint_MipPoint,
+    /// <summary>
+    /// Linear interpolation is used for minification and mip-level sampling; point sampling is used for magnification.
+    /// </summary>
+    MinLinear_MagPoint_MipLinear,
+    /// <summary>
+    /// Linear interpolation is used for minification and magnification, and point sampling is used for mip-level sampling.
+    /// </summary>
+    MinLinear_MagLinear_MipPoint,
+    /// <summary>
+    /// Linear interpolation is used for minification, magnification, and mip-level sampling.
+    /// </summary>
+    MinLinear_MagLinear_MipLinear,
+    /// <summary>
+    /// Anisotropic filtering is used. The maximum anisotropy is controlled by
+    /// <see cref="SamplerDescription.MaximumAnisotropy"/>.
+    /// </summary>
+    Anisotropic,
+    Default = MinPoint_MagPoint_MipPoint
   };
 };
 
