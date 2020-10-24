@@ -102,6 +102,8 @@ struct EZ_RHI_DLL RHIDepthStencilStateDescription : public ezHashableStruct<RHID
   /// </summary>
   ezUInt32 StencilReference = 0;
 
+  RHIDepthStencilStateDescription() = default;
+
   /// <summary>
   /// Constructs a new <see cref="DepthStencilStateDescription"/>. This describes a depth-stencil state with no stencil
   /// testing enabled.

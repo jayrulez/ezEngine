@@ -283,22 +283,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIBlendStateDescription& other) const
   {
-    if (BlendFactor == other.BlendFactor && AlphaToCoverageEnabled == other.AlphaToCoverageEnabled)
-    {
-      if (AttachmentStates.GetCount() != other.AttachmentStates.GetCount())
-      {
-        return false;
-      }
-
-      for (ezUInt32 i = 0; i < AttachmentStates.GetCount(); i++)
-      {
-        if (!(AttachmentStates[i] == other.AttachmentStates[i]))
-        {
-          return false;
-        }
-      }
-    }
-    return true;
+    return BlendFactor == other.BlendFactor && AttachmentStates == other.AttachmentStates && AlphaToCoverageEnabled == other.AlphaToCoverageEnabled;
   }
 
   RHIBlendStateDescription Clone()

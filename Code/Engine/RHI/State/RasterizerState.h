@@ -35,6 +35,8 @@ struct EZ_RHI_DLL RHIRasterizerStateDescription : public ezHashableStruct<RHIRas
   /// </summary>
   bool ScissorTestEnabled = false;
 
+  RHIRasterizerStateDescription() = default;
+
   /// <summary>
   /// Constructs a new RasterizerStateDescription.
   /// </summary>

@@ -15,7 +15,7 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
   /// <summary>
   /// The shader stage this instance describes.
   /// </summary>
-  ezEnum<RHIShaderStage> Stage = RHIShaderStage::None;
+  ezEnum<RHIShaderStages> Stage = RHIShaderStages::None;
 
   /// <summary>
   /// An array containing the raw shader bytes.
@@ -44,7 +44,7 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
   /// <param name="stage">The shader stage to create.</param>
   /// <param name="shaderBytes">An array containing the raw shader bytes.</param>
   /// <param name="entryPoint">The name of the entry point function in the shader module to be used in this stage.</param>
-  RHIShaderDescription(ezEnum<RHIShaderStage> stage, ezDynamicArray<ezUInt8> shaderBytes, ezString entryPoint)
+  RHIShaderDescription(ezEnum<RHIShaderStages> stage, ezDynamicArray<ezUInt8> shaderBytes, ezString entryPoint)
   {
     Stage = stage;
     ShaderBytes = shaderBytes;
@@ -60,7 +60,7 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
   /// <param name="entryPoint">The name of the entry point function in the shader module to be used in this stage.</param>
   /// <param name="debug">Indicates whether the shader should be debuggable. This flag only has an effect if
   /// <paramref name="shaderBytes"/> contains shader code that will be compiled.</param>
-  RHIShaderDescription(ezEnum<RHIShaderStage> stage, ezDynamicArray<ezUInt8> shaderBytes, ezString entryPoint, bool debug)
+  RHIShaderDescription(ezEnum<RHIShaderStages> stage, ezDynamicArray<ezUInt8> shaderBytes, ezString entryPoint, bool debug)
   {
     Stage = stage;
     ShaderBytes = shaderBytes;
@@ -86,7 +86,7 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
 class EZ_RHI_DLL RHIShader : public RHIDeviceResource
 {
 public:
-  RHIShader(ezEnum<RHIShaderStage> stage, const ezString& entryPoint)
+  RHIShader(ezEnum<RHIShaderStages> stage, const ezString& entryPoint)
   {
     Stage = stage;
     EntryPoint = entryPoint;
@@ -95,7 +95,7 @@ public:
   /// <summary>
   /// The shader stage this instance can be used in.
   /// </summary>
-  ezEnum<RHIShaderStage> GetStage() const
+  ezEnum<RHIShaderStages> GetStage() const
   {
     return Stage;
   }
@@ -116,7 +116,7 @@ public:
   virtual void SetName(const ezString& name) = 0;
 
 private:
-  ezEnum<RHIShaderStage> Stage;
+  ezEnum<RHIShaderStages> Stage;
   ezString EntryPoint;
 };
 
@@ -145,6 +145,8 @@ struct EZ_RHI_DLL RHIShaderSetDescription : ezHashableStruct<RHIShaderSetDescrip
   /// constants specified in each <see cref="RHIShader"/>.
   /// </summary>
   ezDynamicArray<RHISpecializationConstant> Specializations;
+
+  RHIShaderSetDescription() = default;
 
   /// <summary>
   /// Constructs a new ShaderSetDescription.

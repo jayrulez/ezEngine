@@ -626,7 +626,8 @@ struct EZ_RHI_DLL RHIPixelFormat // : byte
     /// BC7 block compressed format.
     /// This is an sRGB format.
     /// </summary>
-    BC7_UNorm_SRgb
+    BC7_UNorm_SRgb,
+    Default = R8_G8_B8_A8_UNorm
   };
 };
 
@@ -787,14 +788,15 @@ struct EZ_RHI_DLL RHIShaderConstantType // : uint
     /// <summary>
     /// A 64-bit floating-point value.
     /// </summary>
-    Double
+    Double,
+    Default = Bool
   };
 };
 
 /// <summary>
 /// A bitmask representing a set of shader stages.
 /// </summary>
-struct EZ_RHI_DLL RHIShaderStage //  : byte
+struct EZ_RHI_DLL RHIShaderStages //  : byte
 {
   using StorageType = ezUInt8;
   enum Enum
@@ -833,7 +835,7 @@ struct EZ_RHI_DLL RHIShaderStage //  : byte
   {
   };
 };
-EZ_DECLARE_FLAGS_OPERATORS(RHIShaderStage);
+EZ_DECLARE_FLAGS_OPERATORS(RHIShaderStages);
 
 /// <summary>
 /// Identifies an action taken on samples that pass or fail the stencil test.
@@ -880,6 +882,42 @@ struct EZ_RHI_DLL RHIStencilOperation // : byte
 };
 
 /// <summary>
+/// Describes the number of samples to use in a <see cref="RHITexture"/>.
+/// </summary>
+struct EZ_RHI_DLL RHITextureSampleCount // : byte
+{
+  using StorageType = ezUInt8;
+  enum Enum
+  {
+    /// <summary>
+    /// 1 sample (no multi-sampling).
+    /// </summary>
+    Count1,
+    /// <summary>
+    /// 2 Samples.
+    /// </summary>
+    Count2,
+    /// <summary>
+    /// 4 Samples.
+    /// </summary>
+    Count4,
+    /// <summary>
+    /// 8 Samples.
+    /// </summary>
+    Count8,
+    /// <summary>
+    /// 16 Samples.
+    /// </summary>
+    Count16,
+    /// <summary>
+    /// 32 Samples.
+    /// </summary>
+    Count32,
+    Default = Count1
+  };
+};
+
+/// <summary>
 /// Identifies a particular type of Texture.
 /// </summary>
 struct EZ_RHI_DLL RHITextureType // : uint
@@ -898,7 +936,8 @@ struct EZ_RHI_DLL RHITextureType // : uint
     /// <summary>
     /// A three-dimensional Texture.
     /// </summary>
-    Texture3D
+    Texture3D,
+    Default = Texture1D
   };
 };
 
@@ -939,7 +978,8 @@ struct EZ_RHI_DLL RHITextureUsage // : byte
     /// <summary>
     /// The Texture supports automatic generation of mipmaps through <see cref="RHICommandList.GenerateMipmaps(RHITexture)"/>.
     /// </summary>
-    GenerateMipmaps = 1 << 6
+    GenerateMipmaps = 1 << 6,
+    Default = Sampled
   };
 
   struct Bits
@@ -947,6 +987,9 @@ struct EZ_RHI_DLL RHITextureUsage // : byte
   };
 };
 EZ_DECLARE_FLAGS_OPERATORS(RHITextureUsage);
+
+// fwd
+struct RHIVertexElementFormat;
 
 /// <summary>
 /// The format of an individual vertex element.
@@ -1079,7 +1122,8 @@ struct EZ_RHI_DLL RHIVertexElementFormat // : byte
     /// <summary>
     /// Four 16-bit floating point values.
     /// </summary>
-    Half4
+    Half4,
+    Default = Float1
   };
 
   static ezUInt32 GetSize(ezEnum<RHIVertexElementFormat> format)
@@ -1125,6 +1169,7 @@ struct EZ_RHI_DLL RHIVertexElementFormat // : byte
       default:
         EZ_REPORT_FAILURE("Invalid format specified for vertex element.");
     }
+    return 0;
   }
 };
 
@@ -1154,7 +1199,8 @@ struct EZ_RHI_DLL RHIVertexElementSemantic // : byte
     /// <summary>
     /// A color.
     /// </summary>
-    Color
+    Color,
+    Default = Position
   };
 };
 
@@ -1351,7 +1397,7 @@ struct EZ_RHI_DLL RHISpecializationConstant : public ezHashableStruct<RHISpecial
   {
     ezUInt64 data;
 
-    data = value;
+    data = static_cast<ezUInt64>(value);
 
     return data;
   }
@@ -1392,7 +1438,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <summary>
   /// The offset in bytes from the beginning of the vertex.
   /// </summary>
-  ezUInt32 Offset;
+  ezUInt32 Offset = 0;
 
   /// <summary>
   /// Constructs a new VertexElementDescription describing a per-vertex element.
@@ -1415,8 +1461,8 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <param name="format">The format of the element.</param>
   RHIVertexElementDescription(
     ezString name,
-    ezEnum<RHIVertexElementSemantic> semantic,
-    ezEnum<RHIVertexElementFormat> format)
+    ezEnum<RHIVertexElementFormat> format,
+    ezEnum<RHIVertexElementSemantic> semantic)
   {
     Name = name;
     Format = format;

@@ -9,7 +9,7 @@
 /// <summary>
 /// A synchronization primitive which allows the GPU to communicate when submitted work items have finished executing.
 /// </summary>
-class RHIFence : public RHIDeviceResource
+class EZ_RHI_DLL RHIFence : public RHIDeviceResource
 {
 public:
   /// <summary>
