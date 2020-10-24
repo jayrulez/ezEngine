@@ -16,7 +16,7 @@ struct EZ_RHI_DLL RHICommandListDescription : public ezHashableStruct<RHICommand
   /// </summary>
   /// <param name="other">The instance to compare to.</param>
   /// <returns>True if all elements are equal; false otherswise.</returns>
-  bool operator=(const RHICommandListDescription& other) const
+  bool operator==(const RHICommandListDescription& other) const
   {
     return true;
   }

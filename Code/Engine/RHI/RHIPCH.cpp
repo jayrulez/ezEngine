@@ -1,4 +1,4 @@
-#include <RendererFoundationPCH.h>
+#include <RHIPCH.h>
 
 EZ_STATICLINK_LIBRARY(RHI)
 {

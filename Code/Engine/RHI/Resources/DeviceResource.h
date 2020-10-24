@@ -1,8 +1,8 @@
 #pragma once
 
+#include <Foundation/Strings/HashedString.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <Foundation/Strings/HashedString.h>
 
 struct EZ_RHI_DLL RHIDeviceResourceFlags // : byte
 {
@@ -36,24 +36,30 @@ EZ_DECLARE_FLAGS_OPERATORS(RHIDeviceResourceFlags);
 class EZ_RHI_DLL RHIDeviceResource : public ezRefCounted
 {
 public:
-	void SetDebugName(const char* name) const
-	{
-		DebugName.Assign(name);
-	}
+  void SetDebugName(const char* name) const
+  {
+    DebugName.Assign(name);
+  }
+  virtual void SetDebugNameCore(const char* name) const = 0;
+
+  /// <summary>
+  /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
+  /// tools.
+  /// </summary>
+  virtual ezString GetName() const = 0;
+  virtual void SetName(const ezString& name) = 0;
 
   const ezBitflags<RHIDeviceResourceFlags> GetFlags() const
   {
     return Flags;
   }
-	
-public:
-	virtual void SetDebugNameCore(const char* name) const = 0;
+
 protected:
-	/// <summary>
-	/// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
-	/// tools.
-	/// </summary>
-	mutable ezHashedString DebugName;
+  /// <summary>
+  /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
+  /// tools.
+  /// </summary>
+  mutable ezHashedString DebugName;
 
   ezBitflags<RHIDeviceResourceFlags> Flags = RHIDeviceResourceFlags::None;
 };

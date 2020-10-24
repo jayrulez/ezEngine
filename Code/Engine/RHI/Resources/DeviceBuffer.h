@@ -20,7 +20,7 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// <summary>
   /// Indicates how the <see cref="RHIDeviceBuffer"/> will be used.
   /// </summary>
-  ezBitflags<RHIBufferUsage> UsageFlags;
+  ezBitflags<RHIBufferUsage> Usage;
 
   /// <summary>
   /// For structured buffers, this value indicates the size in bytes of a single structure element, and must be non-zero.
@@ -39,10 +39,10 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// </summary>
   /// <param name="size">The desired capacity, in bytes.</param>
   /// <param name="usage">Indicates how the <see cref="RHIDeviceBuffer"/> will be used.</param>
-  RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usageFlags)
+  RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usage)
   {
     Size = size;
-    UsageFlags = usageFlags;
+    Usage = usage;
     StructureByteStride = 0;
     RawBuffer = false;
   }
@@ -51,31 +51,31 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// Constructs a new <see cref="BufferDescription"/>.
   /// </summary>
   /// <param name="sizeInBytes">The desired capacity, in bytes.</param>
-  /// <param name="usage">Indicates how the <see cref="DeviceBuffer"/> will be used.</param>
+  /// <param name="usage">Indicates how the <see cref="RHIDeviceBuffer"/> will be used.</param>
   /// <param name="structureByteStride">For structured buffers, this value indicates the size in bytes of a single
   /// structure element, and must be non-zero. For all other buffer types, this value must be zero.</param>
-  RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usageFlags, ezUInt32 structureByteStride)
+  RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usage, ezUInt32 structureByteStride)
   {
     Size = size;
-    UsageFlags = usageFlags;
+    Usage = usage;
     StructureByteStride = structureByteStride;
     RawBuffer = false;
   }
 
   /// <summary>
-  /// Constructs a new <see cref="BufferDescription"/>.
+  /// Constructs a new <see cref="RHIBufferDescription"/>.
   /// </summary>
   /// <param name="sizeInBytes">The desired capacity, in bytes.</param>
-  /// <param name="usage">Indicates how the <see cref="DeviceBuffer"/> will be used.</param>
+  /// <param name="usage">Indicates how the <see cref="RHIDeviceBuffer"/> will be used.</param>
   /// <param name="structureByteStride">For structured buffers, this value indicates the size in bytes of a single
   /// structure element, and must be non-zero. For all other buffer types, this value must be zero.</param>
   /// <param name="rawBuffer">Indicates that this is a raw buffer. This should be combined with
-  /// <see cref="BufferUsage.StructuredBufferReadWrite"/>. This affects how the buffer is bound in the D3D11 backend.
+  /// <see cref="RHIBufferUsage.StructuredBufferReadWrite"/>. This affects how the buffer is bound in the D3D11 backend.
   /// </param>
-  RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usageFlags, ezUInt32 structureByteStride, bool rawBuffer)
+  RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usage, ezUInt32 structureByteStride, bool rawBuffer)
   {
     Size = size;
-    UsageFlags = usageFlags;
+    Usage = usage;
     StructureByteStride = structureByteStride;
     RawBuffer = rawBuffer;
   }
@@ -85,9 +85,9 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// </summary>
   /// <param name="other">The instance to compare to.</param>
   /// <returns>True if all elements are equal; false otherswise.</returns>
-  bool operator=(const RHIBufferDescription& other) const
+  bool operator==(const RHIBufferDescription& other) const
   {
-    return Size == other.Size && UsageFlags == other.UsageFlags && StructureByteStride == other.StructureByteStride && RawBuffer == other.RawBuffer;
+    return Size == other.Size && Usage == other.Usage && StructureByteStride == other.StructureByteStride && RawBuffer == other.RawBuffer;
   }
 };
 
@@ -105,35 +105,20 @@ public:
     Flags.Add(RHIDeviceResourceFlags::Mappable);
   }
 
-  ezString GetName() const
-  {
-    return Name;
-  }
+  /// <summary>
+  /// The total capacity, in bytes, of the buffer. This value is fixed upon creation.
+  /// </summary>
+  virtual ezUInt32 GetSize() const = 0;
 
-  ezUInt32 GetSize() const
-  {
-    return Size;
-  }
-
-  const ezBitflags<RHIBufferUsage> GetUsageFlags() const
-  {
-    return UsageFlags;
-  }
-
-private:
   /// <summary>
   /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
   /// tools.
   /// </summary>
-  ezString Name;
+  virtual ezString GetName() const = 0;
+  virtual void SetName(const ezString& name) = 0;
 
   /// <summary>
   /// A bitmask indicating how this instance is permitted to be used.
   /// </summary>
-  ezBitflags<RHIBufferUsage> UsageFlags;
-
-  /// <summary>
-  /// The total capacity, in bytes, of the buffer. This value is fixed upon creation.
-  /// </summary>
-  ezUInt32 Size;
+  virtual ezBitflags<RHIBufferUsage> GetUsage() const = 0;
 };

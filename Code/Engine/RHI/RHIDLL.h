@@ -33,6 +33,14 @@ struct EZ_RHI_DLL RHI // : byte
 EZ_DECLARE_FLAGS_OPERATORS(RHIType);
 */
 
+namespace RHIUtils
+{
+  //template <typename T, typename AllocatorWrapper = ezDefaultAllocatorWrapper>
+  //void CloneArray(ezDynamicArray<T, AllocatorWrapper>& destination, const ezDynamicArray<T, AllocatorWrapper>& source)
+  //{
+  //}
+}
+
 /// <summary>
 /// The format of index data used in a <see cref="RHIDeviceBuffer"/>.
 /// </summary>
@@ -828,6 +836,50 @@ struct EZ_RHI_DLL RHIShaderStage //  : byte
 EZ_DECLARE_FLAGS_OPERATORS(RHIShaderStage);
 
 /// <summary>
+/// Identifies an action taken on samples that pass or fail the stencil test.
+/// </summary>
+struct EZ_RHI_DLL RHIStencilOperation // : byte
+{
+  using StorageType = ezUInt8;
+  enum Enum
+  {
+    /// <summary>
+    /// Keep the existing value.
+    /// </summary>
+    Keep,
+    /// <summary>
+    /// Sets the value to 0.
+    /// </summary>
+    Zero,
+    /// <summary>
+    /// Replaces the existing value with <see cref="RHIDepthStencilStateDescription.StencilReference"/>.
+    /// </summary>
+    Replace,
+    /// <summary>
+    /// Increments the existing value and clamps it to the maximum representable unsigned value.
+    /// </summary>
+    IncrementAndClamp,
+    /// <summary>
+    /// Decrements the existing value and clamps it to 0.
+    /// </summary>
+    DecrementAndClamp,
+    /// <summary>
+    /// Bitwise-inverts the existing value.
+    /// </summary>
+    Invert,
+    /// <summary>
+    /// Increments the existing value and wraps it to 0 when it exceeds the maximum representable unsigned value.
+    /// </summary>
+    IncrementAndWrap,
+    /// <summary>
+    /// Decrements the existing value and wraps it to the maximum representable unsigned value if it would be reduced below
+    /// 0.
+    /// </summary>
+    DecrementAndWrap
+  };
+};
+
+/// <summary>
 /// Identifies a particular type of Texture.
 /// </summary>
 struct EZ_RHI_DLL RHITextureType // : uint
@@ -1029,6 +1081,51 @@ struct EZ_RHI_DLL RHIVertexElementFormat // : byte
     /// </summary>
     Half4
   };
+
+  static ezUInt32 GetSize(ezEnum<RHIVertexElementFormat> format)
+  {
+    switch (format)
+    {
+      case RHIVertexElementFormat::Byte2_Norm:
+      case RHIVertexElementFormat::Byte2:
+      case RHIVertexElementFormat::SByte2_Norm:
+      case RHIVertexElementFormat::SByte2:
+      case RHIVertexElementFormat::Half1:
+        return 2;
+      case RHIVertexElementFormat::Float1:
+      case RHIVertexElementFormat::UInt1:
+      case RHIVertexElementFormat::Int1:
+      case RHIVertexElementFormat::Byte4_Norm:
+      case RHIVertexElementFormat::Byte4:
+      case RHIVertexElementFormat::SByte4_Norm:
+      case RHIVertexElementFormat::SByte4:
+      case RHIVertexElementFormat::UShort2_Norm:
+      case RHIVertexElementFormat::UShort2:
+      case RHIVertexElementFormat::Short2_Norm:
+      case RHIVertexElementFormat::Short2:
+      case RHIVertexElementFormat::Half2:
+        return 4;
+      case RHIVertexElementFormat::Float2:
+      case RHIVertexElementFormat::UInt2:
+      case RHIVertexElementFormat::Int2:
+      case RHIVertexElementFormat::UShort4_Norm:
+      case RHIVertexElementFormat::UShort4:
+      case RHIVertexElementFormat::Short4_Norm:
+      case RHIVertexElementFormat::Short4:
+      case RHIVertexElementFormat::Half4:
+        return 8;
+      case RHIVertexElementFormat::Float3:
+      case RHIVertexElementFormat::UInt3:
+      case RHIVertexElementFormat::Int3:
+        return 12;
+      case RHIVertexElementFormat::Float4:
+      case RHIVertexElementFormat::UInt4:
+      case RHIVertexElementFormat::Int4:
+        return 16;
+      default:
+        EZ_REPORT_FAILURE("Invalid format specified for vertex element.");
+    }
+  }
 };
 
 /// <summary>
@@ -1132,6 +1229,322 @@ struct EZ_RHI_DLL IndirectDrawIndexedArguments
 };
 
 /// <summary>
+/// Describes a single shader specialization constant. Used to substitute new values into Shaders when constructing a
+/// <see cref="RHIPipeline"/>.
+/// </summary>
+struct EZ_RHI_DLL RHISpecializationConstant : public ezHashableStruct<RHISpecializationConstant>
+{
+  /// <summary>
+  /// The constant variable ID, as defined in the <see cref="RHIShader"/>.
+  /// </summary>
+  ezUInt32 ID = 0;
+
+  /// <summary>
+  /// The type of data stored in this instance. Must be a scalar numeric type.
+  /// </summary>
+  ezEnum<RHIShaderConstantType> Type;
+
+  /// <summary>
+  /// An 8-byte block storing the contents of the specialization value. This is treated as an untyped buffer and is
+  /// interepreted according to <see cref="Type"/>.
+  /// </summary>
+  ezUInt64 Data = 0;
+
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/>.
+  /// </summary>
+  /// <param name="id">The constant variable ID, as defined in the <see cref="Shader"/>.</param>
+  /// <param name="type">The type of data stored in this instance. Must be a scalar numeric type.</param>
+  /// <param name="data">An 8-byte block storing the contents of the specialization value. This is treated as an untyped
+  /// buffer and is interepreted according to <see cref="Type"/>.</param>
+  RHISpecializationConstant(ezUInt32 id, ezEnum<RHIShaderConstantType> type, ezUInt64 data)
+  {
+    ID = id;
+    Type = type;
+    Data = data;
+  }
+
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a boolean.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, bool value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::Bool, Store(value ? static_cast<unsigned char>(1u) : static_cast<unsigned char>(0u)))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 16-bit unsigned integer.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, ezUInt16 value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::UInt16, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 16-bit signed integer.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, ezInt16 value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::Int16, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 32-bit unsigned integer.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, ezUInt32 value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::UInt32, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 32-bit signed integer.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, ezInt32 value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::Int32, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 64-bit unsigned integer.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, ezUInt64 value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::UInt64, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 64-bit signed integer.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, ezInt64 value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::Int64, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 32-bit floating-point value.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, float value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::Float, Store(value))
+  {
+  }
+  /// <summary>
+  /// Constructs a new <see cref="SpecializationConstant"/> for a 64-bit floating-point value.
+  /// </summary>
+  /// <param name="id">The constant variable ID.</param>
+  /// <param name="value">The constant value.</param>
+  RHISpecializationConstant(ezUInt32 id, double value)
+    : RHISpecializationConstant(id, RHIShaderConstantType::Double, Store(value))
+  {
+  }
+
+  template <typename T>
+  static ezUInt64 Store(T value)
+  {
+    ezUInt64 data;
+
+    data = value;
+
+    return data;
+  }
+
+  /// <summary>
+  /// Element-wise equality.
+  /// </summary>
+  /// <param name="other">The instance to compare to.</param>
+  /// <returns>True if all elements are equal; false otherswise.</returns>
+  bool operator==(const RHISpecializationConstant& other) const
+  {
+    return ID == other.ID && Type == other.Type && Data == other.Data;
+  }
+};
+
+/// <summary>
+/// Describes a single element of a vertex.
+/// </summary>
+struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVertexElementDescription>
+{
+  /// <summary>
+  /// The name of the element.
+  /// </summary>
+  ezString Name;
+
+  /// <summary>
+  /// The semantic type of the element.
+  /// NOTE: When using SPIRV, all vertex elements will use
+  /// <see cref="RHIVertexElementSemantic.TextureCoordinate"/>.
+  /// </summary>
+  ezEnum<RHIVertexElementSemantic> Semantic;
+
+  /// <summary>
+  /// The format of the element.
+  /// </summary>
+  ezEnum<RHIVertexElementFormat> Format;
+
+  /// <summary>
+  /// The offset in bytes from the beginning of the vertex.
+  /// </summary>
+  ezUInt32 Offset;
+
+  /// <summary>
+  /// Constructs a new VertexElementDescription describing a per-vertex element.
+  /// </summary>
+  /// <param name="name">The name of the element.</param>
+  /// <param name="semantic">The semantic type of the element.</param>
+  /// <param name="format">The format of the element.</param>
+  RHIVertexElementDescription(ezString name, ezEnum<RHIVertexElementSemantic> semantic, ezEnum<RHIVertexElementFormat> format)
+    : Name(name)
+    , Semantic(semantic)
+    , Format(format)
+  {
+  }
+
+  /// <summary>
+  /// Constructs a new VertexElementDescription.
+  /// </summary>
+  /// <param name="name">The name of the element.</param>
+  /// <param name="semantic">The semantic type of the element.</param>
+  /// <param name="format">The format of the element.</param>
+  RHIVertexElementDescription(
+    ezString name,
+    ezEnum<RHIVertexElementSemantic> semantic,
+    ezEnum<RHIVertexElementFormat> format)
+  {
+    Name = name;
+    Format = format;
+    Semantic = semantic;
+    Offset = 0;
+  }
+
+  /// <summary>
+  /// Constructs a new VertexElementDescription.
+  /// </summary>
+  /// <param name="name">The name of the element.</param>
+  /// <param name="semantic">The semantic type of the element.</param>
+  /// <param name="format">The format of the element.</param>
+  /// <param name="offset">The offset in bytes from the beginning of the vertex.</param>
+  RHIVertexElementDescription(
+    ezString name,
+    ezEnum<RHIVertexElementSemantic> semantic,
+    ezEnum<RHIVertexElementFormat> format,
+    ezUInt32 offset)
+  {
+    Name = name;
+    Format = format;
+    Semantic = semantic;
+    Offset = offset;
+  }
+
+  /// <summary>
+  /// Element-wise equality.
+  /// </summary>
+  /// <param name="other">The instance to compare to.</param>
+  /// <returns>True if all elements are equal; false otherswise.</returns>
+  bool operator==(const RHIVertexElementDescription& other) const
+  {
+    return Name.IsEqual(other.Name) && Format == other.Format && Semantic == other.Semantic && Offset == other.Offset;
+  }
+};
+
+/// <summary>
+/// Describes the layout of vertex data in a single <see cref="RHIDeviceBuffer"/> used as a vertex buffer.
+/// </summary>
+struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertexLayoutDescription>
+{
+  /// <summary>
+  /// The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.
+  /// </summary>
+  ezUInt32 Stride;
+
+  /// <summary>
+  /// An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element of vertex data.
+  /// </summary>
+  ezDynamicArray<RHIVertexElementDescription> Elements;
+
+  /// <summary>
+  /// A value controlling how often data for instances is advanced for this layout. For per-vertex elements, this value
+  /// should be 0.
+  /// For example, an InstanceStepRate of 3 indicates that 3 instances will be drawn with the same value for this layout. The
+  /// next 3 instances will be drawn with the next value, and so on.
+  /// </summary>
+  ezUInt32 InstanceStepRate;
+
+  /// <summary>
+  /// Constructs a new RHIVertexLayoutDescription.
+  /// </summary>
+  /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.</param>
+  /// <param name="elements">An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element
+  /// of vertex data.</param>
+  RHIVertexLayoutDescription(ezUInt32 stride, ezDynamicArray<RHIVertexElementDescription> elements)
+  {
+    Stride = stride;
+    Elements = elements;
+    InstanceStepRate = 0;
+  }
+
+  /// <summary>
+  /// Constructs a new RHIVertexLayoutDescription.
+  /// </summary>
+  /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.</param>
+  /// <param name="elements">An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element
+  /// of vertex data.</param>
+  /// <param name="instanceStepRate">A value controlling how often data for instances is advanced for this element. For
+  /// per-vertex elements, this value should be 0.
+  /// For example, an InstanceStepRate of 3 indicates that 3 instances will be drawn with the same value for this element.
+  /// The next 3 instances will be drawn with the next value for this element, and so on.</param>
+  RHIVertexLayoutDescription(ezUInt32 stride, ezUInt32 instanceStepRate, ezDynamicArray<RHIVertexElementDescription> elements)
+  {
+    Stride = stride;
+    Elements = elements;
+    InstanceStepRate = instanceStepRate;
+  }
+
+  /// <summary>
+  /// Constructs a new RHIVertexLayoutDescription. The stride is assumed to be the sum of the size of all elements.
+  /// </summary>
+  /// <param name="elements">An array of <see cref="VertexElementDescription"/> objects, each describing a single element
+  /// of vertex data.</param>
+  RHIVertexLayoutDescription(ezDynamicArray<RHIVertexElementDescription> elements)
+  {
+    Elements = elements;
+    ezUInt32 computedStride = 0;
+    for (ezUInt32 i = 0; i < elements.GetCount(); i++)
+    {
+      ezUInt32 elementSize = RHIVertexElementFormat::GetSize(elements[i].Format);
+      if (elements[i].Offset != 0)
+      {
+        computedStride = elements[i].Offset + elementSize;
+      }
+      else
+      {
+        computedStride += elementSize;
+      }
+    }
+
+    Stride = computedStride;
+    InstanceStepRate = 0;
+  }
+
+  /// <summary>
+  /// Element-wise equality.
+  /// </summary>
+  /// <param name="other">The instance to compare to.</param>
+  /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
+  bool operator==(const RHIVertexLayoutDescription& other) const
+  {
+    return Stride == other.Stride && Elements == other.Elements && InstanceStepRate == other.InstanceStepRate;
+  }
+};
+
+/// <summary>
 /// Describes a 3-dimensional region.
 /// </summary>
 struct EZ_RHI_DLL RHIViewport : ezHashableStruct<RHIViewport>
@@ -1176,7 +1589,6 @@ struct EZ_RHI_DLL RHIViewport : ezHashableStruct<RHIViewport>
   /// <param name="height">The height.</param>
   /// <param name="minDepth">The minimum depth.</param>
   /// <param name="maxDepth">The maximum depth.</param>
-
   RHIViewport(float x, float y, float width, float height, float minDepth, float maxDepth)
   {
     X = x;
@@ -1192,8 +1604,7 @@ struct EZ_RHI_DLL RHIViewport : ezHashableStruct<RHIViewport>
   /// </summary>
   /// <param name="other">The instance to compare to.</param>
   /// <returns>True if all elements are equal; false otherswise.</returns>
-
-  bool operator=(const RHIViewport& other) const
+  bool operator==(const RHIViewport& other) const
   {
     return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height && MinDepth == other.MinDepth && MaxDepth == other.MaxDepth;
   }
