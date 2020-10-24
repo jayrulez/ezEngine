@@ -138,6 +138,10 @@ struct EZ_RHI_DLL RHISwapchainDescription : public ezHashableStruct<RHISwapchain
   }
 };
 
+/// <summary>
+/// A device resource providing the ability to present rendered images to a visible surface.
+/// See <see cref="SwapchainDescription"/>.
+/// </summary>
 class EZ_RHI_DLL RHISwapchain : public RHIDeviceResource
 {
 public:
