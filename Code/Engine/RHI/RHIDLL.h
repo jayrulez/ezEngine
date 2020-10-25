@@ -44,7 +44,7 @@ namespace RHIUtils
 /// <summary>
 /// The format of index data used in a <see cref="RHIDeviceBuffer"/>.
 /// </summary>
-struct EZ_RHI_DLL RHIIndexType // : byte
+struct EZ_RHI_DLL RHIIndexFormat // : byte
 {
   using StorageType = ezUInt8;
   enum Enum
@@ -204,7 +204,8 @@ struct EZ_RHI_DLL RHIBufferUsage // : byte
     /// <see cref="RHIMapMode"/> values.
     /// This flag cannot be combined with any other flag.
     /// </summary>
-    Staging = 1 << 7
+    Staging = 1 << 7,
+    Default = VertexBuffer
   };
 
   struct Bits
@@ -353,7 +354,8 @@ struct EZ_RHI_DLL RHIMapMode // : byte
     /// A read-write resource mapping. The mapped data region is both readable and writable. NOTE: this mode can only be used
     /// on resources created with the Staging usage flag.
     /// </summary>
-    ReadWrite
+    ReadWrite,
+    Default = Read
   };
 };
 
@@ -1757,4 +1759,185 @@ struct EZ_RHI_DLL RHIViewport : ezHashableStruct<RHIViewport>
   {
     return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height && MinDepth == other.MinDepth && MaxDepth == other.MaxDepth;
   }
+};
+
+/// <summary>
+/// Enumerates the optional features supported by a given <see cref="GraphicsDevice"/>.
+/// </summary>
+class RHIGraphicsDeviceFeatures
+{
+public:
+  /// <summary>
+  /// Indicates whether Compute Shaders can be used.
+  /// </summary>
+  bool ComputeShaderSupported() const { return ComputeShader; }
+
+  /// <summary>
+  /// Indicates whether Geometry Shaders can be used.
+  /// </summary>
+  bool GeometryShaderSupported() const { return GeometryShader; }
+
+  /// <summary>
+  /// Indicates whether Tessellation Shaders can be used.
+  /// </summary>
+  bool TessellationShadersSupported() const { return TessellationShaders; }
+
+  /// <summary>
+  /// Indicates whether multiple independent viewports can be set simultaneously.
+  /// If this is not supported, then only the first Viewport index will be used for all render outputs.
+  /// </summary>
+  bool MultipleViewportsSupported() const { return MultipleViewports; }
+
+  /// <summary>
+  /// Indicates whether <see cref="SamplerDescription.LodBias"/> can be non-zero.
+  /// If false, it is an error to attempt to use a non-zero bias value.
+  /// </summary>
+  bool SamplerLodBiasSupported() const { return SamplerLodBias; }
+
+  /// <summary>
+  /// Indicates whether a non-zero "vertexStart" value can be used in
+  /// <see cref="CommandList.Draw(uint, uint, uint, uint)"/> and
+  /// <see cref="CommandList.DrawIndexed(uint, uint, uint, int, uint)"/>.
+  /// </summary>
+  bool DrawBaseVertexSupported() const { return DrawBaseVertex; }
+
+  /// <summary>
+  /// Indicates whether a non-zero "instanceStart" value can be used in
+  /// <see cref="CommandList.Draw(uint, uint, uint, uint)"/> and
+  /// <see cref="CommandList.DrawIndexed(uint, uint, uint, int, uint)"/>.
+  /// </summary>
+  bool DrawBaseInstanceSupported() const { return DrawBaseInstance; }
+
+  /// <summary>
+  /// Indicates whether indirect draw commands can be issued.
+  /// </summary>
+  bool DrawIndirectSupported() const { return DrawIndirect; }
+
+  /// <summary>
+  /// Indicates whether indirect draw structures stored in an Indirect DeviceBuffer can contain
+  /// a non-zero FirstInstance value.
+  /// </summary>
+  bool DrawIndirectBaseInstanceSupported() const { return DrawIndirectBaseInstance; }
+
+  /// <summary>
+  /// Indicates whether <see cref="PolygonFillMode.Wireframe"/> is supported.
+  /// </summary>
+  bool FillModeWireframeSupported() const { return FillModeWireframe; }
+
+  /// <summary>
+  /// Indicates whether <see cref="SamplerFilter.Anisotropic"/> is supported.
+  /// </summary>
+  bool SamplerAnisotropySupported() const { return SamplerAnisotropy; }
+
+  /// <summary>
+  /// Indicates whether <see cref="RasterizerStateDescription.DepthClipEnabled"/> can be set to false.
+  /// </summary>
+  bool DepthClipDisableSupported() const { return DepthClipDisable; }
+
+  /// <summary>
+  /// Indicates whether a <see cref="Texture"/> can be created with <see cref="TextureType.Texture1D"/>.
+  /// </summary>
+  bool Texture1DSupported() const { return Texture1D; }
+
+  /// <summary>
+  /// Indicates whether a <see cref="BlendStateDescription"/> can be used which has multiple different
+  /// <see cref="BlendAttachmentDescription"/> values for each attachment. If false, all attachments must have the same
+  /// blend state.
+  /// </summary>
+  bool IndependentBlendSupported() const { return IndependentBlend; }
+
+  /// <summary>
+  /// Indicates whether <see cref="BufferUsage.StructuredBufferReadOnly"/> and
+  /// <see cref="BufferUsage.StructuredBufferReadWrite"/> can be used. If false, structured buffers cannot be created.
+  /// </summary>
+  bool StructuredBufferSupported() const { return StructuredBuffer; }
+
+  /// <summary>
+  /// Indicates whether a <see cref="TextureView"/> can be created which does not view the full set of mip levels and array
+  /// layers contained in its target Texture, or uses a different <see cref="PixelFormat"/> from the underlying Texture.
+  /// </summary>
+  bool SubsetTextureViewSupported() const { return SubsetTextureView; }
+
+  /// <summary>
+  /// Indicates whether <see cref="CommandList"/> instances created with this device support the
+  /// <see cref="CommandList.PushDebugGroup(string)"/>, <see cref="CommandList.PopDebugGroup"/>, and
+  /// <see cref="CommandList.InsertDebugMarker(string)"/> methods. If not, these methods will have no effect.
+  /// </summary>
+  bool CommandListDebugMarkersSupported() const { return CommandListDebugMarkers; }
+
+  /// <summary>
+  /// Indicates whether uniform and structured buffers can be bound with an offset and a size. If false, buffer resources
+  /// must be bound with their full range.
+  /// </summary>
+  bool BufferRangeBindingSupported() const { return BufferRangeBinding; }
+
+  /// <summary>
+  /// Indicates whether 64-bit floating point integers can be used in shaders.
+  /// </summary>
+  bool ShaderFloat64Supported() const { return ShaderFloat64; }
+
+  RHIGraphicsDeviceFeatures() {}
+
+  RHIGraphicsDeviceFeatures(bool computeShader,
+    bool geometryShader,
+    bool tessellationShaders,
+    bool multipleViewports,
+    bool samplerLodBias,
+    bool drawBaseVertex,
+    bool drawBaseInstance,
+    bool drawIndirect,
+    bool drawIndirectBaseInstance,
+    bool fillModeWireframe,
+    bool samplerAnisotropy,
+    bool depthClipDisable,
+    bool texture1D,
+    bool independentBlend,
+    bool structuredBuffer,
+    bool subsetTextureView,
+    bool commandListDebugMarkers,
+    bool bufferRangeBinding,
+    bool shaderFloat64)
+  {
+
+    ComputeShader = computeShader;
+    GeometryShader = geometryShader;
+    TessellationShaders = tessellationShaders;
+    MultipleViewports = multipleViewports;
+    SamplerLodBias = samplerLodBias;
+    DrawBaseVertex = drawBaseVertex;
+    DrawBaseInstance = drawBaseInstance;
+    DrawIndirect = drawIndirect;
+    DrawIndirectBaseInstance = drawIndirectBaseInstance;
+    FillModeWireframe = fillModeWireframe;
+    SamplerAnisotropy = samplerAnisotropy;
+    DepthClipDisable = depthClipDisable;
+    Texture1D = texture1D;
+    IndependentBlend = independentBlend;
+    StructuredBuffer = structuredBuffer;
+    SubsetTextureView = subsetTextureView;
+    CommandListDebugMarkers = commandListDebugMarkers;
+    BufferRangeBinding = bufferRangeBinding;
+    ShaderFloat64 = shaderFloat64;
+  }
+
+private:
+  bool ComputeShader = false;
+  bool GeometryShader = false;
+  bool TessellationShaders = false;
+  bool MultipleViewports = false;
+  bool SamplerLodBias = false;
+  bool DrawBaseVertex = false;
+  bool DrawBaseInstance = false;
+  bool DrawIndirect = false;
+  bool DrawIndirectBaseInstance = false;
+  bool FillModeWireframe = false;
+  bool SamplerAnisotropy = false;
+  bool DepthClipDisable = false;
+  bool Texture1D = false;
+  bool IndependentBlend = false;
+  bool StructuredBuffer = false;
+  bool SubsetTextureView = false;
+  bool CommandListDebugMarkers = false;
+  bool BufferRangeBinding = false;
+  bool ShaderFloat64 = false;
 };

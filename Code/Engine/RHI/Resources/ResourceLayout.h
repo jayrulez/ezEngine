@@ -161,4 +161,17 @@ class RHIResourceLayout : public RHIDeviceResource
     }
 #endif
   }
+
+public:
+#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
+  const RHIResourceLayoutDescription& GetDescription() const
+  {
+    return Description;
+  }
+
+  ezUInt32 GetDynamicBufferCount() const
+  {
+    return DynamicBufferCount;
+  }
+#endif
 };

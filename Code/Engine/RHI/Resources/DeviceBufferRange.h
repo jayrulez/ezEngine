@@ -51,5 +51,12 @@ struct RHIDeviceBufferRange : public RHIDeviceResource
     return Buffer == other.Buffer && Offset == other.Offset && Size == other.Size;
   }
 
-  // TODO: GetHashCode()
+  virtual void SetName(const ezString& name) override
+  {
+  }
+
+  virtual ezString GetName() const override
+  {
+    return ezString();
+  }
 };
