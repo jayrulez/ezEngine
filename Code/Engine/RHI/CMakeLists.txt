@@ -79,8 +79,8 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 if(MSVC)
-  #target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
-  target_compile_options(${PROJECT_NAME} PRIVATE /W0 /WX-)
+  target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+  #target_compile_options(${PROJECT_NAME} PRIVATE /W0 /WX-)
   target_compile_options(${PROJECT_NAME} PRIVATE /GR) #temporarily
 endif()
 

@@ -388,6 +388,7 @@ namespace RHIFormatUtils
         return RHITextureSampleCount::Count32;
       default:
         EZ_REPORT_FAILURE("Unsupported multisample count: {}", samples);
+        return RHITextureSampleCount::Default;
     }
   }
   ezEnum<RHIPixelFormat> GetViewFamilyFormat(ezEnum<RHIPixelFormat> format)

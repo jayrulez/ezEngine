@@ -70,7 +70,7 @@ public:
       if (description.BlendState.AttachmentStates.GetCount() > 0)
       {
         RHIBlendAttachmentDescription attachmentState = description.BlendState.AttachmentStates[0];
-        for (int i = 1; i < description.BlendState.AttachmentStates.GetCount(); i++)
+        for (ezUInt32 i = 1; i < description.BlendState.AttachmentStates.GetCount(); i++)
         {
           if (!(attachmentState == description.BlendState.AttachmentStates[i]))
           {

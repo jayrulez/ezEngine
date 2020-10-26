@@ -254,7 +254,7 @@ public:
     }
 
 #endif
-    SetGraphicsResourceSet(slot, resourceSet, dynamicOffsetsCount, dynamicOffsets);
+    SetGraphicsResourceSetCore(slot, resourceSet, dynamicOffsetsCount, dynamicOffsets);
   }
 
   /// <summary>
@@ -265,7 +265,6 @@ public:
   /// <param name="rs">The new <see cref="ResourceSet"/>.</param>
   void SetComputeResourceSet(ezUInt32 slot, RHIResourceSet* resourceSet)
   {
-
     SetComputeResourceSet(slot, resourceSet, 0, ezDynamicArray<ezUInt32>());
   }
 
@@ -412,11 +411,11 @@ public:
   /// </summary>
   void SetFullViewports()
   {
-    SetViewport(0, RHIViewport(0, 0, m_pFramebuffer->GetWidth(), m_pFramebuffer->GetHeight(), 0, 1));
+    SetViewport(0, RHIViewport(0, 0, (float)m_pFramebuffer->GetWidth(), (float)m_pFramebuffer->GetHeight(), 0, 1));
 
     for (ezUInt32 index = 1; index < m_pFramebuffer->GetColorTargets().GetCount(); index++)
     {
-      SetViewport(index, RHIViewport(0, 0, m_pFramebuffer->GetWidth(), m_pFramebuffer->GetHeight(), 0, 1));
+      SetViewport(index, RHIViewport(0, 0, (float)m_pFramebuffer->GetWidth(), (float)m_pFramebuffer->GetHeight(), 0, 1));
     }
   }
 
@@ -426,7 +425,7 @@ public:
   /// <param name="index">The color target index.</param>
   void SetFullViewport(ezUInt32 index)
   {
-    SetViewport(index, RHIViewport(0, 0, m_pFramebuffer->GetWidth(), m_pFramebuffer->GetHeight(), 0, 1));
+    SetViewport(index, RHIViewport(0, 0, (float)m_pFramebuffer->GetWidth(), (float)m_pFramebuffer->GetHeight(), 0, 1));
   }
 
   /// <summary>
@@ -1035,7 +1034,7 @@ private:
     }
   }
 
-  static void ValidateIndirectStride(ezUInt32 stride, int argumentSize)
+  static void ValidateIndirectStride(ezUInt32 stride, ezUInt32 argumentSize)
   {
     if (stride < argumentSize || ((stride % 4) != 0))
     {

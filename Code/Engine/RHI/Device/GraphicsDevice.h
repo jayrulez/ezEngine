@@ -824,9 +824,9 @@ public:
 public:
   static bool IsBackendSupported(ezEnum<RHIGraphicsBackend> backend)
   {
-    switch (backend)
-    {
-    }
+    //switch (backend)
+    //{
+    //}
     return false;
   }
 
