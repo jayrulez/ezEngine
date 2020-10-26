@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Foundation/Strings/HashedString.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
+
+#include <Foundation/Strings/HashedString.h>
 
 struct EZ_RHI_DLL RHIDeviceResourceFlags // : byte
 {

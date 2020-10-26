@@ -2,30 +2,21 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
+#include <RHI/Descriptors/CommandListDescription.h>
+#include <RHI/Descriptors/ResourceLayoutDescription.h>
 
-#include <Foundation/Algorithm/HashableStruct.h>
-#include <RHI/Resources/DeviceBuffer.h>
-#include <RHI/Resources/DeviceResource.h>
-#include <RHI/Resources/Framebuffer.h>
 #include <RHI/Resources/Pipeline.h>
+#include <RHI/Resources/DeviceBuffer.h>
+#include <RHI/Resources/DeviceBufferRange.h>
+#include <RHI/Resources/ResourceLayout.h>
 #include <RHI/Resources/ResourceSet.h>
-#include <RHI/Utils.h>
+#include <RHI/Resources/Framebuffer.h>
+#include <RHI/Resources/Viewport.h>
+#include <RHI/Resources/Texture.h>
 
-/// <summary>
-/// Describes a <see cref="RHICommandList"/>, for creation using a <see cref="RHIResourceFactory"/>.
-/// </summary>
-struct EZ_RHI_DLL RHICommandListDescription : public ezHashableStruct<RHICommandListDescription>
-{
-  /// <summary>
-  /// Element-wise equality.
-  /// </summary>
-  /// <param name="other">The instance to compare to.</param>
-  /// <returns>True if all elements are equal; false otherswise.</returns>
-  bool operator==(const RHICommandListDescription& other) const
-  {
-    return true;
-  }
-};
+#include <RHI/Resources/DeviceResource.h>
+
+#include <RHI/Utils.h>
 
 /// <summary>
 /// A device resource which allows the recording of graphics commands, which can later be executed by a
@@ -669,7 +660,7 @@ public:
   void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source)
   {
     ezUInt8* sourcePtr = &source;
-    UpdateBuffer(buffer, bufferOffset, sourcePtr, sizeof(T));
+    UpdateBuffer(buffer, bufferOffset, sourcePtr, (ezUInt32)sizeof(T));
   }
 
   /// <summary>
@@ -1040,7 +1031,7 @@ private:
   {
     if ((indirectBuffer->GetUsage() & RHIBufferUsage::IndirectBuffer) != RHIBufferUsage::IndirectBuffer)
     {
-      EZ_REPORT_FAILURE("indirectBuffer parameter must have been created with RHIBufferUsage::IndirectBuffer. Instead, it was {}.", indirectBuffer->GetUsage());
+      EZ_REPORT_FAILURE("indirectBuffer parameter must have been created with RHIBufferUsage::IndirectBuffer. Instead, it was {}.", indirectBuffer->GetUsage().GetValue());
     }
   }
 

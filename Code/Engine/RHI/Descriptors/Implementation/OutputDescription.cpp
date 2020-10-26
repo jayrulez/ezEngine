@@ -1,3 +1,4 @@
+#include <RHI/Descriptors/OutputDescription.h>
 #include <RHI/Resources/Framebuffer.h>
 
 RHIOutputDescription RHIOutputDescription::CreateFromFramebuffer(RHIFramebuffer* framebuffer)

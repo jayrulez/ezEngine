@@ -1,8 +1,7 @@
 #include <RHI/Resources/Texture.h>
+#include <RHI/Device/GraphicsDevice.h>
 
 RHITextureView* RHITexture::CreateFullTextureView(RHIGraphicsDevice* graphicsDevice)
 {
-  //TODO: implement
-  //return graphicsDevice->GetResourceFactory()->CreateTextureView(this);
-  return nullptr;
+  return graphicsDevice->GetResourceFactory()->CreateTextureView(this);
 }

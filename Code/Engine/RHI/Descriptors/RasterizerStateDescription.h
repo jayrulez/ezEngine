@@ -93,21 +93,3 @@ struct EZ_RHI_DLL RHIRasterizerStateDescription : public ezHashableStruct<RHIRas
     return CullMode == other.CullMode && FillMode == other.FillMode && FrontFace == other.FrontFace && DepthClipEnabled == other.DepthClipEnabled && ScissorTestEnabled == other.ScissorTestEnabled;
   }
 };
-
-// TODO move to cpp
-const RHIRasterizerStateDescription RHIRasterizerStateDescription::Default = RHIRasterizerStateDescription{
-  RHIFaceCullMode::Back,     // CullMode
-  RHIPolygonFillMode::Solid, // FillMode
-  RHIFrontFace::Clockwise,   // FrontFace
-  true,                      // DepthClipEnabled
-  false                      // ScissorTestEnabled
-};
-
-const RHIRasterizerStateDescription RHIRasterizerStateDescription::CullNone = RHIRasterizerStateDescription{
-  RHIFaceCullMode::None,     // CullMode
-  RHIPolygonFillMode::Solid, // FillMode
-  RHIFrontFace::Clockwise,   // FrontFace
-  true,                      // DepthClipEnabled
-  false                      // ScissorTestEnabled
-};
-// TODO end

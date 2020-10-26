@@ -1,0 +1,74 @@
+#pragma once
+
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
+#include <RHI/Descriptors/OutputAttachmentDescription.h>
+
+#include <Foundation/Algorithm/HashableStruct.h>
+
+#include <optional>
+
+class RHIFramebuffer;
+
+/// <summary>
+/// Describes a set of output attachments and their formats.
+/// </summary>
+struct EZ_RHI_DLL RHIOutputDescription : public ezHashableStruct<RHIOutputDescription>
+{
+  /// <summary>
+  /// A description of the depth attachment, or null if none exists.
+  /// </summary>
+  std::optional<RHIOutputAttachmentDescription> DepthAttachment;
+
+  /// <summary>
+  /// An array of attachment descriptions, one for each color attachment. May be empty.
+  /// </summary>
+  ezDynamicArray<RHIOutputAttachmentDescription> ColorAttachments;
+
+  /// <summary>
+  /// The number of samples in each target attachment.
+  /// </summary>
+  ezEnum<RHITextureSampleCount> SampleCount;
+
+  RHIOutputDescription() = default;
+
+  /// <summary>
+  /// Constructs a new <see cref="RHIOutputDescription"/>.
+  /// </summary>
+  /// <param name="depthAttachment">A description of the depth attachment.</param>
+  /// <param name="colorAttachments">An array of descriptions of each color attachment.</param>
+  RHIOutputDescription(std::optional<RHIOutputAttachmentDescription> depthAttachment, ezDynamicArray<RHIOutputAttachmentDescription>& colorAttachments)
+  {
+    DepthAttachment = depthAttachment;
+    ColorAttachments = colorAttachments;
+    SampleCount = RHITextureSampleCount::Count1;
+  }
+
+  /// <summary>
+  /// Constructs a new <see cref="OutputDescription"/>.
+  /// </summary>
+  /// <param name="depthAttachment">A description of the depth attachment.</param>
+  /// <param name="colorAttachments">An array of descriptions of each color attachment.</param>
+  /// <param name="sampleCount">The number of samples in each target attachment.</param>
+  RHIOutputDescription(
+    std::optional<RHIOutputAttachmentDescription> depthAttachment,
+    ezDynamicArray<RHIOutputAttachmentDescription>& colorAttachments,
+    ezEnum<RHITextureSampleCount> sampleCount)
+  {
+    DepthAttachment = depthAttachment;
+    ColorAttachments = colorAttachments;
+    SampleCount = sampleCount;
+  }
+
+  static RHIOutputDescription CreateFromFramebuffer(RHIFramebuffer* framebuffer);
+
+  /// <summary>
+  /// Element-wise equality.
+  /// </summary>
+  /// <param name="other">The instance to compare to.</param>
+  /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
+  bool operator==(const RHIOutputDescription& other) const
+  {
+    return DepthAttachment == other.DepthAttachment && ColorAttachments == other.ColorAttachments && SampleCount == other.SampleCount;
+  }
+};
