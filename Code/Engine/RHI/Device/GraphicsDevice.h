@@ -815,21 +815,6 @@ public:
     return Aniso4xSampler;
   }
 
-public:
-  /// <summary>
-  /// Checks whether the given <see cref="GraphicsBackend"/> is supported on this system.
-  /// </summary>
-  /// <param name="backend">The GraphicsBackend to check.</param>
-  /// <returns>True if the GraphicsBackend is supported; false otherwise.</returns>
-public:
-  static bool IsBackendSupported(ezEnum<RHIGraphicsBackend> backend)
-  {
-    //switch (backend)
-    //{
-    //}
-    return false;
-  }
-
 protected:
   /// <summary>
   /// Creates and caches common device resources after device creation completes.

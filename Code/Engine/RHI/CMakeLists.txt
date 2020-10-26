@@ -84,6 +84,10 @@ if(MSVC)
   target_compile_options(${PROJECT_NAME} PRIVATE /GR) #temporarily
 endif()
 
+if(${EZ_RHI_D3D11_SUPPORTED})
+  ez_link_target_dx11(${PROJECT_NAME})
+endif()
+
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
   Foundation
