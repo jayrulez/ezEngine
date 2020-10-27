@@ -19,27 +19,27 @@ struct EZ_RHI_DLL RHIBlendAttachmentDescription : public ezHashableStruct<RHIBle
   /// <summary>
   /// Controls the source color's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> SourceColorFactor;
+  ezEnum<RHIBlendFactor> SourceColorFactor = RHIBlendFactor::Default;
   /// <summary>
   /// Controls the destination color's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> DestinationColorFactor;
+  ezEnum<RHIBlendFactor> DestinationColorFactor = RHIBlendFactor::Default;
   /// <summary>
   /// Controls the function used to combine the source and destination color factors.
   /// </summary>
-  ezEnum<RHIBlendFunction> ColorFunction = RHIBlendFunction::Add;
+  ezEnum<RHIBlendFunction> ColorFunction = RHIBlendFunction::Default;
   /// <summary>
   /// Controls the source alpha's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> SourceAlphaFactor;
+  ezEnum<RHIBlendFactor> SourceAlphaFactor = RHIBlendFactor::Default;
   /// <summary>
   /// Controls the destination alpha's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> DestinationAlphaFactor;
+  ezEnum<RHIBlendFactor> DestinationAlphaFactor = RHIBlendFactor::Default;
   /// <summary>
   /// Controls the function used to combine the source and destination alpha factors.
   /// </summary>
-  ezEnum<RHIBlendFunction> AlphaFunction;
+  ezEnum<RHIBlendFunction> AlphaFunction = RHIBlendFunction::Default;
 
   RHIBlendAttachmentDescription() = default;
 
@@ -130,6 +130,12 @@ struct EZ_RHI_DLL RHIBlendAttachmentDescription : public ezHashableStruct<RHIBle
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIBlendAttachmentDescription& other) const
   {
-    return BlendEnabled == other.BlendEnabled && SourceColorFactor == other.SourceColorFactor && DestinationColorFactor == other.DestinationColorFactor && ColorFunction == other.ColorFunction && SourceAlphaFactor == other.SourceAlphaFactor && DestinationAlphaFactor == other.DestinationAlphaFactor && AlphaFunction == other.AlphaFunction;
+    return BlendEnabled == other.BlendEnabled &&
+      SourceColorFactor == other.SourceColorFactor &&
+      DestinationColorFactor == other.DestinationColorFactor &&
+      ColorFunction == other.ColorFunction &&
+      SourceAlphaFactor == other.SourceAlphaFactor &&
+      DestinationAlphaFactor == other.DestinationAlphaFactor &&
+      AlphaFunction == other.AlphaFunction;
   }
 };

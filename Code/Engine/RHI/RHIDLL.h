@@ -152,6 +152,7 @@ struct EZ_RHI_DLL RHIBufferUsage // : byte
   using StorageType = ezUInt8;
   enum Enum
   {
+    None,
     /// <summary>
     /// Indicates that a <see cref="RHIDeviceBuffer"/> can be used as the source of vertex data for drawing commands.
     /// This flag enables the use of a Buffer in the <see cref="RHICommandList.SetVertexBuffer(ezUInt32, RHIDeviceBuffer)"/> method.
@@ -198,7 +199,7 @@ struct EZ_RHI_DLL RHIBufferUsage // : byte
     /// This flag cannot be combined with any other flag.
     /// </summary>
     Staging = 1 << 7,
-    Default = VertexBuffer
+    Default = None
   };
 
   struct Bits
@@ -320,7 +321,8 @@ struct EZ_RHI_DLL RHIGraphicsBackend // : byte
     /// <summary>
     /// OpenGL ES.
     /// </summary>
-    OpenGLES
+    OpenGLES,
+    Default = Direct3D11
   };
 };
 

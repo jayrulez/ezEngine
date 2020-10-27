@@ -623,7 +623,7 @@ public:
 
     if (destination->GetSampleCount() != RHITextureSampleCount::Count1)
     {
-      EZ_REPORT_FAILURE("The destination parameter of ResolveTexture must be a non-multisample texture. Instead, it is a texture with {FormatHelpers.GetSampleCountUInt32(source.SampleCount)} samples.");
+      EZ_REPORT_FAILURE("The destination parameter of ResolveTexture must be a non-multisample texture. Instead, it is a texture with {} samples.", RHIFormatUtils::GetSampleCount(source->GetSampleCount()));
     }
 #endif
 
@@ -1078,9 +1078,9 @@ private:
   }
 
 protected:
-  RHIFramebuffer* m_pFramebuffer;
-  RHIPipeline* m_pGraphicsPipeline;
-  RHIPipeline* m_pComputePipeline;
+  RHIFramebuffer* m_pFramebuffer = nullptr;
+  RHIPipeline* m_pGraphicsPipeline = nullptr;
+  RHIPipeline* m_pComputePipeline = nullptr;
 
 private:
   RHIGraphicsDeviceFeatures m_Features;
@@ -1088,7 +1088,7 @@ private:
   ezUInt32 m_StructuredBufferAlignment;
 
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-  RHIDeviceBuffer* m_pIndexBuffer;
+  RHIDeviceBuffer* m_pIndexBuffer = nullptr;
   ezEnum<RHIIndexFormat> m_IndexFormat;
 #endif
 };

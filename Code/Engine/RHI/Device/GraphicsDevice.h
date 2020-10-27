@@ -2,7 +2,6 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/SamplerDescription.h>
 
 #include <RHI/Resources/Swapchain.h>
 #include <RHI/Resources/CommandList.h>
@@ -11,6 +10,7 @@
 #include <RHI/Resources/MappedResource.h>
 #include <RHI/Resources/MappedResourceView.h>
 #include <RHI/Resources/Sampler.h>
+#include <RHI/Descriptors/SamplerDescription.h>
 
 #include <RHI/Device/ResourceFactory.h>
 

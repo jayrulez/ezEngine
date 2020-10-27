@@ -1,9 +1,9 @@
 #pragma once
 
-#include <RHI/RHIDLL.h>
-#include <RHI/RHIPCH.h>
 #include <RHI/Descriptors/ResourceLayoutDescription.h>
 #include <RHI/Descriptors/ResourceLayoutElementDescription.h>
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
 
 #include <RHI/Resources/DeviceResource.h>
 
@@ -19,6 +19,7 @@ class RHIResourceLayout : public RHIDeviceResource
   ezUInt32 DynamicBufferCount;
 #endif
 
+protected:
   RHIResourceLayout(const RHIResourceLayoutDescription& description)
   {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)

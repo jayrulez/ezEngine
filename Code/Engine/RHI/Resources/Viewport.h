@@ -67,6 +67,11 @@ struct EZ_RHI_DLL RHIViewport : ezHashableStruct<RHIViewport>
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIViewport& other) const
   {
-    return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height && MinDepth == other.MinDepth && MaxDepth == other.MaxDepth;
+    return X == other.X &&
+           Y == other.Y &&
+           Width == other.Width &&
+           Height == other.Height &&
+           MinDepth == other.MinDepth &&
+           MaxDepth == other.MaxDepth;
   }
 };

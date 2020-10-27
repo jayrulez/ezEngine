@@ -3,6 +3,7 @@
 
 RHIFramebufferAttachmentDescription::RHIFramebufferAttachmentDescription(RHITexture* target, ezUInt32 arrayLayer, ezUInt32 mipLevel)
 {
+
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   ezUInt32 effectiveArrayLayers = target->GetArrayLayers();
   if ((target->GetUsage() & RHITextureUsage::Cubemap) != 0)
@@ -19,6 +20,7 @@ RHIFramebufferAttachmentDescription::RHIFramebufferAttachmentDescription(RHIText
     EZ_REPORT_FAILURE("mipLevel must be less than target.MipLevels");
   }
 #endif
+
   Target = target;
   ArrayLayer = arrayLayer;
   MipLevel = mipLevel;

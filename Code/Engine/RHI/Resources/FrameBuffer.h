@@ -17,9 +17,12 @@ class RHITexture;
 class RHIFramebuffer : public RHIDeviceResource
 {
 public:
+  //virtual void Dispose() override = 0;
+
+public:
   RHIFramebuffer() = default;
 
-  RHIFramebuffer(std::optional<RHIFramebufferAttachmentDescription>& depthTargetDesc, ezDynamicArray<RHIFramebufferAttachmentDescription>& colorTargetDescs)
+  RHIFramebuffer(const std::optional<RHIFramebufferAttachmentDescription>& depthTargetDesc, const ezDynamicArray<RHIFramebufferAttachmentDescription>& colorTargetDescs)
   {
     if (depthTargetDesc)
     {

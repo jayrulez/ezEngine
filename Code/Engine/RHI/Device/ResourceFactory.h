@@ -202,8 +202,7 @@ public:
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
     if (description.MipLevels == 0 || description.ArrayLayers == 0 || (description.BaseMipLevel + description.MipLevels) > description.Target->GetMipLevels() || (description.BaseArrayLayer + description.ArrayLayers) > description.Target->GetArrayLayers())
     {
-      EZ_REPORT_FAILURE(
-        "TextureView mip level and array layer range must be contained in the target Texture.");
+      EZ_REPORT_FAILURE("TextureView mip level and array layer range must be contained in the target Texture.");
     }
     if ((description.Target->GetUsage() & RHITextureUsage::Sampled) == 0 && (description.Target->GetUsage() & RHITextureUsage::Storage) == 0)
     {

@@ -37,31 +37,42 @@ EZ_DECLARE_FLAGS_OPERATORS(RHIDeviceResourceFlags);
 class EZ_RHI_DLL RHIDeviceResource : public ezRefCounted
 {
 public:
+  virtual ~RHIDeviceResource() {}
+
   /// <summary>
   /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
   /// tools.
   /// </summary>
   virtual ezString GetName() const = 0;
-  virtual void SetName(const ezString& name)
-  {
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    DebugName.Assign(name);
-#endif
-  }
+
+  virtual void SetName(const ezString& name) = 0;
+
+  /// <summary>
+  /// Checks if this device resource has been disposed
+  /// </summary>
+  /// <returns></returns>
+  virtual bool IsDisposed() const = 0;
+
+  /// <summary>
+  /// Frees device resources controlled by this instance.
+  /// </summary>
+  virtual void Dispose() = 0;
 
   const ezBitflags<RHIDeviceResourceFlags> GetFlags() const
   {
     return Flags;
   }
 
-protected:
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-  /// <summary>
-  /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
-  /// tools.
-  /// </summary>
-  mutable ezHashedString DebugName;
-#endif
+  const bool IsBindable() const
+  {
+    return Flags.IsSet(RHIDeviceResourceFlags::Bindable);
+  }
 
+  const bool IsMappable() const
+  {
+    return Flags.IsSet(RHIDeviceResourceFlags::Mappable);
+  }
+
+protected:
   ezBitflags<RHIDeviceResourceFlags> Flags = RHIDeviceResourceFlags::None;
 };

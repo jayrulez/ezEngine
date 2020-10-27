@@ -1,8 +1,8 @@
 #pragma once
 
+#include <RHI/Descriptors/TextureViewDescription.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/TextureViewDescription.h>
 
 #include <RHI/Resources/DeviceResource.h>
 #include <RHI/Resources/texture.h>
@@ -23,29 +23,34 @@ public:
   /// The target <see cref="Texture"/> object to be sampled via this instance.
   /// </summary>
   RHITexture* GetTarget() const { return Target; }
+
   /// <summary>
   /// The base mip level visible in the view.
   /// </summary>
   unsigned int GetBaseMipLevel() const { return BaseMipLevel; }
+
   /// <summary>
   /// The number of mip levels visible in the view.
   /// </summary>
   unsigned int GetMipLevels() const { return MipLevels; }
+
   /// <summary>
   /// The base array layer visible in the view.
   /// </summary>
   unsigned int GetBaseArrayLayer() const { return BaseArrayLayer; }
+
   /// <summary>
   /// The number of array layers visible in the view.
   /// </summary>
   unsigned int GetArrayLayers() const { return ArrayLayers; }
+
   /// <summary>
   /// The format used to interpret the contents of the target Texture. This may be different from the target Texture's
   /// true storage format, but it will be the same size.
   /// </summary>
   ezEnum<RHIPixelFormat> GetFormat() const { return Format; }
 
-private:
+protected:
   RHITextureView(const RHITextureViewDescription& description)
   {
     Target = description.Target;

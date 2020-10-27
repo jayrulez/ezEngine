@@ -59,4 +59,17 @@ struct RHIDeviceBufferRange : public RHIDeviceResource
   {
     return ezString();
   }
+
+  virtual bool IsDisposed() const override { return Disposed; }
+
+  virtual void Dispose() override
+  {
+    if (!Disposed)
+    {
+      Disposed = true;
+    }
+  }
+
+private:
+  bool Disposed = false;
 };
