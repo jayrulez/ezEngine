@@ -26,4 +26,9 @@ public:
       Disposed = true;
     }
   }
+
+  D3D11CommandList(D3D11GraphicsDevice* graphicsDevice, const RHICommandListDescription& description)
+    : RHICommandList(description, graphicsDevice->GetFeatures(), graphicsDevice->GetUniformBufferMinOffsetAlignment(), graphicsDevice->GetStructuredBufferMinOffsetAlignment())
+  {
+  }
 };

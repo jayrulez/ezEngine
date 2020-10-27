@@ -46,7 +46,7 @@ public:
   /// <summary>
   /// Gets the <see cref="GraphicsBackend"/> of this instance.
   /// </summary>
-  virtual ezEnum<RHIGraphicsBackend> GetBackendType() = 0;
+  virtual ezEnum<RHIGraphicsBackend> GetBackendType() const = 0;
 
   /// <summary>
   /// Creates a new <see cref="Pipeline"/> object.
@@ -113,14 +113,19 @@ public:
   /// </summary>
   /// <param name="description">The desirede properties of the created object.</param>
   /// <returns>A new <see cref="Pipeline"/> which, when bound to a CommandList, is used to dispatch compute commands.</returns>
-  virtual RHIPipeline* CreateComputePipeline(const RHIComputePipelineDescription& description) = 0;
+  virtual RHIPipeline* CreateComputePipeline(const RHIComputePipelineDescription& description)
+  {
+    return CreateComputePipelineCore(description);
+  }
 
   /// <summary>
   /// Creates a new <see cref="Framebuffer"/>.
   /// </summary>
   /// <param name="description">The desired properties of the created object.</param>
   /// <returns>A new <see cref="Framebuffer"/>.</returns>
-  virtual RHIFramebuffer* CreateFramebuffer(const RHIFramebufferDescription& description) = 0;
+  virtual RHIFramebuffer* CreateFramebuffer(const RHIFramebufferDescription& description) {
+    return CreateFramebufferCore(description);
+  }
 
   /// <summary>
   /// Creates a new <see cref="Texture"/>.
@@ -403,6 +408,8 @@ protected:
   virtual RHIResourceSet* CreateResourceSetCore(const RHIResourceSetDescription& description) = 0;
   virtual RHIFence* CreateFenceCore(bool signaled) = 0;
   virtual RHISwapchain* CreateSwapchainCore(const RHISwapchainDescription& description) = 0;
+  virtual RHIPipeline* CreateComputePipelineCore(const RHIComputePipelineDescription& description) = 0;
+  virtual RHIFramebuffer* CreateFramebufferCore(const RHIFramebufferDescription& description) = 0;
 
 private:
   RHIGraphicsDeviceFeatures Features;

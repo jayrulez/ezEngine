@@ -41,7 +41,8 @@ public:
   virtual void SetName(const ezString& name) override
   {
     Name = name;
-    DeviceTexture->SetPrivateData(WKPDID_D3DDebugObjectName, name.GetCharacterCount(), name.GetData());
+    if (DeviceTexture != nullptr)
+      DeviceTexture->SetPrivateData(WKPDID_D3DDebugObjectName, name.GetCharacterCount(), name.GetData());
   }
 
   virtual bool IsDisposed() const override { return DeviceTexture == nullptr; }

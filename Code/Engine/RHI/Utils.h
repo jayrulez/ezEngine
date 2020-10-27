@@ -3,12 +3,19 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 #include <RHI/Resources/DeviceBufferRange.h>
+#include <RHI/Resources/DeviceBuffer.h>
+
+#include <RHI/Descriptors/ResourceSetDescription.h>
+#include <RHI/Descriptors/ResourceLayoutElementDescription.h>
 
 class RHITexture;
+class RHIGraphicsDevice;
 
 namespace RHIUtils
 {
   RHIDeviceBufferRange GetBufferRange(RHIDeviceResource* resource, ezUInt32 additionalOffset);
+  bool GetDeviceBuffer(RHIDeviceResource* resource, RHIDeviceBuffer* buffer);
+
   void GetMipDimensions(RHITexture* tex, ezUInt32 mipLevel, ezUInt32& width, ezUInt32& height, ezUInt32& depth);
 
   ezUInt32 GetDimension(ezUInt32 largestLevelDimension, ezUInt32 mipLevel);
@@ -76,3 +83,10 @@ namespace RHIFormatUtils
 
   ezEnum<RHIPixelFormat> GetViewFamilyFormat(ezEnum<RHIPixelFormat> format);
 } // namespace RHIFormatUtils
+
+namespace RHIValidationUtils
+{
+  void ValidateResourceSet(RHIGraphicsDevice* gd, const RHIResourceSetDescription& description);
+
+  void ValidateResourceKind(ezEnum<RHIResourceKind> kind, RHIDeviceResource* resource, ezUInt32 slot);
+} // namespace RHIValidationUtils
