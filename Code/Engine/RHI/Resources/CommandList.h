@@ -1,18 +1,18 @@
 #pragma once
 
-#include <RHI/RHIDLL.h>
-#include <RHI/RHIPCH.h>
 #include <RHI/Descriptors/CommandListDescription.h>
 #include <RHI/Descriptors/ResourceLayoutDescription.h>
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/Pipeline.h>
 #include <RHI/Resources/DeviceBuffer.h>
 #include <RHI/Resources/DeviceBufferRange.h>
+#include <RHI/Resources/Framebuffer.h>
+#include <RHI/Resources/Pipeline.h>
 #include <RHI/Resources/ResourceLayout.h>
 #include <RHI/Resources/ResourceSet.h>
-#include <RHI/Resources/Framebuffer.h>
-#include <RHI/Resources/Viewport.h>
 #include <RHI/Resources/Texture.h>
+#include <RHI/Resources/Viewport.h>
 
 #include <RHI/Resources/DeviceResource.h>
 
@@ -54,14 +54,20 @@ public:
   /// Begin must only be called if it has not been previously called, if <see cref="End"/> has been called,
   /// or if <see cref="GraphicsDevice.SubmitCommands(CommandList)"/> has been called on this instance.
   /// </summary>
-  virtual void Begin() = 0;
+  void Begin()
+  {
+    BeginCore();
+  }
 
   /// <summary>
   /// Completes this list of graphics commands, putting it into an executable state for a <see cref="GraphicsDevice"/>.
   /// This function must only be called after <see cref="Begin"/> has been called.
   /// It is an error to call this function in succession, unless <see cref="Begin"/> has been called in between invocations.
   /// </summary>
-  virtual void End() = 0;
+  void End()
+  {
+    EndCore();
+  }
 
   /// <summary>
   /// Sets the active <see cref="Pipeline"/> used for rendering.
@@ -470,7 +476,7 @@ public:
   /// <param name="y">The Y value of the scissor rectangle.</param>
   /// <param name="width">The width of the scissor rectangle.</param>
   /// <param name="height">The height of the scissor rectangle.</param>
-  virtual void SetScissorRect(ezUInt32 index, ezUInt32 x, ezUInt32 y, ezUInt32 width, ezUInt32 height)
+  void SetScissorRect(ezUInt32 index, ezUInt32 x, ezUInt32 y, ezUInt32 width, ezUInt32 height)
   {
     SetScissorRectCore(index, x, y, width, height);
   }
@@ -964,6 +970,8 @@ public:
   }
 
 protected:
+  virtual void BeginCore() = 0;
+  virtual void EndCore() = 0;
   virtual void SetPipelineCore(RHIPipeline* pipeline) = 0;
   virtual void SetVertexBufferCore(ezUInt32 index, RHIDeviceBuffer* buffer, ezUInt32 offset) = 0;
   virtual void SetIndexBufferCore(RHIDeviceBuffer* buffer, ezEnum<RHIIndexFormat> format, ezUInt32 offset) = 0;
@@ -1000,17 +1008,6 @@ protected:
   virtual void InsertDebugMarkerCore(ezString name) = 0;
 
 private:
-  void ClearCachedState()
-  {
-    m_pFramebuffer = nullptr;
-    m_pGraphicsPipeline = nullptr;
-    m_pComputePipeline = nullptr;
-
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    m_pIndexBuffer = nullptr;
-#endif
-  }
-
   static void ValidateIndirectOffset(ezUInt32 offset)
   {
     if ((offset % 4) != 0)
@@ -1074,6 +1071,18 @@ private:
     {
       EZ_REPORT_FAILURE("The OutputDescription of the current graphics Pipeline is not compatible with the current Framebuffer.");
     }
+#endif
+  }
+
+protected:
+  void ClearCachedState()
+  {
+    m_pFramebuffer = nullptr;
+    m_pGraphicsPipeline = nullptr;
+    m_pComputePipeline = nullptr;
+
+#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
+    m_pIndexBuffer = nullptr;
 #endif
   }
 

@@ -10,7 +10,7 @@
 #include <RHI/Backends/D3D11/D3D11Utils.h>
 #include <RHI/Resources/Texture.h>
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 class D3D11GraphicsDevice;
 

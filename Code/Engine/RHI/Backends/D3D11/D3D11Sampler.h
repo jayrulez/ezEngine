@@ -4,7 +4,7 @@
 #include <RHI/RHIPCH.h>
 
 #include <RHI/Resources/Sampler.h>
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 class D3D11Sampler : public RHISampler
 {

@@ -41,4 +41,9 @@ public:
 
     Layout = reinterpret_cast<D3D11ResourceLayout*>(description.Layout);
   }
+
+  D3D11ResourceLayout* GetLayout() const
+  {
+    return Layout;
+  }
 };

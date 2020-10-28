@@ -11,13 +11,17 @@
 
 #include <RHI/Backends/D3D11/D3D11Utils.h>
 
-#include <d3d11.h>
+#include <d3d11_1.h>
+
+class D3D11Swapchain;
 
 class D3D11Framebuffer : public RHIFramebuffer
 {
 private:
   ezDynamicArray<ID3D11RenderTargetView*> RenderTargetViews;
   ID3D11DepthStencilView* DepthStencilView = nullptr;
+
+  D3D11Swapchain* Swapchain = nullptr;
 
 private:
   bool Disposed = false;
@@ -72,4 +76,17 @@ public:
   }
 
   D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDescription& description);
+
+public:
+  //TODO: Make private and expost to friends
+
+  D3D11Swapchain* GetSwapchain() const
+  {
+    return Swapchain;
+  }
+
+  void SetSwapchain(D3D11Swapchain* swapchain)
+  {
+    Swapchain = swapchain;
+  }
 };

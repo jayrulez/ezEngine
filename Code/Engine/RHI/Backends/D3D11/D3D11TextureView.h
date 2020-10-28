@@ -5,7 +5,7 @@
 
 #include <RHI/Resources/TextureView.h>
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 class D3D11TextureView : public RHITextureView
 {
@@ -55,4 +55,14 @@ public:
 
 public:
   D3D11TextureView(D3D11GraphicsDevice* graphicsDevice, const RHITextureViewDescription& description);
+
+  ID3D11ShaderResourceView* GetShaderResourceView() const
+  {
+    return ShaderResourceView;
+  }
+
+  ID3D11UnorderedAccessView* GetUnorderedAccessView() const
+  {
+    return UnorderedAccessView;
+  }
 };

@@ -1625,3 +1625,51 @@ private:
   bool BufferRangeBinding = false;
   bool ShaderFloat64 = false;
 };
+
+/// <summary>
+/// Defines an integer rectangle (Left, Top, Right, Bottom)
+/// </summary>
+struct RHIRawRect
+{
+  /// <summary>
+  /// The left position.
+  /// </summary>
+  ezInt32 Left = 0;
+
+  /// <summary>
+  /// The top position.
+  /// </summary>
+  ezInt32 Top = 0;
+
+  /// <summary>
+  /// The right position
+  /// </summary>
+  ezInt32 Right = 0;
+
+  /// <summary>
+  /// The bottom position.
+  /// </summary>
+  ezInt32 Bottom = 0;
+
+  RHIRawRect(ezInt32 left, ezInt32 top, ezInt32 right, ezInt32 bottom)
+  {
+    Left = left;
+    Top = top;
+    Right = right;
+    Bottom = bottom;
+  }
+
+  /// <summary>
+  /// Performs an implicit conversion from <see cre ="RawRect"/> to <see cref="System.Drawing.Rectangle" />.
+  /// </summary>
+  /// <param name="value">The value to convert.</param>
+  /// <returns>The result of the conversion.</returns>
+  //static implicit operator Rectangle(RawRect value) = > Rectangle.FromLTRB(value.Left, value.Top, value.Right, value.Bottom);
+
+  /// <summary>
+  /// Performs an implicit conversion from <see cre ="Rectangle"/> to <see cref="RawRect" />.
+  /// </summary>
+  /// <param name="value">The value to convert.</param>
+  /// <returns>The result of the conversion.</returns>
+  //static implicit operator RawRect(Rectangle value) = > new RawRect(value.Left, value.Top, value.Right, value.Bottom);
+};

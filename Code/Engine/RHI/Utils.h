@@ -2,11 +2,11 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Resources/DeviceBufferRange.h>
 #include <RHI/Resources/DeviceBuffer.h>
+#include <RHI/Resources/DeviceBufferRange.h>
 
-#include <RHI/Descriptors/ResourceSetDescription.h>
 #include <RHI/Descriptors/ResourceLayoutElementDescription.h>
+#include <RHI/Descriptors/ResourceSetDescription.h>
 
 class RHITexture;
 class RHIGraphicsDevice;
@@ -16,9 +16,35 @@ namespace RHIUtils
   RHIDeviceBufferRange GetBufferRange(RHIDeviceResource* resource, ezUInt32 additionalOffset);
   bool GetDeviceBuffer(RHIDeviceResource* resource, RHIDeviceBuffer* buffer);
 
+  RHITextureView* GetTextureView(RHIGraphicsDevice* gd, RHIDeviceResource* resource);
+
   void GetMipDimensions(RHITexture* tex, ezUInt32 mipLevel, ezUInt32& width, ezUInt32& height, ezUInt32& depth);
 
   ezUInt32 GetDimension(ezUInt32 largestLevelDimension, ezUInt32 mipLevel);
+
+  template <typename Base, typename Derived>
+  Derived* AssertSubtype(Base* base)
+  {
+    if (base == nullptr)
+    {
+      EZ_REPORT_FAILURE("Base type must not be null.");
+      return nullptr;
+    }
+
+    Derived* derived = dynamic_cast<Derived*>(base);
+    if (derived == nullptr)
+      EZ_REPORT_FAILURE("Type must be derived from specified base type.");
+
+    return derived;
+  }
+
+  template <typename T, typename Derived>
+  void ClearArray(ezArrayBase<T, Derived> array)
+  {
+    ezUInt32 count = array.GetCount();
+    array.Clear();
+    array.SetCountUninitialized(count);
+  }
 } // namespace RHIUtils
 
 namespace RHIFormatUtils

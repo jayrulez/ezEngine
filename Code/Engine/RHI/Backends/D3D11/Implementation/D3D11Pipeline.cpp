@@ -73,7 +73,7 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
   if (vsBytecode.GetCount() > 0 && description.ShaderSet.VertexLayouts.GetCount() > 0)
   {
     InputLayout = inputLayout;
-    int numVertexBuffers = description.ShaderSet.VertexLayouts.GetCount();
+    ezUInt32 numVertexBuffers = description.ShaderSet.VertexLayouts.GetCount();
     VertexStrides.SetCountUninitialized(numVertexBuffers);
     for (ezUInt32 i = 0; i < numVertexBuffers; i++)
     {
@@ -96,7 +96,7 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIComputePipeline
   ComputeShader = (ID3D11ComputeShader*)(reinterpret_cast<D3D11Shader*>(description.ComputeShader))->GetDeviceShader();
   ezDynamicArray<RHIResourceLayout*> genericLayouts = description.ResourceLayouts;
   ResourceLayouts.SetCountUninitialized(genericLayouts.GetCount());
-  for (int i = 0; i < ResourceLayouts.GetCount(); i++)
+  for (ezUInt32 i = 0; i < ResourceLayouts.GetCount(); i++)
   {
     ResourceLayouts[i] = reinterpret_cast<D3D11ResourceLayout*>(genericLayouts[i]);
   }

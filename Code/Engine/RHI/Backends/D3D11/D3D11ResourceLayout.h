@@ -5,24 +5,27 @@
 
 #include <RHI/Resources/ResourceLayout.h>
 
-struct ResourceBindingInfo
-{
-  ezUInt32 Slot = 0;
-  ezBitflags<RHIShaderStages> Stages;
-  ezEnum<RHIResourceKind> Kind;
-  bool DynamicBuffer = false;
 
-  ResourceBindingInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezEnum<RHIResourceKind> kind, bool dynamicBuffer)
-  {
-    Slot = slot;
-    Stages = stages;
-    Kind = kind;
-    DynamicBuffer = dynamicBuffer;
-  }
-};
 
 class D3D11ResourceLayout : public RHIResourceLayout
 {
+public:
+  struct ResourceBindingInfo
+  {
+    ezUInt32 Slot = 0;
+    ezBitflags<RHIShaderStages> Stages;
+    ezEnum<RHIResourceKind> Kind;
+    bool DynamicBuffer = false;
+
+    ResourceBindingInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezEnum<RHIResourceKind> kind, bool dynamicBuffer)
+    {
+      Slot = slot;
+      Stages = stages;
+      Kind = kind;
+      DynamicBuffer = dynamicBuffer;
+    }
+  };
+
 private:
   ezDynamicArray<ResourceBindingInfo> BindingInfosByRHIIndex;
 
@@ -62,7 +65,7 @@ public:
     int samplerIndex = 0;
     int unorderedAccessIndex = 0;
 
-    for (int i = 0; i < BindingInfosByRHIIndex.GetCount(); i++)
+    for (ezUInt32 i = 0; i < BindingInfosByRHIIndex.GetCount(); i++)
     {
       int slot;
       switch (elements[i].Kind)

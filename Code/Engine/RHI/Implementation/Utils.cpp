@@ -43,6 +43,25 @@ namespace RHIUtils
     return false;
   }
 
+  RHITextureView* GetTextureView(RHIGraphicsDevice* gd, RHIDeviceResource* resource)
+  {
+    RHITextureView* view = dynamic_cast<RHITextureView*>(resource);
+    RHITexture* tex = dynamic_cast<RHITexture*>(resource);
+    if (view)
+    {
+      return view;
+    }
+    else if (tex)
+    {
+      return tex->GetFullTextureView(gd);
+    }
+    else
+    {
+      EZ_REPORT_FAILURE("Unexpected resource type. Expected Texture or TextureView but found {resource.GetType().Name}");
+      return nullptr;
+    }
+  }
+
   void GetMipDimensions(RHITexture* tex, ezUInt32 mipLevel, ezUInt32& width, ezUInt32& height, ezUInt32& depth)
   {
     width = GetDimension(tex->GetWidth(), mipLevel);
@@ -541,12 +560,14 @@ namespace RHIValidationUtils
 
   void ValidateResourceKind(ezEnum<RHIResourceKind> kind, RHIDeviceResource* resource, ezUInt32 slot)
   {
+
+    RHIDeviceBuffer* db = nullptr;
+    bool dbValid = RHIUtils::GetDeviceBuffer(resource, db);
     switch (kind)
     {
       case RHIResourceKind::UniformBuffer:
       {
-        RHIDeviceBuffer* b;
-        if (!RHIUtils::GetDeviceBuffer(resource, b) || (b->GetUsage() & RHIBufferUsage::UniformBuffer) == 0)
+        if (!dbValid || (db->GetUsage() & RHIBufferUsage::UniformBuffer) == 0)
         {
           EZ_REPORT_FAILURE("Resource in slot {slot} does not match {nameof(ResourceKind)}.{kind} specified in the {nameof(ResourceLayout)}. It must be a {nameof(DeviceBuffer)} or {nameof(DeviceBufferRange)} with {nameof(BufferUsage)}.{nameof(BufferUsage.UniformBuffer)}.");
         }
@@ -554,8 +575,7 @@ namespace RHIValidationUtils
       }
       case RHIResourceKind::StructuredBufferReadOnly:
       {
-        RHIDeviceBuffer* b;
-        if (!RHIUtils::GetDeviceBuffer(resource, b) || (b->GetUsage() & (RHIBufferUsage::StructuredBufferReadOnly | RHIBufferUsage::StructuredBufferReadWrite)) == 0)
+        if (!dbValid || (db->GetUsage() & (RHIBufferUsage::StructuredBufferReadOnly | RHIBufferUsage::StructuredBufferReadWrite)) == 0)
         {
           EZ_REPORT_FAILURE("Resource in slot {slot} does not match {nameof(ResourceKind)}.{kind} specified in the {nameof(ResourceLayout)}. It must be a {nameof(DeviceBuffer)} with {nameof(BufferUsage)}.{nameof(BufferUsage.StructuredBufferReadOnly)}.");
         }
@@ -563,8 +583,7 @@ namespace RHIValidationUtils
       }
       case RHIResourceKind::StructuredBufferReadWrite:
       {
-        RHIDeviceBuffer* b;
-        if (!RHIUtils::GetDeviceBuffer(resource, b) || (b->GetUsage() & RHIBufferUsage::StructuredBufferReadWrite) == 0)
+        if (!dbValid || (db->GetUsage() & RHIBufferUsage::StructuredBufferReadWrite) == 0)
         {
           EZ_REPORT_FAILURE("Resource in slot {slot} does not match {nameof(ResourceKind)} specified in the {nameof(ResourceLayout)}. It must be a {nameof(DeviceBuffer)} with {nameof(BufferUsage)}.{nameof(BufferUsage.StructuredBufferReadWrite)}.");
         }

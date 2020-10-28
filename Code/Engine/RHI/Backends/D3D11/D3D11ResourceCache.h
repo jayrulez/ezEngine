@@ -8,9 +8,9 @@
 #include <RHI/Descriptors/RasterizerStateDescription.h>
 #include <RHI/Descriptors/VertexLayoutDescription.h>
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
-class ID3D11Device;
+struct ID3D11Device;
 
 class D3D11ResourceCache
 {
@@ -126,7 +126,7 @@ public:
     ID3D11RasterizerState* rasterState,
     ID3D11InputLayout* inputLayout)
   {
-    ezLock(DeviceMutex);
+    ezLock lock(DeviceMutex);
     blendState = GetBlendState(blendDesc);
     depthState = GetDepthStencilState(dssDesc);
     rasterState = GetRasterizerState(rasterDesc, multisample);
@@ -195,7 +195,7 @@ private:
     ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates = description.AttachmentStates;
     D3D11_BLEND_DESC d3dBlendStateDesc;
 
-    for (int i = 0; i < attachmentStates.GetCount(); i++)
+    for (ezUInt32 i = 0; i < attachmentStates.GetCount(); i++)
     {
       RHIBlendAttachmentDescription state = attachmentStates[i];
       d3dBlendStateDesc.RenderTarget[i].BlendEnable = state.BlendEnabled;

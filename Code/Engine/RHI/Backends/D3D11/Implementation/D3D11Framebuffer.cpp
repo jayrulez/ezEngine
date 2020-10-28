@@ -7,8 +7,7 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
 {
   if (description.DepthTarget)
   {
-    D3D11Texture* d3dDepthTarget = dynamic_cast<D3D11Texture*>(description.DepthTarget.value().Target);
-    EZ_VERIFY(d3dDepthTarget != nullptr, "Depth Target Texture is not a valid D3D11Texture.");
+    D3D11Texture* d3dDepthTarget = RHIUtils::AssertSubtype<RHITexture, D3D11Texture>(description.DepthTarget.value().Target);
 
     D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     dsvDesc.Format = D3D11FormatUtils::GetDepthFormat(d3dDepthTarget->GetFormat());
@@ -51,8 +50,7 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
 
     for (ezUInt32 i = 0; i < RenderTargetViews.GetCount(); i++)
     {
-      D3D11Texture* d3dColorTarget = dynamic_cast<D3D11Texture*>(description.ColorTargets[i].Target);
-      EZ_ASSERT_ALWAYS(d3dColorTarget != nullptr, "Color target is null.");
+      D3D11Texture* d3dColorTarget = RHIUtils::AssertSubtype<RHITexture, D3D11Texture>(description.ColorTargets[i].Target);
 
       D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
       rtvDesc.Format = D3D11FormatUtils::ToDxgiFormat(d3dColorTarget->GetFormat(), false);

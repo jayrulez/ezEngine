@@ -3,7 +3,7 @@
 #include <RHI/Backends/D3D11/D3D11Utils.h>
 #include <optional>
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 class D3D11GraphicsDevice : public RHIGraphicsDevice
 {
@@ -45,7 +45,15 @@ public:
   }
 
   ID3D11Device* GetDevice() const { return Device; }
+  IDXGIAdapter* GetAdapter() const { return DXGIAdapter; }
+
+  bool SupportsCommandLists() const
+  {
+    return _supportsCommandLists;
+  }
 
 private:
+  bool _supportsCommandLists;
+  IDXGIAdapter* DXGIAdapter = nullptr;
   ID3D11Device* Device = nullptr;
 };
