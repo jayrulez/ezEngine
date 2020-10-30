@@ -7,7 +7,7 @@
 
 #include <optional>
 
-class RHISwapchainSource;
+struct RHISwapchainSource;
 
 /// <summary>
 /// Describes a <see cref="Swapchain"/>, for creation via a <see cref="ResourceFactory"/>.

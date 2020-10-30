@@ -3,6 +3,9 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
+#include <dxgi.h>
+#include <dxgiformat.h>
+
 #include <d3d11_1.h>
 
 namespace D3D11FormatUtils
@@ -33,7 +36,7 @@ namespace D3D11FormatUtils
 
   D3D11_MAP RHIToD3D11MapMode(bool isDynamic, ezEnum<RHIMapMode> mode);
 
-  D3D11_PRIMITIVE_TOPOLOGY RHIToD3D11PrimitiveTopology(ezEnum<RHIPrimitiveTopology> primitiveTopology);
+  D3D_PRIMITIVE_TOPOLOGY RHIToD3D11PrimitiveTopology(ezEnum<RHIPrimitiveTopology> primitiveTopology);
 
   D3D11_FILL_MODE RHIToD3D11FillMode(ezEnum<RHIPolygonFillMode> fillMode);
 

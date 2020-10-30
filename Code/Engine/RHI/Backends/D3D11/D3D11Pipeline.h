@@ -7,7 +7,16 @@
 #include <RHI/Backends/D3D11/D3D11ResourceLayout.h>
 #include <RHI/Backends/D3D11/D3D11ResourceCache.h>
 
-#include <d3d11_1.h>
+struct ID3D11BlendState;
+struct ID3D11DepthStencilState;
+struct ID3D11RasterizerState;
+struct ID3D11InputLayout;
+struct ID3D11VertexShader;
+struct ID3D11GeometryShader;
+struct ID3D11HullShader;
+struct ID3D11DomainShader;
+struct ID3D11PixelShader;
+struct ID3D11ComputeShader;
 
 class D3D11Pipeline : public RHIPipeline
 {
@@ -17,7 +26,7 @@ private:
   ID3D11DepthStencilState* DepthStencilState = nullptr;
   ezUInt32 StencilReference = 0;
   ID3D11RasterizerState* RasterizerState = nullptr;
-  D3D11_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+  D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
   ID3D11InputLayout* InputLayout = nullptr;
   ID3D11VertexShader* VertexShader = nullptr;
   ID3D11GeometryShader* GeometryShader = nullptr; // May be null.
@@ -34,40 +43,28 @@ private:
 public:
   virtual ezString GetName() const override { return Name; }
 
-  virtual void SetName(const ezString& name) override
-  {
-    Name = name;
-  }
+  virtual void SetName(const ezString& name) override;
   virtual bool IsDisposed() const override { return Disposed; }
-  virtual void Dispose() override
-  {
-    if (!Disposed)
-    {
-      Disposed = true;
-    }
-  }
+  virtual void Dispose() override;
 
-  virtual bool IsComputePipeline() const override
-  {
-    return ComputePipeline;
-  }
+  virtual bool IsComputePipeline() const override;
 
 public:
   D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelineDescription& description);
   D3D11Pipeline(D3D11ResourceCache* cache, const RHIComputePipelineDescription& description);
 
-  ID3D11BlendState* GetBlendState() const { return BlendState; }
-  ID3D11DepthStencilState* GetDepthStencilState() const { return DepthStencilState; }
-  ezUInt32 GetStencilReference() const { return StencilReference; }
-  ID3D11RasterizerState* GetRasterizerState() const { return RasterizerState; }
-  D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return PrimitiveTopology; }
-  ID3D11InputLayout* GetInputLayout() const { return InputLayout; }
-  ID3D11VertexShader* GetVertexShader() const { return VertexShader; }
-  ID3D11GeometryShader* GetGeometryShader() const { return GeometryShader; }
-  ID3D11HullShader* GetHullShader() const { return HullShader; }
-  ID3D11DomainShader* GetDomainShader() const { return DomainShader; }
-  ID3D11PixelShader* GetPixelShader() const { return PixelShader; }
-  ID3D11ComputeShader* GetComputeShader() const { return ComputeShader; }
-  ezDynamicArray<D3D11ResourceLayout*> GetResourceLayouts() const { return ResourceLayouts; }
-  ezDynamicArray<ezUInt32> GetVertexStrides() const { return VertexStrides; }
+  ID3D11BlendState* GetBlendState() const;
+  ID3D11DepthStencilState* GetDepthStencilState() const;
+  ezUInt32 GetStencilReference() const;
+  ID3D11RasterizerState* GetRasterizerState() const;
+  D3D_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const;
+  ID3D11InputLayout* GetInputLayout() const;
+  ID3D11VertexShader* GetVertexShader() const;
+  ID3D11GeometryShader* GetGeometryShader() const;
+  ID3D11HullShader* GetHullShader() const;
+  ID3D11DomainShader* GetDomainShader() const;
+  ID3D11PixelShader* GetPixelShader() const;
+  ID3D11ComputeShader* GetComputeShader() const;
+  ezDynamicArray<D3D11ResourceLayout*> GetResourceLayouts() const;
+  ezDynamicArray<ezUInt32> GetVertexStrides() const;
 };

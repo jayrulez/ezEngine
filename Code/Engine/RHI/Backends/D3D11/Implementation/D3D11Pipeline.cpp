@@ -1,6 +1,24 @@
 #include <RHI/Backends/D3D11/D3D11Pipeline.h>
 #include <RHI/Backends/D3D11/D3D11Shader.h>
 
+void D3D11Pipeline::SetName(const ezString& name)
+{
+  Name = name;
+}
+
+void D3D11Pipeline::Dispose()
+{
+  if (!Disposed)
+  {
+    Disposed = true;
+  }
+}
+
+bool D3D11Pipeline::IsComputePipeline() const
+{
+  return ComputePipeline;
+}
+
 D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelineDescription& description)
   : RHIPipeline(description)
 {
@@ -100,4 +118,74 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIComputePipeline
   {
     ResourceLayouts[i] = reinterpret_cast<D3D11ResourceLayout*>(genericLayouts[i]);
   }
+}
+
+ID3D11BlendState* D3D11Pipeline::GetBlendState() const
+{
+  return BlendState;
+}
+
+ID3D11DepthStencilState* D3D11Pipeline::GetDepthStencilState() const
+{
+  return DepthStencilState;
+}
+
+ezUInt32 D3D11Pipeline::GetStencilReference() const
+{
+  return StencilReference;
+}
+
+ID3D11RasterizerState* D3D11Pipeline::GetRasterizerState() const
+{
+  return RasterizerState;
+}
+
+D3D_PRIMITIVE_TOPOLOGY D3D11Pipeline::GetPrimitiveTopology() const
+{
+  return PrimitiveTopology;
+}
+
+ID3D11InputLayout* D3D11Pipeline::GetInputLayout() const
+{
+  return InputLayout;
+}
+
+ID3D11VertexShader* D3D11Pipeline::GetVertexShader() const
+{
+  return VertexShader;
+}
+
+ID3D11GeometryShader* D3D11Pipeline::GetGeometryShader() const
+{
+  return GeometryShader;
+}
+
+ID3D11HullShader* D3D11Pipeline::GetHullShader() const
+{
+  return HullShader;
+}
+
+ID3D11DomainShader* D3D11Pipeline::GetDomainShader() const
+{
+  return DomainShader;
+}
+
+ID3D11PixelShader* D3D11Pipeline::GetPixelShader() const
+{
+  return PixelShader;
+}
+
+ID3D11ComputeShader* D3D11Pipeline::GetComputeShader() const
+{
+  return ComputeShader;
+}
+
+ezDynamicArray<D3D11ResourceLayout*> D3D11Pipeline::GetResourceLayouts() const
+{
+  return ResourceLayouts;
+}
+
+ezDynamicArray<ezUInt32> D3D11Pipeline::GetVertexStrides() const
+{
+  return VertexStrides;
 }

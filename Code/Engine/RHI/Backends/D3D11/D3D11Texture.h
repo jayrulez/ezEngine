@@ -7,10 +7,12 @@
 #include <RHI/Descriptors/TextureDescription.h>
 #include <RHI/Descriptors/TextureViewDescription.h>
 
-#include <RHI/Backends/D3D11/D3D11Utils.h>
 #include <RHI/Resources/Texture.h>
+#include <dxgi.h>
+#include <dxgiformat.h>
 
-#include <d3d11_1.h>
+struct ID3D11Device;
+struct ID3D11Resource;
 
 class D3D11GraphicsDevice;
 
@@ -36,47 +38,35 @@ private:
   ezString Name;
 
 public:
-  virtual ezString GetName() const override { return Name; }
+  virtual ezString GetName() const override;
 
-  virtual void SetName(const ezString& name) override
-  {
-    Name = name;
-    if (DeviceTexture != nullptr)
-      DeviceTexture->SetPrivateData(WKPDID_D3DDebugObjectName, name.GetCharacterCount(), name.GetData());
-  }
+  virtual void SetName(const ezString& name) override;
 
-  virtual bool IsDisposed() const override { return DeviceTexture == nullptr; }
-  virtual void Dispose() override
-  {
-    if (DeviceTexture != nullptr)
-    {
-      DeviceTexture->Release();
-      DeviceTexture = nullptr;
-    }
-  }
+  virtual bool IsDisposed() const override;
+  virtual void Dispose() override;
 
-  virtual ezEnum<RHIPixelFormat> GetFormat() const override { return Format; }
+  virtual ezEnum<RHIPixelFormat> GetFormat() const override;
 
-  virtual ezUInt32 GetWidth() const override { return Width; }
+  virtual ezUInt32 GetWidth() const override;
 
-  virtual ezUInt32 GetHeight() const override { return Height; }
+  virtual ezUInt32 GetHeight() const override;
 
-  virtual ezUInt32 GetDepth() const override { return Depth; }
+  virtual ezUInt32 GetDepth() const override;
 
-  virtual ezUInt32 GetMipLevels() const override { return MipLevels; }
+  virtual ezUInt32 GetMipLevels() const override;
 
-  virtual ezUInt32 GetArrayLayers() const override { return ArrayLayers; }
+  virtual ezUInt32 GetArrayLayers() const override;
 
-  virtual ezBitflags<RHITextureUsage> GetUsage() const override { return TextureUsage; }
+  virtual ezBitflags<RHITextureUsage> GetUsage() const override;
 
-  virtual ezEnum<RHITextureType> GetType() const override { return TextureType; }
+  virtual ezEnum<RHITextureType> GetType() const override;
 
-  virtual ezEnum<RHITextureSampleCount> GetSampleCount() const override { return SampleCount; }
+  virtual ezEnum<RHITextureSampleCount> GetSampleCount() const override;
 
 public:
-  ID3D11Resource* GetDeviceTexture() { return DeviceTexture; }
-  DXGI_FORMAT GetDxgiFormat() const { return DxgiFormat; }
-  DXGI_FORMAT GetTypelessDxgiFormatt() const { return TypelessDxgiFormat; }
+  ID3D11Resource* GetDeviceTexture();
+  DXGI_FORMAT GetDxgiFormat() const;
+  DXGI_FORMAT GetTypelessDxgiFormatt() const;
 
   D3D11Texture(ID3D11Device* device, const RHITextureDescription& description);
 

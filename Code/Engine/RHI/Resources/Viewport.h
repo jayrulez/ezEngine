@@ -23,7 +23,7 @@ struct EZ_RHI_DLL RHIViewportScaling // : byte
 /// <summary>
 /// Describes a 3-dimensional region.
 /// </summary>
-struct EZ_RHI_DLL RHIViewport : ezHashableStruct<RHIViewport>
+struct EZ_RHI_DLL RHIViewport : public ezHashableStruct<RHIViewport>
 {
   /// <summary>
   /// The minimum X value.

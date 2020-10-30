@@ -13,10 +13,12 @@
 /// </summary>
 struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertexLayoutDescription>
 {
+  EZ_DECLARE_POD_TYPE();
+
   /// <summary>
   /// The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.
   /// </summary>
-  ezUInt32 Stride;
+  ezUInt32 Stride = 0;
 
   /// <summary>
   /// An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element of vertex data.
@@ -29,7 +31,9 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// For example, an InstanceStepRate of 3 indicates that 3 instances will be drawn with the same value for this layout. The
   /// next 3 instances will be drawn with the next value, and so on.
   /// </summary>
-  ezUInt32 InstanceStepRate;
+  ezUInt32 InstanceStepRate  = 0;
+
+  RHIVertexLayoutDescription() = default;
 
   /// <summary>
   /// Constructs a new RHIVertexLayoutDescription.

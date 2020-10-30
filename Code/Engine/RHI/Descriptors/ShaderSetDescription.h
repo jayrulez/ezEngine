@@ -12,7 +12,7 @@ struct RHISpecializationConstant;
 /// <summary>
 /// A <see cref="RHIPipeline"/> component describing a full set of shader stages and vertex layouts.
 /// </summary>
-struct EZ_RHI_DLL RHIShaderSetDescription : ezHashableStruct<RHIShaderSetDescription>
+struct EZ_RHI_DLL RHIShaderSetDescription : public ezHashableStruct<RHIShaderSetDescription>
 {
   /// <summary>
   /// An array of <see cref="RHIVertexLayoutDescription"/> describing the set of vertex layouts understood by the

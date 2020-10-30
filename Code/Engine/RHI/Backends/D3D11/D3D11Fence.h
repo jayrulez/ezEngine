@@ -24,58 +24,21 @@ public:
 
   virtual bool IsDisposed() const override { return Disposed; }
 
-  virtual void Dispose() override
-  {
-    if (!Disposed)
-    {
-      if (Signal != nullptr)
-      {
-        delete Signal;
-        Signal = nullptr;
-      }
-      Disposed = true;
-    }
-  }
+  virtual void Dispose() override;
 
-  virtual bool GetSignaled() override
-  {
-    return Signal->WaitForSignal(ezTime::Zero()) == ezThreadSignal::WaitResult::Signaled;
-  }
+  virtual bool GetSignaled() override;
 
   /// <summary>
   /// Sets this instance to the unsignaled state.
   /// </summary>
-  virtual bool Reset() override
-  {
-    Signal->ClearSignal();
-  }
+  virtual bool Reset() override;
 
 public:
-  D3D11Fence(bool signaled)
-  {
-    ezThreadSignal sigManual(ezThreadSignal::Mode::ManualReset);
-    Signal = &sigManual;
+  D3D11Fence(bool signaled);
 
-    if (signaled)
-    {
-      Signal->RaiseSignal();
-    }
-  }
+  ezThreadSignal& GetResetSignal() const;
 
-  ezThreadSignal& GetResetSignal() const
-  {
-    return *Signal;
-  }
+  void Set();
 
-  void Set()
-  {
-    Signal->RaiseSignal();
-  }
-
-  bool Wait(ezUInt64 nanosecondTimeout)
-  {
-    ezUInt64 timeout = ezMath::Min(ezMath::MaxValue<ezUInt64>(), nanosecondTimeout / 1000000);
-
-    return Signal->WaitForSignal(ezTime::Nanoseconds(nanosecondTimeout)) == ezThreadSignal::WaitResult::Signaled;
-  }
+  bool Wait(ezUInt64 nanosecondTimeout);
 };

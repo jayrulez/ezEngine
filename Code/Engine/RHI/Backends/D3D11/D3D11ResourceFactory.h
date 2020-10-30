@@ -29,50 +29,25 @@ public:
     return RHIGraphicsBackend::Direct3D11;
   }
 
-  D3D11ResourceFactory(D3D11GraphicsDevice* graphicsDevice)
-    : RHIResourceFactory(graphicsDevice->GetFeatures())
-  {
-    GraphicsDevice = graphicsDevice;
-    Device = graphicsDevice->GetDevice();
-    Cache = new D3D11ResourceCache(Device);
-  }
+  D3D11ResourceFactory(D3D11GraphicsDevice* graphicsDevice);
 
-  void Dispose()
-  {
-    if (!Cache->IsDisposed())
-    {
-      Cache->Dispose();
-    }
-  }
+  void Dispose();
 
 public:
-  virtual RHICommandList* CreateCommandListCore(const RHICommandListDescription& description) override { return new D3D11CommandList(GraphicsDevice, description); }
+  virtual RHICommandList* CreateCommandListCore(const RHICommandListDescription& description) override;
 
-  virtual RHIFramebuffer* CreateFramebufferCore(const RHIFramebufferDescription& description) override { new D3D11Framebuffer(Device, description); }
+  virtual RHIFramebuffer* CreateFramebufferCore(const RHIFramebufferDescription& description) override;
 
-  virtual RHIPipeline* CreateGraphicsPipelineCore(const RHIGraphicsPipelineDescription& description) override { return new D3D11Pipeline(Cache, description); }
+  virtual RHIPipeline* CreateGraphicsPipelineCore(const RHIGraphicsPipelineDescription& description) override;
 
-  virtual RHIPipeline* CreateComputePipelineCore(const RHIComputePipelineDescription& description) override { return new D3D11Pipeline(Cache, description); }
+  virtual RHIPipeline* CreateComputePipelineCore(const RHIComputePipelineDescription& description) override;
 
-  virtual RHITexture* CreateTextureCore(ezUInt64 nativeTexture, const RHITextureDescription& description) override
-  {
-    // TODO: this is sus, figure out what to do here
-    ID3D11Texture2D* existingTexture = reinterpret_cast<ID3D11Texture2D*>(&nativeTexture);
-    return new D3D11Texture(existingTexture, description.Type, description.Format);
-  }
-  virtual RHITexture* CreateTextureCore(const RHITextureDescription& description) override { return new D3D11Texture(Device, description); }
+  virtual RHITexture* CreateTextureCore(ezUInt64 nativeTexture, const RHITextureDescription& description) override;
+  virtual RHITexture* CreateTextureCore(const RHITextureDescription& description) override;
 
-  virtual RHITextureView* CreateTextureViewCore(const RHITextureViewDescription& description) override { return new D3D11TextureView(GraphicsDevice, description); }
+  virtual RHITextureView* CreateTextureViewCore(const RHITextureViewDescription& description) override;
 
-  virtual RHIDeviceBuffer* CreateBufferCore(const RHIBufferDescription& description) override
-  {
-    return new D3D11DeviceBuffer(
-      Device,
-      description.Size,
-      description.Usage,
-      description.StructureByteStride,
-      description.RawBuffer);
-  }
+  virtual RHIDeviceBuffer* CreateBufferCore(const RHIBufferDescription& description) override;
 
   virtual RHISampler* CreateSamplerCore(const RHISamplerDescription& description) override { return new D3D11Sampler(Device, description); }
 

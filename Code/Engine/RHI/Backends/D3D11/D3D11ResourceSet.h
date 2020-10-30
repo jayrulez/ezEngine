@@ -4,8 +4,10 @@
 #include <RHI/RHIPCH.h>
 
 #include <RHI/Backends/D3D11/D3D11ResourceLayout.h>
-
+#include <RHI/Descriptors/ResourceSetDescription.h>
+#include <RHI/Resources/DeviceResource.h>
 #include <RHI/Resources/ResourceSet.h>
+
 
 class D3D11ResourceSet : public RHIResourceSet
 {
@@ -17,33 +19,14 @@ private:
   ezString Name;
 
 public:
-  virtual ezString GetName() const override { return Name; }
+  virtual ezString GetName() const override;
 
-  virtual void SetName(const ezString& name) override
-  {
-    Name = name;
-  }
-  virtual bool IsDisposed() const override { return Disposed; }
-  virtual void Dispose() override
-  {
-    if (!Disposed)
-    {
-      Disposed = true;
-    }
-  }
+  virtual void SetName(const ezString& name) override;
+  virtual bool IsDisposed() const override;
+  virtual void Dispose() override;
 
 public:
-  D3D11ResourceSet(const RHIResourceSetDescription& description)
-    : RHIResourceSet(description)
-  {
-    Resources.SetCountUninitialized(description.BoundResources.GetCount());
-    Resources.GetArrayPtr().CopyFrom(description.BoundResources.GetArrayPtr());
+  D3D11ResourceSet(const RHIResourceSetDescription& description);
 
-    Layout = reinterpret_cast<D3D11ResourceLayout*>(description.Layout);
-  }
-
-  D3D11ResourceLayout* GetLayout() const
-  {
-    return Layout;
-  }
+  D3D11ResourceLayout* GetLayout() const;
 };

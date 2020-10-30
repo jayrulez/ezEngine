@@ -10,6 +10,8 @@
 /// </summary>
 struct EZ_RHI_DLL RHIRasterizerStateDescription : public ezHashableStruct<RHIRasterizerStateDescription>
 {
+  EZ_DECLARE_POD_TYPE();
+
   /// <summary>
   /// Controls which face will be culled.
   /// </summary>

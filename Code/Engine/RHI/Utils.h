@@ -9,6 +9,7 @@
 #include <RHI/Descriptors/ResourceSetDescription.h>
 
 class RHITexture;
+class RHITextureView;
 class RHIGraphicsDevice;
 
 namespace RHIUtils

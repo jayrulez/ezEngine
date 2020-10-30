@@ -74,17 +74,7 @@ struct EZ_RHI_DLL RHIGraphicsDeviceOptions
   /// </summary>
   /// <param name="debug">Indicates whether the GraphicsDevice will support debug features, provided they are supported by
   /// the host system.</param>
-  RHIGraphicsDeviceOptions(bool debug)
-  {
-    Debug = debug;
-    HasMainSwapchain = false;
-    SwapchainDepthFormat = std::nullopt;
-    SyncToVerticalBlank = false;
-    ResourceBindingModel = RHIResourceBindingModel::Default;
-    PreferDepthRangeZeroToOne = false;
-    PreferStandardClipSpaceYDirection = false;
-    SwapchainSrgbFormat = false;
-  }
+  RHIGraphicsDeviceOptions(bool debug);
 
   /// <summary>
   /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
@@ -95,17 +85,7 @@ struct EZ_RHI_DLL RHIGraphicsDeviceOptions
   /// swapchain. If this value is null, then no depth buffer will be present on the swapchain.</param>
   /// <param name="syncToVerticalBlank">Indicates whether the main Swapchain will be synchronized to the window system's
   /// vertical refresh rate.</param>
-  RHIGraphicsDeviceOptions(bool debug, std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat, bool syncToVerticalBlank)
-  {
-    Debug = debug;
-    HasMainSwapchain = true;
-    SwapchainDepthFormat = swapchainDepthFormat;
-    SyncToVerticalBlank = syncToVerticalBlank;
-    ResourceBindingModel = RHIResourceBindingModel::Default;
-    PreferDepthRangeZeroToOne = false;
-    PreferStandardClipSpaceYDirection = false;
-    SwapchainSrgbFormat = false;
-  }
+  RHIGraphicsDeviceOptions(bool debug, std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat, bool syncToVerticalBlank);
 
   /// <summary>
   /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
@@ -121,17 +101,7 @@ struct EZ_RHI_DLL RHIGraphicsDeviceOptions
     bool debug,
     std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat,
     bool syncToVerticalBlank,
-    ezEnum<RHIResourceBindingModel> resourceBindingModel)
-  {
-    Debug = debug;
-    HasMainSwapchain = true;
-    SwapchainDepthFormat = swapchainDepthFormat;
-    SyncToVerticalBlank = syncToVerticalBlank;
-    ResourceBindingModel = resourceBindingModel;
-    PreferDepthRangeZeroToOne = false;
-    PreferStandardClipSpaceYDirection = false;
-    SwapchainSrgbFormat = false;
-  }
+    ezEnum<RHIResourceBindingModel> resourceBindingModel);
 
   /// <summary>
   /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
@@ -150,17 +120,7 @@ struct EZ_RHI_DLL RHIGraphicsDeviceOptions
     std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat,
     bool syncToVerticalBlank,
     ezEnum<RHIResourceBindingModel> resourceBindingModel,
-    bool preferDepthRangeZeroToOne)
-  {
-    Debug = debug;
-    HasMainSwapchain = true;
-    SwapchainDepthFormat = swapchainDepthFormat;
-    SyncToVerticalBlank = syncToVerticalBlank;
-    ResourceBindingModel = resourceBindingModel;
-    PreferDepthRangeZeroToOne = preferDepthRangeZeroToOne;
-    PreferStandardClipSpaceYDirection = false;
-    SwapchainSrgbFormat = false;
-  }
+    bool preferDepthRangeZeroToOne);
 
   /// <summary>
   /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
@@ -182,17 +142,7 @@ struct EZ_RHI_DLL RHIGraphicsDeviceOptions
     bool syncToVerticalBlank,
     ezEnum<RHIResourceBindingModel> resourceBindingModel,
     bool preferDepthRangeZeroToOne,
-    bool preferStandardClipSpaceYDirection)
-  {
-    Debug = debug;
-    HasMainSwapchain = true;
-    SwapchainDepthFormat = swapchainDepthFormat;
-    SyncToVerticalBlank = syncToVerticalBlank;
-    ResourceBindingModel = resourceBindingModel;
-    PreferDepthRangeZeroToOne = preferDepthRangeZeroToOne;
-    PreferStandardClipSpaceYDirection = preferStandardClipSpaceYDirection;
-    SwapchainSrgbFormat = false;
-  }
+    bool preferStandardClipSpaceYDirection);
 
   /// <summary>
   /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
@@ -219,17 +169,7 @@ struct EZ_RHI_DLL RHIGraphicsDeviceOptions
     ezEnum<RHIResourceBindingModel> resourceBindingModel,
     bool preferDepthRangeZeroToOne,
     bool preferStandardClipSpaceYDirection,
-    bool swapchainSrgbFormat)
-  {
-    Debug = debug;
-    HasMainSwapchain = true;
-    SwapchainDepthFormat = swapchainDepthFormat;
-    SyncToVerticalBlank = syncToVerticalBlank;
-    ResourceBindingModel = resourceBindingModel;
-    PreferDepthRangeZeroToOne = preferDepthRangeZeroToOne;
-    PreferStandardClipSpaceYDirection = preferStandardClipSpaceYDirection;
-    SwapchainSrgbFormat = swapchainSrgbFormat;
-  }
+    bool swapchainSrgbFormat);
 };
 
 /// <summary>
@@ -241,63 +181,42 @@ public:
   /// <summary>
   /// Gets a value identifying the specific graphics API used by this instance.
   /// </summary>
-  ezEnum<RHIGraphicsBackend> GetBackendType() const
-  {
-    return BackendType;
-  }
+  ezEnum<RHIGraphicsBackend> GetBackendType() const;
 
   /// <summary>
   /// Gets a value identifying whether texture coordinates begin in the top left corner of a Texture.
   /// If true, (0, 0) refers to the top-left texel of a Texture. If false, (0, 0) refers to the bottom-left
   /// texel of a Texture. This property is useful for determining how the output of a Framebuffer should be sampled.
   /// </summary>
-  bool GetIsUvOriginTopLeft() const
-  {
-    return IsUvOriginTopLeft;
-  }
+  bool GetIsUvOriginTopLeft() const;
 
   /// <summary>
   /// Gets a value indicating whether this device's depth values range from 0 to 1.
   /// If false, depth values instead range from -1 to 1.
   /// </summary>
-  bool GetIsDepthRangeZeroToOne() const
-  {
-    return IsDepthRangeZeroToOne;
-  }
+  bool GetIsDepthRangeZeroToOne() const;
 
   /// <summary>
   /// Gets a value indicating whether this device's clip space Y values increase from top (-1) to bottom (1).
   /// If false, clip space Y values instead increase from bottom (-1) to top (1).
   /// </summary>
-  bool IsClipSpaceYInverted() const
-  {
-    return IsDepthRangeZeroToOne;
-  }
+  bool IsClipSpaceYInverted() const;
 
   /// <summary>
   /// Gets the <see cref="ResourceFactory"/> controlled by this instance.
   /// </summary>
-  RHIResourceFactory* GetResourceFactory() const
-  {
-    return ResourceFactory;
-  }
+  RHIResourceFactory* GetResourceFactory() const;
 
   /// <summary>
   /// Retrieves the main Swapchain for this device. This property is only valid if the device was created with a main
   /// Swapchain, and will return null otherwise.
   /// </summary>
-  RHISwapchain* GetMainSwapchain() const
-  {
-    return MainSwapchain;
-  }
+  RHISwapchain* GetMainSwapchain() const;
 
   /// <summary>
   /// Gets a <see cref="GraphicsDeviceFeatures"/> which enumerates the optional features supported by this instance.
   /// </summary>
-  const RHIGraphicsDeviceFeatures& GetFeatures() const
-  {
-    return Features;
-  }
+  const RHIGraphicsDeviceFeatures& GetFeatures() const;
 
   /// <summary>
   /// Gets whether the main Swapchain's <see cref="SwapBuffers()"/> should be synchronized to the window system's
@@ -305,10 +224,7 @@ public:
   /// This is equivalent to <see cref="MainSwapchain"/>.<see cref="Swapchain.GetSyncToVerticalBlank"/>.
   /// This property cannot be set if this GraphicsDevice was created without a main Swapchain.
   /// </summary>
-  bool GetSyncToVerticalBlank() const
-  {
-    return SyncToVerticalBlank;
-  }
+  bool GetSyncToVerticalBlank() const;
 
   /// <summary>
   /// Sets whether the main Swapchain's <see cref="SwapBuffers()"/> should be synchronized to the window system's
@@ -316,35 +232,21 @@ public:
   /// This is equivalent to <see cref="MainSwapchain"/>.<see cref="Swapchain.SetSyncToVerticalBlank"/>.
   /// This property cannot be set if this GraphicsDevice was created without a main Swapchain.
   /// </summary>
-  bool SetSyncToVerticalBlank(bool value)
-  {
-    if (MainSwapchain == nullptr)
-    {
-      EZ_REPORT_FAILURE("This GraphicsDevice was created without a main Swapchain. This property cannot be set.");
-    }
-
-    SyncToVerticalBlank = value;
-  }
+  void SetSyncToVerticalBlank(bool value);
 
   /// <summary>
   /// The required alignment, in bytes, for uniform buffer offsets. <see cref="DeviceBufferRange.Offset"/> must be a
   /// multiple of this value. When binding a <see cref="ResourceSet"/> to a <see cref="CommandList"/> with an overload
   /// accepting dynamic offsets, each offset must be a multiple of this value.
   /// </summary>
-  ezUInt32 GetUniformBufferMinOffsetAlignment() const
-  {
-    return GetUniformBufferMinOffsetAlignmentCore();
-  }
+  ezUInt32 GetUniformBufferMinOffsetAlignment() const;
 
   /// <summary>
   /// The required alignment, in bytes, for structured buffer offsets. <see cref="DeviceBufferRange.Offset"/> must be a
   /// multiple of this value. When binding a <see cref="ResourceSet"/> to a <see cref="CommandList"/> with an overload
   /// accepting dynamic offsets, each offset must be a multiple of this value.
   /// </summary>
-  ezUInt32 GetStructuredBufferMinOffsetAlignment() const
-  {
-    return GetStructuredBufferMinOffsetAlignmentCore();
-  }
+  ezUInt32 GetStructuredBufferMinOffsetAlignment() const;
 
   /// <summary>
   /// Submits the given <see cref="CommandList"/> for execution by this device.
@@ -354,10 +256,7 @@ public:
   /// </summary>
   /// <param name="commandList">The completed <see cref="CommandList"/> to execute. <see cref="CommandList.End"/> must have
   /// been previously called on this object.</param>
-  void SubmitCommands(RHICommandList* commandList)
-  {
-    SubmitCommandsCore(commandList, nullptr);
-  }
+  void SubmitCommands(RHICommandList* commandList);
 
   /// <summary>
   /// Submits the given <see cref="CommandList"/> for execution by this device.
@@ -369,22 +268,13 @@ public:
   /// been previously called on this object.</param>
   /// <param name="fence">A <see cref="Fence"/> which will become signaled after this submission fully completes
   /// execution.</param>
-  void SubmitCommands(RHICommandList* commandList, RHIFence* fence)
-  {
-    SubmitCommandsCore(commandList, fence);
-  }
+  void SubmitCommands(RHICommandList* commandList, RHIFence* fence);
 
   /// <summary>
   /// Blocks the calling thread until the given <see cref="Fence"/> becomes signaled.
   /// </summary>
   /// <param name="fence">The <see cref="Fence"/> instance to wait on.</param>
-  void WaitForFence(RHIFence* fence)
-  {
-    if (!WaitForFence(fence, ezMath::MaxValue<ezUInt64>()))
-    {
-      EZ_REPORT_FAILURE("The operation timed out before the Fence was signaled.");
-    }
-  }
+  void WaitForFence(RHIFence* fence);
 
   /// <summary>
   /// Blocks the calling thread until the given <see cref="Fence"/> becomes signaled, or until a time greater than the
@@ -393,10 +283,7 @@ public:
   /// <param name="fence">The <see cref="Fence"/> instance to wait on.</param>
   /// <param name="nanosecondTimeout">A value in nanoseconds, indicating the maximum time to wait on the Fence.</param>
   /// <returns>True if the Fence was signaled. False if the timeout was reached instead.</returns>
-  bool WaitForFence(RHIFence* fence, ezUInt64 nanosecondTimeout)
-  {
-    return WaitForFenceCore(fence, nanosecondTimeout);
-  }
+  bool WaitForFence(RHIFence* fence, ezUInt64 nanosecondTimeout);
 
   /// <summary>
   /// Blocks the calling thread until one or all of the given <see cref="Fence"/> instances have become signaled.
@@ -404,13 +291,7 @@ public:
   /// <param name="fences">An array of <see cref="Fence"/> objects to wait on.</param>
   /// <param name="waitAll">If true, then this method blocks until all of the given Fences become signaled.
   /// If false, then this method only waits until one of the Fences become signaled.</param>
-  void WaitForFences(ezDynamicArray<RHIFence*> fences, bool waitAll)
-  {
-    if (!WaitForFences(fences, waitAll, ezMath::MaxValue<ezUInt64>()))
-    {
-      EZ_REPORT_FAILURE("The operation timed out before the Fence(s) were signaled.");
-    }
-  }
+  void WaitForFences(ezDynamicArray<RHIFence*> fences, bool waitAll);
 
   /// <summary>
   /// Blocks the calling thread until one or all of the given <see cref="Fence"/> instances have become signaled,
@@ -421,58 +302,33 @@ public:
   /// If false, then this method only waits until one of the Fences become signaled.</param>
   /// <param name="nanosecondTimeout">A value in nanoseconds, indicating the maximum time to wait on the Fence.</param>
   /// <returns>True if the Fence was signaled. False if the timeout was reached instead.</returns>
-  bool WaitForFences(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout)
-  {
-    return WaitForFencesCore(fences, waitAll, nanosecondTimeout);
-  }
+  bool WaitForFences(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout);
 
   /// <summary>
   /// Resets the given <see cref="Fence"/> to the unsignaled state.
   /// </summary>
   /// <param name="fence">The <see cref="Fence"/> instance to reset.</param>
-  void ResetFence(RHIFence* fence)
-  {
-    ResetFenceCore(fence);
-  }
+  void ResetFence(RHIFence* fence);
 
   /// <summary>
   /// Swaps the buffers of the main swapchain and presents the rendered image to the screen.
   /// This is equivalent to passing <see cref="MainSwapchain"/> to <see cref="SwapBuffers(Swapchain)"/>.
   /// This method can only be called if this GraphicsDevice was created with a main Swapchain.
   /// </summary>
-  void SwapBuffers()
-  {
-    if (MainSwapchain == nullptr)
-    {
-      EZ_REPORT_FAILURE("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
-    }
-
-    SwapBuffers(MainSwapchain);
-  }
+  void SwapBuffers();
 
   /// <summary>
   /// Swaps the buffers of the given swapchain.
   /// </summary>
   /// <param name="swapchain">The <see cref="Swapchain"/> to swap and present.</param>
-  void SwapBuffers(RHISwapchain* swapchain)
-  {
-    SwapBuffersCore(swapchain);
-  }
+  void SwapBuffers(RHISwapchain* swapchain);
 
   /// <summary>
   /// Gets a <see cref="Framebuffer"/> object representing the render targets of the main swapchain.
   /// This is equivalent to <see cref="MainSwapchain"/>.<see cref="Swapchain.Framebuffer"/>.
   /// If this GraphicsDevice was created without a main Swapchain, then this returns null.
   /// </summary>
-  RHIFramebuffer* GetSwapchainFramebuffer() const
-  {
-    if (MainSwapchain != nullptr)
-    {
-      return MainSwapchain->GetFramebuffer();
-    }
-
-    return nullptr;
-  }
+  RHIFramebuffer* GetSwapchainFramebuffer() const;
 
   /// <summary>
   /// Notifies this instance that the main window has been resized. This causes the <see cref="SwapchainFramebuffer"/> to
@@ -482,24 +338,12 @@ public:
   /// </summary>
   /// <param name="width">The new width of the main window.</param>
   /// <param name="height">The new height of the main window.</param>
-  void ResizeMainWindow(ezUInt32 width, ezUInt32 height)
-  {
-    if (MainSwapchain == nullptr)
-    {
-      EZ_REPORT_FAILURE("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
-    }
-
-    MainSwapchain->Resize(width, height);
-  }
+  void ResizeMainWindow(ezUInt32 width, ezUInt32 height);
 
   /// <summary>
   /// A blocking method that returns when all submitted <see cref="CommandList"/> objects have fully completed.
   /// </summary>
-  void WaitForIdle()
-  {
-    WaitForIdleCore();
-    //FlushDeferredDisposals();
-  }
+  void WaitForIdle();
 
   /// <summary>
   /// Gets the maximum sample count supported by the given <see cref="PixelFormat"/>.
@@ -517,10 +361,7 @@ public:
   /// <param name="resource">The <see cref="DeviceBuffer"/> or <see cref="Texture"/> resource to map.</param>
   /// <param name="mode">The <see cref="MapMode"/> to use.</param>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
-  RHIMappedResource* Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode)
-  {
-    return Map(resource, mode, 0);
-  }
+  RHIMappedResource* Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode);
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region.
@@ -530,44 +371,7 @@ public:
   /// <param name="subresource">The subresource to map. Subresources are indexed first by mip slice, then by array layer.
   /// For <see cref="DeviceBuffer"/> resources, this parameter must be 0.</param>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
-  RHIMappedResource* Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
-  {
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    RHIDeviceBuffer* buffer = dynamic_cast<RHIDeviceBuffer*>(resource);
-    if (buffer != nullptr)
-    {
-      if ((buffer->GetUsage() & RHIBufferUsage::Dynamic) != RHIBufferUsage::Dynamic && (buffer->GetUsage() & RHIBufferUsage::Staging) != RHIBufferUsage::Staging)
-      {
-        EZ_REPORT_FAILURE("Buffers must have the Staging or Dynamic usage flag to be mapped.");
-      }
-      if (subresource != 0)
-      {
-        EZ_REPORT_FAILURE("Subresource must be 0 for Buffer resources.");
-      }
-      if ((mode == RHIMapMode::Read || mode == RHIMapMode::ReadWrite) && (buffer->GetUsage() & RHIBufferUsage::Staging) == 0)
-      {
-        EZ_REPORT_FAILURE("RHIMapMode::Read and RHIMapMode::ReadWrite can only be used on buffers created with RHIBufferUsage::Staging.");
-      }
-    }
-    else
-    {
-      RHITexture* tex = dynamic_cast<RHITexture*>(resource);
-      if (tex != nullptr)
-      {
-        if ((tex->GetUsage() & RHITextureUsage::Staging) == 0)
-        {
-          EZ_REPORT_FAILURE("Texture must have the Staging usage flag to be mapped.");
-        }
-        if (subresource >= tex->GetArrayLayers() * tex->GetMipLevels())
-        {
-          EZ_REPORT_FAILURE("Subresource must be less than the number of subresources in the Texture being mapped.");
-        }
-      }
-    }
-#endif
-
-    return MapCore(resource, mode, subresource);
-  }
+  RHIMappedResource* Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
@@ -578,10 +382,7 @@ public:
   /// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
   template <typename T>
-  RHIMappedResourceView<T> Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode)
-  {
-    Map<T>(resource, mode, 0);
-  }
+  RHIMappedResourceView<T> Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode);
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
@@ -593,21 +394,14 @@ public:
   /// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
   template <typename T>
-  RHIMappedResourceView<T> Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
-  {
-    RHIMappedResource* mappedResource = Map(resource, mode, subresource);
-    return RHIMappedResourceView<T>(mappedResource);
-  }
+  RHIMappedResourceView<T> Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
 
   /// <summary>
   /// Invalidates a previously-mapped data region for the given <see cref="DeviceBuffer"/> or <see cref="Texture"/>.
   /// For <see cref="Texture"/> resources, this unmaps the first subresource.
   /// </summary>
   /// <param name="resource">The resource to unmap.</param>
-  void Unmap(RHIDeviceResource* resource)
-  {
-    Unmap(resource, 0);
-  }
+  void Unmap(RHIDeviceResource* resource);
 
   /// <summary>
   /// Invalidates a previously-mapped data region for the given <see cref="DeviceBuffer"/> or <see cref="Texture"/>.
@@ -615,10 +409,7 @@ public:
   /// <param name="resource">The resource to unmap.</param>
   /// <param name="subresource">The subresource to unmap. Subresources are indexed first by mip slice, then by array layer.
   /// For <see cref="DeviceBuffer"/> resources, this parameter must be 0.</param>
-  void Unmap(RHIDeviceResource* resource, ezUInt32 subresource)
-  {
-    UnmapCore(resource, subresource);
-  }
+  void Unmap(RHIDeviceResource* resource, ezUInt32 subresource);
 
   /// <summary>
   /// Updates a portion of a <see cref="Texture"/> resource with new data.
@@ -644,13 +435,7 @@ public:
     ezUInt32 size,
     ezUInt32 x, ezUInt32 y, ezUInt32 z,
     ezUInt32 width, ezUInt32 height, ezUInt32 depth,
-    ezUInt32 mipLevel, ezUInt32 arrayLayer)
-  {
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    ValidateUpdateTextureParameters(texture, size, x, y, z, width, height, depth, mipLevel, arrayLayer);
-#endif
-    UpdateTextureCore(texture, source, size, x, y, z, width, height, depth, mipLevel, arrayLayer);
-  }
+    ezUInt32 mipLevel, ezUInt32 arrayLayer);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -662,11 +447,7 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">The value to upload.</param>
   template <typename T>
-  void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, T source)
-  {
-    ezUInt8* ptr = &source;
-    UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-  }
+  void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, T source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -678,11 +459,7 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the single value to upload.</param>
   template <typename T>
-  void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source)
-  {
-    ezUInt8* ptr = &source;
-    UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-  }
+  void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -699,11 +476,7 @@ public:
     RHIDeviceBuffer* buffer,
     ezUInt32 bufferOffset,
     const T& source,
-    ezUInt32 size)
-  {
-    ezUInt8* ptr = &source;
-    UpdateBuffer(buffer, bufferOffset, ptr, size);
-  }
+    ezUInt32 size);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -718,10 +491,7 @@ public:
   void UpdateBuffer(
     RHIDeviceBuffer* buffer,
     ezUInt32 bufferOffset,
-    ezDynamicArray<T> source)
-  {
-    UpdateBuffer(buffer, bufferOffset, source.GetPtr(), source.GetCount());
-  }
+    ezDynamicArray<T> source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -736,14 +506,7 @@ public:
     RHIDeviceBuffer* buffer,
     ezUInt32 bufferOffset,
     ezUInt8* source,
-    ezUInt32 size)
-  {
-    if (bufferOffset + size > buffer.SizeInBytes)
-    {
-      EZ_REPORT_FAILURE("The data size given to UpdateBuffer is too large. The given buffer can only hold {} total bytes. The requested update would require {} bytes.", buffer->GetSize(), (bufferOffset + size));
-    }
-    UpdateBufferCore(buffer, bufferOffset, source, size);
-  }
+    ezUInt32 size);
 
   /// <summary>
   /// Gets whether or not the given <see cref="PixelFormat"/>, <see cref="TextureType"/>, and <see cref="TextureUsage"/>
@@ -756,11 +519,7 @@ public:
   bool GetPixelFormatSupport(
     ezEnum<RHIPixelFormat> format,
     ezEnum<RHITextureType> type,
-    ezEnum<RHITextureUsage> usage)
-  {
-    RHIPixelFormatProperties properties;
-    return GetPixelFormatSupportCore(format, type, usage, properties);
-  }
+    ezEnum<RHITextureUsage> usage);
 
   /// <summary>
   /// Gets whether or not the given <see cref="PixelFormat"/>, <see cref="TextureType"/>, and <see cref="TextureUsage"/>
@@ -777,57 +536,32 @@ public:
     ezEnum<RHIPixelFormat> format,
     ezEnum<RHITextureType> type,
     ezEnum<RHITextureUsage> usage,
-    RHIPixelFormatProperties& properties)
-  {
-    return GetPixelFormatSupportCore(format, type, usage, properties);
-  }
+    RHIPixelFormatProperties& properties);
 
   /// <summary>
   /// Gets a simple point-filtered <see cref="Sampler"/> object owned by this instance.
   /// This object is created with <see cref="SamplerDescription.Point"/>.
   /// </summary>
-  RHISampler* GetPointSampler() const
-  {
-    return PointSampler;
-  }
+  RHISampler* GetPointSampler() const;
 
   /// <summary>
   /// Gets a simple linear-filtered <see cref="Sampler"/> object owned by this instance.
   /// This object is created with <see cref="SamplerDescription.Linear"/>.
   /// </summary>
-  RHISampler* GetLinearSampler() const
-  {
-    return LinearSampler;
-  }
+  RHISampler* GetLinearSampler() const;
 
   /// <summary>
   /// Gets a simple 4x anisotropic-filtered <see cref="Sampler"/> object owned by this instance.
   /// This object is created with <see cref="SamplerDescription.Aniso4x"/>.
   /// This property can only be used when <see cref="GraphicsDeviceFeatures.SamplerAnisotropy"/> is supported.
   /// </summary>
-  RHISampler* GetAniso4xSampler()
-  {
-    if (!Features.SamplerAnisotropySupported())
-    {
-      EZ_REPORT_FAILURE("GraphicsDevice.Aniso4xSampler cannot be used unless GraphicsDeviceFeatures.SamplerAnisotropy is supported.");
-    }
-    EZ_VERIFY(Aniso4xSampler != nullptr, "");
-    return Aniso4xSampler;
-  }
+  RHISampler* GetAniso4xSampler();
 
 protected:
   /// <summary>
   /// Creates and caches common device resources after device creation completes.
   /// </summary>
-  void PostDeviceCreated()
-  {
-    PointSampler = ResourceFactory->CreateSampler(RHISamplerDescription::Point);
-    LinearSampler = ResourceFactory->CreateSampler(RHISamplerDescription::Linear);
-    if (Features.SamplerAnisotropySupported())
-    {
-      Aniso4xSampler = ResourceFactory->CreateSampler(RHISamplerDescription::Aniso4x);
-    }
-  }
+  void PostDeviceCreated();
 
 
 protected:
@@ -861,62 +595,7 @@ private:
     ezUInt32 size,
     ezUInt32 x, ezUInt32 y, ezUInt32 z,
     ezUInt32 width, ezUInt32 height, ezUInt32 depth,
-    ezUInt32 mipLevel, ezUInt32 arrayLayer)
-  {
-    if (RHIFormatUtils::IsCompressedFormat(texture->GetFormat()))
-    {
-      if (x % 4 != 0 || y % 4 != 0 || height % 4 != 0 || width % 4 != 0)
-      {
-        ezUInt32 mipWidth;
-        ezUInt32 mipHeight;
-        ezUInt32 mipDepth;
-        RHIUtils::GetMipDimensions(texture, mipLevel, mipWidth, mipHeight, mipDepth);
-        if (width != mipWidth && height != mipHeight)
-        {
-          EZ_REPORT_FAILURE("Updates to block-compressed textures must use a region that is block-size aligned and sized.");
-        }
-      }
-    }
-    ezUInt32 expectedSize = RHIFormatUtils::GetRegionSize(width, height, depth, texture->GetFormat());
-    if (size < expectedSize)
-    {
-      EZ_REPORT_FAILURE("The data size is less than expected for the given update region. At least {} bytes must be provided, but only {} were.", expectedSize, size);
-    }
-
-    // Compressed textures don't necessarily need to have a Texture.Width and Texture.Height that are a multiple of 4.
-    // But the mipdata width and height *does* need to be a multiple of 4.
-    ezUInt32 roundedTextureWidth, roundedTextureHeight;
-    if (RHIFormatUtils::IsCompressedFormat(texture->GetFormat()))
-    {
-      roundedTextureWidth = (texture->GetWidth() + 3) / 4 * 4;
-      roundedTextureHeight = (texture->GetHeight() + 3) / 4 * 4;
-    }
-    else
-    {
-      roundedTextureWidth = texture->GetWidth();
-      roundedTextureHeight = texture->GetHeight();
-    }
-
-    if (x + width > roundedTextureWidth || y + height > roundedTextureHeight || z + depth > texture->GetDepth())
-    {
-      EZ_REPORT_FAILURE("The given region does not fit into the Texture.");
-    }
-
-    if (mipLevel >= texture->GetMipLevels())
-    {
-      EZ_REPORT_FAILURE("mipLevel ({}) must be less than the Texture's mip level count ({}).", mipLevel, texture->GetMipLevels());
-    }
-
-    ezUInt32 effectiveArrayLayers = texture->GetArrayLayers();
-    if ((texture->GetUsage() & RHITextureUsage::Cubemap) != 0)
-    {
-      effectiveArrayLayers *= 6;
-    }
-    if (arrayLayer >= effectiveArrayLayers)
-    {
-      EZ_REPORT_FAILURE("arrayLayer ({}) must be less than the Texture's effective array layer count ({}).", arrayLayer, effectiveArrayLayers);
-    }
-  }
+    ezUInt32 mipLevel, ezUInt32 arrayLayer);
 
 private:
   ezEnum<RHIGraphicsBackend> BackendType;
@@ -930,3 +609,128 @@ private:
   RHISampler* LinearSampler;
   RHISampler* Aniso4xSampler;
 };
+
+/// <summary>
+/// Updates a <see cref="DeviceBuffer"/> region with new data.
+/// </summary>
+/// <param name="buffer">The resource to update.</param>
+/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
+/// which new data will be uploaded.</param>
+/// <param name="source">A pointer to the start of the data to upload.</param>
+/// <param name="size">The total size of the uploaded data, in bytes.</param>
+
+
+/// <summary>
+/// Updates a <see cref="DeviceBuffer"/> region with new data.
+/// This function must be used with a blittable value type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T">The type of data to upload.</typeparam>
+/// <param name="buffer">The resource to update.</param>
+/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
+/// which new data will be uploaded.</param>
+/// <param name="source">An array containing the data to upload.</param>
+
+
+/// <summary>
+/// Updates a <see cref="DeviceBuffer"/> region with new data.
+/// This function must be used with a blittable value type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T">The type of data to upload.</typeparam>
+/// <param name="buffer">The resource to update.</param>
+/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
+/// which new data will be uploaded.</param>
+/// <param name="source">A reference to the first of a series of values to upload.</param>
+/// <param name="size">The total size of the uploaded data, in bytes.</param>
+
+
+/// <summary>
+/// Updates a <see cref="DeviceBuffer"/> region with new data.
+/// This function must be used with a blittable value type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T">The type of data to upload.</typeparam>
+/// <param name="buffer">The resource to update.</param>
+/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
+/// which new data will be uploaded.</param>
+/// <param name="source">A reference to the single value to upload.</param>
+
+
+/// <summary>
+/// Updates a <see cref="DeviceBuffer"/> region with new data.
+/// This function must be used with a blittable value type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T">The type of data to upload.</typeparam>
+/// <param name="buffer">The resource to update.</param>
+/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/> storage, at
+/// which new data will be uploaded.</param>
+/// <param name="source">The value to upload.</param>
+
+
+/// <summary>
+/// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
+/// view over that region.
+/// </summary>
+/// <param name="resource">The <see cref="DeviceBuffer"/> or <see cref="Texture"/> resource to map.</param>
+/// <param name="mode">The <see cref="MapMode"/> to use.</param>
+/// <param name="subresource">The subresource to map. Subresources are indexed first by mip slice, then by array layer.</param>
+/// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
+/// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
+
+
+/// <summary>
+/// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
+/// view over that region. For Texture resources, this overload maps the first subresource.
+/// </summary>
+/// <param name="resource">The <see cref="DeviceBuffer"/> or <see cref="Texture"/> resource to map.</param>
+/// <param name="mode">The <see cref="MapMode"/> to use.</param>
+/// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
+/// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
+
+template <typename T>
+RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode)
+{
+  Map<T>(resource, mode, 0);
+}
+
+template <typename T>
+RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
+{
+  RHIMappedResource* mappedResource = Map(resource, mode, subresource);
+  return RHIMappedResourceView<T>(mappedResource);
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, T source)
+{
+  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source)
+{
+  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size)
+{
+  //ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  //UpdateBuffer(buffer, bufferOffset, ptr, size);
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, ezDynamicArray<T> source)
+{
+  UpdateBuffer(buffer, bufferOffset, source.GetPtr(), source.GetCount());
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size)
+{
+  if (bufferOffset + size > buffer.SizeInBytes)
+  {
+    EZ_REPORT_FAILURE("The data size given to UpdateBuffer is too large. The given buffer can only hold {} total bytes. The requested update would require {} bytes.", buffer->GetSize(), (bufferOffset + size));
+  }
+  UpdateBufferCore(buffer, bufferOffset, source, size);
+}

@@ -1,6 +1,92 @@
 #include <RHI/Backends/D3D11/D3D11Texture.h>
 #include <RHI/Backends/D3D11/D3D11TextureView.h>
 
+ezString D3D11Texture::GetName() const
+{
+  return Name;
+}
+
+void D3D11Texture::SetName(const ezString& name)
+{
+  Name = name;
+  if (DeviceTexture != nullptr)
+    DeviceTexture->SetPrivateData(WKPDID_D3DDebugObjectName, name.GetCharacterCount(), name.GetData());
+}
+
+bool D3D11Texture::IsDisposed() const
+{
+  return DeviceTexture == nullptr;
+}
+
+void D3D11Texture::Dispose()
+{
+  if (DeviceTexture != nullptr)
+  {
+    DeviceTexture->Release();
+    DeviceTexture = nullptr;
+  }
+}
+
+ ezEnum<RHIPixelFormat> D3D11Texture::GetFormat() const
+{
+  return Format;
+}
+
+ ezUInt32 D3D11Texture::GetWidth() const
+{
+  return Width;
+}
+
+ ezUInt32 D3D11Texture::GetHeight() const
+{
+  return Height;
+}
+
+ ezUInt32 D3D11Texture::GetDepth() const
+{
+  return Depth;
+}
+
+ ezUInt32 D3D11Texture::GetMipLevels() const
+{
+  return MipLevels;
+}
+
+ ezUInt32 D3D11Texture::GetArrayLayers() const
+{
+  return ArrayLayers;
+}
+
+ ezBitflags<RHITextureUsage> D3D11Texture::GetUsage() const
+{
+  return TextureUsage;
+}
+
+ ezEnum<RHITextureType> D3D11Texture::GetType() const
+{
+  return TextureType;
+}
+
+ ezEnum<RHITextureSampleCount> D3D11Texture::GetSampleCount() const
+{
+  return SampleCount;
+}
+
+   ID3D11Resource* D3D11Texture::GetDeviceTexture()
+{
+  return DeviceTexture;
+}
+
+DXGI_FORMAT D3D11Texture::GetDxgiFormat() const
+{
+  return DxgiFormat;
+}
+
+DXGI_FORMAT D3D11Texture::GetTypelessDxgiFormatt() const
+{
+  return TypelessDxgiFormat;
+}
+
 D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& description)
 {
   Device = device;

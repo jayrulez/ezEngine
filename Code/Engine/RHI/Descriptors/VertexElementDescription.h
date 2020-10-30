@@ -11,6 +11,7 @@
 /// </summary>
 struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVertexElementDescription>
 {
+  EZ_DECLARE_POD_TYPE();
   /// <summary>
   /// The name of the element.
   /// </summary>

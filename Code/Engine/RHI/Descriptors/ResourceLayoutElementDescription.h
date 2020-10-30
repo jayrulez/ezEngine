@@ -10,6 +10,7 @@
 /// </summary>
 struct EZ_RHI_DLL RHIResourceLayoutElementDescription : public ezHashableStruct<RHIResourceLayoutElementDescription>
 {
+  EZ_DECLARE_POD_TYPE();
   /// <summary>
   /// The name of the element.
   /// </summary>
@@ -29,6 +30,8 @@ struct EZ_RHI_DLL RHIResourceLayoutElementDescription : public ezHashableStruct<
   /// Miscellaneous resource options for this element.
   /// </summary>
   ezBitflags<RHIResourceLayoutElementOptions> Options;
+
+  RHIResourceLayoutElementDescription() = default;
 
   /// <summary>
   /// Constructs a new ResourceLayoutElementDescription.

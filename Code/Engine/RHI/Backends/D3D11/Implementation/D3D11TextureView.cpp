@@ -1,6 +1,52 @@
 #include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
 #include <RHI/Backends/D3D11/D3D11TextureView.h>
 
+#include <d3d11_1.h>
+
+ezString D3D11TextureView::GetName() const
+{
+  return Name;
+}
+
+void D3D11TextureView::SetName(const ezString& name)
+{
+  Name = name;
+
+  if (ShaderResourceView != nullptr)
+  {
+    ezStringBuilder sb(name.GetData(), "_SRV");
+    ShaderResourceView->SetPrivateData(WKPDID_D3DDebugObjectName, sb.GetCharacterCount(), sb.GetData());
+  }
+  if (UnorderedAccessView != nullptr)
+  {
+    ezStringBuilder sb(name.GetData(), "_UAV");
+    UnorderedAccessView->SetPrivateData(WKPDID_D3DDebugObjectName, sb.GetCharacterCount(), sb.GetData());
+  }
+}
+
+bool D3D11TextureView::IsDisposed() const
+{
+  return Disposed;
+}
+
+void D3D11TextureView::Dispose()
+{
+  if (!Disposed)
+  {
+    if (ShaderResourceView != nullptr)
+    {
+      ShaderResourceView->Release();
+      ShaderResourceView = nullptr;
+    }
+    if (UnorderedAccessView != nullptr)
+    {
+      UnorderedAccessView->Release();
+      UnorderedAccessView = nullptr;
+    }
+    Disposed = true;
+  }
+}
+
 D3D11TextureView::D3D11TextureView(D3D11GraphicsDevice* graphicsDevice, const RHITextureViewDescription& description)
   : RHITextureView(description)
 {
@@ -71,4 +117,14 @@ D3D11TextureView::D3D11TextureView(D3D11GraphicsDevice* graphicsDevice, const RH
 
     hr = device->CreateUnorderedAccessView(d3dTex->GetDeviceTexture(), &uavDesc, &UnorderedAccessView);
   }
+}
+
+ID3D11ShaderResourceView* D3D11TextureView::GetShaderResourceView() const
+{
+  return ShaderResourceView;
+}
+
+ID3D11UnorderedAccessView* D3D11TextureView::GetUnorderedAccessView() const
+{
+  return UnorderedAccessView;
 }

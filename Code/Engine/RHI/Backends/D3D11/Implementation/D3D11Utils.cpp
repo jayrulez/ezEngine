@@ -634,7 +634,7 @@ namespace D3D11FormatUtils
     }
   }
 
-  D3D11_PRIMITIVE_TOPOLOGY RHIToD3D11PrimitiveTopology(ezEnum<RHIPrimitiveTopology> primitiveTopology)
+  D3D_PRIMITIVE_TOPOLOGY RHIToD3D11PrimitiveTopology(ezEnum<RHIPrimitiveTopology> primitiveTopology)
   {
     switch (primitiveTopology)
     {

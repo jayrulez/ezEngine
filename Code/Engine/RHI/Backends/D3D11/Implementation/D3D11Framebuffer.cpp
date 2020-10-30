@@ -1,6 +1,48 @@
-#pragma once
-
 #include <RHI/Backends/D3D11/D3D11Framebuffer.h>
+
+void D3D11Framebuffer::SetName(const ezString& name)
+{
+  Name = name;
+
+  for (ezUInt32 i = 0; i < RenderTargetViews.GetCount(); i++)
+  {
+    ezStringBuilder sb(name.GetData(), "_RTV");
+    sb.Append(i);
+    RenderTargetViews[i]->SetPrivateData(WKPDID_D3DDebugObjectName, sb.GetCharacterCount(), sb.GetData());
+  }
+  if (DepthStencilView != nullptr)
+  {
+    ezStringBuilder sb(name.GetData(), "_DSV");
+    DepthStencilView->SetPrivateData(WKPDID_D3DDebugObjectName, sb.GetCharacterCount(), sb.GetData());
+  }
+}
+
+void D3D11Framebuffer::Dispose()
+{
+  if (!Disposed)
+  {
+    if (DepthStencilView)
+    {
+      DepthStencilView->Release();
+      for (ID3D11RenderTargetView* rtv : RenderTargetViews)
+      {
+        rtv->Release();
+      }
+    }
+
+    Disposed = true;
+  }
+}
+
+ezDynamicArray<ID3D11RenderTargetView*> D3D11Framebuffer::GetRenderTargetViews() const
+{
+  return RenderTargetViews;
+}
+
+ID3D11DepthStencilView* D3D11Framebuffer::GetDepthStencilView() const
+{
+  return DepthStencilView;
+}
 
 D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDescription& description)
   : RHIFramebuffer(description.DepthTarget, description.ColorTargets)
@@ -98,4 +140,14 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
   {
     RenderTargetViews.Clear();
   }
+}
+
+D3D11Swapchain* D3D11Framebuffer::GetSwapchain() const
+{
+  return Swapchain;
+}
+
+void D3D11Framebuffer::SetSwapchain(D3D11Swapchain* swapchain)
+{
+  Swapchain = swapchain;
 }
