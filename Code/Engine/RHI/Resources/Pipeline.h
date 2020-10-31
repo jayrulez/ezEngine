@@ -1,10 +1,10 @@
 #pragma once
 
+#include <RHI/Descriptors/ComputePipelineDescription.h>
+#include <RHI/Descriptors/GraphicsPipelineDescription.h>
+#include <RHI/Descriptors/OutputDescription.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/GraphicsPipelineDescription.h>
-#include <RHI/Descriptors/ComputePipelineDescription.h>
-#include <RHI/Descriptors/OutputDescription.h>
 
 #include <RHI/Resources/Resource.h>
 #include <RHI/Resources/ResourceLayout.h>
@@ -17,25 +17,51 @@
 class EZ_RHI_DLL RHIPipeline : public RHIResource
 {
 public:
-  RHIPipeline(const ezDynamicArray<RHIResourceLayout*>& resourceLayouts);
-
-  RHIPipeline(const RHIGraphicsPipelineDescription& graphicsDescription);
-
-  RHIPipeline(const RHIComputePipelineDescription& computeDescription);
-
   /// <summary>
   /// Gets a value indicating whether this instance represents a compute Pipeline.
   /// If false, this instance is a graphics pipeline.
   /// </summary>
   virtual bool IsComputePipeline() const = 0;
 
+protected:
+  friend class RHICommandList;
+  RHIPipeline(const RHIGraphicsPipelineDescription& graphicsDescription)
+    : RHIPipeline(graphicsDescription.ResourceLayouts)
+  {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-  RHIOutputDescription GetGraphicsOutputDescription() const;
+    GraphicsOutputDescription = graphicsDescription.Outputs;
+#endif
+  }
 
-  ezDynamicArray<RHIResourceLayout*> GetResourceLayouts() const;
+  RHIPipeline(const RHIComputePipelineDescription& computeDescription)
+    : RHIPipeline(computeDescription.ResourceLayouts)
+  {
+  }
+
+  RHIPipeline(const ezDynamicArray<RHIResourceLayout*>& resourceLayouts)
+  {
+#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
+    // TODO: ShallowClone
+    ResourceLayouts.SetCountUninitialized(resourceLayouts.GetCount());
+    ResourceLayouts.GetArrayPtr().CopyFrom(resourceLayouts.GetArrayPtr());
+#endif
+  }
+
+#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
+  RHIOutputDescription GetGraphicsOutputDescription() const
+  {
+    return GraphicsOutputDescription;
+  }
+
+  ezDynamicArray<RHIResourceLayout*> GetResourceLayouts() const
+  {
+    return ResourceLayouts;
+  }
 #endif
 
 private:
+#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   RHIOutputDescription GraphicsOutputDescription;
   ezDynamicArray<RHIResourceLayout*> ResourceLayouts;
+#endif
 };

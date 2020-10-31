@@ -6,6 +6,7 @@
 #include <RHI/RHIPCH.h>
 
 #include <RHI/Resources/Resource.h>
+#include <RHI/ValidationHelpers.h>
 
 /// <summary>
 /// A device resource which describes the layout and kind of <see cref="RHIBindableResource"/> objects available
@@ -14,12 +15,17 @@
 /// </summary>
 class RHIResourceLayout : public RHIResource
 {
+private:
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   RHIResourceLayoutDescription Description;
   ezUInt32 DynamicBufferCount;
 #endif
 
 protected:
+  friend class RHICommandList;
+
+  friend void ValidationHelpers::ValidateResourceSet(RHIGraphicsDevice* graphicsDevice, const RHIResourceSetDescription& description);
+
   RHIResourceLayout(const RHIResourceLayoutDescription& description)
   {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
@@ -34,7 +40,6 @@ protected:
 #endif
   }
 
-public:
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   const RHIResourceLayoutDescription& GetDescription() const
   {

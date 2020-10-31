@@ -38,7 +38,10 @@ public:
   /// <summary>
   /// Gets the <see cref="GraphicsDeviceFeatures"/> this instance was created with.
   /// </summary>
-  RHIGraphicsDeviceFeatures GetFeatures() const;
+  RHIGraphicsDeviceFeatures GetFeatures() const
+  {
+    return Features;
+  }
 
   /// <summary>
   /// Gets the <see cref="GraphicsBackend"/> of this instance.

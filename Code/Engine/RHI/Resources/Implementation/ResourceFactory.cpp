@@ -4,11 +4,6 @@
 /// Gets the <see cref="GraphicsDeviceFeatures"/> this instance was created with.
 /// </summary>
 
-RHIGraphicsDeviceFeatures RHIResourceFactory::GetFeatures() const
-{
-  return Features;
-}
-
 /// <summary>
 /// Creates a new <see cref="Pipeline"/> object.
 /// </summary>
@@ -41,11 +36,11 @@ RHIPipeline* RHIResourceFactory::CreateGraphicsPipeline(const RHIGraphicsPipelin
       }
     }
   }
-  for (RHIVertexLayoutDescription layoutDesc : description.ShaderSet.VertexLayouts)
+  for (const RHIVertexLayoutDescription& layoutDesc : description.ShaderSet.VertexLayouts)
   {
     bool hasExplicitLayout = false;
     ezUInt32 minOffset = 0;
-    for (RHIVertexElementDescription elementDesc : layoutDesc.Elements)
+    for (const RHIVertexElementDescription& elementDesc : layoutDesc.Elements)
     {
       if (hasExplicitLayout && elementDesc.Offset == 0)
       {
@@ -289,14 +284,17 @@ RHIShader* RHIResourceFactory::CreateShader(const RHIShaderDescription& descript
   if (!Features.ComputeShaderSupported() && description.Stage == RHIShaderStages::Compute)
   {
     EZ_REPORT_FAILURE("GraphicsDevice does not support Compute Shaders.");
+    return;
   }
   if (!Features.GeometryShaderSupported() && description.Stage == RHIShaderStages::Geometry)
   {
     EZ_REPORT_FAILURE("GraphicsDevice does not support Compute Shaders.");
+    return;
   }
   if (!Features.TessellationShadersSupported() && (description.Stage == RHIShaderStages::TessellationControl || description.Stage == RHIShaderStages::TessellationEvaluation))
   {
     EZ_REPORT_FAILURE("GraphicsDevice does not support Tessellation Shaders.");
+    return;
   }
 #endif
   return CreateShaderCore(description);
