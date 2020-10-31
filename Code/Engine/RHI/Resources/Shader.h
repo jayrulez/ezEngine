@@ -13,12 +13,6 @@
 class EZ_RHI_DLL RHIShader : public RHIResource
 {
 public:
-  RHIShader(ezEnum<RHIShaderStages> stage, const ezString& entryPoint)
-  {
-    Stage = stage;
-    EntryPoint = entryPoint;
-  }
-
   /// <summary>
   /// The shader stage this instance can be used in.
   /// </summary>
@@ -35,9 +29,14 @@ public:
     return EntryPoint;
   }
 
+protected:
+  RHIShader(ezEnum<RHIShaderStages> stage, const ezString& entryPoint)
+  {
+    Stage = stage;
+    EntryPoint = entryPoint;
+  }
+
 private:
   ezEnum<RHIShaderStages> Stage;
   ezString EntryPoint;
 };
-
-
