@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RHI/Device/D3D11DeviceOptions.h>
+#include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
 #include <RHI/Device/GraphicsDevice.h>
 #include <optional>
 

@@ -94,7 +94,7 @@ private:
   ezStaticArray<ezUInt32, 1> VertexOffsets;
 
   // Cached pipeline State
-  RHIDeviceBuffer* _ib = nullptr;
+  RHIBuffer* _ib = nullptr;
   ezUInt32 _ibOffset = 0;
   ID3D11BlendState* BlendState = nullptr;
   ID3D11DepthStencilState* DepthStencilState = nullptr;
@@ -138,8 +138,8 @@ private:
   ezHybridArray<ezDynamicArray<BoundTextureInfo>, 20> BoundTextureInfoPool;
 
   static constexpr ezUInt32 MaxUAVs = 8;
-  ezHybridArray<std::tuple<RHIDeviceBuffer*, int>, MaxUAVs> BoundComputeUAVBuffers;
-  ezHybridArray<std::tuple<RHIDeviceBuffer*, int>, MaxUAVs> BoundOMUAVBuffers;
+  ezHybridArray<std::tuple<RHIBuffer*, int>, MaxUAVs> BoundComputeUAVBuffers;
+  ezHybridArray<std::tuple<RHIBuffer*, int>, MaxUAVs> BoundOMUAVBuffers;
 
   ezDynamicArray<D3D11DeviceBuffer*> AvailableStagingBuffers;
   ezDynamicArray<D3D11DeviceBuffer*> SubmittedStagingBuffers;
@@ -161,9 +161,9 @@ protected:
   virtual void EndCore() override;
 
   virtual void SetPipelineCore(RHIPipeline* pipeline) override;
-  virtual void SetVertexBufferCore(ezUInt32 index, RHIDeviceBuffer* buffer, ezUInt32 offset) override;
+  virtual void SetVertexBufferCore(ezUInt32 index, RHIBuffer* buffer, ezUInt32 offset) override;
 
-  virtual void SetIndexBufferCore(RHIDeviceBuffer* buffer, ezEnum<RHIIndexFormat> format, ezUInt32 offset) override;
+  virtual void SetIndexBufferCore(RHIBuffer* buffer, ezEnum<RHIIndexFormat> format, ezUInt32 offset) override;
 
   virtual void SetGraphicsResourceSetCore(ezUInt32 slot, RHIResourceSet* resourceSet, ezUInt32 dynamicOffsetsCount, const ezDynamicArray<ezUInt32>& dynamicOffsets) override;
 
@@ -179,19 +179,19 @@ protected:
   virtual void DrawCore(ezUInt32 vertexCount, ezUInt32 instanceCount, ezUInt32 vertexStart, ezUInt32 instanceStart) override;
 
   virtual void DrawIndexedCore(ezUInt32 indexCount, ezUInt32 instanceCount, ezUInt32 indexStart, ezInt32 vertexOffset, ezUInt32 instanceStart) override;
-  virtual void DrawIndirectCore(RHIDeviceBuffer* indirectBuffer, ezUInt32 offset, ezUInt32 drawCount, ezUInt32 stride) override;
+  virtual void DrawIndirectCore(RHIBuffer* indirectBuffer, ezUInt32 offset, ezUInt32 drawCount, ezUInt32 stride) override;
 
-  virtual void DrawIndexedIndirectCore(RHIDeviceBuffer* indirectBuffer, ezUInt32 offset, ezUInt32 drawCount, ezUInt32 stride) override;
+  virtual void DrawIndexedIndirectCore(RHIBuffer* indirectBuffer, ezUInt32 offset, ezUInt32 drawCount, ezUInt32 stride) override;
 
   virtual void DispatchCore(ezUInt32 groupCountX, ezUInt32 groupCountY, ezUInt32 groupCountZ) override;
 
-  virtual void DispatchIndirectCore(RHIDeviceBuffer* indirectBuffer, ezUInt32 offset) override;
+  virtual void DispatchIndirectCore(RHIBuffer* indirectBuffer, ezUInt32 offset) override;
 
   virtual void ResolveTextureCore(RHITexture* source, RHITexture* destination) override;
 
-  virtual void UpdateBufferCore(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size) override;
+  virtual void UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size) override;
 
-  virtual void CopyBufferCore(RHIDeviceBuffer* source, ezUInt32 sourceOffset, RHIDeviceBuffer* destination, ezUInt32 destinationOffset, ezUInt32 size) override;
+  virtual void CopyBufferCore(RHIBuffer* source, ezUInt32 sourceOffset, RHIBuffer* destination, ezUInt32 destinationOffset, ezUInt32 size) override;
 
   virtual void CopyTextureCore(
     RHITexture* source,
@@ -232,15 +232,15 @@ private:
 
   void UnbindUAVTexture(RHITexture* target);
 
-  void UnbindUAVBuffer(RHIDeviceBuffer* buffer);
+  void UnbindUAVBuffer(RHIBuffer* buffer);
 
-  void UnbindUAVBufferIndividual(RHIDeviceBuffer* buffer, bool compute);
+  void UnbindUAVBufferIndividual(RHIBuffer* buffer, bool compute);
 
-  void TrackBoundUAVBuffer(RHIDeviceBuffer* buffer, ezUInt32 slot, bool compute);
+  void TrackBoundUAVBuffer(RHIBuffer* buffer, ezUInt32 slot, bool compute);
 
   void BindUnorderedAccessView(
     RHITexture* texture,
-    RHIDeviceBuffer* buffer,
+    RHIBuffer* buffer,
     ID3D11UnorderedAccessView* uav,
     ezUInt32 slot,
     ezBitflags<RHIShaderStages> stages,
@@ -281,7 +281,7 @@ private:
 
   void ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInfo brsi, bool graphics);
 
-  D3D11BufferRange* GetBufferRange(RHIDeviceResource* resource, ezUInt32 additionalOffset);
+  D3D11BufferRange* GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset);
 
   void UnbindSRVTexture(RHITexture* target);
 

@@ -3,7 +3,7 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 class RHITextureView;
 class RHIGraphicsDevice;
@@ -12,13 +12,13 @@ class RHIGraphicsDevice;
 /// A device resource used to store arbitrary image data in a specific format.
 /// See <see cref="TextureDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHITexture : public RHIDeviceResource
+class EZ_RHI_DLL RHITexture : public RHIResource
 {
 public:
   RHITexture()
   {
-    Flags.Add(RHIDeviceResourceFlags::Bindable);
-    Flags.Add(RHIDeviceResourceFlags::Mappable);
+    Flags.Add(RHIResourceFlags::Bindable);
+    Flags.Add(RHIResourceFlags::Mappable);
   }
 
   /// <summary>
@@ -79,17 +79,7 @@ public:
   /// </summary>
   virtual ezEnum<RHITextureSampleCount> GetSampleCount() const = 0;
 
-  RHITextureView* GetFullTextureView(RHIGraphicsDevice* graphicsDevice)
-  {
-    _fullTextureViewLock.Lock();
-
-    if (_fullTextureView == nullptr)
-    {
-      _fullTextureView = CreateFullTextureView(graphicsDevice);
-    }
-
-    return _fullTextureView;
-  }
+  RHITextureView* GetFullTextureView(RHIGraphicsDevice* graphicsDevice);
 
 
 protected:

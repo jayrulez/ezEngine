@@ -2,13 +2,13 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
 
 struct RHIMappedResourceCacheKey : public ezHashableStruct<RHIMappedResourceCacheKey>
 {
-  RHIDeviceResource* Resource = nullptr;
+  RHIResource* Resource = nullptr;
   ezUInt32 Subresource = 0;
 
   RHIMappedResourceCacheKey()
@@ -17,7 +17,7 @@ struct RHIMappedResourceCacheKey : public ezHashableStruct<RHIMappedResourceCach
   {
   }
 
-  RHIMappedResourceCacheKey(RHIDeviceResource* resource, ezUInt32 subresource)
+  RHIMappedResourceCacheKey(RHIResource* resource, ezUInt32 subresource)
   {
     Resource = resource;
     Subresource = subresource;

@@ -5,14 +5,14 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 /// <summary>
 /// A device resource which describes the layout and kind of <see cref="RHIBindableResource"/> objects available
 /// to a shader set.
 /// See <see cref="RHIResourceLayoutDescription"/>.
 /// </summary>
-class RHIResourceLayout : public RHIDeviceResource
+class RHIResourceLayout : public RHIResource
 {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   RHIResourceLayoutDescription Description;

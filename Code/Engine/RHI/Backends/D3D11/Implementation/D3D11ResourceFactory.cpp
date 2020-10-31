@@ -1,4 +1,5 @@
 #include <RHI/Backends/D3D11/D3D11ResourceFactory.h>
+#include <RHI/ValidationHelpers.h>
 
 D3D11ResourceFactory::D3D11ResourceFactory(D3D11GraphicsDevice* graphicsDevice)
   : RHIResourceFactory(graphicsDevice->GetFeatures())
@@ -53,7 +54,7 @@ RHITextureView* D3D11ResourceFactory::CreateTextureViewCore(const RHITextureView
   return new D3D11TextureView(GraphicsDevice, description);
 }
 
-RHIDeviceBuffer* D3D11ResourceFactory::CreateBufferCore(const RHIBufferDescription& description)
+RHIBuffer* D3D11ResourceFactory::CreateBufferCore(const RHIBufferDescription& description)
 {
   return new D3D11DeviceBuffer(
     Device,
@@ -61,4 +62,10 @@ RHIDeviceBuffer* D3D11ResourceFactory::CreateBufferCore(const RHIBufferDescripti
     description.Usage,
     description.StructureByteStride,
     description.RawBuffer);
+}
+
+RHIResourceSet* D3D11ResourceFactory::CreateResourceSetCore(const RHIResourceSetDescription& description)
+{
+  ValidationHelpers::ValidateResourceSet(GraphicsDevice, description);
+  return new D3D11ResourceSet(description);
 }

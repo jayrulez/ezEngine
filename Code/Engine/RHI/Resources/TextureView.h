@@ -4,19 +4,19 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 #include <RHI/Resources/texture.h>
 
 /// <summary>
 /// A bindable device resource which provides a shader with access to a sampled <see cref="RHITexture"/> object.
 /// See <see cref="RHITextureViewDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHITextureView : public RHIDeviceResource
+class EZ_RHI_DLL RHITextureView : public RHIResource
 {
 public:
   RHITextureView()
   {
-    Flags.Add(RHIDeviceResourceFlags::Bindable);
+    Flags.Add(RHIResourceFlags::Bindable);
   }
 
   /// <summary>

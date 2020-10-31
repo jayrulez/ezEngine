@@ -3,17 +3,17 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 /// <summary>
-/// A structure describing the layout of a mapped <see cref="RHIDeviceResource"/> object.
+/// A structure describing the layout of a mapped <see cref="RHIResource"/> object.
 /// </summary>
 struct RHIMappedResource
 {
   /// <summary>
   /// The resource which has been mapped.
   /// </summary>
-  RHIDeviceResource* Resource = nullptr;
+  RHIResource* Resource = nullptr;
 
   /// <summary>
   /// Identifies the <see cref="MapMode"/> that was used to map the resource.
@@ -49,7 +49,7 @@ struct RHIMappedResource
   ezUInt32 DepthPitch = 0;
 
   RHIMappedResource(
-    RHIDeviceResource* resource,
+    RHIResource* resource,
     ezEnum<RHIMapMode> mode,
     ezUInt64* data,
     ezUInt32 size,
@@ -59,7 +59,7 @@ struct RHIMappedResource
   {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
     EZ_VERIFY(resource != nullptr, "Resource is null.");
-    EZ_VERIFY(resource->GetFlags().IsSet(RHIDeviceResourceFlags::Mappable), "Resource is not mappable.");
+    EZ_VERIFY(resource->GetFlags().IsSet(RHIResourceFlags::Mappable), "Resource is not mappable.");
 #endif
 
     Resource = resource;
@@ -71,11 +71,11 @@ struct RHIMappedResource
     DepthPitch = depthPitch;
   }
 
-  RHIMappedResource(RHIDeviceResource* resource, ezEnum<const RHIMapMode> mode, ezUInt64* data, ezUInt32 size)
+  RHIMappedResource(RHIResource* resource, ezEnum<const RHIMapMode> mode, ezUInt64* data, ezUInt32 size)
   {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
     EZ_VERIFY(resource != nullptr, "Resource is null.");
-    EZ_VERIFY(resource->GetFlags().IsSet(RHIDeviceResourceFlags::Mappable), "Resource is not mappable.");
+    EZ_VERIFY(resource->GetFlags().IsSet(RHIResourceFlags::Mappable), "Resource is not mappable.");
 #endif
 
     Resource = resource;

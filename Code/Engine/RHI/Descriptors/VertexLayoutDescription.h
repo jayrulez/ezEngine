@@ -3,20 +3,20 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 #include <RHI/Descriptors/VertexElementDescription.h>
-#include <RHI/Utils.h>
+#include <RHI/FormatHelpers.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
 
 
 /// <summary>
-/// Describes the layout of vertex data in a single <see cref="RHIDeviceBuffer"/> used as a vertex buffer.
+/// Describes the layout of vertex data in a single <see cref="RHIBuffer"/> used as a vertex buffer.
 /// </summary>
 struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertexLayoutDescription>
 {
   EZ_DECLARE_POD_TYPE();
 
   /// <summary>
-  /// The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.
+  /// The number of bytes in between successive elements in the <see cref="RHIBuffer"/>.
   /// </summary>
   ezUInt32 Stride = 0;
 
@@ -38,7 +38,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// <summary>
   /// Constructs a new RHIVertexLayoutDescription.
   /// </summary>
-  /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.</param>
+  /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIBuffer"/>.</param>
   /// <param name="elements">An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element
   /// of vertex data.</param>
   RHIVertexLayoutDescription(ezUInt32 stride, ezDynamicArray<RHIVertexElementDescription> elements)
@@ -51,7 +51,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// <summary>
   /// Constructs a new RHIVertexLayoutDescription.
   /// </summary>
-  /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIDeviceBuffer"/>.</param>
+  /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIBuffer"/>.</param>
   /// <param name="elements">An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element
   /// of vertex data.</param>
   /// <param name="instanceStepRate">A value controlling how often data for instances is advanced for this element. For
@@ -76,7 +76,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
     ezUInt32 computedStride = 0;
     for (ezUInt32 i = 0; i < elements.GetCount(); i++)
     {
-      ezUInt32 elementSize = RHIFormatUtils::GetSize(elements[i].Format);
+      ezUInt32 elementSize = FormatHelpers::GetSize(elements[i].Format);
       if (elements[i].Offset != 0)
       {
         computedStride = elements[i].Offset + elementSize;

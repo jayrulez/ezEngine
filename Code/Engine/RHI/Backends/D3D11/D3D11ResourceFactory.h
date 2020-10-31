@@ -5,7 +5,7 @@
 
 #include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
 #include <RHI/Backends/D3D11/D3D11ResourceCache.h>
-#include <RHI/Device/ResourceFactory.h>
+#include <RHI/Resources/ResourceFactory.h>
 
 
 #include <RHI/Backends/D3D11/D3D11Buffer.h>
@@ -47,7 +47,7 @@ public:
 
   virtual RHITextureView* CreateTextureViewCore(const RHITextureViewDescription& description) override;
 
-  virtual RHIDeviceBuffer* CreateBufferCore(const RHIBufferDescription& description) override;
+  virtual RHIBuffer* CreateBufferCore(const RHIBufferDescription& description) override;
 
   virtual RHISampler* CreateSamplerCore(const RHISamplerDescription& description) override { return new D3D11Sampler(Device, description); }
 
@@ -55,11 +55,7 @@ public:
 
   virtual RHIResourceLayout* CreateResourceLayoutCore(const RHIResourceLayoutDescription& description) override { return new D3D11ResourceLayout(description); }
 
-  virtual RHIResourceSet* CreateResourceSetCore(const RHIResourceSetDescription& description) override
-  {
-    RHIValidationUtils::ValidateResourceSet(GraphicsDevice, description);
-    return new D3D11ResourceSet(description);
-  }
+  virtual RHIResourceSet* CreateResourceSetCore(const RHIResourceSetDescription& description) override;
   virtual RHIFence* CreateFenceCore(bool signaled) override { return new D3D11Fence(signaled); }
 
   virtual RHISwapchain* CreateSwapchainCore(const RHISwapchainDescription& description) override { return new D3D11Swapchain(GraphicsDevice, description); }

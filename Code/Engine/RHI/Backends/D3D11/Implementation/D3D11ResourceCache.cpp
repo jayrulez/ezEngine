@@ -227,7 +227,7 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
 
       // TODO: check push back
 
-      currentOffset += RHIFormatUtils::GetSize(desc.Format);
+      currentOffset += FormatHelpers::GetSize(desc.Format);
       element += 1;
     }
   }

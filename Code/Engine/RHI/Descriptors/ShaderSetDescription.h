@@ -16,7 +16,7 @@ struct EZ_RHI_DLL RHIShaderSetDescription : public ezHashableStruct<RHIShaderSet
 {
   /// <summary>
   /// An array of <see cref="RHIVertexLayoutDescription"/> describing the set of vertex layouts understood by the
-  /// <see cref="RHIPipeline"/>. Each element in this array describes the input layout of a single <see cref="RHIDeviceBuffer"/>
+  /// <see cref="RHIPipeline"/>. Each element in this array describes the input layout of a single <see cref="RHIBuffer"/>
   /// to be bound when drawing.
   /// </summary>
   ezDynamicArray<RHIVertexLayoutDescription> VertexLayouts;
@@ -42,7 +42,7 @@ struct EZ_RHI_DLL RHIShaderSetDescription : public ezHashableStruct<RHIShaderSet
   /// </summary>
   /// <param name="vertexLayouts">An array of <see cref="RHIVertexLayoutDescription"/> describing the set of vertex layouts
   /// understood by the <see cref="Pipeline"/>. Each element in this array describes the input layout of a single
-  /// <see cref="RHIDeviceBuffer"/> to be bound when drawing.</param>
+  /// <see cref="RHIBuffer"/> to be bound when drawing.</param>
   /// <param name="shaders">An array of <see cref="Shader"/> objects, one for each shader stage which is to be active
   /// in the <see cref="RHIPipeline"/>. At a minimum, every graphics Pipeline must include a Vertex and Fragment shader. All
   /// other stages are optional, but if either Tessellation stage is present, then the other must also be.</param>
@@ -58,7 +58,7 @@ struct EZ_RHI_DLL RHIShaderSetDescription : public ezHashableStruct<RHIShaderSet
   /// </summary>
   /// <param name="vertexLayouts">An array of <see cref="RHIVertexLayoutDescription"/> describing the set of vertex layouts
   /// understood by the <see cref="RHIPipeline"/>. Each element in this array describes the input layout of a single
-  /// <see cref="RHIDeviceBuffer"/> to be bound when drawing.</param>
+  /// <see cref="RHIBuffer"/> to be bound when drawing.</param>
   /// <param name="shaders">An array of <see cref="Shader"/> objects, one for each shader stage which is to be active
   /// in the <see cref="Pipeline"/>. At a minimum, every graphics Pipeline must include a Vertex and Fragment shader. All
   /// other stages are optional, but if either Tessellation stage is present, then the other must also be.</param>

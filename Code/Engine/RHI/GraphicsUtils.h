@@ -10,7 +10,7 @@
 #  include <Foundation/Basics/Platform/Win/MinWindows.h>
 
 #  ifdef EZ_RHI_D3D11_SUPPORTED
-#include <RHI/Device/D3D11DeviceOptions.h>
+#include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
 #include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
 #  endif
 
@@ -31,7 +31,7 @@
 #if EZ_ENABLED(EZ_PLATFORM_ANDROID)
 #endif
 
-class GraphicsDeviceUtils
+class GraphicsUtils
 {
 public:
   /// <summary>

@@ -6,7 +6,7 @@
 #include <RHI/Descriptors/ComputePipelineDescription.h>
 #include <RHI/Descriptors/OutputDescription.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 #include <RHI/Resources/ResourceLayout.h>
 
 /// <summary>
@@ -14,26 +14,14 @@
 /// <see cref="CommandList.SetPipeline(Pipeline)"/> to prepare a <see cref="CommandList"/> for draw commands.
 /// See <see cref="GraphicsPipelineDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHIPipeline : public RHIDeviceResource
+class EZ_RHI_DLL RHIPipeline : public RHIResource
 {
 public:
-  RHIPipeline(const ezDynamicArray<RHIResourceLayout*>& resourceLayouts)
-  {
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    ResourceLayouts.SetCountUninitialized(resourceLayouts.GetCount());
-    ResourceLayouts.GetArrayPtr().CopyFrom(resourceLayouts.GetArrayPtr());
-#endif
-  }
+  RHIPipeline(const ezDynamicArray<RHIResourceLayout*>& resourceLayouts);
 
-  RHIPipeline(const RHIGraphicsPipelineDescription& graphicsDescription)
-    : RHIPipeline(graphicsDescription.ResourceLayouts)
-  {
-  }
+  RHIPipeline(const RHIGraphicsPipelineDescription& graphicsDescription);
 
-  RHIPipeline(const RHIComputePipelineDescription& computeDescription)
-    : RHIPipeline(computeDescription.ResourceLayouts)
-  {
-  }
+  RHIPipeline(const RHIComputePipelineDescription& computeDescription);
 
   /// <summary>
   /// Gets a value indicating whether this instance represents a compute Pipeline.
@@ -42,15 +30,9 @@ public:
   virtual bool IsComputePipeline() const = 0;
 
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-  RHIOutputDescription GetGraphicsOutputDescription() const
-  {
-    return GraphicsOutputDescription;
-  }
+  RHIOutputDescription GetGraphicsOutputDescription() const;
 
-  ezDynamicArray<RHIResourceLayout*> GetResourceLayouts() const
-  {
-    return ResourceLayouts;
-  }
+  ezDynamicArray<RHIResourceLayout*> GetResourceLayouts() const;
 #endif
 
 private:

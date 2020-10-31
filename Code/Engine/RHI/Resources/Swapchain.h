@@ -3,14 +3,14 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 #include <RHI/Resources/Framebuffer.h>
 
 /// <summary>
 /// A device resource providing the ability to present rendered images to a visible surface.
 /// See <see cref="SwapchainDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHISwapchain : public RHIDeviceResource
+class EZ_RHI_DLL RHISwapchain : public RHIResource
 {
 public:
   /// <summary>

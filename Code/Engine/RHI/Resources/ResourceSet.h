@@ -4,14 +4,14 @@
 #include <RHI/RHIPCH.h>
 #include <RHI/Descriptors/ResourceSetDescription.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 #include <RHI/Resources/ResourceLayout.h>
 
 /// <summary>
 /// A device resource used to bind a particular set of <see cref="BindableResource"/> objects to a <see cref="CommandList"/>.
 /// See <see cref="ResourceSetDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHIResourceSet : public RHIDeviceResource
+class EZ_RHI_DLL RHIResourceSet : public RHIResource
 {
 public:
   RHIResourceSet(const RHIResourceSetDescription& description)
@@ -28,7 +28,7 @@ public:
     return Layout;
   }
 
-  ezDynamicArray<RHIDeviceResource*> GetResources() const
+  ezDynamicArray<RHIResource*> GetResources() const
   {
     return Resources;
   }
@@ -37,7 +37,7 @@ public:
 private:
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   RHIResourceLayout* Layout;
-  ezDynamicArray<RHIDeviceResource*> Resources;
+  ezDynamicArray<RHIResource*> Resources;
 #endif
 };
 

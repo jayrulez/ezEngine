@@ -3,13 +3,13 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 // A GPU-CPU sync point
 /// <summary>
 /// A synchronization primitive which allows the GPU to communicate when submitted work items have finished executing.
 /// </summary>
-class EZ_RHI_DLL RHIFence : public RHIDeviceResource
+class EZ_RHI_DLL RHIFence : public RHIResource
 {
 public:
   /// <summary>

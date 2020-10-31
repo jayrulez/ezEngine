@@ -4,13 +4,13 @@
 #include <RHI/RHIPCH.h>
 
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 /// <summary>
 /// A device resource encapsulating a single shader module.
 /// See <see cref="RHIShaderDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHIShader : public RHIDeviceResource
+class EZ_RHI_DLL RHIShader : public RHIResource
 {
 public:
   RHIShader(ezEnum<RHIShaderStages> stage, const ezString& entryPoint)

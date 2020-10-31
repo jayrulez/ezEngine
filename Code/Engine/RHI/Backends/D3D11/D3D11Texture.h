@@ -2,7 +2,6 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Utils.h>
 
 #include <RHI/Descriptors/TextureDescription.h>
 #include <RHI/Descriptors/TextureViewDescription.h>

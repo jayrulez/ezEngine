@@ -33,7 +33,7 @@ EZ_DECLARE_FLAGS_OPERATORS(RHIType);
 */
 
 /// <summary>
-/// The format of index data used in a <see cref="RHIDeviceBuffer"/>.
+/// The format of index data used in a <see cref="RHIBuffer"/>.
 /// </summary>
 struct EZ_RHI_DLL RHIIndexFormat // : byte
 {
@@ -145,7 +145,7 @@ struct EZ_RHI_DLL RHIBlendFunction // : byte
 };
 
 /// <summary>
-/// A bitmask describing the permitted uses of a <see cref="RHIDeviceBuffer"/> object.
+/// A bitmask describing the permitted uses of a <see cref="RHIBuffer"/> object.
 /// </summary>
 struct EZ_RHI_DLL RHIBufferUsage // : byte
 {
@@ -154,22 +154,22 @@ struct EZ_RHI_DLL RHIBufferUsage // : byte
   {
     None,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> can be used as the source of vertex data for drawing commands.
-    /// This flag enables the use of a Buffer in the <see cref="RHICommandList.SetVertexBuffer(ezUInt32, RHIDeviceBuffer)"/> method.
+    /// Indicates that a <see cref="RHIBuffer"/> can be used as the source of vertex data for drawing commands.
+    /// This flag enables the use of a Buffer in the <see cref="RHICommandList.SetVertexBuffer(ezUInt32, RHIBuffer)"/> method.
     /// </summary>
     VertexBuffer = 1 << 0,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> can be used as the source of index data for drawing commands.
-    /// This flag enables the use of a Buffer in the <see cref="RHICommandList.SetIndexBuffer(RHIDeviceBuffer, RHIIndexFormat)" /> method.
+    /// Indicates that a <see cref="RHIBuffer"/> can be used as the source of index data for drawing commands.
+    /// This flag enables the use of a Buffer in the <see cref="RHICommandList.SetIndexBuffer(RHIBuffer, RHIIndexFormat)" /> method.
     /// </summary>
     IndexBuffer = 1 << 1,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> can be used as a uniform Buffer.
+    /// Indicates that a <see cref="RHIBuffer"/> can be used as a uniform Buffer.
     /// This flag enables the use of a Buffer in a <see cref="RHIResourceSet"/> as a uniform Buffer.
     /// </summary>
     UniformBuffer = 1 << 2,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> can be used as a read-only structured Buffer.
+    /// Indicates that a <see cref="RHIBuffer"/> can be used as a read-only structured Buffer.
     /// This flag enables the use of a Buffer in a <see cref="RHIResourceSet"/> as a read-only structured Buffer.
     /// This flag can only be combined with <see cref="Dynamic"/>.
     /// </summary>
@@ -181,19 +181,19 @@ struct EZ_RHI_DLL RHIBufferUsage // : byte
     /// </summary>
     StructuredBufferReadWrite = 1 << 4,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> can be used as the source of indirect drawing information.
+    /// Indicates that a <see cref="RHIBuffer"/> can be used as the source of indirect drawing information.
     /// This flag enables the use of a Buffer in the *Indirect methods of <see cref="RHICommandList"/>.
     /// This flag cannot be combined with <see cref="Dynamic"/>.
     /// </summary>
     IndirectBuffer = 1 << 5,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> will be updated with new data very frequently. Dynamic Buffers can be
+    /// Indicates that a <see cref="RHIBuffer"/> will be updated with new data very frequently. Dynamic Buffers can be
     /// mapped with <see cref="RHIMapMode.Write"/>. This flag cannot be combined with <see cref="StructuredBufferReadWrite"/>
     /// or <see cref="IndirectBuffer"/>.
     /// </summary>
     Dynamic = 1 << 6,
     /// <summary>
-    /// Indicates that a <see cref="RHIDeviceBuffer"/> will be used as a staging Buffer. Staging Buffers can be used to transfer data
+    /// Indicates that a <see cref="RHIBuffer"/> will be used as a staging Buffer. Staging Buffers can be used to transfer data
     /// to-and-from the CPU using <see cref="RHIGraphicsDevice.Map(RHIMappableResource, RHIMapMode)"/>. Staging Buffers can use all
     /// <see cref="RHIMapMode"/> values.
     /// This flag cannot be combined with any other flag.
@@ -710,18 +710,18 @@ struct EZ_RHI_DLL RHIResourceKind // : byte
   enum Enum
   {
     /// <summary>
-    /// A <see cref="RHIDeviceBuffer"/> accessed as a uniform buffer. A subset of a buffer can be bound using a
-    /// <see cref="RHIDeviceBufferRange"/>.
+    /// A <see cref="RHIBuffer"/> accessed as a uniform buffer. A subset of a buffer can be bound using a
+    /// <see cref="RHIBufferRange"/>.
     /// </summary>
     UniformBuffer,
     /// <summary>
-    /// A <see cref="RHIDeviceBuffer"/> accessed as a read-only storage buffer. A subset of a buffer can be bound using a
-    /// <see cref="RHIDeviceBufferRange"/>.
+    /// A <see cref="RHIBuffer"/> accessed as a read-only storage buffer. A subset of a buffer can be bound using a
+    /// <see cref="RHIBufferRange"/>.
     /// </summary>
     StructuredBufferReadOnly,
     /// <summary>
-    /// A <see cref="RHIDeviceBuffer"/> accessed as a read-write storage buffer. A subset of a buffer can be bound using a
-    /// <see cref="RHIDeviceBufferRange"/>.
+    /// A <see cref="RHIBuffer"/> accessed as a read-write storage buffer. A subset of a buffer can be bound using a
+    /// <see cref="RHIBufferRange"/>.
     /// </summary>
     StructuredBufferReadWrite,
     /// <summary>
@@ -1290,7 +1290,7 @@ struct EZ_RHI_DLL RHIVertexElementSemantic // : byte
 };
 
 /// <summary>
-/// A structure describing the format expected by indirect dispatch commands contained in an indirect <see cref="RHIDeviceBuffer"/>.
+/// A structure describing the format expected by indirect dispatch commands contained in an indirect <see cref="RHIBuffer"/>.
 /// </summary>
 struct EZ_RHI_DLL IndirectDispatchArguments
 {
@@ -1333,7 +1333,7 @@ struct EZ_RHI_DLL IndirectDrawArguments
 
 /// <summary>
 /// A structure describing the format expected by indirect, indexed draw commands contained in an indirect
-/// <see cref="RHIDeviceBuffer"/>.
+/// <see cref="RHIBuffer"/>.
 /// </summary>
 struct EZ_RHI_DLL IndirectDrawIndexedArguments
 {

@@ -1,88 +1,6 @@
-#include <RHI/Device/GraphicsDevice.h>
-#include <RHI/Resources/Texture.h>
-#include <RHI/Utils.h>
+#include <RHI/FormatHelpers.h>
 
-namespace RHIUtils
-{
-  RHIDeviceBufferRange GetBufferRange(RHIDeviceResource* resource, ezUInt32 additionalOffset)
-  {
-
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    EZ_VERIFY(resource->GetFlags().IsSet(RHIDeviceResourceFlags::Bindable), "Resource is not bindable.");
-#endif
-
-    RHIDeviceBufferRange* range = dynamic_cast<RHIDeviceBufferRange*>(resource);
-    if (range != nullptr)
-    {
-      return RHIDeviceBufferRange(range->Buffer, range->Offset + additionalOffset, range->Size);
-    }
-    else
-    {
-      RHIDeviceBuffer* buffer = static_cast<RHIDeviceBuffer*>(resource);
-
-      return RHIDeviceBufferRange(buffer, additionalOffset, buffer->GetSize());
-    }
-  }
-
-  bool GetDeviceBuffer(RHIDeviceResource* resource, RHIDeviceBuffer* buffer)
-  {
-    RHIDeviceBuffer* db = dynamic_cast<RHIDeviceBuffer*>(resource);
-    RHIDeviceBufferRange* dbr = dynamic_cast<RHIDeviceBufferRange*>(resource);
-    if (db)
-    {
-      buffer = db;
-      return true;
-    }
-    else if (dbr)
-    {
-      buffer = dbr->Buffer;
-      return true;
-    }
-
-    buffer = nullptr;
-    return false;
-  }
-
-  RHITextureView* GetTextureView(RHIGraphicsDevice* gd, RHIDeviceResource* resource)
-  {
-    RHITextureView* view = dynamic_cast<RHITextureView*>(resource);
-    RHITexture* tex = dynamic_cast<RHITexture*>(resource);
-    if (view)
-    {
-      return view;
-    }
-    else if (tex)
-    {
-      return tex->GetFullTextureView(gd);
-    }
-    else
-    {
-      EZ_REPORT_FAILURE("Unexpected resource type. Expected Texture or TextureView but found {resource.GetType().Name}");
-      return nullptr;
-    }
-  }
-
-  void GetMipDimensions(RHITexture* tex, ezUInt32 mipLevel, ezUInt32& width, ezUInt32& height, ezUInt32& depth)
-  {
-    width = GetDimension(tex->GetWidth(), mipLevel);
-    height = GetDimension(tex->GetHeight(), mipLevel);
-    depth = GetDimension(tex->GetDepth(), mipLevel);
-  }
-
-  ezUInt32 GetDimension(ezUInt32 largestLevelDimension, ezUInt32 mipLevel)
-  {
-    ezUInt32 ret = largestLevelDimension;
-    for (ezUInt32 i = 0; i < mipLevel; i++)
-    {
-      ret /= 2;
-    }
-
-    return ezMath::Max((ezUInt32)1, ret);
-  }
-
-} // namespace RHIUtils
-
-namespace RHIFormatUtils
+namespace FormatHelpers
 {
   ezUInt32 GetSize(ezEnum<RHIPixelFormat> format)
   {
@@ -259,6 +177,38 @@ namespace RHIFormatUtils
         EZ_REPORT_FAILURE("Invalid format specified for vertex element format.");
     }
     return 0;
+  }
+
+  ezUInt32 GetSampleCount(ezEnum<RHITextureSampleCount> sampleCount)
+  {
+    switch (sampleCount)
+    {
+      case RHITextureSampleCount::Count1:
+        return 1;
+      case RHITextureSampleCount::Count2:
+        return 2;
+      case RHITextureSampleCount::Count4:
+        return 4;
+      case RHITextureSampleCount::Count8:
+        return 8;
+      case RHITextureSampleCount::Count16:
+        return 16;
+      case RHITextureSampleCount::Count32:
+        return 32;
+      default:
+        EZ_REPORT_FAILURE("Invalid SampleCount");
+        return 0;
+    }
+  }
+
+  bool IsStencilFormat(ezEnum<RHIPixelFormat> format)
+  {
+    return format == RHIPixelFormat::D24_UNorm_S8_UInt || format == RHIPixelFormat::D32_Float_S8_UInt;
+  }
+
+  bool IsDepthStencilFormat(ezEnum<RHIPixelFormat> format)
+  {
+    return format == RHIPixelFormat::D32_Float_S8_UInt || format == RHIPixelFormat::D24_UNorm_S8_UInt || format == RHIPixelFormat::R16_UNorm || format == RHIPixelFormat::R32_Float;
   }
 
   bool IsCompressedFormat(ezEnum<RHIPixelFormat> format)
@@ -510,125 +460,4 @@ namespace RHIFormatUtils
         return format;
     }
   }
-} // namespace RHIFormatUtils
-
-namespace RHIValidationUtils
-{
-  void ValidateResourceSet(RHIGraphicsDevice* gd, const RHIResourceSetDescription& description)
-  {
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    ezDynamicArray<RHIResourceLayoutElementDescription> elements = description.Layout->GetDescription().Elements;
-    ezDynamicArray<RHIDeviceResource*> resources = description.BoundResources;
-
-    if (elements.GetCount() != resources.GetCount())
-    {
-      EZ_REPORT_FAILURE("The number of resources specified ({}) must be equal to the number of resources in the ResourceLayout ({}).", resources.GetCount(), elements.GetCount());
-    }
-
-    for (ezUInt32 i = 0; i < elements.GetCount(); i++)
-    {
-      ValidateResourceKind(elements[i].Kind, resources[i], i);
-    }
-
-    for (ezUInt32 i = 0; i < description.Layout->GetDescription().Elements.GetCount(); i++)
-    {
-      RHIResourceLayoutElementDescription element = description.Layout->GetDescription().Elements[i];
-      if (element.Kind == RHIResourceKind::UniformBuffer || element.Kind == RHIResourceKind::StructuredBufferReadOnly || element.Kind == RHIResourceKind::StructuredBufferReadWrite)
-      {
-        RHIDeviceBufferRange range = RHIUtils::GetBufferRange(description.BoundResources[i], 0);
-
-        if (!gd->GetFeatures().BufferRangeBindingSupported() && (range.Offset != 0 || range.Size != range.Buffer->GetSize()))
-        {
-          EZ_REPORT_FAILURE("The {nameof(DeviceBufferRange)} in slot {i} uses a non-zero offset or less-than-full size, which requires {nameof(GraphicsDeviceFeatures)}.{nameof(GraphicsDeviceFeatures.BufferRangeBinding)}.");
-        }
-
-        ezUInt32 alignment = element.Kind == RHIResourceKind::UniformBuffer
-                               ? gd->GetUniformBufferMinOffsetAlignment()
-                               : gd->GetStructuredBufferMinOffsetAlignment();
-
-        if ((range.Offset % alignment) != 0)
-        {
-          ezStringBuilder sb;
-          sb.AppendFormat("The DeviceBufferRange in slot {} has an invalid offset: {range.Offset}. ", i, range.Offset);
-          sb.AppendFormat("The offset for this buffer must be a multiple of {}.", alignment);
-          EZ_REPORT_FAILURE(sb.GetData());
-        }
-      }
-    }
-#endif
-  }
-
-  void ValidateResourceKind(ezEnum<RHIResourceKind> kind, RHIDeviceResource* resource, ezUInt32 slot)
-  {
-
-    RHIDeviceBuffer* db = nullptr;
-    bool dbValid = RHIUtils::GetDeviceBuffer(resource, db);
-    switch (kind)
-    {
-      case RHIResourceKind::UniformBuffer:
-      {
-        if (!dbValid || (db->GetUsage() & RHIBufferUsage::UniformBuffer) == 0)
-        {
-          EZ_REPORT_FAILURE("Resource in slot {slot} does not match {nameof(ResourceKind)}.{kind} specified in the {nameof(ResourceLayout)}. It must be a {nameof(DeviceBuffer)} or {nameof(DeviceBufferRange)} with {nameof(BufferUsage)}.{nameof(BufferUsage.UniformBuffer)}.");
-        }
-        break;
-      }
-      case RHIResourceKind::StructuredBufferReadOnly:
-      {
-        if (!dbValid || (db->GetUsage() & (RHIBufferUsage::StructuredBufferReadOnly | RHIBufferUsage::StructuredBufferReadWrite)) == 0)
-        {
-          EZ_REPORT_FAILURE("Resource in slot {slot} does not match {nameof(ResourceKind)}.{kind} specified in the {nameof(ResourceLayout)}. It must be a {nameof(DeviceBuffer)} with {nameof(BufferUsage)}.{nameof(BufferUsage.StructuredBufferReadOnly)}.");
-        }
-        break;
-      }
-      case RHIResourceKind::StructuredBufferReadWrite:
-      {
-        if (!dbValid || (db->GetUsage() & RHIBufferUsage::StructuredBufferReadWrite) == 0)
-        {
-          EZ_REPORT_FAILURE("Resource in slot {slot} does not match {nameof(ResourceKind)} specified in the {nameof(ResourceLayout)}. It must be a {nameof(DeviceBuffer)} with {nameof(BufferUsage)}.{nameof(BufferUsage.StructuredBufferReadWrite)}.");
-        }
-        break;
-      }
-      case RHIResourceKind::TextureReadOnly:
-      {
-        RHITextureView* tv = dynamic_cast<RHITextureView*>(resource);
-        RHITexture* t = dynamic_cast<RHITexture*>(resource);
-
-        if (!(tv && (tv->GetTarget()->GetUsage() & RHITextureUsage::Sampled) != 0) && !(t && (t->GetUsage() & RHITextureUsage::Sampled) != 0))
-        {
-          ezStringBuilder sb;
-          sb.AppendFormat("Resource in slot {} does not match ResourceKind specified in the ", slot);
-          sb.AppendFormat("ResourceLayout. It must be a Texture or TextureView whose target ");
-          sb.AppendFormat("has TextureUsage::Sampled.");
-          EZ_REPORT_FAILURE(sb.GetData());
-        }
-        break;
-      }
-      case RHIResourceKind::TextureReadWrite:
-      {
-        RHITextureView* tv = dynamic_cast<RHITextureView*>(resource);
-        RHITexture* t = dynamic_cast<RHITexture*>(resource);
-
-        if (!(tv && (tv->GetTarget()->GetUsage() & RHITextureUsage::Storage) != 0) && !(t && (t->GetUsage() & RHITextureUsage::Storage) != 0))
-        {
-          ezStringBuilder sb;
-          sb.AppendFormat("Resource in slot {} does not match ResourceKind specified in the ", slot);
-          sb.AppendFormat("ResourceLayout. It must be a Texture or extureView whose target ");
-          sb.AppendFormat("has TextureUsage::Storage.");
-          EZ_REPORT_FAILURE(sb.GetData());
-        }
-        break;
-      }
-      case RHIResourceKind::Sampler:
-      {
-        if (!(dynamic_cast<RHISampler*>(resource)))
-        {
-          EZ_REPORT_FAILURE("Resource in slot {} does not match ResourceKind specified in the ResourceLayout. It must be a Sampler.", slot);
-        }
-        break;
-      }
-      default:
-        EZ_REPORT_FAILURE("Invalid resource kind");
-    }
-  }
-} // namespace RHIValidationUtils
+} // namespace FormatHelpers

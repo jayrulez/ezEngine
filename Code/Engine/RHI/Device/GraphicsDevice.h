@@ -6,13 +6,13 @@
 #include <RHI/Resources/Swapchain.h>
 #include <RHI/Resources/CommandList.h>
 #include <RHI/Resources/Fence.h>
-#include <RHI/Resources/DeviceBuffer.h>
+#include <RHI/Resources/Buffer.h>
 #include <RHI/Resources/MappedResource.h>
 #include <RHI/Resources/MappedResourceView.h>
 #include <RHI/Resources/Sampler.h>
 #include <RHI/Descriptors/SamplerDescription.h>
 
-#include <RHI/Device/ResourceFactory.h>
+#include <RHI/Resources/ResourceFactory.h>
 
 #include <optional>
 
@@ -361,7 +361,7 @@ public:
   /// <param name="resource">The <see cref="DeviceBuffer"/> or <see cref="Texture"/> resource to map.</param>
   /// <param name="mode">The <see cref="MapMode"/> to use.</param>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
-  RHIMappedResource* Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode);
+  RHIMappedResource* Map(RHIResource* resource, ezEnum<RHIMapMode> mode);
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region.
@@ -371,7 +371,7 @@ public:
   /// <param name="subresource">The subresource to map. Subresources are indexed first by mip slice, then by array layer.
   /// For <see cref="DeviceBuffer"/> resources, this parameter must be 0.</param>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
-  RHIMappedResource* Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
+  RHIMappedResource* Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
@@ -382,7 +382,7 @@ public:
   /// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
   template <typename T>
-  RHIMappedResourceView<T> Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode);
+  RHIMappedResourceView<T> Map(RHIResource* resource, ezEnum<RHIMapMode> mode);
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
@@ -394,14 +394,14 @@ public:
   /// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
   template <typename T>
-  RHIMappedResourceView<T> Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
+  RHIMappedResourceView<T> Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
 
   /// <summary>
   /// Invalidates a previously-mapped data region for the given <see cref="DeviceBuffer"/> or <see cref="Texture"/>.
   /// For <see cref="Texture"/> resources, this unmaps the first subresource.
   /// </summary>
   /// <param name="resource">The resource to unmap.</param>
-  void Unmap(RHIDeviceResource* resource);
+  void Unmap(RHIResource* resource);
 
   /// <summary>
   /// Invalidates a previously-mapped data region for the given <see cref="DeviceBuffer"/> or <see cref="Texture"/>.
@@ -409,7 +409,7 @@ public:
   /// <param name="resource">The resource to unmap.</param>
   /// <param name="subresource">The subresource to unmap. Subresources are indexed first by mip slice, then by array layer.
   /// For <see cref="DeviceBuffer"/> resources, this parameter must be 0.</param>
-  void Unmap(RHIDeviceResource* resource, ezUInt32 subresource);
+  void Unmap(RHIResource* resource, ezUInt32 subresource);
 
   /// <summary>
   /// Updates a portion of a <see cref="Texture"/> resource with new data.
@@ -447,7 +447,7 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">The value to upload.</param>
   template <typename T>
-  void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, T source);
+  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -459,7 +459,7 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the single value to upload.</param>
   template <typename T>
-  void UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source);
+  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -473,7 +473,7 @@ public:
   /// <param name="size">The total size of the uploaded data, in bytes.</param>
   template <typename T>
   void UpdateBuffer(
-    RHIDeviceBuffer* buffer,
+    RHIBuffer* buffer,
     ezUInt32 bufferOffset,
     const T& source,
     ezUInt32 size);
@@ -489,7 +489,7 @@ public:
   /// <param name="source">An array containing the data to upload.</param>
   template <typename T>
   void UpdateBuffer(
-    RHIDeviceBuffer* buffer,
+    RHIBuffer* buffer,
     ezUInt32 bufferOffset,
     ezDynamicArray<T> source);
 
@@ -503,7 +503,7 @@ public:
   /// <param name="size">The total size of the uploaded data, in bytes.</param>
   template <typename T>
   void UpdateBuffer(
-    RHIDeviceBuffer* buffer,
+    RHIBuffer* buffer,
     ezUInt32 bufferOffset,
     ezUInt8* source,
     ezUInt32 size);
@@ -573,8 +573,8 @@ protected:
   virtual void ResetFenceCore(RHIFence* fence) = 0;
   virtual void SwapBuffersCore(RHISwapchain* swapchain) = 0;
   virtual void WaitForIdleCore() = 0;
-  virtual RHIMappedResource* MapCore(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource) = 0;
-  virtual void UnmapCore(RHIDeviceResource* resource, ezUInt32 subresource) = 0;
+  virtual RHIMappedResource* MapCore(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource) = 0;
+  virtual void UnmapCore(RHIResource* resource, ezUInt32 subresource) = 0;
   virtual void UpdateTextureCore(
     RHITexture* texture,
     ezUInt8* source,
@@ -582,7 +582,7 @@ protected:
     ezUInt32 x, ezUInt32 y, ezUInt32 z,
     ezUInt32 width, ezUInt32 height, ezUInt32 depth,
     ezUInt32 mipLevel, ezUInt32 arrayLayer) = 0;
-  virtual void UpdateBufferCore(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size) = 0;
+  virtual void UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size) = 0;
   virtual bool GetPixelFormatSupportCore(
     ezEnum<RHIPixelFormat> format,
     ezEnum<RHITextureType> type,
@@ -686,47 +686,47 @@ private:
 /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
 
 template <typename T>
-RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode)
+RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIResource* resource, ezEnum<RHIMapMode> mode)
 {
   Map<T>(resource, mode, 0);
 }
 
 template <typename T>
-RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
+RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
 {
   RHIMappedResource* mappedResource = Map(resource, mode, subresource);
   return RHIMappedResourceView<T>(mappedResource);
 }
 
 template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, T source)
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source)
 {
   ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
   UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
 }
 
 template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source)
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source)
 {
   ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
   UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
 }
 
 template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size)
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size)
 {
   //ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
   //UpdateBuffer(buffer, bufferOffset, ptr, size);
 }
 
 template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, ezDynamicArray<T> source)
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, ezDynamicArray<T> source)
 {
   UpdateBuffer(buffer, bufferOffset, source.GetPtr(), source.GetCount());
 }
 
 template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIDeviceBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size)
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size)
 {
   if (bufferOffset + size > buffer.SizeInBytes)
   {

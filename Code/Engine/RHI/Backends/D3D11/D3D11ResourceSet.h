@@ -5,14 +5,14 @@
 
 #include <RHI/Backends/D3D11/D3D11ResourceLayout.h>
 #include <RHI/Descriptors/ResourceSetDescription.h>
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 #include <RHI/Resources/ResourceSet.h>
 
 
 class D3D11ResourceSet : public RHIResourceSet
 {
 private:
-  ezDynamicArray<RHIDeviceResource*> Resources;
+  ezDynamicArray<RHIResource*> Resources;
   D3D11ResourceLayout* Layout = nullptr;
 
   bool Disposed = false;

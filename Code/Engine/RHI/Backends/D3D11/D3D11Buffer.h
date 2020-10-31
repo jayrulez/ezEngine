@@ -4,7 +4,7 @@
 #include <RHI/RHIPCH.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
-#include <RHI/Resources/DeviceBuffer.h>
+#include <RHI/Resources/Buffer.h>
 
 struct ID3D11Device;
 struct ID3D11Buffer;
@@ -31,7 +31,7 @@ struct OffsetSizePair : public ezHashableStruct<OffsetSizePair>
   }
 };
 
-class D3D11DeviceBuffer : public RHIDeviceBuffer
+class D3D11DeviceBuffer : public RHIBuffer
 {
 public:
 private:

@@ -146,7 +146,7 @@ D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& de
 
   ezUInt32 roundedWidth = description.Width;
   ezUInt32 roundedHeight = description.Height;
-  if (RHIFormatUtils::IsCompressedFormat(description.Format))
+  if (FormatHelpers::IsCompressedFormat(description.Format))
   {
     roundedWidth = ((roundedWidth + 3) / 4) * 4;
     roundedHeight = ((roundedHeight + 3) / 4) * 4;
@@ -180,7 +180,7 @@ D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& de
     desc2D.CPUAccessFlags = (D3D11_CPU_ACCESS_FLAG)cpuFlags;
     desc2D.Usage = (D3D11_USAGE)resourceUsage;
 
-    desc2D.SampleDesc.Count = RHIFormatUtils::GetSampleCount(SampleCount);
+    desc2D.SampleDesc.Count = FormatHelpers::GetSampleCount(SampleCount);
     desc2D.SampleDesc.Quality = 0;
 
     desc2D.MiscFlags = (D3D11_RESOURCE_MISC_FLAG)optionFlags;
@@ -222,7 +222,7 @@ D3D11Texture::D3D11Texture(ID3D11Texture2D* existingTexture, ezEnum<RHITextureTy
   MipLevels = desc.MipLevels;
   ArrayLayers = desc.ArraySize;
   Format = format;
-  SampleCount = RHIFormatUtils::GetSampleCount(desc.SampleDesc.Count);
+  SampleCount = FormatHelpers::GetSampleCount(desc.SampleDesc.Count);
   TextureType = type;
 
   TextureUsage = D3D11FormatUtils::GetRHIUsage((D3D11_BIND_FLAG)desc.BindFlags, (D3D11_CPU_ACCESS_FLAG)desc.CPUAccessFlags, (D3D11_RESOURCE_MISC_FLAG)desc.MiscFlags);

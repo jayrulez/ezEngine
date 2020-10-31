@@ -6,18 +6,18 @@
 #include <Foundation/Algorithm/HashableStruct.h>
 
 /// <summary>
-/// Describes a <see cref="RHIDeviceBuffer"/>, used in the creation of <see cref="RHIDeviceBuffer"/> objects by a
+/// Describes a <see cref="RHIBuffer"/>, used in the creation of <see cref="RHIBuffer"/> objects by a
 /// <see cref="RHIResourceFactory"/>.
 /// </summary>
 struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescription>
 {
   /// <summary>
-  /// The desired capacity, in bytes, of the <see cref="RHIDeviceBuffer"/>.
+  /// The desired capacity, in bytes, of the <see cref="RHIBuffer"/>.
   /// </summary>
   ezUInt32 Size;
 
   /// <summary>
-  /// Indicates how the <see cref="RHIDeviceBuffer"/> will be used.
+  /// Indicates how the <see cref="RHIBuffer"/> will be used.
   /// </summary>
   ezBitflags<RHIBufferUsage> Usage;
 
@@ -34,10 +34,10 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   bool RawBuffer;
 
   /// <summary>
-  /// Constructs a new <see cref="RHIBufferDescription"/> describing a non-dynamic <see cref="RHIDeviceBuffer"/>.
+  /// Constructs a new <see cref="RHIBufferDescription"/> describing a non-dynamic <see cref="RHIBuffer"/>.
   /// </summary>
   /// <param name="size">The desired capacity, in bytes.</param>
-  /// <param name="usage">Indicates how the <see cref="RHIDeviceBuffer"/> will be used.</param>
+  /// <param name="usage">Indicates how the <see cref="RHIBuffer"/> will be used.</param>
   RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usage)
   {
     Size = size;
@@ -50,7 +50,7 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// Constructs a new <see cref="BufferDescription"/>.
   /// </summary>
   /// <param name="sizeInBytes">The desired capacity, in bytes.</param>
-  /// <param name="usage">Indicates how the <see cref="RHIDeviceBuffer"/> will be used.</param>
+  /// <param name="usage">Indicates how the <see cref="RHIBuffer"/> will be used.</param>
   /// <param name="structureByteStride">For structured buffers, this value indicates the size in bytes of a single
   /// structure element, and must be non-zero. For all other buffer types, this value must be zero.</param>
   RHIBufferDescription(ezUInt32 size, ezBitflags<RHIBufferUsage> usage, ezUInt32 structureByteStride)
@@ -65,7 +65,7 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// Constructs a new <see cref="RHIBufferDescription"/>.
   /// </summary>
   /// <param name="sizeInBytes">The desired capacity, in bytes.</param>
-  /// <param name="usage">Indicates how the <see cref="RHIDeviceBuffer"/> will be used.</param>
+  /// <param name="usage">Indicates how the <see cref="RHIBuffer"/> will be used.</param>
   /// <param name="structureByteStride">For structured buffers, this value indicates the size in bytes of a single
   /// structure element, and must be non-zero. For all other buffer types, this value must be zero.</param>
   /// <param name="rawBuffer">Indicates that this is a raw buffer. This should be combined with

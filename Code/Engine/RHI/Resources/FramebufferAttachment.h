@@ -15,38 +15,24 @@ public:
   /// <summary>
   /// The target <see cref="Texture"/> which will be rendered to.
   /// </summary>
-  virtual RHITexture* GetTarget() const
-  {
-    return Target;
-  }
+  virtual RHITexture* GetTarget() const;
 
   /// <summary>
   /// The target array layer.
   /// </summary>
-  virtual ezUInt32 GetArrayLayer() const
-  {
-    return ArrayLayer;
-  }
+  virtual ezUInt32 GetArrayLayer() const;
 
   /// <summary>
   /// The target mip level.
   /// </summary>
-  virtual ezUInt32 GetMipLevel() const
-  {
-    return MipLevel;
-  }
+  virtual ezUInt32 GetMipLevel() const;
 
   /// <summary>
   /// Constructs a new FramebufferAttachment.
   /// </summary>
   /// <param name="target">The target <see cref="RHITexture"/> which will be rendered to.</param>
   /// <param name="arrayLayer">The target array layer.</param>
-  RHIFramebufferAttachment(RHITexture* target, ezUInt32 arrayLayer)
-  {
-    Target = target;
-    ArrayLayer = arrayLayer;
-    MipLevel = 0;
-  }
+  RHIFramebufferAttachment(RHITexture* target, ezUInt32 arrayLayer);
 
   /// <summary>
   /// Constructs a new FramebufferAttachment.
@@ -54,12 +40,7 @@ public:
   /// <param name="target">The target <see cref="RHITexture"/> which will be rendered to.</param>
   /// <param name="arrayLayer">The target array layer.</param>
   /// <param name="mipLevel">The target mip level.</param>
-  RHIFramebufferAttachment(RHITexture* target, ezUInt32 arrayLayer, ezUInt32 mipLevel)
-  {
-    Target = target;
-    ArrayLayer = arrayLayer;
-    MipLevel = mipLevel;
-  }
+  RHIFramebufferAttachment(RHITexture* target, ezUInt32 arrayLayer, ezUInt32 mipLevel);
 
 private:
   RHITexture* Target = nullptr;

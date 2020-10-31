@@ -1,22 +1,23 @@
 #include <RHI/Device/GraphicsDevice.h>
+#include <RHI/Util.h>
 
 void RHIGraphicsDevice::ValidateUpdateTextureParameters(RHITexture* texture, ezUInt32 size, ezUInt32 x, ezUInt32 y, ezUInt32 z, ezUInt32 width, ezUInt32 height, ezUInt32 depth, ezUInt32 mipLevel, ezUInt32 arrayLayer)
 {
-  if (RHIFormatUtils::IsCompressedFormat(texture->GetFormat()))
+  if (FormatHelpers::IsCompressedFormat(texture->GetFormat()))
   {
     if (x % 4 != 0 || y % 4 != 0 || height % 4 != 0 || width % 4 != 0)
     {
       ezUInt32 mipWidth;
       ezUInt32 mipHeight;
       ezUInt32 mipDepth;
-      RHIUtils::GetMipDimensions(texture, mipLevel, mipWidth, mipHeight, mipDepth);
+      Util::GetMipDimensions(texture, mipLevel, mipWidth, mipHeight, mipDepth);
       if (width != mipWidth && height != mipHeight)
       {
         EZ_REPORT_FAILURE("Updates to block-compressed textures must use a region that is block-size aligned and sized.");
       }
     }
   }
-  ezUInt32 expectedSize = RHIFormatUtils::GetRegionSize(width, height, depth, texture->GetFormat());
+  ezUInt32 expectedSize = FormatHelpers::GetRegionSize(width, height, depth, texture->GetFormat());
   if (size < expectedSize)
   {
     EZ_REPORT_FAILURE("The data size is less than expected for the given update region. At least {} bytes must be provided, but only {} were.", expectedSize, size);
@@ -25,7 +26,7 @@ void RHIGraphicsDevice::ValidateUpdateTextureParameters(RHITexture* texture, ezU
   // Compressed textures don't necessarily need to have a Texture.Width and Texture.Height that are a multiple of 4.
   // But the mipdata width and height *does* need to be a multiple of 4.
   ezUInt32 roundedTextureWidth, roundedTextureHeight;
-  if (RHIFormatUtils::IsCompressedFormat(texture->GetFormat()))
+  if (FormatHelpers::IsCompressedFormat(texture->GetFormat()))
   {
     roundedTextureWidth = (texture->GetWidth() + 3) / 4 * 4;
     roundedTextureHeight = (texture->GetHeight() + 3) / 4 * 4;
@@ -466,15 +467,15 @@ void RHIGraphicsDevice::WaitForIdle()
   //FlushDeferredDisposals();
 }
 
-RHIMappedResource* RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode)
+RHIMappedResource* RHIGraphicsDevice::Map(RHIResource* resource, ezEnum<RHIMapMode> mode)
 {
   return Map(resource, mode, 0);
 }
 
-RHIMappedResource* RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
+RHIMappedResource* RHIGraphicsDevice::Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
 {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-  RHIDeviceBuffer* buffer = dynamic_cast<RHIDeviceBuffer*>(resource);
+  RHIBuffer* buffer = dynamic_cast<RHIBuffer*>(resource);
   if (buffer != nullptr)
   {
     if ((buffer->GetUsage() & RHIBufferUsage::Dynamic) != RHIBufferUsage::Dynamic && (buffer->GetUsage() & RHIBufferUsage::Staging) != RHIBufferUsage::Staging)
@@ -510,12 +511,12 @@ RHIMappedResource* RHIGraphicsDevice::Map(RHIDeviceResource* resource, ezEnum<RH
   return MapCore(resource, mode, subresource);
 }
 
-void RHIGraphicsDevice::Unmap(RHIDeviceResource* resource)
+void RHIGraphicsDevice::Unmap(RHIResource* resource)
 {
   Unmap(resource, 0);
 }
 
-void RHIGraphicsDevice::Unmap(RHIDeviceResource* resource, ezUInt32 subresource)
+void RHIGraphicsDevice::Unmap(RHIResource* resource, ezUInt32 subresource)
 {
   UnmapCore(resource, subresource);
 }

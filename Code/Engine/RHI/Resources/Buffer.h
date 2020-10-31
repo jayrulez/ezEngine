@@ -3,20 +3,20 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/DeviceResource.h>
+#include <RHI/Resources/Resource.h>
 
 /// <summary>
 /// A device resource used to store arbitrary graphics data in various formats.
-/// The size of a <see cref="RHIDeviceBuffer"/> is fixed upon creation, and resizing is not possible.
+/// The size of a <see cref="RHIBuffer"/> is fixed upon creation, and resizing is not possible.
 /// See <see cref="RHIBufferDescription"/>.
 /// </summary>
-class EZ_RHI_DLL RHIDeviceBuffer : public RHIDeviceResource
+class EZ_RHI_DLL RHIBuffer : public RHIResource
 {
 public:
-  RHIDeviceBuffer()
+  RHIBuffer()
   {
-    Flags.Add(RHIDeviceResourceFlags::Bindable);
-    Flags.Add(RHIDeviceResourceFlags::Mappable);
+    Flags.Add(RHIResourceFlags::Bindable);
+    Flags.Add(RHIResourceFlags::Mappable);
   }
 
   /// <summary>

@@ -6,7 +6,7 @@
 #include <Foundation/Algorithm/HashableStruct.h>
 
 class RHIResourceLayout;
-class RHIDeviceResource;
+class RHIResource;
 
 /// <summary>
 /// Describes a <see cref="ResourceSet"/>, for creation using a <see cref="ResourceFactory"/>.
@@ -23,7 +23,7 @@ struct EZ_RHI_DLL RHIResourceSetDescription : public ezHashableStruct<RHIResourc
   /// An array of <see cref="BindableResource"/> objects.
   /// The number and type of resources must match those specified in the <see cref="ResourceLayout"/>.
   /// </summary>
-  ezDynamicArray<RHIDeviceResource*> BoundResources;
+  ezDynamicArray<RHIResource*> BoundResources;
 
   /// <summary>
   /// Constructs a new ResourceSetDescription.
@@ -31,7 +31,7 @@ struct EZ_RHI_DLL RHIResourceSetDescription : public ezHashableStruct<RHIResourc
   /// <param name="layout">The <see cref="ResourceLayout"/> describing the number and kind of resources used.</param>
   /// <param name="boundResources">An array of <see cref="BindableResource"/> objects.
   /// The number and type of resources must match those specified in the <see cref="ResourceLayout"/>.</param>
-  RHIResourceSetDescription(RHIResourceLayout* layout, const ezDynamicArray<RHIDeviceResource*>& boundResources)
+  RHIResourceSetDescription(RHIResourceLayout* layout, const ezDynamicArray<RHIResource*>& boundResources)
   {
     Layout = layout;
     BoundResources = boundResources;
