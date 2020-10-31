@@ -3,6 +3,14 @@
 #include <RHI/Utils.h>
 #include <d3d11_1.h>
 
+template <>
+struct ezHashHelper<OffsetSizePair>
+{
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const OffsetSizePair& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+
+  EZ_ALWAYS_INLINE static bool Equal(const OffsetSizePair& a, const OffsetSizePair& b) { return a == b; }
+};
+
 ezString D3D11DeviceBuffer::GetName() const
 {
   return Name;

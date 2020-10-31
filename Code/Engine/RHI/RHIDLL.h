@@ -1631,6 +1631,8 @@ private:
 /// </summary>
 struct RHIRawRect
 {
+  EZ_DECLARE_POD_TYPE();
+
   /// <summary>
   /// The left position.
   /// </summary>
@@ -1650,6 +1652,8 @@ struct RHIRawRect
   /// The bottom position.
   /// </summary>
   ezInt32 Bottom = 0;
+
+  RHIRawRect() = default;
 
   RHIRawRect(ezInt32 left, ezInt32 top, ezInt32 right, ezInt32 bottom)
   {

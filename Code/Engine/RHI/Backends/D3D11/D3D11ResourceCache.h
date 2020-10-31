@@ -28,10 +28,20 @@ struct InputLayoutCacheKey : public ezHashableStruct<InputLayoutCacheKey>
 
   static InputLayoutCacheKey CreatePermanentKey(ezDynamicArray<RHIVertexLayoutDescription> original);
 
-  bool operator==(const InputLayoutCacheKey& other)
+  bool operator==(const InputLayoutCacheKey& other) const
   {
     return VertexLayouts == other.VertexLayouts;
   }
+};
+
+
+
+template <>
+struct ezHashHelper<InputLayoutCacheKey>
+{
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const InputLayoutCacheKey& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+
+  EZ_ALWAYS_INLINE static bool Equal(const InputLayoutCacheKey& a, const InputLayoutCacheKey& b) { return a == b; }
 };
 
 struct D3D11RasterizerStateCacheKey : public ezHashableStruct<D3D11RasterizerStateCacheKey>
@@ -45,10 +55,18 @@ struct D3D11RasterizerStateCacheKey : public ezHashableStruct<D3D11RasterizerSta
 
   D3D11RasterizerStateCacheKey(const RHIRasterizerStateDescription& rhiDescription, bool multisampled);
 
-  bool operator==(const D3D11RasterizerStateCacheKey& other)
+  bool operator==(const D3D11RasterizerStateCacheKey& other) const
   {
     return RHIDescription == other.RHIDescription && Multisampled == other.Multisampled;
   }
+};
+
+template <>
+struct ezHashHelper<D3D11RasterizerStateCacheKey>
+{
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const D3D11RasterizerStateCacheKey& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+
+  EZ_ALWAYS_INLINE static bool Equal(const D3D11RasterizerStateCacheKey& a, const D3D11RasterizerStateCacheKey& b) { return a == b; }
 };
 
 class D3D11ResourceCache
@@ -74,7 +92,7 @@ private:
 
   ezHashTable<RHIBlendStateDescription, ID3D11BlendState*> BlendStates;
   ezHashTable<RHIDepthStencilStateDescription, ID3D11DepthStencilState*> DepthStencilStates;
-  ezHashTable<RHIRasterizerStateDescription, ID3D11RasterizerState*> RasterizerStates;
+  ezHashTable<D3D11RasterizerStateCacheKey, ID3D11RasterizerState*> RasterizerStates;
   ezHashTable<InputLayoutCacheKey, ID3D11InputLayout*> InputLayouts;
 
 public:

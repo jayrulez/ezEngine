@@ -34,6 +34,8 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// </summary>
   ezUInt32 Offset = 0;
 
+  RHIVertexElementDescription() = default;
+
   /// <summary>
   /// Constructs a new VertexElementDescription describing a per-vertex element.
   /// </summary>

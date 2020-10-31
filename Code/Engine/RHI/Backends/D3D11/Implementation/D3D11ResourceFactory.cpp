@@ -23,7 +23,7 @@ RHICommandList* D3D11ResourceFactory::CreateCommandListCore(const RHICommandList
 
 RHIFramebuffer* D3D11ResourceFactory::CreateFramebufferCore(const RHIFramebufferDescription& description)
 {
-  new D3D11Framebuffer(Device, description);
+  return new D3D11Framebuffer(Device, description);
 }
 
 RHIPipeline* D3D11ResourceFactory::CreateGraphicsPipelineCore(const RHIGraphicsPipelineDescription& description)

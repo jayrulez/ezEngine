@@ -12,6 +12,8 @@ struct RHIBoundResourceSetInfo : public ezHashableStruct<RHIBoundResourceSetInfo
   RHIResourceSet* Set = nullptr;
   ezHybridArray<ezUInt32, 5> Offsets;
 
+  RHIBoundResourceSetInfo() = default;
+
   RHIBoundResourceSetInfo(RHIResourceSet* set, ezDynamicArray<ezUInt32> offsets)
   {
     Set = set;

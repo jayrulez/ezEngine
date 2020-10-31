@@ -17,13 +17,15 @@ struct OffsetSizePair : public ezHashableStruct<OffsetSizePair>
 
   ezUInt32 Size = 0;
 
+  OffsetSizePair() = default;
+
   OffsetSizePair(ezUInt32 offset, ezUInt32 size)
   {
     Offset = offset;
     Size = size;
   }
 
-  bool operator==(const OffsetSizePair& other)
+  bool operator==(const OffsetSizePair& other) const
   {
     return Offset == other.Offset && Size == other.Size;
   }

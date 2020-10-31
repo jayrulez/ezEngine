@@ -27,6 +27,7 @@ struct ID3D11PixelShader;
 
 struct RawRect
 {
+  EZ_DECLARE_POD_TYPE();
   ezUInt32 left;
   ezUInt32 top;
   ezUInt32 right;
@@ -53,7 +54,7 @@ private:
 
     D3D11BufferRange(D3D11DeviceBuffer* buffer, ezUInt32 offset, ezUInt32 size);
 
-    bool operator==(const D3D11BufferRange& other)
+    bool operator==(const D3D11BufferRange& other) const
     {
       return Buffer == other.Buffer && Offset == other.Offset && Size == other.Size;
     }
@@ -67,6 +68,11 @@ private:
 
     BoundTextureInfo() = default;
     BoundTextureInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezUInt32 resourceSet);
+
+    bool operator==(const BoundTextureInfo& other) const
+    {
+      return Slot == other.Slot && Stages == other.Stages && ResourceSet == other.ResourceSet;
+    }
   };
 
 private:
@@ -77,7 +83,7 @@ private:
   bool Begun = false;
   ID3D11CommandList* CommandList = nullptr;
 
-  ezDynamicArray<D3D11_VIEWPORT> Viewports; // = new Vortice.Mathematics.Viewport[0];
+  ezDynamicArray<RHIViewport> Viewports; // = new Vortice.Mathematics.Viewport[0];
   ezDynamicArray<RawRect> Scissors;
   bool ViewportsChanged = false;
   bool ScissorRectsChanged = false;

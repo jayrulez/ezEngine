@@ -44,7 +44,7 @@ namespace RHIUtils
   {
     ezUInt32 count = array.GetCount();
     array.Clear();
-    array.SetCountUninitialized(count);
+    array.SetCount(count);
   }
 } // namespace RHIUtils
 

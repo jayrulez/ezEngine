@@ -168,3 +168,11 @@ struct EZ_RHI_DLL RHIDepthStencilStateDescription : public ezHashableStruct<RHID
     return DepthTestEnabled == other.DepthTestEnabled && DepthWriteEnabled == other.DepthWriteEnabled && DepthComparison == other.DepthComparison && StencilTestEnabled == other.StencilTestEnabled && StencilFront == other.StencilFront && StencilBack == other.StencilBack && StencilReadMask == other.StencilReadMask && StencilWriteMask == other.StencilWriteMask && StencilReference == other.StencilReference;
   }
 };
+
+template <>
+struct ezHashHelper<RHIDepthStencilStateDescription>
+{
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIDepthStencilStateDescription& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+
+  EZ_ALWAYS_INLINE static bool Equal(const RHIDepthStencilStateDescription& a, const RHIDepthStencilStateDescription& b) { return a == b; }
+};

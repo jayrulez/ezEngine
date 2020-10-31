@@ -26,6 +26,7 @@ bool D3D11Fence::GetSignaled()
 bool D3D11Fence::Reset()
 {
   Signal->ClearSignal();
+  return true;
 }
 
 D3D11Fence::D3D11Fence(bool signaled)

@@ -56,6 +56,8 @@ struct EZ_RHI_DLL RHIViewport : public ezHashableStruct<RHIViewport>
 
   float MaxDepth = 0;
 
+  RHIViewport() = default;
+
   /// <summary>
   /// Initializes a new instance of the <see cref="Viewport"/> struct.
   /// </summary>

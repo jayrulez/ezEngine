@@ -67,6 +67,7 @@ D3D11ResourceLayout::D3D11ResourceLayout(const RHIResourceLayoutDescription& des
         break;
       default:
         EZ_REPORT_FAILURE("Invalid RHIResourceKind");
+        return;
     }
 
     BindingInfosByRHIIndex[i] = ResourceBindingInfo(

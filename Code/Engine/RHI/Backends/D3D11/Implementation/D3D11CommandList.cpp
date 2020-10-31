@@ -9,6 +9,7 @@
 #include <RHI/Backends/D3D11/D3D11TextureView.h>
 
 #include <d3d11_1.h>
+#include <vector>
 
 bool D3D11CommandList::D3D11BufferRange::IsFullRange()
 {
@@ -310,15 +311,7 @@ void D3D11CommandList::SetViewportCore(ezUInt32 index, const RHIViewport& viewpo
   ViewportsChanged = true;
   Viewports.EnsureCount(index + 1);
 
-  D3D11_VIEWPORT vp;
-  vp.TopLeftX = viewport.X;
-  vp.TopLeftY = viewport.Y;
-  vp.Width = viewport.Width;
-  vp.Height = viewport.Height;
-  vp.MinDepth = viewport.MinDepth;
-  vp.MaxDepth = viewport.MaxDepth;
-
-  Viewports[index] = vp;
+  Viewports[index] = viewport;
 }
 
 void D3D11CommandList::SetScissorRectCore(ezUInt32 index, ezUInt32 x, ezUInt32 y, ezUInt32 width, ezUInt32 height)
@@ -1208,7 +1201,23 @@ void D3D11CommandList::FlushViewports()
   if (ViewportsChanged)
   {
     ViewportsChanged = false;
-    Context->RSSetViewports(Viewports.GetCount(), Viewports.GetData());
+
+    std::vector<D3D11_VIEWPORT> vps;
+    for (auto viewport : Viewports )
+    {
+      D3D11_VIEWPORT vp;
+      vp.TopLeftX = viewport.X;
+      vp.TopLeftY = viewport.Y;
+      vp.Width = viewport.Width;
+      vp.Height = viewport.Height;
+      vp.MinDepth = viewport.MinDepth;
+      vp.MaxDepth = viewport.MaxDepth;
+
+      vps.push_back(vp);
+    }
+
+    //vp.TopLeftX = viewp
+    Context->RSSetViewports(Viewports.GetCount(), vps.data());
   }
 }
 

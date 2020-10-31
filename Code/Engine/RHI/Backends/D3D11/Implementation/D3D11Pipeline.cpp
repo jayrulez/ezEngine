@@ -57,10 +57,10 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
     }
   }
 
-  ID3D11BlendState* blendState;
-  ID3D11DepthStencilState* depthStencilState;
-  ID3D11RasterizerState* rasterizerState;
-  ID3D11InputLayout* inputLayout;
+  ID3D11BlendState* blendState = nullptr;
+  ID3D11DepthStencilState* depthStencilState = nullptr;
+  ID3D11RasterizerState* rasterizerState = nullptr;
+  ID3D11InputLayout* inputLayout = nullptr;
 
   cache->GetPipelineResources(
     description.BlendState,

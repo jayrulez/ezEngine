@@ -129,3 +129,11 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
     return result;
   }
 };
+
+template <>
+struct ezHashHelper<RHIBlendStateDescription>
+{
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIBlendStateDescription& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+
+  EZ_ALWAYS_INLINE static bool Equal(const RHIBlendStateDescription& a, const RHIBlendStateDescription& b) { return a == b; }
+};

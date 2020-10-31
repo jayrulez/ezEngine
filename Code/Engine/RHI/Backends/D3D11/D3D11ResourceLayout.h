@@ -17,6 +17,7 @@ public:
     ezEnum<RHIResourceKind> Kind;
     bool DynamicBuffer = false;
 
+    ResourceBindingInfo() = default;
     ResourceBindingInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezEnum<RHIResourceKind> kind, bool dynamicBuffer);
   };
 
