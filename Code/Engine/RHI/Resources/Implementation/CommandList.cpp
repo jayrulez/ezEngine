@@ -2,13 +2,6 @@
 
 #include <RHI/Util.h>
 
-RHICommandList::RHICommandList(const RHICommandListDescription& description, RHIGraphicsDeviceFeatures features, ezUInt32 uniformBufferAlignment, ezUInt32 structuredBufferAlignment)
-{
-  m_Features = features;
-  m_UniformBufferAlignment = uniformBufferAlignment;
-  m_StructuredBufferAlignment = structuredBufferAlignment;
-}
-
 /// <summary>
 /// Puts this <see cref="CommandList"/> into the initial state.
 /// This function must be called before other graphics commands can be issued.
@@ -169,12 +162,14 @@ void RHICommandList::SetGraphicsResourceSet(ezUInt32 slot, RHIResourceSet* resou
   if (m_pGraphicsPipeline == nullptr)
   {
     EZ_REPORT_FAILURE("A graphics Pipeline must be active before SetGraphicsResourceSet can be called.");
+    return;
   }
 
   ezUInt32 layoutsCount = m_pGraphicsPipeline->GetResourceLayouts().GetCount();
   if (layoutsCount <= slot)
   {
     EZ_REPORT_FAILURE("Failed to bind ResourceSet to slot {}. The active graphics Pipeline only contains {} ResourceLayouts.", slot, layoutsCount);
+    return;
   }
 
   RHIResourceLayout* layout = m_pGraphicsPipeline->GetResourceLayouts()[slot];
@@ -195,6 +190,7 @@ void RHICommandList::SetGraphicsResourceSet(ezUInt32 slot, RHIResourceSet* resou
     if (pipelineKind != setKind)
     {
       EZ_REPORT_FAILURE("Failed to bind ResourceSet to slot {}. Resource element {} was of the incorrect type. The bound Pipeline expects {}, but the ResourceSet contained {}.", slot, i, pipelineKind, setKind);
+      return;
     }
   }
 
@@ -204,6 +200,7 @@ void RHICommandList::SetGraphicsResourceSet(ezUInt32 slot, RHIResourceSet* resou
     errorSb.Append("RHIResourceLayoutElementOptions.RHIResourceLayoutElementOptions.DynamicBinding. ");
     errorSb.AppendFormat("{} offsets were expected, but only {} were provided.", resourceSet->GetLayout()->GetDynamicBufferCount(), dynamicOffsetsCount);
     EZ_REPORT_FAILURE(errorSb.GetData());
+    return;
   }
 
   ezUInt32 dynamicOffsetIndex = 0;
@@ -217,6 +214,7 @@ void RHICommandList::SetGraphicsResourceSet(ezUInt32 slot, RHIResourceSet* resou
                                      : m_StructuredBufferAlignment;
       ezUInt32 desiredOffset = dynamicOffsetIndex;
       dynamicOffsetIndex += 1;
+      // TODO: verify this ^
       RHIBufferRange range = Util::GetBufferRange(resourceSet->GetResources()[i], desiredOffset);
 
       if ((range.GetOffset() % requiredAlignment) != 0)
@@ -226,6 +224,7 @@ void RHICommandList::SetGraphicsResourceSet(ezUInt32 slot, RHIResourceSet* resou
         errorSb.AppendFormat("equirements of this device. The offset must be a multiple of {}, but it is {}", requiredAlignment, range.GetOffset());
 
         EZ_REPORT_FAILURE(errorSb.GetData());
+        return;
       }
     }
   }
@@ -282,13 +281,15 @@ void RHICommandList::SetComputeResourceSet(ezUInt32 slot, RHIResourceSet* resour
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   if (m_pComputePipeline == nullptr)
   {
-    EZ_REPORT_FAILURE("A graphics Pipeline must be active before SetComputeResourceSet can be called.");
+    EZ_REPORT_FAILURE("A compute Pipeline must be active before SetComputeResourceSet can be called.");
+    return;
   }
 
   ezUInt32 layoutsCount = m_pComputePipeline->GetResourceLayouts().GetCount();
   if (layoutsCount <= slot)
   {
     EZ_REPORT_FAILURE("Failed to bind ResourceSet to slot {}. The active compute Pipeline only contains {} ResourceLayouts.", slot, layoutsCount);
+    return;
   }
 
   RHIResourceLayout* layout = m_pComputePipeline->GetResourceLayouts()[slot];
@@ -298,6 +299,7 @@ void RHICommandList::SetComputeResourceSet(ezUInt32 slot, RHIResourceSet* resour
   if (pipelineLength != setLength)
   {
     EZ_REPORT_FAILURE("Failed to bind ResourceSet to slot {}. The number of resources in the ResourceSet ({}) does not match the number expected by the active Pipeline ({}).", slot, setLength, pipelineLength);
+    return;
   }
 
   for (ezUInt32 i = 0; i < pipelineLength; i++)
@@ -308,6 +310,7 @@ void RHICommandList::SetComputeResourceSet(ezUInt32 slot, RHIResourceSet* resour
     if (pipelineKind != setKind)
     {
       EZ_REPORT_FAILURE("Failed to bind ResourceSet to slot {}. Resource element {} was of the incorrect type. The bound Pipeline expects {}, but the ResourceSet contained {}.", slot, i, pipelineKind, setKind);
+      return;
     }
   }
 #endif
@@ -345,11 +348,13 @@ void RHICommandList::ClearColorTarget(ezUInt32 index, ezColor clearColor)
   if (m_pFramebuffer == nullptr)
   {
     EZ_REPORT_FAILURE("Cannot use ClearColorTarget. There is no Framebuffer bound.");
+    return;
   }
 
-  if (m_pFramebuffer->GetColorTargets().GetCount() < index)
+  if (m_pFramebuffer->GetColorTargets().GetCount() <= index)
   {
     EZ_REPORT_FAILURE("ClearColorTarget index must be less than the current Framebuffer's color target count.");
+    return;
   }
 #endif
   ClearColorTargetCore(index, clearColor);
@@ -380,10 +385,12 @@ void RHICommandList::ClearDepthStencil(float depth, ezUInt8 stencil)
   if (m_pFramebuffer == nullptr)
   {
     EZ_REPORT_FAILURE("Cannot use ClearDepthStencil. There is no Framebuffer bound.");
+    return;
   }
   if (!m_pFramebuffer->GetDepthTarget().has_value())
   {
     EZ_REPORT_FAILURE("The current Framebuffer has no depth target, so ClearDepthStencil cannot be used.");
+    return;
   }
 #endif
 
@@ -618,11 +625,13 @@ void RHICommandList::ResolveTexture(RHITexture* source, RHITexture* destination)
   if (source->GetSampleCount() == RHITextureSampleCount::Count1)
   {
     EZ_REPORT_FAILURE("The source parameter of ResolveTexture must be a multisample texture.");
+    return;
   }
 
   if (destination->GetSampleCount() != RHITextureSampleCount::Count1)
   {
     EZ_REPORT_FAILURE("The destination parameter of ResolveTexture must be a non-multisample texture. Instead, it is a texture with {} samples.", FormatHelpers::GetSampleCount(source->GetSampleCount()));
+    return;
   }
 #endif
 
@@ -949,7 +958,7 @@ void RHICommandList::ValidateIndexBuffer(ezUInt32 indexCount)
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   if (m_pIndexBuffer == nullptr)
   {
-    EZ_REPORT_FAILURE("An index buffer must be bound before {nameof(CommandList)}.{nameof(DrawIndexed)} can be called.");
+    EZ_REPORT_FAILURE("An index buffer must be bound before CommandList.DrawIndexed can be called.");
   }
 
   ezUInt32 indexFormatSize = m_IndexFormat == RHIIndexFormat::UInt16 ? 2u : 4u;
@@ -993,20 +1002,20 @@ void RHICommandList::ClearCachedState()
 template <typename T>
 void RHICommandList::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source)
 {
-  ezUInt8* sourcePtr = &source;
+  ezUInt8* sourcePtr = reinterpret_cast<ezUInt8*>(&source);
   UpdateBuffer(buffer, bufferOffset, sourcePtr, sizeof(T));
 }
 
 template <typename T>
 void RHICommandList::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source)
 {
-  ezUInt8* sourcePtr = &source;
+  ezUInt8* sourcePtr = reinterpret_cast<ezUInt8*>(&source);
   UpdateBuffer(buffer, bufferOffset, sourcePtr, (ezUInt32)sizeof(T));
 }
 
 template <typename T>
 void RHICommandList::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size)
 {
-  ezUInt8* sourcePtr = &source;
+  ezUInt8* sourcePtr = reinterpret_cast<ezUInt8*>(&source);
   UpdateBuffer(buffer, bufferOffset, sourcePtr, size);
 }

@@ -34,13 +34,21 @@
 /// </summary>
 class EZ_RHI_DLL RHICommandList : public RHIResource
 {
-public:
+protected:
   RHICommandList(
     const RHICommandListDescription& description,
     RHIGraphicsDeviceFeatures features,
     ezUInt32 uniformBufferAlignment,
-    ezUInt32 structuredBufferAlignment);
+    ezUInt32 structuredBufferAlignment)
+  {
+    m_Features = features;
+    m_UniformBufferAlignment = uniformBufferAlignment;
+    m_StructuredBufferAlignment = structuredBufferAlignment;
+  }
 
+  void ClearCachedState();
+
+public:
   /// <summary>
   /// Puts this <see cref="CommandList"/> into the initial state.
   /// This function must be called before other graphics commands can be issued.
@@ -274,7 +282,6 @@ public:
   /// </summary>
   /// <param name="indexCount">The number of indices.</param>
   void DrawIndexed(ezUInt32 indexCount);
-  ;
 
   /// <summary>
   /// Draws indexed primitives from the currently-bound state in this <see cref="CommandList"/>.
@@ -517,6 +524,7 @@ protected:
 
 private:
   static void ValidateIndirectOffset(ezUInt32 offset);
+
   void ValidateDrawIndirectSupport();
 
   static void ValidateIndirectBuffer(RHIBuffer* indirectBuffer);
@@ -527,8 +535,6 @@ private:
 
   void PreDrawValidation();
 
-protected:
-  void ClearCachedState();
 
 protected:
   RHIFramebuffer* m_pFramebuffer = nullptr;
@@ -545,69 +551,3 @@ private:
   ezEnum<RHIIndexFormat> m_IndexFormat;
 #endif
 };
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/> storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">The value to upload.</param>
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A reference to the single value to upload.</param>
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A reference to the first of a series of values to upload.</param>
-/// <param name="size">The total size of the uploaded data, in bytes.</param>
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A reference to the first of a series of values to upload.</param>
-/// <param name="size">The total size of the uploaded data, in bytes.</param>
-
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A reference to the single value to upload.</param>
-
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/> storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">The value to upload.</param>
-
-
