@@ -8,12 +8,18 @@
 
 struct RHIMappedResourceCacheKey : public ezHashableStruct<RHIMappedResourceCacheKey>
 {
-  RHIResource* Resource = nullptr;
-  ezUInt32 Subresource = 0;
+  RHIResource* GetResource() const
+  {
+    return Resource;
+  }
+
+  ezUInt32 GetSubresource() const
+  {
+    return Subresource;
+  }
 
   RHIMappedResourceCacheKey()
-    : Resource(nullptr)
-    , Subresource(0)
+    : RHIMappedResourceCacheKey(nullptr, 0)
   {
   }
 
@@ -27,4 +33,8 @@ struct RHIMappedResourceCacheKey : public ezHashableStruct<RHIMappedResourceCach
   {
     return Resource == other.Resource && Subresource == other.Subresource;
   }
+
+private:
+  RHIResource* Resource = nullptr;
+  ezUInt32 Subresource = 0;
 };
