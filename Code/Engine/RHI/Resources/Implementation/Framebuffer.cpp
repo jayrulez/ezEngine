@@ -8,6 +8,8 @@ RHIFramebuffer::RHIFramebuffer(const std::optional<RHIFramebufferAttachmentDescr
     DepthTarget = RHIFramebufferAttachment(depthAttachment.Target, depthAttachment.ArrayLayer, depthAttachment.MipLevel);
   }
 
+  ColorTargets.SetCount(colorTargetDescs.GetCount());
+
   for (ezUInt32 i = 0; i < colorTargetDescs.GetCount(); i++)
   {
     ColorTargets.PushBack(RHIFramebufferAttachment(colorTargetDescs[i].Target, colorTargetDescs[i].ArrayLayer, colorTargetDescs[i].MipLevel));
@@ -23,16 +25,16 @@ RHIFramebuffer::RHIFramebuffer(const std::optional<RHIFramebufferAttachmentDescr
   }
   else
   {
-    EZ_VERIFY(DepthTarget.has_value(), "DepthTarget is not set.");
+    EZ_ASSERT_DEBUG(DepthTarget.has_value(), "DepthTarget is not set.");
     dimTex = DepthTarget.value().GetTarget();
-    dimTex = DepthTarget.value().GetTarget();
+    mipLevel = DepthTarget.value().GetMipLevel();
   }
 
   ezUInt32 mipWidth = 0;
   ezUInt32 mipHeight = 0;
+  ezUInt32 mipDepth = 0;
 
-  // TODO: implement this
-  //Util.GetMipDimensions(dimTex, mipLevel, out uint mipWidth, out uint mipHeight, out _);
+  Util::GetMipDimensions(dimTex, mipLevel, mipWidth, mipHeight, mipDepth);
 
   Width = mipWidth;
   Height = mipHeight;
