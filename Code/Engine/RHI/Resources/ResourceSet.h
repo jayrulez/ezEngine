@@ -13,7 +13,8 @@
 /// </summary>
 class EZ_RHI_DLL RHIResourceSet : public RHIResource
 {
-public:
+protected:
+  friend class RHICommandList;
   RHIResourceSet(const RHIResourceSetDescription& description)
   {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)

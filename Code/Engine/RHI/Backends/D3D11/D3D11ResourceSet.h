@@ -29,4 +29,6 @@ public:
   D3D11ResourceSet(const RHIResourceSetDescription& description);
 
   D3D11ResourceLayout* GetLayout() const;
+
+  ezDynamicArray<RHIResource*> GetResources() const;
 };

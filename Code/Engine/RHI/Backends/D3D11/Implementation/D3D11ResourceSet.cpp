@@ -36,3 +36,8 @@ D3D11ResourceLayout* D3D11ResourceSet::GetLayout() const
 {
   return Layout;
 }
+
+ezDynamicArray<RHIResource*> D3D11ResourceSet::GetResources() const
+{
+  return Resources;
+}
