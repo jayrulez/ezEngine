@@ -86,6 +86,9 @@ struct EZ_RHI_DLL RHIBufferDescription : public ezHashableStruct<RHIBufferDescri
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIBufferDescription& other) const
   {
-    return Size == other.Size && Usage == other.Usage && StructureByteStride == other.StructureByteStride && RawBuffer == other.RawBuffer;
+    return Size == other.Size &&
+           Usage == other.Usage &&
+           StructureByteStride == other.StructureByteStride &&
+           RawBuffer == other.RawBuffer;
   }
 };

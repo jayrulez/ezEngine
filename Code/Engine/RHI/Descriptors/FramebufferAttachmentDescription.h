@@ -43,9 +43,7 @@ struct EZ_RHI_DLL RHIFramebufferAttachmentDescription : public ezHashableStruct<
   /// <param name="arrayLayer">The array layer to render to. This value must be less than <see cref="Texture.ArrayLayers"/>
   /// in the target <see cref="Texture"/>.</param>
   RHIFramebufferAttachmentDescription(RHITexture* target, ezUInt32 arrayLayer)
-    : Target(target)
-    , ArrayLayer(arrayLayer)
-    , MipLevel(0)
+    : RHIFramebufferAttachmentDescription(target, arrayLayer, 0)
   {
   }
 
@@ -68,6 +66,8 @@ struct EZ_RHI_DLL RHIFramebufferAttachmentDescription : public ezHashableStruct<
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIFramebufferAttachmentDescription& other) const
   {
-    return Target == other.Target && ArrayLayer == other.ArrayLayer && MipLevel == other.MipLevel;
+    return Target == other.Target &&
+           ArrayLayer == other.ArrayLayer &&
+           MipLevel == other.MipLevel;
   }
 };

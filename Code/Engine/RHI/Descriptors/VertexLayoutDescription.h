@@ -1,11 +1,12 @@
 #pragma once
 
-#include <RHI/RHIDLL.h>
-#include <RHI/RHIPCH.h>
 #include <RHI/Descriptors/VertexElementDescription.h>
 #include <RHI/FormatHelpers.h>
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Util.h>
 
 
 /// <summary>
@@ -31,7 +32,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// For example, an InstanceStepRate of 3 indicates that 3 instances will be drawn with the same value for this layout. The
   /// next 3 instances will be drawn with the next value, and so on.
   /// </summary>
-  ezUInt32 InstanceStepRate  = 0;
+  ezUInt32 InstanceStepRate = 0;
 
   RHIVertexLayoutDescription() = default;
 
@@ -98,6 +99,8 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIVertexLayoutDescription& other) const
   {
-    return Stride == other.Stride && Elements == other.Elements && InstanceStepRate == other.InstanceStepRate;
+    return Stride == other.Stride &&
+           Util::AreEquatable(Elements, other.Elements) &&
+           InstanceStepRate == other.InstanceStepRate;
   }
 };

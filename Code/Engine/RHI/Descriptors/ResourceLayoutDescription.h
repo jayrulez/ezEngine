@@ -5,6 +5,7 @@
 #include <RHI/Descriptors/ResourceLayoutElementDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Util.h>
 
 /// <summary>
 /// Describes the layout of <see cref="RHIResourseFlags::Bindable"/> objects for a <see cref="RHIPipeline"/>.
@@ -24,7 +25,7 @@ struct EZ_RHI_DLL RHIResourceLayoutDescription : public ezHashableStruct<RHIReso
   /// </summary>
   /// <param name="elements">An array of <see cref="RHIResourceLayoutElementDescription"/> objects, describing the properties
   /// of each resource element in the <see cref="RHIResourceLayout"/>.</param>
-  RHIResourceLayoutDescription(ezDynamicArray<RHIResourceLayoutElementDescription>& elements)
+  RHIResourceLayoutDescription(ezDynamicArray<RHIResourceLayoutElementDescription> elements)
   {
     Elements = elements;
   }
@@ -36,6 +37,6 @@ struct EZ_RHI_DLL RHIResourceLayoutDescription : public ezHashableStruct<RHIReso
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIResourceLayoutDescription& other) const
   {
-    return Elements == other.Elements;
+    return Util::AreEquatable(Elements , other.Elements);
   }
 };

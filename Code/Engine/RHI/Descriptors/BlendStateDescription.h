@@ -2,9 +2,10 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/BlendAttachmentDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Descriptors/BlendAttachmentDescription.h>
+#include <RHI/Util.h>
 
 /// <summary>
 /// A <see cref="Pipeline"/> component describing how values are blended into each individual color target.
@@ -35,7 +36,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// </summary>
   /// <param name="blendFactor">The constant blend color.</param>
   /// <param name="attachmentStates">The blend attachment states.</param>
-  RHIBlendStateDescription(ezColor blendFactor, ezDynamicArray<RHIBlendAttachmentDescription>& attachmentStates)
+  RHIBlendStateDescription(ezColor blendFactor, ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates)
   {
     BlendFactor = blendFactor;
     AttachmentStates = attachmentStates;
@@ -52,7 +53,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   RHIBlendStateDescription(
     ezColor blendFactor,
     bool alphaToCoverageEnabled,
-    ezDynamicArray<RHIBlendAttachmentDescription>& attachmentStates)
+    ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates)
   {
     BlendFactor = blendFactor;
     AttachmentStates = attachmentStates;
@@ -115,12 +116,17 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIBlendStateDescription& other) const
   {
-    return BlendFactor == other.BlendFactor && AttachmentStates == other.AttachmentStates && AlphaToCoverageEnabled == other.AlphaToCoverageEnabled;
+    return BlendFactor == other.BlendFactor &&
+           Util::AreEquatable(AttachmentStates, other.AttachmentStates) &&
+           AlphaToCoverageEnabled == other.AlphaToCoverageEnabled;
   }
 
   RHIBlendStateDescription Clone()
   {
     ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates;
+
+    // TODO: shallow copy
+
     attachmentStates.SetCountUninitialized(this->AttachmentStates.GetCount());
     attachmentStates.GetArrayPtr().CopyFrom(this->AttachmentStates.GetArrayPtr());
 
@@ -133,7 +139,12 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
 template <>
 struct ezHashHelper<RHIBlendStateDescription>
 {
-  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIBlendStateDescription& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIBlendStateDescription& value)
+  {
+    // TODO: hash
+    return ezHashingUtils::xxHash32(&value.BlendFactor, sizeof(ezColor)) +
+           ezHashingUtils::xxHash32(&value.AlphaToCoverageEnabled, sizeof(bool));
+  }
 
   EZ_ALWAYS_INLINE static bool Equal(const RHIBlendStateDescription& a, const RHIBlendStateDescription& b) { return a == b; }
 };

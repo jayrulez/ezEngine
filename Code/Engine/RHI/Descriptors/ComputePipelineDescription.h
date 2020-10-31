@@ -5,6 +5,7 @@
 #include <RHI/Resources/SpecializationConstant.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Util.h>
 
 class RHIShader;
 class RHIResourceLayout;
@@ -126,7 +127,7 @@ struct EZ_RHI_DLL RHIComputePipelineDescription : public ezHashableStruct<RHICom
   bool operator==(const RHIComputePipelineDescription& other) const
   {
     return ComputeShader == other.ComputeShader &&
-           ResourceLayouts == other.ResourceLayouts &&
+           Util::AreEqual(ResourceLayouts, other.ResourceLayouts) &&
            ThreadGroupSizeX == other.ThreadGroupSizeX &&
            ThreadGroupSizeY == other.ThreadGroupSizeY &&
            ThreadGroupSizeZ == other.ThreadGroupSizeZ;

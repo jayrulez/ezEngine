@@ -7,6 +7,7 @@
 #include <RHI/Descriptors/DepthStencilStateDescription.h>
 #include <RHI/Descriptors/RasterizerStateDescription.h>
 #include <RHI/Descriptors/VertexLayoutDescription.h>
+#include <RHI/Util.h>
 
 struct ID3D11Device;
 struct ID3D11BlendState;
@@ -30,11 +31,9 @@ struct InputLayoutCacheKey : public ezHashableStruct<InputLayoutCacheKey>
 
   bool operator==(const InputLayoutCacheKey& other) const
   {
-    return VertexLayouts == other.VertexLayouts;
+    return Util::AreEquatable(VertexLayouts, other.VertexLayouts);
   }
 };
-
-
 
 template <>
 struct ezHashHelper<InputLayoutCacheKey>

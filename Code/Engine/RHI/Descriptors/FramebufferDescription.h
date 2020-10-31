@@ -1,8 +1,8 @@
 #pragma once
 
+#include <RHI/Descriptors/FramebufferAttachmentDescription.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/FramebufferAttachmentDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
 
@@ -32,7 +32,7 @@ struct EZ_RHI_DLL RHIFramebufferDescription : public ezHashableStruct<RHIFramebu
   /// <see cref="RHITextureUsage.DepthStencil"/> usage flags. May be null.</param>
   /// <param name="colorTargets">An array of color textures, all of which must have been created with
   /// <see cref="RHITextureUsage.RenderTarget"/> usage flags. May be null or empty.</param>
-  RHIFramebufferDescription(RHITexture* depthTarget, ezDynamicArray<RHITexture*>& colorTargets)
+  RHIFramebufferDescription(RHITexture* depthTarget, ezDynamicArray<RHITexture*> colorTargets)
   {
     if (depthTarget != nullptr)
     {
@@ -42,7 +42,7 @@ struct EZ_RHI_DLL RHIFramebufferDescription : public ezHashableStruct<RHIFramebu
     {
       DepthTarget = std::nullopt;
     }
-    ColorTargets.Clear();
+    //ColorTargets.Clear();
     ColorTargets.SetCountUninitialized(colorTargets.GetCount());
 
     for (ezUInt32 i = 0; i < colorTargets.GetCount(); i++)
@@ -58,8 +58,8 @@ struct EZ_RHI_DLL RHIFramebufferDescription : public ezHashableStruct<RHIFramebu
   /// <param name="colorTargets">An array of descriptions of color attachments. May be empty if no color attachments will
   /// be used.</param>
   RHIFramebufferDescription(
-    std::optional<RHIFramebufferAttachmentDescription>& depthTarget,
-    ezDynamicArray<RHIFramebufferAttachmentDescription>& colorTargets)
+    std::optional<RHIFramebufferAttachmentDescription> depthTarget,
+    ezDynamicArray<RHIFramebufferAttachmentDescription> colorTargets)
   {
     DepthTarget = depthTarget;
     ColorTargets = colorTargets;
@@ -72,6 +72,7 @@ struct EZ_RHI_DLL RHIFramebufferDescription : public ezHashableStruct<RHIFramebu
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIFramebufferDescription& other) const
   {
-    return DepthTarget == other.DepthTarget && ColorTargets == other.ColorTargets;
+    return DepthTarget == other.DepthTarget &&
+           Util::AreEquatable(ColorTargets, other.ColorTargets);
   }
 };

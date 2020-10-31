@@ -43,9 +43,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <param name="semantic">The semantic type of the element.</param>
   /// <param name="format">The format of the element.</param>
   RHIVertexElementDescription(ezString name, ezEnum<RHIVertexElementSemantic> semantic, ezEnum<RHIVertexElementFormat> format)
-    : Name(name)
-    , Semantic(semantic)
-    , Format(format)
+    : RHIVertexElementDescription(name, format, semantic)
   {
   }
 
@@ -92,6 +90,9 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIVertexElementDescription& other) const
   {
-    return Name.IsEqual(other.Name) && Format == other.Format && Semantic == other.Semantic && Offset == other.Offset;
+    return Name.IsEqual(other.Name) &&
+           Format == other.Format &&
+           Semantic == other.Semantic &&
+           Offset == other.Offset;
   }
 };

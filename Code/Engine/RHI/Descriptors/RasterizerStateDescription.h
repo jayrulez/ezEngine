@@ -92,6 +92,10 @@ struct EZ_RHI_DLL RHIRasterizerStateDescription : public ezHashableStruct<RHIRas
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIRasterizerStateDescription& other) const
   {
-    return CullMode == other.CullMode && FillMode == other.FillMode && FrontFace == other.FrontFace && DepthClipEnabled == other.DepthClipEnabled && ScissorTestEnabled == other.ScissorTestEnabled;
+    return CullMode == other.CullMode &&
+           FillMode == other.FillMode &&
+           FrontFace == other.FrontFace &&
+           DepthClipEnabled == other.DepthClipEnabled &&
+           ScissorTestEnabled == other.ScissorTestEnabled;
   }
 };

@@ -56,6 +56,9 @@ struct EZ_RHI_DLL RHIStencilBehaviorDescription : public ezHashableStruct<RHISte
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIStencilBehaviorDescription& other) const
   {
-    return Fail == other.Fail && Pass == other.Pass && DepthFail == other.DepthFail && Comparison == other.Comparison;
+    return Fail == other.Fail &&
+           Pass == other.Pass &&
+           DepthFail == other.DepthFail &&
+           Comparison == other.Comparison;
   }
 };

@@ -1,10 +1,11 @@
 #pragma once
 
+#include <RHI/Descriptors/VertexLayoutDescription.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/VertexLayoutDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Util.h>
 
 class RHIShader;
 struct RHISpecializationConstant;
@@ -82,6 +83,8 @@ struct EZ_RHI_DLL RHIShaderSetDescription : public ezHashableStruct<RHIShaderSet
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIShaderSetDescription& other) const
   {
-    return VertexLayouts == other.VertexLayouts && Shaders == other.Shaders && Specializations == other.Specializations;
+    return Util::AreEquatable(VertexLayouts, other.VertexLayouts) &&
+           Util::AreEqual(Shaders, other.Shaders) &&
+           Util::AreEquatable(Specializations, other.Specializations);
   }
 };

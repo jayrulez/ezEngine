@@ -73,6 +73,9 @@ struct EZ_RHI_DLL RHIResourceLayoutElementDescription : public ezHashableStruct<
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIResourceLayoutElementDescription& other) const
   {
-    return Name.IsEqual(other.Name) && Kind == other.Kind && Stages == other.Stages && Options == other.Options;
+    return Name.IsEqual(other.Name) &&
+           Kind == other.Kind &&
+           Stages == other.Stages &&
+           Options == other.Options;
   }
 };

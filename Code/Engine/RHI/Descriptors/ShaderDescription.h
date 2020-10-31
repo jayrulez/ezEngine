@@ -73,6 +73,9 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIShaderDescription& other) const
   {
-    return Stage == other.Stage && ShaderBytes == other.ShaderBytes && EntryPoint == other.EntryPoint && Debug == other.Debug;
+    return Stage == other.Stage &&
+           ShaderBytes == other.ShaderBytes &&
+           EntryPoint == other.EntryPoint &&
+           Debug == other.Debug;
   }
 };

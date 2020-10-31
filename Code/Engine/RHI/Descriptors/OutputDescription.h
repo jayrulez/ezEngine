@@ -5,6 +5,7 @@
 #include <RHI/Descriptors/OutputAttachmentDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Util.h>
 
 #include <optional>
 
@@ -69,6 +70,8 @@ struct EZ_RHI_DLL RHIOutputDescription : public ezHashableStruct<RHIOutputDescri
   /// <returns>True if all elements and all array elements are equal; false otherswise.</returns>
   bool operator==(const RHIOutputDescription& other) const
   {
-    return DepthAttachment == other.DepthAttachment && ColorAttachments == other.ColorAttachments && SampleCount == other.SampleCount;
+    return DepthAttachment == other.DepthAttachment &&
+      Util::AreEquatable(ColorAttachments, other.ColorAttachments) &&
+      SampleCount == other.SampleCount;
   }
 };

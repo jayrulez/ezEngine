@@ -1,14 +1,15 @@
 #pragma once
 
-#include <RHI/RHIDLL.h>
-#include <RHI/RHIPCH.h>
 #include <RHI/Descriptors/BlendStateDescription.h>
 #include <RHI/Descriptors/DepthStencilStateDescription.h>
+#include <RHI/Descriptors/OutputDescription.h>
 #include <RHI/Descriptors/RasterizerStateDescription.h>
 #include <RHI/Descriptors/ShaderSetDescription.h>
-#include <RHI/Descriptors/OutputDescription.h>
+#include <RHI/RHIDLL.h>
+#include <RHI/RHIPCH.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
+#include <RHI/Util.h>
 
 #include <optional>
 
@@ -81,7 +82,7 @@ struct EZ_RHI_DLL RHIGraphicsPipelineDescription : public ezHashableStruct<RHIGr
     const RHIRasterizerStateDescription rasterizerState,
     ezEnum<RHIPrimitiveTopology> primitiveTopology,
     const RHIShaderSetDescription& shaderSet,
-    const ezDynamicArray<RHIResourceLayout*>& resourceLayouts,
+    const ezDynamicArray<RHIResourceLayout*> resourceLayouts,
     const RHIOutputDescription& outputs)
   {
     BlendState = blendState;
@@ -177,7 +178,7 @@ struct EZ_RHI_DLL RHIGraphicsPipelineDescription : public ezHashableStruct<RHIGr
            RasterizerState == other.RasterizerState &&
            PrimitiveTopology == other.PrimitiveTopology &&
            ShaderSet == other.ShaderSet &&
-           ResourceLayouts == other.ResourceLayouts &&
+           Util::AreEqual(ResourceLayouts, other.ResourceLayouts) &&
            ResourceBindingModel == other.ResourceBindingModel &&
            Outputs == other.Outputs;
   }

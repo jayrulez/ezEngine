@@ -99,6 +99,11 @@ struct EZ_RHI_DLL RHITextureViewDescription : public ezHashableStruct<RHITexture
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHITextureViewDescription& other) const
   {
-    return Target == other.Target && BaseMipLevel == other.BaseMipLevel && MipLevels == other.MipLevels && BaseArrayLayer == other.BaseArrayLayer && ArrayLayers == other.ArrayLayers && Format == other.Format;
+    return Target == other.Target &&
+           BaseMipLevel == other.BaseMipLevel &&
+           MipLevels == other.MipLevels &&
+           BaseArrayLayer == other.BaseArrayLayer &&
+           ArrayLayers == other.ArrayLayers &&
+           Format == other.Format;
   }
 };

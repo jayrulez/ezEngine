@@ -44,6 +44,6 @@ struct EZ_RHI_DLL RHIResourceSetDescription : public ezHashableStruct<RHIResourc
   /// <returns>True if all elements are equal; false otherswise.</returns>
   virtual bool operator==(const RHIResourceSetDescription& other) const
   {
-    return Layout == other.Layout && BoundResources == other.BoundResources;
+    return Layout == other.Layout && Util::AreEqual(BoundResources, other.BoundResources);
   }
 };
