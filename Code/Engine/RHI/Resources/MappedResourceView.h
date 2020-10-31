@@ -17,7 +17,7 @@ public:
   RHIMappedResourceView(RHIMappedResource* rawResource)
   {
     Resource = rawResource;
-    Size = rawResource->Size;
+    Size = rawResource->GetSize();
     Count = Size / sizeof(T);
   }
 
@@ -41,14 +41,15 @@ public:
   /// </summary>
   /// <param name="index">The index of the value.</param>
   /// <returns>A reference to the value at the given index.</returns>
-  T* operator[](ezInt32 index)
+  T* Get(ezInt32 index)
   {
     if (index >= Count || index < 0)
     {
       EZ_REPORT_FAILURE("Given index {} must be non-negative and less than Count {}.", index, Count);
     }
-
-    ezUInt8* ptr = Resource->Data + (index * sizeof(T));
+    // TODO: Verify this math
+    // TODO: cast Resource->GetData() to ezUInt8*
+    ezUInt8* ptr = Resource->GetData() + (index * sizeof(T));
 
     return reinterpret_cast<T*>(ptr);
   }
@@ -58,14 +59,16 @@ public:
   /// </summary>
   /// <param name="index">The index of the value.</param>
   /// <returns>A reference to the value at the given index.</returns>
-  T* operator[](ezUInt32 index)
+  T* Get(ezUInt32 index)
   {
     if (index >= Count)
     {
       EZ_REPORT_FAILURE("Given index {} must be  less than Count {}.", Count);
     }
 
-    ezUInt8* ptr = Resource->Data + (index * sizeof(T));
+    // TODO: Verify this math
+    // TODO: cast Resource->GetData() to ezUInt8*
+    ezUInt8* ptr = Resource->GetData() + (index * sizeof(T));
 
     return reinterpret_cast<T*>(ptr);
   }
@@ -73,11 +76,16 @@ public:
   /// <summary>
   /// Gets a reference to the structure at the given 2-dimensional texture coordinates.
   /// </summary>
-  /// <param name="coord">ezVec2I32 coordinate vector.</param>
+  /// <param name="x">The x coordinate vector.</param>
+  /// <param name="y">The y coordinate vector.</param>
   /// <returns>A reference to the value at the given coordinates.</returns>
-  T* operator[](ezVec2I32 coord)
+  T* Get(ezInt32 x, ezInt32 y)
   {
-    ezUInt8* ptr = Resource->Data + (coord.y * Resource->RowPitch) + (coord.x * sizeof(T));
+    // TODO: Verify this math
+    // TODO: cast Resource->GetData() to ezUInt8*
+    ezUInt8* ptr = Resource->GetData() +
+                   (y * Resource->GetRowPitch()) +
+                   (x * sizeof(T));
 
     return reinterpret_cast<T*>(ptr);
   }
@@ -85,11 +93,16 @@ public:
   /// <summary>
   /// Gets a reference to the structure at the given 2-dimensional texture coordinates.
   /// </summary>
-  /// <param name="coord">ezVec2U32 coordinate vector.</param>
+  /// <param name="x">The x coordinate vector.</param>
+  /// <param name="y">The y coordinate vector.</param>
   /// <returns>A reference to the value at the given coordinates.</returns>
-  T* operator[](ezVec2U32 coord)
+  T* Get(ezUInt32 x, ezUInt32 y)
   {
-    ezUInt8* ptr = Resource->Data + (coord.y * Resource->RowPitch) + (coord.x * sizeof(T));
+    // TODO: Verify this math
+    // TODO: cast Resource->GetData() to ezUInt8*
+    ezUInt8* ptr = Resource->GetData() +
+                   (y * Resource->GetRowPitch()) +
+                   (x * sizeof(T));
 
     return reinterpret_cast<T*>(ptr);
   }
@@ -97,14 +110,18 @@ public:
   /// <summary>
   /// Gets a reference to the structure at the given 3-dimensional texture coordinates.
   /// </summary>
-  /// <param name="coord">ezVec3I32 coordinate vector.</param>
+  /// <param name="x">The x coordinate vector.</param>
+  /// <param name="y">The y coordinate vector.</param>
+  /// <param name="z">The z coordinate vector.</param>
   /// <returns>A reference to the value at the given coordinates.</returns>
-  T* operator[](ezVec3I32 coord)
+  T* Get(ezInt32 x, ezInt32 y, ezInt32 z)
   {
-    ezUInt8* ptr = Resource->Data +
-                   (coord.z * Resource->DepthPitch) +
-                   (coord.y * Resource->RowPitch) +
-                   (coord.x * sizeof(T));
+    // TODO: Verify this math
+    // TODO: cast Resource->GetData() to ezUInt8*
+    ezUInt8* ptr = Resource->GetData() +
+                   (z * Resource->GetDepthPitch()) +
+                   (y * Resource->GetRowPitch()) +
+                   (x * sizeof(T));
 
     return reinterpret_cast<T*>(ptr);
   }
@@ -112,14 +129,18 @@ public:
   /// <summary>
   /// Gets a reference to the structure at the given 3-dimensional texture coordinates.
   /// </summary>
-  /// <param name="coord">ezVec3U32 coordinate vector.</param>
+  /// <param name="x">The x coordinate vector.</param>
+  /// <param name="y">The y coordinate vector.</param>
+  /// <param name="z">The z coordinate vector.</param>
   /// <returns>A reference to the value at the given coordinates.</returns>
-  T* operator[](ezVec3U32 coord)
+  T* Get(ezUInt32 x, ezUInt32 y, ezUInt32 z)
   {
-    ezUInt8* ptr = Resource->Data +
-                   (coord.z * Resource->DepthPitch) +
-                   (coord.y * Resource->RowPitch) +
-                   (coord.x * sizeof(T));
+    // TODO: Verify this math
+    // TODO: cast Resource->GetData() to ezUInt8*
+    ezUInt8* ptr = Resource->GetData() +
+                   (z * Resource->GetDepthPitch()) +
+                   (y * Resource->GetRowPitch()) +
+                   (x * sizeof(T));
 
     return reinterpret_cast<T*>(ptr);
   }

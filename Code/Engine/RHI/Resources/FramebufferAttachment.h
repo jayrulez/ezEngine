@@ -27,6 +27,8 @@ public:
   /// </summary>
   virtual ezUInt32 GetMipLevel() const;
 
+  RHIFramebufferAttachment() = default;
+
   /// <summary>
   /// Constructs a new FramebufferAttachment.
   /// </summary>
