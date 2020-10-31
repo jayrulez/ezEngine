@@ -35,7 +35,7 @@ namespace Util
     RHIBufferRange* range = dynamic_cast<RHIBufferRange*>(resource);
     if (range != nullptr)
     {
-      return RHIBufferRange(range->Buffer, range->Offset + additionalOffset, range->Size);
+      return RHIBufferRange(range->GetBuffer(), range->GetOffset() + additionalOffset, range->GetSize());
     }
     else
     {
@@ -56,7 +56,7 @@ namespace Util
     }
     else if (dbr)
     {
-      buffer = dbr->Buffer;
+      buffer = dbr->GetBuffer();
       return true;
     }
 

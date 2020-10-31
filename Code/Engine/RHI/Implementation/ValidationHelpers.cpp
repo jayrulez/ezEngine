@@ -26,7 +26,7 @@ namespace ValidationHelpers
       {
         RHIBufferRange range = Util::GetBufferRange(description.BoundResources[i], 0);
 
-        if (!graphicsDevice->GetFeatures().BufferRangeBindingSupported() && (range.Offset != 0 || range.Size != range.Buffer->GetSize()))
+        if (!graphicsDevice->GetFeatures().BufferRangeBindingSupported() && (range.GetOffset() != 0 || range.GetSize() != range.GetBuffer()->GetSize()))
         {
           EZ_REPORT_FAILURE("The {nameof(DeviceBufferRange)} in slot {i} uses a non-zero offset or less-than-full size, which requires {nameof(GraphicsDeviceFeatures)}.{nameof(GraphicsDeviceFeatures.BufferRangeBinding)}.");
         }
@@ -35,10 +35,10 @@ namespace ValidationHelpers
                                ? graphicsDevice->GetUniformBufferMinOffsetAlignment()
                                : graphicsDevice->GetStructuredBufferMinOffsetAlignment();
 
-        if ((range.Offset % alignment) != 0)
+        if ((range.GetOffset() % alignment) != 0)
         {
           ezStringBuilder sb;
-          sb.AppendFormat("The DeviceBufferRange in slot {} has an invalid offset: {range.Offset}. ", i, range.Offset);
+          sb.AppendFormat("The DeviceBufferRange in slot {} has an invalid offset: {range.Offset}. ", i, range.GetOffset());
           sb.AppendFormat("The offset for this buffer must be a multiple of {}.", alignment);
           EZ_REPORT_FAILURE(sb.GetData());
         }

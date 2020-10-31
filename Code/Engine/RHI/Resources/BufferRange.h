@@ -13,20 +13,30 @@
 /// </summary>
 struct RHIBufferRange : public RHIResource
 {
+public:
   /// <summary>
   /// The underlying <see cref="RHIBuffer"/> that this range refers to.
   /// </summary>
-  RHIBuffer* Buffer;
+  RHIBuffer* GetBuffer() const
+  {
+    return Buffer;
+  }
 
   /// <summary>
   /// The offset, in bytes, from the beginning of the buffer that this range starts at.
   /// </summary>
-  ezUInt32 Offset;
+  ezUInt32 GetOffset() const
+  {
+    return Offset;
+  }
 
   /// <summary>
   /// The total number of bytes that this range encompasses.
   /// </summary>
-  ezUInt32 Size;
+  ezUInt32 GetSize() const
+  {
+    return Size;
+  }
 
   /// <summary>
   /// Constructs a new <see cref="RHIBufferRange"/>.
@@ -34,7 +44,12 @@ struct RHIBufferRange : public RHIResource
   /// <param name="buffer">The underlying <see cref="RHIBuffer"/> that this range will refer to.</param>
   /// <param name="offset">The offset, in bytes, from the beginning of the buffer that this range will start at.</param>
   /// <param name="sizeInBytes">The total number of bytes that this range will encompass.</param>
-  RHIBufferRange(RHIBuffer* buffer, ezUInt32 offset, ezUInt32 sizeInBytes);
+  RHIBufferRange(RHIBuffer* buffer, ezUInt32 offset, ezUInt32 sizeInBytes)
+  {
+    Buffer = buffer;
+    Offset = offset;
+    Size = sizeInBytes;
+  }
 
   /// <summary>
   /// Element-wise equality.
@@ -46,14 +61,31 @@ struct RHIBufferRange : public RHIResource
     return Buffer == other.Buffer && Offset == other.Offset && Size == other.Size;
   }
 
-  virtual void SetName(const ezString& name) override;
+  virtual void SetName(const ezString& name) override
+  {
+  }
 
-  virtual ezString GetName() const override;
+  virtual ezString GetName() const override
+  {
+    return ezString();
+  }
 
-  virtual bool IsDisposed() const override;
+  virtual bool IsDisposed() const override
+  {
+    return Disposed;
+  }
 
-  virtual void Dispose() override;
+  virtual void Dispose() override
+  {
+    if (!Disposed)
+    {
+      Disposed = true;
+    }
+  }
 
 private:
   bool Disposed = false;
+  RHIBuffer* Buffer;
+  ezUInt32 Offset;
+  ezUInt32 Size;
 };

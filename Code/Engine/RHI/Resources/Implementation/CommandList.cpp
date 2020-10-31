@@ -219,11 +219,11 @@ void RHICommandList::SetGraphicsResourceSet(ezUInt32 slot, RHIResourceSet* resou
       dynamicOffsetIndex += 1;
       RHIBufferRange range = Util::GetBufferRange(resourceSet->GetResources()[i], desiredOffset);
 
-      if ((range.Offset % requiredAlignment) != 0)
+      if ((range.GetOffset() % requiredAlignment) != 0)
       {
         ezStringBuilder errorSb;
         errorSb.AppendFormat("The effective offset of the buffer in slot {} does not meet the alignment ", i);
-        errorSb.AppendFormat("equirements of this device. The offset must be a multiple of {}, but it is {}", requiredAlignment, range.Offset);
+        errorSb.AppendFormat("equirements of this device. The offset must be a multiple of {}, but it is {}", requiredAlignment, range.GetOffset());
 
         EZ_REPORT_FAILURE(errorSb.GetData());
       }

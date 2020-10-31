@@ -1206,7 +1206,7 @@ void D3D11CommandList::FlushViewports()
     ViewportsChanged = false;
 
     std::vector<D3D11_VIEWPORT> vps;
-    for (auto viewport : Viewports )
+    for (auto viewport : Viewports)
     {
       D3D11_VIEWPORT vp;
       vp.TopLeftX = viewport.X;
@@ -1337,9 +1337,9 @@ D3D11CommandList::D3D11BufferRange* D3D11CommandList::GetBufferRange(RHIResource
   else if (range)
   {
     return new D3D11BufferRange(
-      Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(range->Buffer),
-      range->Offset + additionalOffset,
-      range->Size);
+      Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(range->GetBuffer()),
+      range->GetOffset() + additionalOffset,
+      range->GetSize());
   }
   else
   {
