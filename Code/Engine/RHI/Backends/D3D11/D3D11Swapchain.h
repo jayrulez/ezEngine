@@ -6,6 +6,12 @@
 #include <RHI/Resources/Swapchain.h>
 #include <RHI/Resources/SwapchainSource.h>
 
+class D3D11Texture;
+class D3D11GraphicsDevice;
+class D3D11CommandList;
+class D3D11Framebuffer;
+struct IDXGISwapChain;
+
 #include <dxgi.h>
 #include <dxgiformat.h>
 

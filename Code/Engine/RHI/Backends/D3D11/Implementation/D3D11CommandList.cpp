@@ -431,6 +431,14 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
     subregion->front = 0;
     subregion->top = 0;
 
+    RawRect workAroundRegion;
+    workAroundRegion.left = bufferOffset;
+    workAroundRegion.right = size + bufferOffset;
+    workAroundRegion.bottom = 1;
+    workAroundRegion.back = 1;
+    workAroundRegion.front = 0;
+    workAroundRegion.top = 0;
+
     if (isUniformBuffer)
     {
       subregion = nullptr;
@@ -442,7 +450,7 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
     }
     else
     {
-      UpdateSubresource_Workaround(d3dBuffer->GetBuffer(), 0, *subregion, source);
+      UpdateSubresource_Workaround(d3dBuffer->GetBuffer(), 0, workAroundRegion, source);
     }
   }
   else if (useMap && updateFullBuffer) // Can only update full buffer with WriteDiscard.
@@ -1093,7 +1101,7 @@ void D3D11CommandList::BindTextureView(D3D11TextureView* texView, ezUInt32 slot,
   }
 }
 
-void D3D11CommandList::UpdateSubresource_Workaround(ID3D11Resource* resource, int subresource, D3D11_BOX region, ezUInt8* data)
+void D3D11CommandList::UpdateSubresource_Workaround(ID3D11Resource* resource, int subresource, RawRect region, ezUInt8* data)
 {
   bool needWorkaround = !GraphicsDevice->SupportsCommandLists();
   void* pAdjustedSrcData = data;
@@ -1103,7 +1111,15 @@ void D3D11CommandList::UpdateSubresource_Workaround(ID3D11Resource* resource, in
     pAdjustedSrcData = (byte*)data - region.left;
   }
 
-  Context->UpdateSubresource(resource, subresource, &region, pAdjustedSrcData, 0, 0);
+  D3D11_BOX* subregion = new D3D11_BOX;
+  subregion->left = region.left;
+  subregion->right = region.right;
+  subregion->bottom = region.bottom;
+  subregion->back = region.back;
+  subregion->front = region.front;
+  subregion->top = region.top;
+
+  Context->UpdateSubresource(resource, subresource, subregion, pAdjustedSrcData, 0, 0);
 }
 
 D3D11DeviceBuffer* D3D11CommandList::GetFreeStagingBuffer(ezUInt32 size)

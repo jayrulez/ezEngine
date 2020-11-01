@@ -968,6 +968,16 @@ namespace D3D11Util
   {
     return syncToVBlank ? 1 : 0;
   }
+  D3D11_DEPTH_STENCILOP_DESC ToD3D11StencilOpDesc(const RHIStencilBehaviorDescription& sbd)
+  {
+    D3D11_DEPTH_STENCILOP_DESC desc;
+    desc.StencilFunc = D3D11FormatUtils::RHIToD3D11ComparisonFunc(sbd.Comparison);
+    desc.StencilPassOp = D3D11FormatUtils::RHIToD3D11StencilOperation(sbd.Pass);
+    desc.StencilFailOp = D3D11FormatUtils::RHIToD3D11StencilOperation(sbd.Fail);
+    desc.StencilDepthFailOp = D3D11FormatUtils::RHIToD3D11StencilOperation(sbd.DepthFail);
+
+    return desc;
+  }
 } // namespace D3D11Util
 
 namespace D3D11DeviceUtils

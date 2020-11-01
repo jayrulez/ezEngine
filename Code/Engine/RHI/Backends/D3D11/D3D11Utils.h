@@ -3,6 +3,8 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
+#include <RHI/Descriptors/StencilBehaviorDescription.h>
+
 #include <dxgi.h>
 #include <dxgiformat.h>
 
@@ -66,6 +68,8 @@ namespace D3D11Util
     ezEnum<RHIPixelFormat> format);
 
   ezInt32 GetSyncInterval(bool syncToVBlank);
+
+  D3D11_DEPTH_STENCILOP_DESC ToD3D11StencilOpDesc(const RHIStencilBehaviorDescription& sbd);
 } // namespace D3D11Util
 
 namespace D3D11DeviceUtils

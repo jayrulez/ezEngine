@@ -124,7 +124,7 @@ private:
 
   ID3D11DepthStencilState* CreateNewDepthStencilState(const RHIDepthStencilStateDescription& description);
 
-  D3D11_DEPTH_STENCILOP_DESC ToD3D11StencilOpDesc(RHIStencilBehaviorDescription sbd);
+  
 
   ID3D11RasterizerState* GetRasterizerState(const RHIRasterizerStateDescription& description, bool multisample);
 

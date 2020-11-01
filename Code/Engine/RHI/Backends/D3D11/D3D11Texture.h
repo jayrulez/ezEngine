@@ -12,6 +12,7 @@
 
 struct ID3D11Device;
 struct ID3D11Resource;
+struct ID3D11Texture2D;
 
 class D3D11GraphicsDevice;
 
@@ -75,8 +76,5 @@ protected:
   virtual RHITextureView* CreateFullTextureView(RHIGraphicsDevice* graphicsDevice) override;
 
 private:
-  void DisposeCore() override
-  {
-    DeviceTexture->Release();
-  }
+  void DisposeCore() override;
 };

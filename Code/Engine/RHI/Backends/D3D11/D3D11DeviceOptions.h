@@ -2,6 +2,7 @@
 
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
+#include <dxgi.h>
 
 /// <summary>
 /// A structure describing Direct3D11-specific device creation options.
@@ -11,7 +12,7 @@ struct RHID3D11DeviceOptions
   /// <summary>
   /// Native pointer to an adapter.
   /// </summary>
-  ezUInt32* AdapterPtr = nullptr;
+  IDXGIAdapter* AdapterPtr = nullptr;
 
   /// <summary>
   /// Set of device specific flags.

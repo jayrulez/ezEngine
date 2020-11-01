@@ -1,4 +1,5 @@
 #include <RHI/Backends/D3D11/D3D11ResourceCache.h>
+#include <RHI/Backends/D3D11/D3D11Utils.h>
 
 D3D11ResourceCache::D3D11ResourceCache(ID3D11Device* device)
 {
@@ -116,8 +117,8 @@ ID3D11DepthStencilState* D3D11ResourceCache::CreateNewDepthStencilState(const RH
   dssDesc.DepthEnable = description.DepthTestEnabled;
   dssDesc.DepthWriteMask = description.DepthWriteEnabled ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
   dssDesc.StencilEnable = description.StencilTestEnabled;
-  dssDesc.FrontFace = ToD3D11StencilOpDesc(description.StencilFront);
-  dssDesc.BackFace = ToD3D11StencilOpDesc(description.StencilBack);
+  dssDesc.FrontFace = D3D11Util::ToD3D11StencilOpDesc(description.StencilFront);
+  dssDesc.BackFace = D3D11Util::ToD3D11StencilOpDesc(description.StencilBack);
   dssDesc.StencilReadMask = description.StencilReadMask;
   dssDesc.StencilWriteMask = description.StencilWriteMask;
 
@@ -126,17 +127,6 @@ ID3D11DepthStencilState* D3D11ResourceCache::CreateNewDepthStencilState(const RH
   HRESULT hr = Device->CreateDepthStencilState(&dssDesc, &dss);
 
   return dss;
-}
-
-D3D11_DEPTH_STENCILOP_DESC D3D11ResourceCache::ToD3D11StencilOpDesc(RHIStencilBehaviorDescription sbd)
-{
-  D3D11_DEPTH_STENCILOP_DESC desc;
-  desc.StencilFunc = D3D11FormatUtils::RHIToD3D11ComparisonFunc(sbd.Comparison);
-  desc.StencilPassOp = D3D11FormatUtils::RHIToD3D11StencilOperation(sbd.Pass);
-  desc.StencilFailOp = D3D11FormatUtils::RHIToD3D11StencilOperation(sbd.Fail);
-  desc.StencilDepthFailOp = D3D11FormatUtils::RHIToD3D11StencilOperation(sbd.DepthFail);
-
-  return desc;
 }
 
 ID3D11RasterizerState* D3D11ResourceCache::GetRasterizerState(const RHIRasterizerStateDescription& description, bool multisample)

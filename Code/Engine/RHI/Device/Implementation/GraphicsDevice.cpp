@@ -59,54 +59,21 @@ void RHIGraphicsDevice::ValidateUpdateTextureParameters(RHITexture* texture, ezU
 }
 
 
-ezEnum<RHIGraphicsBackend> RHIGraphicsDevice::GetBackendType() const
-{
-  return BackendType;
-}
-
-bool RHIGraphicsDevice::GetIsUvOriginTopLeft() const
-{
-  return IsUvOriginTopLeft;
-}
-
-bool RHIGraphicsDevice::GetIsDepthRangeZeroToOne() const
-{
-  return IsDepthRangeZeroToOne;
-}
-
-bool RHIGraphicsDevice::IsClipSpaceYInverted() const
-{
-  return IsDepthRangeZeroToOne;
-}
-
-RHIResourceFactory* RHIGraphicsDevice::GetResourceFactory() const
-{
-  return ResourceFactory;
-}
-
-RHISwapchain* RHIGraphicsDevice::GetMainSwapchain() const
-{
-  return MainSwapchain;
-}
-
-const RHIGraphicsDeviceFeatures& RHIGraphicsDevice::GetFeatures() const
-{
-  return Features;
-}
-
 bool RHIGraphicsDevice::GetSyncToVerticalBlank() const
 {
-  return SyncToVerticalBlank;
+  if (GetMainSwapchain() != nullptr)
+    return GetMainSwapchain()->GetSyncToVerticalBlank();
+  return false;
 }
 
 void RHIGraphicsDevice::SetSyncToVerticalBlank(bool value)
 {
-  if (MainSwapchain == nullptr)
+  if (GetMainSwapchain() == nullptr)
   {
     EZ_REPORT_FAILURE("This GraphicsDevice was created without a main Swapchain. This property cannot be set.");
   }
 
-  SyncToVerticalBlank = value;
+  GetMainSwapchain()->SetSyncToVerticalBlank(value);
 }
 
 ezUInt32 RHIGraphicsDevice::GetUniformBufferMinOffsetAlignment() const
@@ -162,12 +129,12 @@ void RHIGraphicsDevice::ResetFence(RHIFence* fence)
 
 void RHIGraphicsDevice::SwapBuffers()
 {
-  if (MainSwapchain == nullptr)
+  if (GetMainSwapchain() == nullptr)
   {
     EZ_REPORT_FAILURE("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
   }
 
-  SwapBuffers(MainSwapchain);
+  SwapBuffers(GetMainSwapchain());
 }
 
 void RHIGraphicsDevice::SwapBuffers(RHISwapchain* swapchain)
@@ -177,9 +144,9 @@ void RHIGraphicsDevice::SwapBuffers(RHISwapchain* swapchain)
 
 RHIFramebuffer* RHIGraphicsDevice::GetSwapchainFramebuffer() const
 {
-  if (MainSwapchain != nullptr)
+  if (GetMainSwapchain() != nullptr)
   {
-    return MainSwapchain->GetFramebuffer();
+    return GetMainSwapchain()->GetFramebuffer();
   }
 
   return nullptr;
@@ -187,12 +154,12 @@ RHIFramebuffer* RHIGraphicsDevice::GetSwapchainFramebuffer() const
 
 void RHIGraphicsDevice::ResizeMainWindow(ezUInt32 width, ezUInt32 height)
 {
-  if (MainSwapchain == nullptr)
+  if (GetMainSwapchain() == nullptr)
   {
     EZ_REPORT_FAILURE("This GraphicsDevice was created without a main Swapchain, so the requested operation cannot be performed.");
   }
 
-  MainSwapchain->Resize(width, height);
+  GetMainSwapchain()->Resize(width, height);
 }
 
 void RHIGraphicsDevice::WaitForIdle()
@@ -286,7 +253,7 @@ RHISampler* RHIGraphicsDevice::GetLinearSampler() const
 
 RHISampler* RHIGraphicsDevice::GetAniso4xSampler()
 {
-  if (!Features.SamplerAnisotropySupported())
+  if (!GetFeatures().SamplerAnisotropySupported())
   {
     EZ_REPORT_FAILURE("GraphicsDevice.Aniso4xSampler cannot be used unless GraphicsDeviceFeatures.SamplerAnisotropy is supported.");
   }
@@ -296,10 +263,10 @@ RHISampler* RHIGraphicsDevice::GetAniso4xSampler()
 
 void RHIGraphicsDevice::PostDeviceCreated()
 {
-  PointSampler = ResourceFactory->CreateSampler(RHISamplerDescription::Point);
-  LinearSampler = ResourceFactory->CreateSampler(RHISamplerDescription::Linear);
-  if (Features.SamplerAnisotropySupported())
+  PointSampler = GetResourceFactory()->CreateSampler(RHISamplerDescription::Point);
+  LinearSampler = GetResourceFactory()->CreateSampler(RHISamplerDescription::Linear);
+  if (GetFeatures().SamplerAnisotropySupported())
   {
-    Aniso4xSampler = ResourceFactory->CreateSampler(RHISamplerDescription::Aniso4x);
+    Aniso4xSampler = GetResourceFactory()->CreateSampler(RHISamplerDescription::Aniso4x);
   }
 }

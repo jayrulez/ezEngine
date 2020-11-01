@@ -1,5 +1,6 @@
 #include <RHI/Backends/D3D11/D3D11Texture.h>
 #include <RHI/Backends/D3D11/D3D11TextureView.h>
+#include <d3d11_1.h>
 
 ezString D3D11Texture::GetName() const
 {
@@ -241,4 +242,9 @@ RHITextureView* D3D11Texture::CreateFullTextureView(RHIGraphicsDevice* graphicsD
   EZ_ASSERT_ALWAYS(graphicsDevice != nullptr, "");
 
   return new D3D11TextureView(d3d11GD, desc);
+}
+
+void D3D11Texture::DisposeCore()
+{
+  DeviceTexture->Release();
 }

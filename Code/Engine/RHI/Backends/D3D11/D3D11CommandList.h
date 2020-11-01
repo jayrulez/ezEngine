@@ -23,15 +23,17 @@ struct ID3D11GeometryShader;
 struct ID3D11HullShader;
 struct ID3D11DomainShader;
 struct ID3D11PixelShader;
-
+struct ID3D11Resource;
 
 struct RawRect
 {
   EZ_DECLARE_POD_TYPE();
   ezUInt32 left;
   ezUInt32 top;
+  ezUInt32 front;
   ezUInt32 right;
   ezUInt32 bottom;
+  ezUInt32 back;
 };
 
 class D3D11TextureView;
@@ -259,7 +261,7 @@ private:
   void UpdateSubresource_Workaround(
     ID3D11Resource* resource,
     int subresource,
-    D3D11_BOX region,
+    RawRect region,
     ezUInt8* data);
 
 

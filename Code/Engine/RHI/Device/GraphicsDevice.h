@@ -26,42 +26,42 @@ public:
   /// <summary>
   /// Gets a value identifying the specific graphics API used by this instance.
   /// </summary>
-  ezEnum<RHIGraphicsBackend> GetBackendType() const;
+  virtual ezEnum<RHIGraphicsBackend> GetBackendType() const = 0;
 
   /// <summary>
   /// Gets a value identifying whether texture coordinates begin in the top left corner of a Texture.
   /// If true, (0, 0) refers to the top-left texel of a Texture. If false, (0, 0) refers to the bottom-left
   /// texel of a Texture. This property is useful for determining how the output of a Framebuffer should be sampled.
   /// </summary>
-  bool GetIsUvOriginTopLeft() const;
+  virtual bool GetIsUvOriginTopLeft() const = 0;
 
   /// <summary>
   /// Gets a value indicating whether this device's depth values range from 0 to 1.
   /// If false, depth values instead range from -1 to 1.
   /// </summary>
-  bool GetIsDepthRangeZeroToOne() const;
+  virtual bool GetIsDepthRangeZeroToOne() const = 0;
 
   /// <summary>
   /// Gets a value indicating whether this device's clip space Y values increase from top (-1) to bottom (1).
   /// If false, clip space Y values instead increase from bottom (-1) to top (1).
   /// </summary>
-  bool IsClipSpaceYInverted() const;
+  virtual bool IsClipSpaceYInverted() const = 0;
 
   /// <summary>
   /// Gets the <see cref="ResourceFactory"/> controlled by this instance.
   /// </summary>
-  RHIResourceFactory* GetResourceFactory() const;
+  virtual RHIResourceFactory* GetResourceFactory() const = 0;
 
   /// <summary>
   /// Retrieves the main Swapchain for this device. This property is only valid if the device was created with a main
   /// Swapchain, and will return null otherwise.
   /// </summary>
-  RHISwapchain* GetMainSwapchain() const;
+  virtual RHISwapchain* GetMainSwapchain() const = 0;
 
   /// <summary>
   /// Gets a <see cref="GraphicsDeviceFeatures"/> which enumerates the optional features supported by this instance.
   /// </summary>
-  const RHIGraphicsDeviceFeatures& GetFeatures() const;
+  virtual const RHIGraphicsDeviceFeatures& GetFeatures() const = 0;
 
   /// <summary>
   /// Gets whether the main Swapchain's <see cref="SwapBuffers()"/> should be synchronized to the window system's
@@ -538,13 +538,6 @@ private:
     ezUInt32 mipLevel, ezUInt32 arrayLayer);
 
 private:
-  ezEnum<RHIGraphicsBackend> BackendType;
-  bool IsUvOriginTopLeft;
-  bool IsDepthRangeZeroToOne;
-  RHIResourceFactory* ResourceFactory;
-  RHISwapchain* MainSwapchain;
-  RHIGraphicsDeviceFeatures Features;
-  bool SyncToVerticalBlank;
   RHISampler* PointSampler;
   RHISampler* LinearSampler;
   RHISampler* Aniso4xSampler;
