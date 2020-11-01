@@ -31,7 +31,7 @@ public:
 
   ezEnum<RHIGraphicsBackend> GetBackendType() const override
   {
-    return BackendType;
+    return RHIGraphicsBackend::Direct3D11;
   }
 
   bool GetIsUvOriginTopLeft() const override { return true; }
@@ -52,7 +52,14 @@ public:
   bool SupportsCommandLists() const { return _supportsCommandLists; }
   bool SupportsConcurrentResources() const { return _supportsConcurrentResources; }
 
-  private:
+protected:
+  virtual void ResetFenceCore(RHIFence* fence) override { Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Reset(); }
+  virtual ezUInt32 GetUniformBufferMinOffsetAlignmentCore() const override { return 256u; }
+  virtual ezUInt32 GetStructuredBufferMinOffsetAlignmentCore() const override { return 16u; }
+  virtual void WaitForIdleCore() override {}
+  virtual void DisposeCore() override;
+
+private:
   ezResult InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device* device, ID3D11DeviceContext* immediateContext, ezUInt32 flags);
 
 private:
@@ -60,9 +67,9 @@ private:
   RHIGraphicsDeviceFeatures Features;
   IDXGIAdapter* DXGIAdapter = nullptr;
   ID3D11Device* Device = nullptr;
-  ID3D11DeviceContext* ImmediateContext;
-  D3D11ResourceFactory* ResourceFactory;
-  D3D11Swapchain* MainSwapchain;
+  ID3D11DeviceContext* ImmediateContext = nullptr;
+  D3D11ResourceFactory* ResourceFactory = nullptr;
+  D3D11Swapchain* MainSwapchain = nullptr;
   bool _supportsConcurrentResources;
   ezMutex ImmediateContextMutex;
   ezUInt32 FeatureLevel;
@@ -71,6 +78,5 @@ private:
   ezHashTable<RHIMappedResourceCacheKey, RHIMappedResourceInfo> MappedResources;
 
   ezMutex StagingResourceMutex;
-  ezDynamicArray<D3D11DeviceBuffer> AvailableStagingBuffers;
-  ezEnum<RHIGraphicsBackend> BackendType = RHIGraphicsBackend::Direct3D11;
+  ezDynamicArray<D3D11DeviceBuffer*> AvailableStagingBuffers;
 };

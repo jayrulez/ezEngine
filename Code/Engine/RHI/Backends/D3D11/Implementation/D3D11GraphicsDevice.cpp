@@ -98,6 +98,27 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(const RHID3D11DeviceOptions& options, c
   PostDeviceCreated();
 }
 
+void D3D11GraphicsDevice::DisposeCore()
+{
+  for (RHIBuffer* buffer : AvailableStagingBuffers)
+  {
+    buffer->Dispose();
+  }
+  AvailableStagingBuffers.Clear();
+
+  ResourceFactory->Dispose();
+
+  if (MainSwapchain != nullptr)
+    MainSwapchain->Dispose();
+
+  ImmediateContext->Release();
+
+  // TODO: Check Veldrid PlatformDispose to clean up debug stuff
+
+  Device->Release();
+  DXGIAdapter->Release();
+}
+
 ezResult D3D11GraphicsDevice::InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device* device, ID3D11DeviceContext* immediateContext, ezUInt32 flags)
 {
   D3D_FEATURE_LEVEL FeatureLevels[] = {D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0, D3D_FEATURE_LEVEL_9_3};
