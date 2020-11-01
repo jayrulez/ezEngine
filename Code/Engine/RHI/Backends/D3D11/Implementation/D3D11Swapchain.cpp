@@ -171,7 +171,7 @@ void D3D11Swapchain::RemoveCommandListReference(D3D11CommandList* cl)
     dxgiSCDesc.BufferDesc.Width = description.Width;
     dxgiSCDesc.BufferDesc.Height = description.Height;
     dxgiSCDesc.BufferDesc.Format = ColorFormat;
-    dxgiSCDesc.OutputWindow = (HWND)win32Source->Hwnd;
+    dxgiSCDesc.OutputWindow = (HWND)win32Source->GetHwnd();
     dxgiSCDesc.SampleDesc = {
       1, // Count
       0  // Quality
@@ -185,7 +185,7 @@ void D3D11Swapchain::RemoveCommandListReference(D3D11CommandList* cl)
       HRESULT hr = GraphicsDevice->GetAdapter()->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(&dxgiFactory));
 
       hr = dxgiFactory->CreateSwapChain(GraphicsDevice->GetDevice(), &dxgiSCDesc, &DXGISwapChain);
-      dxgiFactory->MakeWindowAssociation((HWND)win32Source->Hwnd, DXGI_MWA_NO_ALT_ENTER);
+      dxgiFactory->MakeWindowAssociation((HWND)win32Source->GetHwnd(), DXGI_MWA_NO_ALT_ENTER);
     }
   }
   // TODO: uwp

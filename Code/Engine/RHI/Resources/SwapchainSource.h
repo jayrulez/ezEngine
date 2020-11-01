@@ -28,16 +28,31 @@ struct EZ_RHI_DLL RHISwapchainSource
 
 struct RHIWin32SwapchainSource : public RHISwapchainSource
 {
-  ezMinWindows::HWND Hwnd = nullptr;
-  ezMinWindows::HINSTANCE Hinstance = nullptr;
+public:
+  ezMinWindows::HWND GetHwnd() const
+  {
+    return Hwnd;
+  }
 
-  RHIWin32SwapchainSource() {}
+  ezMinWindows::HINSTANCE GetHinstance() const
+  {
+    return Hinstance;
+  }
+
+  RHIWin32SwapchainSource()
+    : RHIWin32SwapchainSource(nullptr, nullptr)
+  {
+  }
 
   RHIWin32SwapchainSource(ezMinWindows::HWND hwnd, ezMinWindows::HINSTANCE hinstance)
   {
     Hwnd = hwnd;
     Hinstance = hinstance;
   }
+
+private:
+  ezMinWindows::HWND Hwnd = nullptr;
+  ezMinWindows::HINSTANCE Hinstance = nullptr;
 };
 #endif
 

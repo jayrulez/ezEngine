@@ -124,13 +124,57 @@ struct EZ_RHI_DLL RHISpecializationConstant : public ezHashableStruct<RHISpecial
   }
 
   template <typename T>
+  T GetValue() const
+  {
+    ezUInt8* dataPtr = (ezUInt8*)&Data;
+    ezUInt32 size = GetSpecializationConstantSize(Type);
+
+    ezUInt8* outDataPtr = new ezUInt8[size];
+
+    std::memcpy(outDataPtr, dataPtr, size);
+
+    T value = (T)(*reinterpret_cast<T*>(outDataPtr));
+
+    return value;
+  }
+
+  template <typename T>
   static ezUInt64 Store(T value)
   {
     ezUInt64 data;
 
-    data = static_cast<ezUInt64>(value);
+    void* dataPtr = reinterpret_cast<void*>(&data);
+    std::memcpy(dataPtr, &value, sizeof(T));
 
     return data;
+  }
+
+  static ezUInt32 GetSpecializationConstantSize(ezEnum<RHIShaderConstantType> type)
+  {
+    switch (type)
+    {
+      case RHIShaderConstantType::Bool:
+        return 4;
+      case RHIShaderConstantType::UInt16:
+        return 2;
+      case RHIShaderConstantType::Int16:
+        return 2;
+      case RHIShaderConstantType::UInt32:
+        return 4;
+      case RHIShaderConstantType::Int32:
+        return 4;
+      case RHIShaderConstantType::UInt64:
+        return 8;
+      case RHIShaderConstantType::Int64:
+        return 8;
+      case RHIShaderConstantType::Float:
+        return 4;
+      case RHIShaderConstantType::Double:
+        return 8;
+      default:
+        EZ_REPORT_FAILURE("Invalid specialization constant type.");
+        return 0;
+    }
   }
 
   /// <summary>
