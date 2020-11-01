@@ -29,7 +29,7 @@ public:
   /// <returns>The subresource index.</returns>
   ezUInt32 CalculateSubresourceIndex(ezUInt32 mipLevel, ezUInt32 arrayLayer) const
   {
-    return arrayLayer * GetMipLevels() * mipLevel;
+    return arrayLayer * GetMipLevels() + mipLevel;
   }
 
   /// <summary>
@@ -79,11 +79,25 @@ public:
   /// </summary>
   virtual ezEnum<RHITextureSampleCount> GetSampleCount() const = 0;
 
-  RHITextureView* GetFullTextureView(RHIGraphicsDevice* graphicsDevice);
+  virtual void Dispose() override
+  {
+    ezLock lock(_fullTextureViewLock);
+    if (_fullTextureView != nullptr)
+    {
+      _fullTextureView->Dispose();
+      _fullTextureView = nullptr;
+    }
+
+    DisposeCore();
+  }
+
 
 
 protected:
+  RHITextureView* GetFullTextureView(RHIGraphicsDevice* graphicsDevice);
   virtual RHITextureView* CreateFullTextureView(RHIGraphicsDevice* graphicsDevice);
+
+  virtual void DisposeCore() = 0;
 
 private:
   ezMutex _fullTextureViewLock;

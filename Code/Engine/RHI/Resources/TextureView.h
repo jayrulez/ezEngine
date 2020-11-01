@@ -14,11 +14,6 @@
 class EZ_RHI_DLL RHITextureView : public RHIResource
 {
 public:
-  RHITextureView()
-  {
-    Flags.Add(RHIResourceFlags::Bindable);
-  }
-
   /// <summary>
   /// The target <see cref="Texture"/> object to be sampled via this instance.
   /// </summary>
@@ -27,22 +22,22 @@ public:
   /// <summary>
   /// The base mip level visible in the view.
   /// </summary>
-  unsigned int GetBaseMipLevel() const { return BaseMipLevel; }
+  ezUInt32 GetBaseMipLevel() const { return BaseMipLevel; }
 
   /// <summary>
   /// The number of mip levels visible in the view.
   /// </summary>
-  unsigned int GetMipLevels() const { return MipLevels; }
+  ezUInt32 GetMipLevels() const { return MipLevels; }
 
   /// <summary>
   /// The base array layer visible in the view.
   /// </summary>
-  unsigned int GetBaseArrayLayer() const { return BaseArrayLayer; }
+  ezUInt32 GetBaseArrayLayer() const { return BaseArrayLayer; }
 
   /// <summary>
   /// The number of array layers visible in the view.
   /// </summary>
-  unsigned int GetArrayLayers() const { return ArrayLayers; }
+  ezUInt32 GetArrayLayers() const { return ArrayLayers; }
 
   /// <summary>
   /// The format used to interpret the contents of the target Texture. This may be different from the target Texture's
@@ -51,7 +46,12 @@ public:
   ezEnum<RHIPixelFormat> GetFormat() const { return Format; }
 
 protected:
+  RHITextureView()
+  {
+    Flags.Add(RHIResourceFlags::Bindable);
+  }
   RHITextureView(const RHITextureViewDescription& description)
+    : RHITextureView()
   {
     Target = description.Target;
     BaseMipLevel = description.BaseMipLevel;
