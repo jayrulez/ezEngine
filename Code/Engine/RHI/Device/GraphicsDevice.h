@@ -3,174 +3,19 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <RHI/Resources/Swapchain.h>
+#include <RHI/Descriptors/SamplerDescription.h>
+#include <RHI/Resources/Buffer.h>
 #include <RHI/Resources/CommandList.h>
 #include <RHI/Resources/Fence.h>
-#include <RHI/Resources/Buffer.h>
 #include <RHI/Resources/MappedResource.h>
 #include <RHI/Resources/MappedResourceView.h>
 #include <RHI/Resources/Sampler.h>
-#include <RHI/Descriptors/SamplerDescription.h>
+#include <RHI/Resources/Swapchain.h>
 
 #include <RHI/Resources/ResourceFactory.h>
 
-#include <optional>
+#include <RHI/Device/GraphicsDeviceOptions.h>
 
-
-/// <summary>
-/// A structure describing several common properties of a GraphicsDevice.
-/// </summary>
-struct EZ_RHI_DLL RHIGraphicsDeviceOptions
-{
-  /// <summary>
-  /// Indicates whether the GraphicsDevice will support debug features, provided they are supported by the host system.
-  /// </summary>
-  bool Debug = false;
-
-  /// <summary>
-  /// Indicates whether the Graphicsdevice will include a "main" Swapchain. If this value is true, then the GraphicsDevice
-  /// must be created with one of the overloads that provides Swapchain source information.
-  /// </summary>
-  bool HasMainSwapchain = false;
-
-  /// <summary>
-  /// An optional <see cref="PixelFormat"/> to be used for the depth buffer of the swapchain. If this value is null, then
-  /// no depth buffer will be present on the swapchain.
-  /// </summary>
-  std::optional<ezEnum<RHIPixelFormat>> SwapchainDepthFormat;
-
-  /// <summary>
-  /// Indicates whether the main Swapchain will be synchronized to the window system's vertical refresh rate.
-  /// </summary>
-  bool SyncToVerticalBlank = false;
-
-  /// <summary>
-  /// Specifies which model the rendering backend should use for binding resources. This can be overridden per-pipeline
-  /// by specifying a value in <see cref="GraphicsPipelineDescription.ResourceBindingModel"/>.
-  /// </summary>
-  ezEnum<RHIResourceBindingModel> ResourceBindingModel;
-
-  /// <summary>
-  /// Indicates whether a 0-to-1 depth range mapping is preferred. For OpenGL, this is not the default, and is not available
-  /// on all systems.
-  /// </summary>
-  bool PreferDepthRangeZeroToOne = false;
-
-  /// <summary>
-  /// Indicates whether a bottom-to-top-increasing clip space Y direction is preferred. For Vulkan, this is not the
-  /// default, and may not be available on all systems.
-  /// </summary>
-  bool PreferStandardClipSpaceYDirection = false;
-
-  /// <summary>
-  /// Indicates whether the main Swapchain should use an sRGB format. This value is only used in cases where the properties
-  /// of the main SwapChain are not explicitly specified with a <see cref="SwapchainDescription"/>. If they are, then the
-  /// value of <see cref="SwapchainDescription.ColorSrgb"/> will supercede the value specified here.
-  /// </summary>
-  bool SwapchainSrgbFormat = false;
-
-  /// <summary>
-  /// Constructs a new GraphicsDeviceOptions for a device with no main Swapchain.
-  /// </summary>
-  /// <param name="debug">Indicates whether the GraphicsDevice will support debug features, provided they are supported by
-  /// the host system.</param>
-  RHIGraphicsDeviceOptions(bool debug);
-
-  /// <summary>
-  /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
-  /// </summary>
-  /// <param name="debug">Indicates whether the GraphicsDevice will enable debug features, provided they are supported by
-  /// the host system.</param>
-  /// <param name="swapchainDepthFormat">An optional <see cref="PixelFormat"/> to be used for the depth buffer of the
-  /// swapchain. If this value is null, then no depth buffer will be present on the swapchain.</param>
-  /// <param name="syncToVerticalBlank">Indicates whether the main Swapchain will be synchronized to the window system's
-  /// vertical refresh rate.</param>
-  RHIGraphicsDeviceOptions(bool debug, std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat, bool syncToVerticalBlank);
-
-  /// <summary>
-  /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
-  /// </summary>
-  /// <param name="debug">Indicates whether the GraphicsDevice will enable debug features, provided they are supported by
-  /// the host system.</param>
-  /// <param name="swapchainDepthFormat">An optional <see cref="PixelFormat"/> to be used for the depth buffer of the
-  /// swapchain. If this value is null, then no depth buffer will be present on the swapchain.</param>
-  /// <param name="syncToVerticalBlank">Indicates whether the main Swapchain will be synchronized to the window system's
-  /// vertical refresh rate.</param>
-  /// <param name="resourceBindingModel">Specifies which model the rendering backend should use for binding resources.</param>
-  RHIGraphicsDeviceOptions(
-    bool debug,
-    std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat,
-    bool syncToVerticalBlank,
-    ezEnum<RHIResourceBindingModel> resourceBindingModel);
-
-  /// <summary>
-  /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
-  /// </summary>
-  /// <param name="debug">Indicates whether the GraphicsDevice will enable debug features, provided they are supported by
-  /// the host system.</param>
-  /// <param name="swapchainDepthFormat">An optional <see cref="PixelFormat"/> to be used for the depth buffer of the
-  /// swapchain. If this value is null, then no depth buffer will be present on the swapchain.</param>
-  /// <param name="syncToVerticalBlank">Indicates whether the main Swapchain will be synchronized to the window system's
-  /// vertical refresh rate.</param>
-  /// <param name="resourceBindingModel">Specifies which model the rendering backend should use for binding resources.</param>
-  /// <param name="preferDepthRangeZeroToOne">Indicates whether a 0-to-1 depth range mapping is preferred. For OpenGL,
-  /// this is not the default, and is not available on all systems.</param>
-  RHIGraphicsDeviceOptions(
-    bool debug,
-    std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat,
-    bool syncToVerticalBlank,
-    ezEnum<RHIResourceBindingModel> resourceBindingModel,
-    bool preferDepthRangeZeroToOne);
-
-  /// <summary>
-  /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
-  /// </summary>
-  /// <param name="debug">Indicates whether the GraphicsDevice will enable debug features, provided they are supported by
-  /// the host system.</param>
-  /// <param name="swapchainDepthFormat">An optional <see cref="PixelFormat"/> to be used for the depth buffer of the
-  /// swapchain. If this value is null, then no depth buffer will be present on the swapchain.</param>
-  /// <param name="syncToVerticalBlank">Indicates whether the main Swapchain will be synchronized to the window system's
-  /// vertical refresh rate.</param>
-  /// <param name="resourceBindingModel">Specifies which model the rendering backend should use for binding resources.</param>
-  /// <param name="preferDepthRangeZeroToOne">Indicates whether a 0-to-1 depth range mapping is preferred. For OpenGL,
-  /// this is not the default, and is not available on all systems.</param>
-  /// <param name="preferStandardClipSpaceYDirection">Indicates whether a bottom-to-top-increasing clip space Y direction
-  /// is preferred. For Vulkan, this is not the default, and is not available on all systems.</param>
-  RHIGraphicsDeviceOptions(
-    bool debug,
-    std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat,
-    bool syncToVerticalBlank,
-    ezEnum<RHIResourceBindingModel> resourceBindingModel,
-    bool preferDepthRangeZeroToOne,
-    bool preferStandardClipSpaceYDirection);
-
-  /// <summary>
-  /// Constructs a new GraphicsDeviceOptions for a device with a main Swapchain.
-  /// </summary>
-  /// <param name="debug">Indicates whether the GraphicsDevice will enable debug features, provided they are supported by
-  /// the host system.</param>
-  /// <param name="swapchainDepthFormat">An optional <see cref="PixelFormat"/> to be used for the depth buffer of the
-  /// swapchain. If this value is null, then no depth buffer will be present on the swapchain.</param>
-  /// <param name="syncToVerticalBlank">Indicates whether the main Swapchain will be synchronized to the window system's
-  /// vertical refresh rate.</param>
-  /// <param name="resourceBindingModel">Specifies which model the rendering backend should use for binding resources.</param>
-  /// <param name="preferDepthRangeZeroToOne">Indicates whether a 0-to-1 depth range mapping is preferred. For OpenGL,
-  /// this is not the default, and is not available on all systems.</param>
-  /// <param name="preferStandardClipSpaceYDirection">Indicates whether a bottom-to-top-increasing clip space Y direction
-  /// is preferred. For Vulkan, this is not the default, and is not available on all systems.</param>
-  /// <param name="swapchainSrgbFormat">Indicates whether the main Swapchain should use an sRGB format. This value is only
-  /// used in cases where the properties of the main SwapChain are not explicitly specified with a
-  /// <see cref="SwapchainDescription"/>. If they are, then the value of <see cref="SwapchainDescription.ColorSrgb"/> will
-  /// supercede the value specified here.</param>
-  RHIGraphicsDeviceOptions(
-    bool debug,
-    std::optional<ezEnum<RHIPixelFormat>> swapchainDepthFormat,
-    bool syncToVerticalBlank,
-    ezEnum<RHIResourceBindingModel> resourceBindingModel,
-    bool preferDepthRangeZeroToOne,
-    bool preferStandardClipSpaceYDirection,
-    bool swapchainSrgbFormat);
-};
 
 /// <summary>
 /// Represents an abstract graphics device, capable of creating device resources and executing commands.
@@ -382,7 +227,10 @@ public:
   /// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
   template <typename T>
-  RHIMappedResourceView<T> Map(RHIResource* resource, ezEnum<RHIMapMode> mode);
+  RHIMappedResourceView<T> Map(RHIResource* resource, ezEnum<RHIMapMode> mode)
+  {
+    Map<T>(resource, mode, 0);
+  }
 
   /// <summary>
   /// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
@@ -394,7 +242,11 @@ public:
   /// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
   /// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
   template <typename T>
-  RHIMappedResourceView<T> Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource);
+  RHIMappedResourceView<T> Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
+  {
+    RHIMappedResource* mappedResource = Map(resource, mode, subresource);
+    return RHIMappedResourceView<T>(mappedResource);
+  }
 
   /// <summary>
   /// Invalidates a previously-mapped data region for the given <see cref="DeviceBuffer"/> or <see cref="Texture"/>.
@@ -437,6 +289,8 @@ public:
     ezUInt32 width, ezUInt32 height, ezUInt32 depth,
     ezUInt32 mipLevel, ezUInt32 arrayLayer);
 
+  ///////////////////////////UPDATE BUFFER////////////////////////////////////
+
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
   /// This function must be used with a blittable value type <typeparamref name="T"/>.
@@ -447,7 +301,14 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">The value to upload.</param>
   template <typename T>
-  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source);
+  void UpdateBuffer(
+    RHIBuffer* buffer,
+    ezUInt32 bufferOffset,
+    T source)
+  {
+    ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+    UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+  }
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -459,7 +320,14 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the single value to upload.</param>
   template <typename T>
-  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source);
+  void UpdateBuffer(
+    RHIBuffer* buffer,
+    ezUInt32 bufferOffset,
+    const T& source)
+  {
+    ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+    UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+  }
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -476,7 +344,11 @@ public:
     RHIBuffer* buffer,
     ezUInt32 bufferOffset,
     const T& source,
-    ezUInt32 size);
+    ezUInt32 size)
+  {
+    ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+    UpdateBuffer(buffer, bufferOffset, ptr, size);
+  }
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -487,11 +359,32 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">An array containing the data to upload.</param>
-  template <typename T>
+  //template <typename T>
+  //void UpdateBuffer(
+  //  RHIBuffer* buffer,
+  //  ezUInt32 bufferOffset,
+  //  T[] source)
+  //{
+  //  UpdateBuffer(buffer, bufferOffset, (ReadOnlySpan<T>)source);
+  //}
+
+  /// <summary>
+  /// Updates a <see cref="DeviceBuffer"/> region with new data.
+  /// This function must be used with a blittable value type <typeparamref name="T"/>.
+  /// </summary>
+  /// <typeparam name="T">The type of data to upload.</typeparam>
+  /// <param name="buffer">The resource to update.</param>
+  /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
+  /// which new data will be uploaded.</param>
+  /// <param name="source">A readonly span containing the data to upload.</param>
+  template <typename T, typename TDerived>
   void UpdateBuffer(
     RHIBuffer* buffer,
     ezUInt32 bufferOffset,
-    ezDynamicArray<T> source);
+    ezArrayBase<T, TDerived> source)
+  {
+    UpdateBuffer(buffer, bufferOffset, source.GetByteArrayPtr().GetPtr(), (ezUInt32)(sizeof(T) * source.GetCount()));
+  }
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -500,13 +393,21 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">A pointer to the start of the data to upload.</param>
-  /// <param name="size">The total size of the uploaded data, in bytes.</param>
-  template <typename T>
+  /// <param name="sizeInBytes">The total size of the uploaded data, in bytes.</param>
   void UpdateBuffer(
     RHIBuffer* buffer,
     ezUInt32 bufferOffset,
     ezUInt8* source,
-    ezUInt32 size);
+    ezUInt32 size)
+  {
+    if (bufferOffset + size > buffer->GetSize())
+    {
+      EZ_REPORT_FAILURE("The data size given to UpdateBuffer is too large. The given buffer can only hold {} total bytes. The requested update would require {} bytes.", buffer->GetSize(), (bufferOffset + size));
+    }
+    UpdateBufferCore(buffer, bufferOffset, source, size);
+  }
+
+  ///////////////////////////END UPDATE BU////////////////////////////////////
 
   /// <summary>
   /// Gets whether or not the given <see cref="PixelFormat"/>, <see cref="TextureType"/>, and <see cref="TextureUsage"/>
@@ -538,6 +439,18 @@ public:
     ezEnum<RHITextureUsage> usage,
     RHIPixelFormatProperties& properties);
 
+  // <summary>
+  /// Adds the given object to a deferred disposal list, which will be processed when this GraphicsDevice becomes idle.
+  /// This method can be used to safely dispose a device resource which may be in use at the time this method is called,
+  /// but which will no longer be in use when the device is idle.
+  /// </summary>
+  /// <param name="disposable">An object to dispose when this instance becomes idle.</param>
+  void DisposeWhenIdle(RHIResource* disposable)
+  {
+    ezLock lock(DeferredDisposalLock);
+    DisposableResources.PushBack(disposable);
+  }
+
   /// <summary>
   /// Gets a simple point-filtered <see cref="Sampler"/> object owned by this instance.
   /// This object is created with <see cref="SamplerDescription.Point"/>.
@@ -556,6 +469,19 @@ public:
   /// This property can only be used when <see cref="GraphicsDeviceFeatures.SamplerAnisotropy"/> is supported.
   /// </summary>
   RHISampler* GetAniso4xSampler();
+
+  /// <summary>
+  /// Frees unmanaged resources controlled by this device.
+  /// All created child resources must be Disposed prior to calling this method.
+  /// </summary>
+  void Dispose()
+  {
+    WaitForIdle();
+    PointSampler->Dispose();
+    LinearSampler->Dispose();
+    Aniso4xSampler->Dispose();
+    DisposeCore();
+  }
 
 protected:
   /// <summary>
@@ -588,8 +514,22 @@ protected:
     ezEnum<RHITextureType> type,
     ezEnum<RHITextureUsage> usage,
     RHIPixelFormatProperties& properties) = 0;
+  /// <summary>
+  /// Performs API-specific disposal of resources controlled by this instance.
+  /// </summary>
+  virtual void DisposeCore() = 0;
 
 private:
+  void FlushDeferredDisposals()
+  {
+    ezLock lock(DeferredDisposalLock);
+    for (RHIResource* disposable : DisposableResources)
+    {
+      disposable->Dispose();
+    }
+    DisposableResources.Clear();
+  }
+
   static void ValidateUpdateTextureParameters(
     RHITexture* texture,
     ezUInt32 size,
@@ -608,129 +548,6 @@ private:
   RHISampler* PointSampler;
   RHISampler* LinearSampler;
   RHISampler* Aniso4xSampler;
+  ezDynamicArray<RHIResource*> DisposableResources;
+  ezMutex DeferredDisposalLock;
 };
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// </summary>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A pointer to the start of the data to upload.</param>
-/// <param name="size">The total size of the uploaded data, in bytes.</param>
-
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">An array containing the data to upload.</param>
-
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A reference to the first of a series of values to upload.</param>
-/// <param name="size">The total size of the uploaded data, in bytes.</param>
-
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">A reference to the single value to upload.</param>
-
-
-/// <summary>
-/// Updates a <see cref="DeviceBuffer"/> region with new data.
-/// This function must be used with a blittable value type <typeparamref name="T"/>.
-/// </summary>
-/// <typeparam name="T">The type of data to upload.</typeparam>
-/// <param name="buffer">The resource to update.</param>
-/// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/> storage, at
-/// which new data will be uploaded.</param>
-/// <param name="source">The value to upload.</param>
-
-
-/// <summary>
-/// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
-/// view over that region.
-/// </summary>
-/// <param name="resource">The <see cref="DeviceBuffer"/> or <see cref="Texture"/> resource to map.</param>
-/// <param name="mode">The <see cref="MapMode"/> to use.</param>
-/// <param name="subresource">The subresource to map. Subresources are indexed first by mip slice, then by array layer.</param>
-/// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
-/// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
-
-
-/// <summary>
-/// Maps a <see cref="DeviceBuffer"/> or <see cref="Texture"/> into a CPU-accessible data region, and returns a structured
-/// view over that region. For Texture resources, this overload maps the first subresource.
-/// </summary>
-/// <param name="resource">The <see cref="DeviceBuffer"/> or <see cref="Texture"/> resource to map.</param>
-/// <param name="mode">The <see cref="MapMode"/> to use.</param>
-/// <typeparam name="T">The blittable value type which mapped data is viewed as.</typeparam>
-/// <returns>A <see cref="MappedResource"/> structure describing the mapped data region.</returns>
-
-template <typename T>
-RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIResource* resource, ezEnum<RHIMapMode> mode)
-{
-  Map<T>(resource, mode, 0);
-}
-
-template <typename T>
-RHIMappedResourceView<T> RHIGraphicsDevice::Map(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)
-{
-  RHIMappedResource* mappedResource = Map(resource, mode, subresource);
-  return RHIMappedResourceView<T>(mappedResource);
-}
-
-template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source)
-{
-  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-}
-
-template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source)
-{
-  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-}
-
-template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size)
-{
-  //ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-  //UpdateBuffer(buffer, bufferOffset, ptr, size);
-}
-
-template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, ezDynamicArray<T> source)
-{
-  UpdateBuffer(buffer, bufferOffset, source.GetPtr(), source.GetCount());
-}
-
-template <typename T>
-void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size)
-{
-  if (bufferOffset + size > buffer.SizeInBytes)
-  {
-    EZ_REPORT_FAILURE("The data size given to UpdateBuffer is too large. The given buffer can only hold {} total bytes. The requested update would require {} bytes.", buffer->GetSize(), (bufferOffset + size));
-  }
-  UpdateBufferCore(buffer, bufferOffset, source, size);
-}

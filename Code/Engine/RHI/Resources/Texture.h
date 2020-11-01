@@ -4,6 +4,7 @@
 #include <RHI/RHIPCH.h>
 
 #include <RHI/Resources/Resource.h>
+#include <RHI/Util.h>
 
 class RHITextureView;
 class RHIGraphicsDevice;
@@ -79,22 +80,15 @@ public:
   /// </summary>
   virtual ezEnum<RHITextureSampleCount> GetSampleCount() const = 0;
 
-  virtual void Dispose() override
-  {
-    ezLock lock(_fullTextureViewLock);
-    if (_fullTextureView != nullptr)
-    {
-      _fullTextureView->Dispose();
-      _fullTextureView = nullptr;
-    }
+  virtual void Dispose() override;
 
-    DisposeCore();
-  }
-
-
+  // TODO: Make this protected and expose it via derived classes.
+  RHITextureView* GetFullTextureView(RHIGraphicsDevice* graphicsDevice);
 
 protected:
-  RHITextureView* GetFullTextureView(RHIGraphicsDevice* graphicsDevice);
+  friend class RHICommandList;
+  friend RHITextureView* Util::GetTextureView(RHIGraphicsDevice* gd, RHIResource* resource);
+
   virtual RHITextureView* CreateFullTextureView(RHIGraphicsDevice* graphicsDevice);
 
   virtual void DisposeCore() = 0;

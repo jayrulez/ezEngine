@@ -71,5 +71,12 @@ public:
 
   D3D11Texture(ID3D11Texture2D* existingTexture, ezEnum<RHITextureType> type, ezEnum<RHIPixelFormat> format);
 
-  RHITextureView* CreateFullTextureView(RHIGraphicsDevice* graphicsDevice);
+protected:
+  virtual RHITextureView* CreateFullTextureView(RHIGraphicsDevice* graphicsDevice) override;
+
+private:
+  void DisposeCore() override
+  {
+    DeviceTexture->Release();
+  }
 };

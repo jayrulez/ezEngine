@@ -284,17 +284,14 @@ RHIShader* RHIResourceFactory::CreateShader(const RHIShaderDescription& descript
   if (!Features.ComputeShaderSupported() && description.Stage == RHIShaderStages::Compute)
   {
     EZ_REPORT_FAILURE("GraphicsDevice does not support Compute Shaders.");
-    return;
   }
   if (!Features.GeometryShaderSupported() && description.Stage == RHIShaderStages::Geometry)
   {
     EZ_REPORT_FAILURE("GraphicsDevice does not support Compute Shaders.");
-    return;
   }
   if (!Features.TessellationShadersSupported() && (description.Stage == RHIShaderStages::TessellationControl || description.Stage == RHIShaderStages::TessellationEvaluation))
   {
     EZ_REPORT_FAILURE("GraphicsDevice does not support Tessellation Shaders.");
-    return;
   }
 #endif
   return CreateShaderCore(description);

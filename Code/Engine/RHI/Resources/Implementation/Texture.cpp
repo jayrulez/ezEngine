@@ -1,5 +1,18 @@
 #include <RHI/Resources/Texture.h>
+#include <RHI/Resources/TextureView.h>
 #include <RHI/Device/GraphicsDevice.h>
+
+void RHITexture::Dispose()
+{
+  ezLock lock(_fullTextureViewLock);
+  if (_fullTextureView != nullptr)
+  {
+    _fullTextureView->Dispose();
+    _fullTextureView = nullptr;
+  }
+
+  DisposeCore();
+}
 
 RHITextureView* RHITexture::GetFullTextureView(RHIGraphicsDevice* graphicsDevice)
 {
