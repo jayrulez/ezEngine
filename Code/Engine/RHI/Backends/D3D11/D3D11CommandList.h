@@ -224,6 +224,7 @@ public:
   void Reset();
 
 private:
+  friend class D3D11GraphicsDevice;
   D3D11Framebuffer* GetD3D11Framebuffer() const;
 
   void ClearState();

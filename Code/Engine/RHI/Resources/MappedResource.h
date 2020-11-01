@@ -70,7 +70,8 @@ public:
     return DepthPitch;
   }
 
-protected:
+  //TODO: should not be public
+//protected:
   RHIMappedResource(
     RHIResource* resource,
     ezEnum<RHIMapMode> mode,

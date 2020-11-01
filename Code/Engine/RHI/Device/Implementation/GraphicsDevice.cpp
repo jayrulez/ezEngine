@@ -230,13 +230,13 @@ void RHIGraphicsDevice::UpdateTexture(RHITexture* texture, ezUInt8* source, ezUI
   UpdateTextureCore(texture, source, size, x, y, z, width, height, depth, mipLevel, arrayLayer);
 }
 
-bool RHIGraphicsDevice::GetPixelFormatSupport(ezEnum<RHIPixelFormat> format, ezEnum<RHITextureType> type, ezEnum<RHITextureUsage> usage)
+bool RHIGraphicsDevice::GetPixelFormatSupport(ezEnum<RHIPixelFormat> format, ezEnum<RHITextureType> type, ezBitflags<RHITextureUsage> usage)
 {
   RHIPixelFormatProperties properties;
   return GetPixelFormatSupportCore(format, type, usage, properties);
 }
 
-bool RHIGraphicsDevice::GetPixelFormatSupport(ezEnum<RHIPixelFormat> format, ezEnum<RHITextureType> type, ezEnum<RHITextureUsage> usage, RHIPixelFormatProperties& properties)
+bool RHIGraphicsDevice::GetPixelFormatSupport(ezEnum<RHIPixelFormat> format, ezEnum<RHITextureType> type, ezBitflags<RHITextureUsage> usage, RHIPixelFormatProperties& properties)
 {
   return GetPixelFormatSupportCore(format, type, usage, properties);
 }

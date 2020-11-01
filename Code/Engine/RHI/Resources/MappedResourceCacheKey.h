@@ -38,3 +38,11 @@ private:
   RHIResource* Resource = nullptr;
   ezUInt32 Subresource = 0;
 };
+
+template <>
+struct ezHashHelper<RHIMappedResourceCacheKey>
+{
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIMappedResourceCacheKey& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+
+  EZ_ALWAYS_INLINE static bool Equal(const RHIMappedResourceCacheKey& a, const RHIMappedResourceCacheKey& b) { return a == b; }
+};

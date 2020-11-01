@@ -420,7 +420,7 @@ public:
   bool GetPixelFormatSupport(
     ezEnum<RHIPixelFormat> format,
     ezEnum<RHITextureType> type,
-    ezEnum<RHITextureUsage> usage);
+    ezBitflags<RHITextureUsage> usage);
 
   /// <summary>
   /// Gets whether or not the given <see cref="PixelFormat"/>, <see cref="TextureType"/>, and <see cref="TextureUsage"/>
@@ -436,7 +436,7 @@ public:
   bool GetPixelFormatSupport(
     ezEnum<RHIPixelFormat> format,
     ezEnum<RHITextureType> type,
-    ezEnum<RHITextureUsage> usage,
+    ezBitflags<RHITextureUsage> usage,
     RHIPixelFormatProperties& properties);
 
   // <summary>
@@ -512,7 +512,7 @@ protected:
   virtual bool GetPixelFormatSupportCore(
     ezEnum<RHIPixelFormat> format,
     ezEnum<RHITextureType> type,
-    ezEnum<RHITextureUsage> usage,
+    ezBitflags<RHITextureUsage> usage,
     RHIPixelFormatProperties& properties) = 0;
   /// <summary>
   /// Performs API-specific disposal of resources controlled by this instance.

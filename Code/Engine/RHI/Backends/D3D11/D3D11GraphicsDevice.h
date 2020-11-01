@@ -53,14 +53,34 @@ public:
   bool SupportsConcurrentResources() const { return _supportsConcurrentResources; }
 
 protected:
-  virtual void ResetFenceCore(RHIFence* fence) override { Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Reset(); }
   virtual ezUInt32 GetUniformBufferMinOffsetAlignmentCore() const override { return 256u; }
   virtual ezUInt32 GetStructuredBufferMinOffsetAlignmentCore() const override { return 16u; }
+  virtual void SubmitCommandsCore(RHICommandList* commandList, RHIFence* fence) override;
+  virtual void ResetFenceCore(RHIFence* fence) override { Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Reset(); }
+  virtual void SwapBuffersCore(RHISwapchain* swapchain) override;
   virtual void WaitForIdleCore() override {}
+
+  virtual RHIMappedResource* MapCore(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource) override;
+  virtual void UnmapCore(RHIResource* resource, ezUInt32 subresource) override;
+  virtual void UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size) override;
   virtual void DisposeCore() override;
+  virtual ezEnum<RHITextureSampleCount> GetSampleCountLimit(ezEnum<RHIPixelFormat> format, bool depthFormat) override;
+  virtual bool GetPixelFormatSupportCore(
+    ezEnum<RHIPixelFormat> format,
+    ezEnum<RHITextureType> type,
+    ezBitflags<RHITextureUsage> usage,
+    RHIPixelFormatProperties& properties) override;
 
 private:
   ezResult InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device* device, ID3D11DeviceContext* immediateContext, ezUInt32 flags);
+  bool CheckFormatMultisample(DXGI_FORMAT format, ezUInt32 sampleCount);
+  D3D11DeviceBuffer* GetFreeStagingBuffer(ezUInt32 size);
+
+  ezUInt32 CalculateMipSize(ezUInt32 mipLevel, ezUInt32 baseSize)
+  {
+    baseSize = baseSize >> mipLevel;
+    return baseSize > 0u ? baseSize : 1u;
+  }
 
 private:
   bool _supportsCommandLists;
