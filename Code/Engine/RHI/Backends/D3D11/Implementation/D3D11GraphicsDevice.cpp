@@ -119,6 +119,44 @@ void D3D11GraphicsDevice::SubmitCommandsCore(RHICommandList* commandList, RHIFen
   }
 }
 
+bool D3D11GraphicsDevice::WaitForFenceCore(RHIFence* fence, ezUInt64 nanosecondTimeout)
+{
+  return Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Wait(nanosecondTimeout);
+}
+
+bool D3D11GraphicsDevice::WaitForFencesCore(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout)
+{
+  //ezUInt32 msTimeout = (ezUInt32)(nanosecondTimeout / 1000000);
+  //ezDynamicArray<ezThreadSignal> events;
+  //{
+  //  ezLock lock(ResetEventsMutex);
+  //  events = ResetEvents;
+  //  ResetEvents.Clear();
+  //}
+
+  //for (ezUInt32 i = 0; i < fences.GetCount(); i++)
+  //{
+  //  events.PushBack(Util::AssertSubtype<RHIFence, D3D11Fence>(fences[i])->GetResetSignal());
+  //  //events[i] = Util::AssertSubtype<RHIFence, D3D11Fence>(fences[i])->GetResetSignal();
+  //}
+  //bool result;
+  //if (waitAll)
+  //{
+  //  result = WaitHandle.WaitAll(events, msTimeout);
+  //}
+  //else
+  //{
+  //  int index = WaitHandle.WaitAny(events, msTimeout);
+  //  result = index != WaitHandle.WaitTimeout;
+  //}
+
+  //ReturnResetEventArray(events);
+
+  //return result;
+
+  return true;
+}
+
 void D3D11GraphicsDevice::SwapBuffersCore(RHISwapchain* swapchain)
 {
   ezLock lock(ImmediateContextMutex);
@@ -235,6 +273,59 @@ void D3D11GraphicsDevice::UnmapCore(RHIResource* resource, ezUInt32 subresource)
         bool result = MappedResources.Remove(key);
         EZ_ASSERT_DEBUG(result, "Failed to removed maped resource entry.");
       }
+    }
+  }
+}
+
+void D3D11GraphicsDevice::UpdateTextureCore(RHITexture* texture, ezUInt8* source, ezUInt32 size, ezUInt32 x, ezUInt32 y, ezUInt32 z, ezUInt32 width, ezUInt32 height, ezUInt32 depth, ezUInt32 mipLevel, ezUInt32 arrayLayer)
+{
+  D3D11Texture* d3dTex = Util::AssertSubtype<RHITexture, D3D11Texture>(texture);
+  bool useMap = (texture->GetUsage() & RHITextureUsage::Staging) == RHITextureUsage::Staging;
+  if (useMap)
+  {
+    ezUInt32 subresource = texture->CalculateSubresourceIndex(mipLevel, arrayLayer);
+    RHIMappedResourceCacheKey key = RHIMappedResourceCacheKey(texture, subresource);
+    RHIMappedResource* map = MapCore(texture, RHIMapMode::Write, subresource);
+
+    ezUInt32 denseRowSize = FormatHelpers::GetRowPitch(width, texture->GetFormat());
+    ezUInt32 denseSliceSize = FormatHelpers::GetDepthPitch(denseRowSize, height, texture->GetFormat());
+
+    Util::CopyTextureRegion(
+      source,
+      0, 0, 0,
+      denseRowSize, denseSliceSize,
+      map->GetData(),
+      x, y, z,
+      map->GetRowPitch(), map->GetDepthPitch(),
+      width, height, depth,
+      texture->GetFormat());
+
+    UnmapCore(texture, subresource);
+  }
+  else
+  {
+    ezUInt32 subresource = D3D11Util::ComputeSubresource(mipLevel, texture->GetMipLevels(), arrayLayer);
+    D3D11_BOX resourceRegion = {
+      x,
+      (x + width),
+      y,
+      z,
+      (y + height),
+      (z + depth),
+    };
+
+    ezUInt32 srcRowPitch = FormatHelpers::GetRowPitch(width, texture->GetFormat());
+    ezUInt32 srcDepthPitch = FormatHelpers::GetDepthPitch(srcRowPitch, height, texture->GetFormat());
+
+    {
+      ezLock lock(ImmediateContextMutex);
+      ImmediateContext->UpdateSubresource(
+        d3dTex->GetDeviceTexture(),
+        subresource,
+        &resourceRegion,
+        source,
+        srcRowPitch,
+        srcDepthPitch);
     }
   }
 }

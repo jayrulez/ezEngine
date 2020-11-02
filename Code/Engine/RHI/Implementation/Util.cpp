@@ -82,4 +82,37 @@ namespace Util
       return nullptr;
     }
   }
+  void CopyTextureRegion(void* src, ezUInt32 srcX, ezUInt32 srcY, ezUInt32 srcZ, ezUInt32 srcRowPitch, ezUInt32 srcDepthPitch, void* dst, ezUInt32 dstX, ezUInt32 dstY, ezUInt32 dstZ, ezUInt32 dstRowPitch, ezUInt32 dstDepthPitch, ezUInt32 width, ezUInt32 height, ezUInt32 depth, ezEnum<RHIPixelFormat> format)
+  {
+    ezUInt32 blockSize = FormatHelpers::IsCompressedFormat(format) ? 4u : 1u;
+    ezUInt32 blockSizeInBytes = blockSize > 1 ? FormatHelpers::GetBlockSize(format) : FormatHelpers::GetSize(format);
+    ezUInt32 compressedSrcX = srcX / blockSize;
+    ezUInt32 compressedSrcY = srcY / blockSize;
+    ezUInt32 compressedDstX = dstX / blockSize;
+    ezUInt32 compressedDstY = dstY / blockSize;
+    ezUInt32 numRows = FormatHelpers::GetNumRows(height, format);
+    ezUInt32 rowSize = width / blockSize * blockSizeInBytes;
+
+    if (srcRowPitch == dstRowPitch && srcDepthPitch == dstDepthPitch)
+    {
+      //ezUInt32 totalCopySize = depth * srcDepthPitch;
+      //ezMemoryUtils::Copy(
+      //  src,
+      //  dst,
+      //  //totalCopySize,
+      //  totalCopySize);
+    }
+    else
+    {
+      for (ezUInt32 zz = 0; zz < depth; zz++)
+        for (ezUInt32 yy = 0; yy < numRows; yy++)
+        {
+          ezUInt8* rowCopyDst = (ezUInt8*)dst + dstDepthPitch * (zz + dstZ) + dstRowPitch * (yy + compressedDstY) + blockSizeInBytes * compressedDstX;
+
+          ezUInt8* rowCopySrc = (ezUInt8*)src + srcDepthPitch * (zz + srcZ) + srcRowPitch * (yy + compressedSrcY) + blockSizeInBytes * compressedSrcX;
+
+          ezMemoryUtils::Copy(rowCopyDst, rowCopySrc, rowSize);
+        }
+    }
+  }
 }

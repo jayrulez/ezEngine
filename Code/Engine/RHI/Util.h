@@ -3,6 +3,8 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
+#include <RHI/FormatHelpers.h>
+
 class RHIResource;
 class RHITexture;
 class RHITextureView;
@@ -80,5 +82,19 @@ namespace Util
   bool GetDeviceBuffer(RHIResource* resource, RHIBuffer* buffer);
 
   RHITextureView* GetTextureView(RHIGraphicsDevice* gd, RHIResource* resource);
+
+  void CopyTextureRegion(
+    void* src,
+    ezUInt32 srcX, ezUInt32 srcY, ezUInt32 srcZ,
+    ezUInt32 srcRowPitch,
+    ezUInt32 srcDepthPitch,
+    void* dst,
+    ezUInt32 dstX, ezUInt32 dstY, ezUInt32 dstZ,
+    ezUInt32 dstRowPitch,
+    ezUInt32 dstDepthPitch,
+    ezUInt32 width,
+    ezUInt32 height,
+    ezUInt32 depth,
+    ezEnum<RHIPixelFormat> format);
 
 } // namespace Util

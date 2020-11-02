@@ -56,12 +56,21 @@ protected:
   virtual ezUInt32 GetUniformBufferMinOffsetAlignmentCore() const override { return 256u; }
   virtual ezUInt32 GetStructuredBufferMinOffsetAlignmentCore() const override { return 16u; }
   virtual void SubmitCommandsCore(RHICommandList* commandList, RHIFence* fence) override;
+  virtual bool WaitForFenceCore(RHIFence* fence, ezUInt64 nanosecondTimeout) override;
+  virtual bool WaitForFencesCore(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout) override;
   virtual void ResetFenceCore(RHIFence* fence) override { Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Reset(); }
   virtual void SwapBuffersCore(RHISwapchain* swapchain) override;
   virtual void WaitForIdleCore() override {}
 
   virtual RHIMappedResource* MapCore(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource) override;
   virtual void UnmapCore(RHIResource* resource, ezUInt32 subresource) override;
+  virtual void UpdateTextureCore(
+    RHITexture* texture,
+    ezUInt8* source,
+    ezUInt32 size,
+    ezUInt32 x, ezUInt32 y, ezUInt32 z,
+    ezUInt32 width, ezUInt32 height, ezUInt32 depth,
+    ezUInt32 mipLevel, ezUInt32 arrayLayer) override;
   virtual void UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size) override;
   virtual void DisposeCore() override;
   virtual ezEnum<RHITextureSampleCount> GetSampleCountLimit(ezEnum<RHIPixelFormat> format, bool depthFormat) override;
@@ -99,4 +108,6 @@ private:
 
   ezMutex StagingResourceMutex;
   ezDynamicArray<D3D11DeviceBuffer*> AvailableStagingBuffers;
+  ezDynamicArray<ezThreadSignal> ResetEvents;
+  ezMutex ResetEventsMutex;
 };
