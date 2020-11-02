@@ -2,14 +2,15 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
+#include <RHI/Graphics.h>
 #include <memory>
 
 namespace wiGraphics
 {
 	typedef uint8_t CommandList;
-	static const CommandList COMMANDLIST_COUNT = 16;
+	static const CommandList COMMANDLIST_COUNT = 32;
 
-	class GraphicsDevice
+	class EZ_RHI_DLL GraphicsDevice
 	{
 	protected:
 		uint64_t FRAMECOUNT = 0;

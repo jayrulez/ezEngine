@@ -18,7 +18,7 @@
 namespace wiGraphics
 {
 
-	class GraphicsDevice_DX11 : public GraphicsDevice
+	class EZ_RHI_DLL GraphicsDevice_DX11 : public GraphicsDevice
 	{
 	private:
 		D3D_DRIVER_TYPE driverType;

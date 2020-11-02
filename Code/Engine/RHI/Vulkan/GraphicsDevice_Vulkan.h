@@ -17,7 +17,7 @@
 #define VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan.h>
 
-#include "Utility/vk_mem_alloc.h"
+#include <RHI/Utility/vk_mem_alloc.h>
 
 #include <vector>
 #include <unordered_map>
@@ -25,6 +25,8 @@
 #include <atomic>
 #include <mutex>
 #include <algorithm>
+
+#include <RHI/RHIInternal.h>
 
 namespace wiGraphics
 {
@@ -41,7 +43,7 @@ namespace wiGraphics
 		}
 	};
 
-	class GraphicsDevice_Vulkan : public GraphicsDevice
+	class EZ_RHI_DLL GraphicsDevice_Vulkan : public GraphicsDevice
 	{
 		friend struct DescriptorTableFrameAllocator;
 	private:

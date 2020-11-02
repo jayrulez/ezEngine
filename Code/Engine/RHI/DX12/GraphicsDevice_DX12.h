@@ -20,10 +20,11 @@
 #include <atomic>
 #include <mutex>
 
+#include <RHI/RHIInternal.h>
 
 namespace wiGraphics
 {
-	class GraphicsDevice_DX12 : public GraphicsDevice
+  class EZ_RHI_DLL GraphicsDevice_DX12 : public GraphicsDevice
 	{
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Device5> device;
