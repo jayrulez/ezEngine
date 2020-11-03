@@ -24,17 +24,11 @@ struct ID3D11HullShader;
 struct ID3D11DomainShader;
 struct ID3D11PixelShader;
 struct ID3D11Resource;
+struct D3D11_BOX;
 
-struct RawRect
-{
-  EZ_DECLARE_POD_TYPE();
-  ezUInt32 left;
-  ezUInt32 top;
-  ezUInt32 front;
-  ezUInt32 right;
-  ezUInt32 bottom;
-  ezUInt32 back;
-};
+EZ_DEFINE_AS_POD_TYPE(D3D11_VIEWPORT);
+EZ_DEFINE_AS_POD_TYPE(D3D11_BOX);
+EZ_DEFINE_AS_POD_TYPE(RECT);
 
 class D3D11TextureView;
 class D3D11Sampler;
@@ -48,18 +42,31 @@ class D3D11CommandList : public RHICommandList
 private:
   struct D3D11BufferRange : public ezHashableStruct<D3D11BufferRange>
   {
-    D3D11DeviceBuffer* Buffer;
-    ezUInt32 Offset;
-    ezUInt32 Size;
+    D3D11DeviceBuffer* GetBuffer() const { return Buffer; }
+    ezUInt32 GetOffset() const { return Offset; }
+    ezUInt32 GetSize() const { return Size; }
 
-    bool IsFullRange();
+    bool IsFullRange() const
+    {
+      return Offset == 0 && Size == Buffer->GetSize();
+    }
 
-    D3D11BufferRange(D3D11DeviceBuffer* buffer, ezUInt32 offset, ezUInt32 size);
+    D3D11BufferRange(D3D11DeviceBuffer* buffer, ezUInt32 offset, ezUInt32 size)
+    {
+      Buffer = buffer;
+      Offset = offset;
+      Size = size;
+    }
 
     bool operator==(const D3D11BufferRange& other) const
     {
       return Buffer == other.Buffer && Offset == other.Offset && Size == other.Size;
     }
+
+  private:
+    D3D11DeviceBuffer* Buffer;
+    ezUInt32 Offset;
+    ezUInt32 Size;
   };
 
   struct BoundTextureInfo
@@ -69,7 +76,12 @@ private:
     ezUInt32 ResourceSet = 0;
 
     BoundTextureInfo() = default;
-    BoundTextureInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezUInt32 resourceSet);
+    BoundTextureInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezUInt32 resourceSet)
+    {
+      Slot = slot;
+      Stages = stages;
+      ResourceSet = resourceSet;
+    }
 
     bool operator==(const BoundTextureInfo& other) const
     {
@@ -77,85 +89,17 @@ private:
     }
   };
 
-private:
-  D3D11GraphicsDevice* GraphicsDevice = nullptr;
-  ID3D11DeviceContext* Context = nullptr;
-  ID3D11DeviceContext1* Context1 = nullptr;
-  ID3DUserDefinedAnnotation* UDA = nullptr;
-  bool Begun = false;
-  ID3D11CommandList* CommandList = nullptr;
-
-  ezDynamicArray<RHIViewport> Viewports; // = new Vortice.Mathematics.Viewport[0];
-  ezDynamicArray<RawRect> Scissors;
-  bool ViewportsChanged = false;
-  bool ScissorRectsChanged = false;
-
-  ezUInt32 NumVertexBindings = 0;
-  ezStaticArray<ID3D11Buffer*, 1> VertexBindings;
-  ezDynamicArray<ezUInt32> VertexStrides;
-  ezStaticArray<ezUInt32, 1> VertexOffsets;
-
-  // Cached pipeline State
-  RHIBuffer* _ib = nullptr;
-  ezUInt32 _ibOffset = 0;
-  ID3D11BlendState* BlendState = nullptr;
-  ID3D11DepthStencilState* DepthStencilState = nullptr;
-  ezUInt32 StencilReference = 0;
-  ID3D11RasterizerState* RasterizerState = nullptr;
-  D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
-  ID3D11InputLayout* InputLayout = nullptr;
-  ID3D11VertexShader* VertexShader = nullptr;
-  ID3D11GeometryShader* GeometryShader = nullptr;
-  ID3D11HullShader* HullShader = nullptr;
-  ID3D11DomainShader* DomainShader = nullptr;
-  ID3D11PixelShader* PixelShader = nullptr;
-
-  D3D11Pipeline* GraphicsPipeline = nullptr;
-  ezHybridArray<RHIBoundResourceSetInfo, 1> GraphicsResourceSets;
-  // Resource sets are invalidated when a new resource set is bound with an incompatible SRV or UAV.
-  ezHybridArray<bool, 1> InvalidatedGraphicsResourceSets;
-
-  D3D11Pipeline* ComputePipeline = nullptr;
-  ezHybridArray<RHIBoundResourceSetInfo, 1> ComputeResourceSets;
-  // Resource sets are invalidated when a new resource set is bound with an incompatible SRV or UAV.
-  ezStaticArray<bool, 1> InvalidatedComputeResourceSets;
-  bool VertexBindingsChanged = false;
-  ezStaticArray<ID3D11Buffer*, 1> CBOut;
-  ezStaticArray<ezUInt32, 1> FirstConstRef;
-  ezStaticArray<ezUInt32, 1> NumConstsRef;
-
-  // Cached resources
-  static constexpr ezUInt32 MaxCachedUniformBuffers = 15;
-  ezStaticArray<D3D11BufferRange*, MaxCachedUniformBuffers> VertexBoundUniformBuffers;
-  ezStaticArray<D3D11BufferRange*, MaxCachedUniformBuffers> FragmentBoundUniformBuffers;
-  static constexpr ezUInt32 MaxCachedTextureViews = 16;
-  ezStaticArray<D3D11TextureView*, MaxCachedTextureViews> VertexBoundTextureViews;
-  ezStaticArray<D3D11TextureView*, MaxCachedTextureViews> FragmentBoundTextureViews;
-  static constexpr ezUInt32 MaxCachedSamplers = 4;
-  ezStaticArray<D3D11Sampler*, MaxCachedSamplers> VertexBoundSamplers;
-  ezStaticArray<D3D11Sampler*, MaxCachedSamplers> FragmentBoundSamplers;
-
-  ezHashTable<RHITexture*, ezDynamicArray<BoundTextureInfo>> BoundSRVs;
-  ezHashTable<RHITexture*, ezDynamicArray<BoundTextureInfo>> BoundUAVs;
-  ezHybridArray<ezDynamicArray<BoundTextureInfo>, 20> BoundTextureInfoPool;
-
-  static constexpr ezUInt32 MaxUAVs = 8;
-  ezHybridArray<std::tuple<RHIBuffer*, int>, MaxUAVs> BoundComputeUAVBuffers;
-  ezHybridArray<std::tuple<RHIBuffer*, int>, MaxUAVs> BoundOMUAVBuffers;
-
-  ezDynamicArray<D3D11DeviceBuffer*> AvailableStagingBuffers;
-  ezDynamicArray<D3D11DeviceBuffer*> SubmittedStagingBuffers;
-
-  ezDynamicArray<D3D11Swapchain*> ReferencedSwapchains;
-
-  bool Disposed = false;
-  ezString Name;
-
 public:
-  virtual ezString GetName() const override;
+  virtual ezString GetName() const override
+  {
+    return Name;
+  }
 
   virtual void SetName(const ezString& name) override;
-  virtual bool IsDisposed() const override;
+  virtual bool IsDisposed() const override
+  {
+    return Disposed;
+  }
   virtual void Dispose() override;
 
 protected:
@@ -216,15 +160,21 @@ protected:
 public:
   D3D11CommandList(D3D11GraphicsDevice* graphicsDevice, const RHICommandListDescription& description);
 
-  ID3D11CommandList* GetDeviceCommandList() const;
-
-  //TODO: private friend
-  ID3D11DeviceContext* GetDeviceContext() const;
+  ID3D11CommandList* GetDeviceCommandList() const
+  {
+    return CommandList;
+  }
 
   void Reset();
 
 private:
   friend class D3D11GraphicsDevice;
+
+  ID3D11DeviceContext* GetDeviceContext() const
+  {
+    return Context;
+  }
+
   D3D11Framebuffer* GetD3D11Framebuffer() const;
 
   void ClearState();
@@ -251,7 +201,7 @@ private:
 
   void PackRangeParams(D3D11BufferRange* range);
 
-  void BindStorageBufferView(D3D11BufferRange* range, int slot, ezBitflags<RHIShaderStages> stages);
+  void BindStorageBufferView(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
 
   void BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
 
@@ -261,8 +211,8 @@ private:
 
   void UpdateSubresource_Workaround(
     ID3D11Resource* resource,
-    int subresource,
-    RawRect region,
+    ezUInt32 subresource,
+    D3D11_BOX region,
     ezUInt8* data);
 
 
@@ -288,10 +238,7 @@ private:
 
   void UnbindSRVTexture(RHITexture* target);
 
-  void PoolBoundTextureList(ezDynamicArray<BoundTextureInfo> btis)
-  {
-    BoundTextureInfoPool.PushBack(btis);
-  }
+  void PoolBoundTextureList(ezDynamicArray<BoundTextureInfo> btis);
 
 
   ezUInt32 GetConstantBufferBase(ezUInt32 slot, bool graphics);
@@ -301,4 +248,80 @@ private:
   ezUInt32 GetTextureBase(ezUInt32 slot, bool graphics);
 
   ezUInt32 GetSamplerBase(ezUInt32 slot, bool graphics);
+
+private:
+  D3D11GraphicsDevice* GraphicsDevice = nullptr;
+  ID3D11DeviceContext* Context = nullptr;
+  ID3D11DeviceContext1* Context1 = nullptr;
+  ID3DUserDefinedAnnotation* UDA = nullptr;
+  bool Begun = false;
+  ID3D11CommandList* CommandList = nullptr;
+
+  ezDynamicArray<D3D11_VIEWPORT> Viewports; // = new Vortice.Mathematics.Viewport[0];
+  ezDynamicArray<RECT> Scissors;
+  bool ViewportsChanged = false;
+  bool ScissorRectsChanged = false;
+
+  ezUInt32 NumVertexBindings = 0;
+  ezHybridArray<ID3D11Buffer*, 1> VertexBindings;
+  ezDynamicArray<ezUInt32> VertexStrides;
+  ezHybridArray<ezUInt32, 1> VertexOffsets;
+
+  // Cached pipeline State
+  RHIBuffer* _ib = nullptr;
+  ezUInt32 _ibOffset = 0;
+  ID3D11BlendState* BlendState = nullptr;
+  ID3D11DepthStencilState* DepthStencilState = nullptr;
+  ezUInt32 StencilReference = 0;
+  ID3D11RasterizerState* RasterizerState = nullptr;
+  D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+  ID3D11InputLayout* InputLayout = nullptr;
+  ID3D11VertexShader* VertexShader = nullptr;
+  ID3D11GeometryShader* GeometryShader = nullptr;
+  ID3D11HullShader* HullShader = nullptr;
+  ID3D11DomainShader* DomainShader = nullptr;
+  ID3D11PixelShader* PixelShader = nullptr;
+
+  D3D11Pipeline* GraphicsPipeline = nullptr;
+  ezHybridArray<RHIBoundResourceSetInfo, 1> GraphicsResourceSets;
+  // Resource sets are invalidated when a new resource set is bound with an incompatible SRV or UAV.
+  ezHybridArray<bool, 1> InvalidatedGraphicsResourceSets;
+
+  D3D11Pipeline* ComputePipeline = nullptr;
+  ezHybridArray<RHIBoundResourceSetInfo, 1> ComputeResourceSets;
+  // Resource sets are invalidated when a new resource set is bound with an incompatible SRV or UAV.
+  ezHybridArray<bool, 1> InvalidatedComputeResourceSets;
+  bool VertexBindingsChanged = false;
+  ezHybridArray<ID3D11Buffer*, 1> CBOut;
+  ezHybridArray<ezUInt32, 1> FirstConstRef;
+  ezHybridArray<ezUInt32, 1> NumConstsRef;
+
+  // Cached resources
+  static constexpr ezUInt32 MaxCachedUniformBuffers = 15;
+  ezStaticArray<D3D11BufferRange*, MaxCachedUniformBuffers> VertexBoundUniformBuffers;
+  ezStaticArray<D3D11BufferRange*, MaxCachedUniformBuffers> FragmentBoundUniformBuffers;
+  static constexpr ezUInt32 MaxCachedTextureViews = 16;
+  ezStaticArray<D3D11TextureView*, MaxCachedTextureViews> VertexBoundTextureViews;
+  ezStaticArray<D3D11TextureView*, MaxCachedTextureViews> FragmentBoundTextureViews;
+  static constexpr ezUInt32 MaxCachedSamplers = 4;
+  ezStaticArray<D3D11Sampler*, MaxCachedSamplers> VertexBoundSamplers;
+  ezStaticArray<D3D11Sampler*, MaxCachedSamplers> FragmentBoundSamplers;
+
+  ezHashTable<RHITexture*, ezDynamicArray<BoundTextureInfo>> BoundSRVs;
+  ezHashTable<RHITexture*, ezDynamicArray<BoundTextureInfo>> BoundUAVs;
+  ezHybridArray<ezDynamicArray<BoundTextureInfo>, 20> BoundTextureInfoPool;
+
+  // TODO: try not to use std::tuple
+  // Check if pair value should be ints or uints
+  static constexpr ezUInt32 MaxUAVs = 8;
+  ezHybridArray<std::tuple<RHIBuffer*, ezUInt32>, MaxUAVs> BoundComputeUAVBuffers;
+  ezHybridArray<std::tuple<RHIBuffer*, ezUInt32>, MaxUAVs> BoundOMUAVBuffers;
+
+  ezDynamicArray<D3D11DeviceBuffer*> AvailableStagingBuffers;
+  ezDynamicArray<D3D11DeviceBuffer*> SubmittedStagingBuffers;
+
+  ezDynamicArray<D3D11Swapchain*> ReferencedSwapchains;
+
+  bool Disposed = false;
+  ezString Name;
 };

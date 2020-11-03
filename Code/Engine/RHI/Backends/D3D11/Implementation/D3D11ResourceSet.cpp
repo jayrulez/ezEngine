@@ -29,7 +29,7 @@ D3D11ResourceSet::D3D11ResourceSet(const RHIResourceSetDescription& description)
   Resources.SetCountUninitialized(description.BoundResources.GetCount());
   Resources.GetArrayPtr().CopyFrom(description.BoundResources.GetArrayPtr());
 
-  Layout = reinterpret_cast<D3D11ResourceLayout*>(description.Layout);
+  Layout = Util::AssertSubtype<RHIResourceLayout, D3D11ResourceLayout>(description.Layout);
 }
 
 D3D11ResourceLayout* D3D11ResourceSet::GetLayout() const

@@ -52,7 +52,11 @@ struct D3D11RasterizerStateCacheKey : public ezHashableStruct<D3D11RasterizerSta
 
   D3D11RasterizerStateCacheKey() = default;
 
-  D3D11RasterizerStateCacheKey(const RHIRasterizerStateDescription& rhiDescription, bool multisampled);
+  D3D11RasterizerStateCacheKey(const RHIRasterizerStateDescription& rhiDescription, bool multisampled)
+  {
+    RHIDescription = rhiDescription;
+    Multisampled = multisampled;
+  }
 
   bool operator==(const D3D11RasterizerStateCacheKey& other) const
   {
@@ -74,25 +78,16 @@ private:
   struct SemanticIndices
   {
   private:
-    int _position = 0;
-    int _texCoord = 0;
-    int _normal = 0;
-    int _color = 0;
+    ezUInt32 Position = 0;
+    ezUInt32 TexCoord = 0;
+    ezUInt32 Normal = 0;
+    ezUInt32 Color = 0;
 
   public:
-    static int GetAndIncrement(SemanticIndices& si, ezEnum<RHIVertexElementSemantic> type);
+    static ezUInt32 GetAndIncrement(SemanticIndices& si, ezEnum<RHIVertexElementSemantic> type);
   };
 
 
-
-private:
-  ezMutex DeviceMutex;
-  ID3D11Device* Device = nullptr;
-
-  ezHashTable<RHIBlendStateDescription, ID3D11BlendState*> BlendStates;
-  ezHashTable<RHIDepthStencilStateDescription, ID3D11DepthStencilState*> DepthStencilStates;
-  ezHashTable<D3D11RasterizerStateCacheKey, ID3D11RasterizerState*> RasterizerStates;
-  ezHashTable<InputLayoutCacheKey, ID3D11InputLayout*> InputLayouts;
 
 public:
   D3D11ResourceCache(ID3D11Device* device);
@@ -124,7 +119,7 @@ private:
 
   ID3D11DepthStencilState* CreateNewDepthStencilState(const RHIDepthStencilStateDescription& description);
 
-  
+
 
   ID3D11RasterizerState* GetRasterizerState(const RHIRasterizerStateDescription& description, bool multisample);
 
@@ -137,6 +132,14 @@ private:
 
   ezString GetSemanticString(ezEnum<RHIVertexElementSemantic> semantic);
 
+
 private:
   bool Disposed = false;
+  ezMutex DeviceMutex;
+  ID3D11Device* Device = nullptr;
+
+  ezHashTable<RHIBlendStateDescription, ID3D11BlendState*> BlendStates;
+  ezHashTable<RHIDepthStencilStateDescription, ID3D11DepthStencilState*> DepthStencilStates;
+  ezHashTable<D3D11RasterizerStateCacheKey, ID3D11RasterizerState*> RasterizerStates;
+  ezHashTable<InputLayoutCacheKey, ID3D11InputLayout*> InputLayouts;
 };

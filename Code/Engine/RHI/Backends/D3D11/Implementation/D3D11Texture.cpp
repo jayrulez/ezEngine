@@ -138,7 +138,7 @@ D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& de
     optionFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
   }
 
-  int arraySize = (int)description.ArrayLayers;
+  ezUInt32 arraySize = description.ArrayLayers;
   if ((description.Usage & RHITextureUsage::Cubemap) == RHITextureUsage::Cubemap)
   {
     optionFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
@@ -161,10 +161,10 @@ D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& de
     desc1D.MipLevels = description.MipLevels;
     desc1D.ArraySize = arraySize;
     desc1D.Format = TypelessDxgiFormat;
-    desc1D.BindFlags = (D3D11_BIND_FLAG)bindFlags;
-    desc1D.CPUAccessFlags = (D3D11_CPU_ACCESS_FLAG)cpuFlags;
+    desc1D.BindFlags = bindFlags;
+    desc1D.CPUAccessFlags = cpuFlags;
     desc1D.Usage = (D3D11_USAGE)resourceUsage;
-    desc1D.MiscFlags = (D3D11_RESOURCE_MISC_FLAG)optionFlags;
+    desc1D.MiscFlags = optionFlags;
 
     HRESULT hr = device->CreateTexture1D(&desc1D, nullptr, reinterpret_cast<ID3D11Texture1D**>(&DeviceTexture));
   }
@@ -177,27 +177,27 @@ D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& de
     desc2D.MipLevels = description.MipLevels;
     desc2D.ArraySize = arraySize;
     desc2D.Format = TypelessDxgiFormat;
-    desc2D.BindFlags = (D3D11_BIND_FLAG)bindFlags;
-    desc2D.CPUAccessFlags = (D3D11_CPU_ACCESS_FLAG)cpuFlags;
+    desc2D.BindFlags = bindFlags;
+    desc2D.CPUAccessFlags = cpuFlags;
     desc2D.Usage = (D3D11_USAGE)resourceUsage;
 
     desc2D.SampleDesc.Count = FormatHelpers::GetSampleCount(SampleCount);
     desc2D.SampleDesc.Quality = 0;
 
-    desc2D.MiscFlags = (D3D11_RESOURCE_MISC_FLAG)optionFlags;
+    desc2D.MiscFlags = optionFlags;
 
     HRESULT hr = device->CreateTexture2D(&desc2D, nullptr, reinterpret_cast<ID3D11Texture2D**>(&DeviceTexture));
   }
   else
   {
-    EZ_ASSERT_ALWAYS(TextureType == RHITextureType::Texture3D, "");
+    EZ_ASSERT_ALWAYS(TextureType == RHITextureType::Texture3D, "TextureType must be RHITextureType::Texture3D");
 
     D3D11_TEXTURE3D_DESC desc3D;
 
     desc3D.Width = roundedWidth;
     desc3D.Height = roundedHeight;
-    desc3D.Depth = (int)description.Depth;
-    desc3D.MipLevels = (int)description.MipLevels;
+    desc3D.Depth = description.Depth;
+    desc3D.MipLevels = description.MipLevels;
     desc3D.Format = TypelessDxgiFormat;
     desc3D.BindFlags = bindFlags;
     desc3D.CPUAccessFlags = cpuFlags;

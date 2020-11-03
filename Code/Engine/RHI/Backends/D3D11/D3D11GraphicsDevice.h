@@ -58,7 +58,7 @@ protected:
   virtual void SubmitCommandsCore(RHICommandList* commandList, RHIFence* fence) override;
   virtual bool WaitForFenceCore(RHIFence* fence, ezUInt64 nanosecondTimeout) override;
   virtual bool WaitForFencesCore(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout) override;
-  virtual void ResetFenceCore(RHIFence* fence) override { Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Reset(); }
+  virtual void ResetFenceCore(RHIFence* fence) override;
   virtual void SwapBuffersCore(RHISwapchain* swapchain) override;
   virtual void WaitForIdleCore() override {}
 
@@ -91,8 +91,10 @@ private:
     return baseSize > 0u ? baseSize : 1u;
   }
 
+  ezDynamicArray<ezThreadSignal*> GetResetEventArray(ezUInt32 length);
+  void ReturnResetEventArray(ezDynamicArray<ezThreadSignal*> array);
+
 private:
-  bool _supportsCommandLists;
   RHIGraphicsDeviceFeatures Features;
   IDXGIAdapter* DXGIAdapter = nullptr;
   ID3D11Device* Device = nullptr;
@@ -100,14 +102,17 @@ private:
   D3D11ResourceFactory* ResourceFactory = nullptr;
   D3D11Swapchain* MainSwapchain = nullptr;
   bool _supportsConcurrentResources;
+  bool _supportsCommandLists;
   ezMutex ImmediateContextMutex;
-  ezUInt32 FeatureLevel;
 
   ezMutex MappedResourceMutex;
   ezHashTable<RHIMappedResourceCacheKey, RHIMappedResourceInfo> MappedResources;
 
   ezMutex StagingResourceMutex;
   ezDynamicArray<D3D11DeviceBuffer*> AvailableStagingBuffers;
-  ezDynamicArray<ezThreadSignal> ResetEvents;
+
+  ezDynamicArray<ezDynamicArray<ezThreadSignal*>> ResetEvents;
   ezMutex ResetEventsMutex;
+
+  ezUInt32 FeatureLevel;
 };

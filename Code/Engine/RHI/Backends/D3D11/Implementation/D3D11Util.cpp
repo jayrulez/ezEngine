@@ -3,9 +3,9 @@
 
 namespace D3D11Util
 {
-  int ComputeSubresource(ezUInt32 mipLevel, ezUInt32 mipLevelCount, ezUInt32 arrayLayer)
+  ezUInt32 ComputeSubresource(ezUInt32 mipLevel, ezUInt32 mipLevelCount, ezUInt32 arrayLayer)
   {
-    return (int)((arrayLayer * mipLevelCount) + mipLevel);
+    return (arrayLayer * mipLevelCount) + mipLevel;
   }
 
   D3D11_SHADER_RESOURCE_VIEW_DESC GetSrvDesc(
@@ -18,8 +18,7 @@ namespace D3D11Util
   {
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
-    srvDesc.Format = D3D11Formats::GetViewFormat(
-      D3D11Formats::ToDxgiFormat(format, (tex->GetUsage() & RHITextureUsage::DepthStencil) != 0));
+    srvDesc.Format = D3D11Formats::GetViewFormat(D3D11Formats::ToDxgiFormat(format, (tex->GetUsage() & RHITextureUsage::DepthStencil) != 0));
 
     if ((tex->GetUsage() & RHITextureUsage::Cubemap) == RHITextureUsage::Cubemap)
     {

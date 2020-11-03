@@ -24,10 +24,10 @@ void D3D11Framebuffer::Dispose()
     if (DepthStencilView)
     {
       DepthStencilView->Release();
-      for (ID3D11RenderTargetView* rtv : RenderTargetViews)
-      {
-        rtv->Release();
-      }
+    }
+    for (ID3D11RenderTargetView* rtv : RenderTargetViews)
+    {
+      rtv->Release();
     }
 
     Disposed = true;
@@ -54,7 +54,7 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
     D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     dsvDesc.Format = D3D11Formats::GetDepthFormat(d3dDepthTarget->GetFormat());
 
-    if (d3dDepthTarget->GetArrayLayers())
+    if (d3dDepthTarget->GetArrayLayers() == 1)
     {
       if (d3dDepthTarget->GetSampleCount() == RHITextureSampleCount::Count1)
       {
@@ -78,7 +78,7 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
       else
       {
         dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
-        dsvDesc.Texture2DMSArray.FirstArraySlice = (int)description.DepthTarget.value().ArrayLayer;
+        dsvDesc.Texture2DMSArray.FirstArraySlice = description.DepthTarget.value().ArrayLayer;
         dsvDesc.Texture2DMSArray.ArraySize = 1;
       }
     }

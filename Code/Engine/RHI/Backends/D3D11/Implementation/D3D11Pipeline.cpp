@@ -26,7 +26,6 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
   ezDynamicArray<RHIShader*> stages = description.ShaderSet.Shaders;
   for (ezUInt32 i = 0; i < description.ShaderSet.Shaders.GetCount(); i++)
   {
-
     //TODO: maybe reinterpret cast here instead of C-Style cast
     if (stages[i]->GetStage() == RHIShaderStages::Vertex)
     {
@@ -84,7 +83,7 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
   ResourceLayouts.SetCountUninitialized(genericLayouts.GetCount());
   for (ezUInt32 i = 0; i < ResourceLayouts.GetCount(); i++)
   {
-    ResourceLayouts[i] = reinterpret_cast<D3D11ResourceLayout*>(genericLayouts[i]);
+    ResourceLayouts[i] = Util::AssertSubtype<RHIResourceLayout, D3D11ResourceLayout>(genericLayouts[i]);
   }
 
   EZ_ASSERT_DEBUG(vsBytecode.GetCount() > 0 || ComputeShader != nullptr, "");
@@ -109,14 +108,12 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIComputePipeline
 {
   ComputePipeline = true;
 
-
-
   ComputeShader = (ID3D11ComputeShader*)(reinterpret_cast<D3D11Shader*>(description.ComputeShader))->GetDeviceShader();
   ezDynamicArray<RHIResourceLayout*> genericLayouts = description.ResourceLayouts;
   ResourceLayouts.SetCountUninitialized(genericLayouts.GetCount());
   for (ezUInt32 i = 0; i < ResourceLayouts.GetCount(); i++)
   {
-    ResourceLayouts[i] = reinterpret_cast<D3D11ResourceLayout*>(genericLayouts[i]);
+    ResourceLayouts[i] = Util::AssertSubtype<RHIResourceLayout, D3D11ResourceLayout>(genericLayouts[i]);
   }
 }
 

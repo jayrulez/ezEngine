@@ -18,6 +18,7 @@ private:
   ezDynamicArray<ID3D11RenderTargetView*> RenderTargetViews;
   ID3D11DepthStencilView* DepthStencilView = nullptr;
 
+  // Only non-null if this is the Framebuffer for a Swapchain.
   D3D11Swapchain* Swapchain = nullptr;
 
 private:
@@ -38,8 +39,9 @@ public:
 
   D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDescription& description);
 
-public:
-  //TODO: Make private and expost to friends
+protected:
+  friend class D3D11CommandList;
+  friend class D3D11Swapchain;
 
   D3D11Swapchain* GetSwapchain() const;
 

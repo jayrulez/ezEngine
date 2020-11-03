@@ -40,9 +40,9 @@ D3D11Fence::D3D11Fence(bool signaled)
   }
 }
 
-ezThreadSignal& D3D11Fence::GetResetSignal() const
+ezThreadSignal* D3D11Fence::GetResetSignal() const
 {
-  return *Signal;
+  return Signal;
 }
 
 void D3D11Fence::Set()
@@ -52,7 +52,5 @@ void D3D11Fence::Set()
 
 bool D3D11Fence::Wait(ezUInt64 nanosecondTimeout)
 {
-  ezUInt64 timeout = ezMath::Min(ezMath::MaxValue<ezUInt64>(), nanosecondTimeout / 1000000);
-
   return Signal->WaitForSignal(ezTime::Nanoseconds((double)nanosecondTimeout)) == ezThreadSignal::WaitResult::Signaled;
 }

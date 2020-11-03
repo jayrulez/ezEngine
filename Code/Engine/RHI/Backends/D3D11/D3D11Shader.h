@@ -18,7 +18,10 @@ private:
   ezString Name;
 
 public:
-  virtual ezString GetName() const override;
+  virtual ezString GetName() const override
+  {
+    return Name;
+  }
 
   virtual void SetName(const ezString& name) override;
   virtual bool IsDisposed() const override;
@@ -30,6 +33,18 @@ public:
 
   ezDynamicArray<ezUInt8> CompileCode(const RHIShaderDescription& description);
 
-  ID3D11DeviceChild* GetDeviceShader() const;
-  ezDynamicArray<ezUInt8> GetByteCode() const;
+  ID3D11DeviceChild* GetDeviceShader() const
+  {
+    return DeviceShader;
+  }
+  ezDynamicArray<ezUInt8> GetByteCode() const
+  {
+    return ByteCode;
+  }
+
+private:
+  void SetByteCode(ezDynamicArray<ezUInt8> byteCode)
+  {
+    ByteCode = byteCode;
+  }
 };

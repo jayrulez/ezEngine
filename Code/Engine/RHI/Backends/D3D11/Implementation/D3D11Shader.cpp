@@ -1,12 +1,8 @@
 #include <RHI/Backends/D3D11/D3D11Shader.h>
 #include <d3d11_1.h>
+#include <d3dcompiler.h>
 
- ezString D3D11Shader::GetName() const
-{
-  return Name;
-}
-
-void D3D11Shader::SetName(const ezString& name)
+ void D3D11Shader::SetName(const ezString& name)
 {
 
   Name = name;
@@ -101,7 +97,7 @@ ezDynamicArray<ezUInt8> D3D11Shader::CompileCode(const RHIShaderDescription& des
 
   // TODO
 
-  //ezUInt32 flags = description.Debug ? D3D10_SHADER_DEBUG : D3D10_SHADER_OPTIMIZATION_LEVEL3;
+  ezUInt32 flags = description.Debug ? D3D10_SHADER_DEBUG : D3D10_SHADER_OPTIMIZATION_LEVEL3;
   //Compiler.Compile(description.ShaderBytes,
   //  description.EntryPoint, null,
   //  profile, out Blob result, out Blob error);
@@ -116,12 +112,3 @@ ezDynamicArray<ezUInt8> D3D11Shader::CompileCode(const RHIShaderDescription& des
   return ezDynamicArray<ezUInt8>();
 }
 
-ID3D11DeviceChild* D3D11Shader::GetDeviceShader() const
-{
-  return DeviceShader;
-}
-
-ezDynamicArray<ezUInt8> D3D11Shader::GetByteCode() const
-{
-  return ByteCode;
-}

@@ -36,7 +36,7 @@ public:
 public:
   D3D11Fence(bool signaled);
 
-  ezThreadSignal& GetResetSignal() const;
+  ezThreadSignal* GetResetSignal() const;
 
   void Set();
 

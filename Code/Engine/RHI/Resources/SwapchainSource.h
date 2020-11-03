@@ -57,6 +57,37 @@ private:
 #endif
 
 #if EZ_ENABLED(EZ_PLATFORM_WINDOWS_UWP)
+
+struct RHIUWPSwapchainSource : public RHISwapchainSource
+{
+public:
+  float GetLogicalDpi() const
+  {
+    return LogicalDpi;
+    ;
+  }
+
+  void* GetSwapChainPanelNative() const
+  {
+    return SwapChainPanelNative;
+  }
+
+  RHIUWPSwapchainSource()
+    : RHIUWPSwapchainSource(nullptr, 0.f)
+  {
+  }
+
+  RHIUWPSwapchainSource(void* swapChainPanelNative, float logicalDpi)
+  {
+    SwapChainPanelNative = swapChainPanelNative;
+    LogicalDpi = logicalDpi;
+  }
+
+private:
+  float LogicalDpi = 72.f;
+  void* SwapChainPanelNative = nullptr;
+};
+
 #endif
 
 #if EZ_ENABLED(EZ_PLATFORM_OSX)

@@ -1,6 +1,8 @@
 #include <RHI/Backends/D3D11/D3D11ResourceCache.h>
 #include <RHI/Backends/D3D11/D3D11Util.h>
 
+EZ_DEFINE_AS_POD_TYPE(D3D11_INPUT_ELEMENT_DESC);
+
 D3D11ResourceCache::D3D11ResourceCache(ID3D11Device* device)
 {
   Device = device;
@@ -22,33 +24,33 @@ void D3D11ResourceCache::Dispose()
     it.Value()->Release();
   }
 
-  BlendStates.Clear();
+  //BlendStates.Clear();
 
   for (auto it : DepthStencilStates)
   {
     it.Value()->Release();
   }
 
-  DepthStencilStates.Clear();
+  //DepthStencilStates.Clear();
 
   for (auto it : RasterizerStates)
   {
     it.Value()->Release();
   }
 
-  RasterizerStates.Clear();
+  //RasterizerStates.Clear();
 
   for (auto it : InputLayouts)
   {
     it.Value()->Release();
   }
 
-  InputLayouts.Clear();
+  //InputLayouts.Clear();
 }
 
 ID3D11BlendState* D3D11ResourceCache::GetBlendState(const RHIBlendStateDescription& description)
 {
-  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "");
+  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "Resource Mutex is not locked.");
 
   ID3D11BlendState* blendState = nullptr;
 
@@ -95,7 +97,7 @@ ID3D11BlendState* D3D11ResourceCache::CreateNewBlendState(const RHIBlendStateDes
 
 ID3D11DepthStencilState* D3D11ResourceCache::GetDepthStencilState(const RHIDepthStencilStateDescription& description)
 {
-  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "");
+  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "Resource Mutex is not locked.");
 
   ID3D11DepthStencilState* dss;
 
@@ -131,7 +133,7 @@ ID3D11DepthStencilState* D3D11ResourceCache::CreateNewDepthStencilState(const RH
 
 ID3D11RasterizerState* D3D11ResourceCache::GetRasterizerState(const RHIRasterizerStateDescription& description, bool multisample)
 {
-  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "");
+  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "Resource Mutex is not locked.");
 
   D3D11RasterizerStateCacheKey key(description, multisample);
   ID3D11RasterizerState* rasterizerState;
@@ -164,7 +166,7 @@ ID3D11RasterizerState* D3D11ResourceCache::CreateNewRasterizerState(const D3D11R
 
 ID3D11InputLayout* D3D11ResourceCache::GetInputLayout(ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts, ezDynamicArray<ezUInt8> vsBytecode)
 {
-  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "");
+  EZ_ASSERT_DEBUG(DeviceMutex.IsLocked(), "Resource Mutex is not locked.");
 
   if (vsBytecode.GetCount() == 0 || vertexLayouts.GetCount() == 0)
   {
@@ -194,7 +196,7 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
   }
 
   ezUInt32 element = 0; // Total element index across slots.
-  ezDynamicArray<D3D11_INPUT_ELEMENT_DESC*> elements;
+  ezDynamicArray<D3D11_INPUT_ELEMENT_DESC> elements;
   elements.SetCountUninitialized(totalCount);
 
   SemanticIndices si;
@@ -215,7 +217,7 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
       elementDesc.InputSlotClass = stepRate == 0 ? D3D11_INPUT_PER_VERTEX_DATA : D3D11_INPUT_PER_INSTANCE_DATA;
       elementDesc.InstanceDataStepRate = stepRate;
 
-      // TODO: check push back
+      elements[i] = elementDesc;
 
       currentOffset += FormatHelpers::GetSize(desc.Format);
       element += 1;
@@ -223,7 +225,7 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
   }
   ID3D11InputLayout* layout = nullptr;
 
-  HRESULT hr = Device->CreateInputLayout(*elements.GetData(), elements.GetCount(), vsBytecode.GetData(), vsBytecode.GetCount(), &layout);
+  HRESULT hr = Device->CreateInputLayout(elements.GetData(), elements.GetCount(), vsBytecode.GetData(), vsBytecode.GetCount(), &layout);
 
   return layout;
 }
@@ -269,26 +271,20 @@ InputLayoutCacheKey InputLayoutCacheKey::CreatePermanentKey(ezDynamicArray<RHIVe
   return InputLayoutCacheKey{vertexLayouts};
 }
 
-int D3D11ResourceCache::SemanticIndices::GetAndIncrement(SemanticIndices& si, ezEnum<RHIVertexElementSemantic> type)
+ezUInt32 D3D11ResourceCache::SemanticIndices::GetAndIncrement(SemanticIndices& si, ezEnum<RHIVertexElementSemantic> type)
 {
   switch (type)
   {
     case RHIVertexElementSemantic::Position:
-      return si._position++;
+      return si.Position++;
     case RHIVertexElementSemantic::TextureCoordinate:
-      return si._texCoord++;
+      return si.TexCoord++;
     case RHIVertexElementSemantic::Normal:
-      return si._normal++;
+      return si.Normal++;
     case RHIVertexElementSemantic::Color:
-      return si._color++;
+      return si.Color++;
     default:
       EZ_REPORT_FAILURE("Invalid Semantic");
       return 0;
   }
-}
-
-D3D11RasterizerStateCacheKey::D3D11RasterizerStateCacheKey(const RHIRasterizerStateDescription& rhiDescription, bool multisampled)
-{
-  RHIDescription = rhiDescription;
-  Multisampled = multisampled;
 }

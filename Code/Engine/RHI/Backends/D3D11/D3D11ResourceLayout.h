@@ -18,7 +18,13 @@ public:
     bool DynamicBuffer = false;
 
     ResourceBindingInfo() = default;
-    ResourceBindingInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezEnum<RHIResourceKind> kind, bool dynamicBuffer);
+    ResourceBindingInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezEnum<RHIResourceKind> kind, bool dynamicBuffer)
+    {
+      Slot = slot;
+      Stages = stages;
+      Kind = kind;
+      DynamicBuffer = dynamicBuffer;
+    }
   };
 
 private:
@@ -33,18 +39,48 @@ private:
   ezString Name;
 
 public:
-  virtual ezString GetName() const override;
+  virtual ezString GetName() const override
+  {
+    return Name;
+  }
 
-  virtual void SetName(const ezString& name) override;
-  virtual bool IsDisposed() const override;
-  virtual void Dispose() override;
+  virtual void SetName(const ezString& name) override
+  {
+    Name = name;
+  }
+  virtual bool IsDisposed() const override
+  {
+    return Disposed;
+  }
+  virtual void Dispose() override
+  {
+    if (!Disposed)
+    {
+      Disposed = true;
+    }
+  }
 
 public:
   D3D11ResourceLayout(const RHIResourceLayoutDescription& description);
-  ezUInt32 GetUniformBufferCount() const;
-  ezUInt32 GetStorageBufferCount() const;
-  ezUInt32 GetTextureCount() const;
-  ezUInt32 GetSamplerCount() const;
-  bool IsDynamicBuffer(ezUInt32 index) const;
+  ezUInt32 GetUniformBufferCount() const
+  {
+    return UniformBufferCount;
+  }
+  ezUInt32 GetStorageBufferCount() const
+  {
+    return StorageBufferCount;
+  }
+  ezUInt32 GetTextureCount() const
+  {
+    return TextureCount;
+  }
+  ezUInt32 GetSamplerCount() const
+  {
+    return SamplerCount;
+  }
+  bool IsDynamicBuffer(ezUInt32 index) const
+  {
+    return BindingInfosByRHIIndex[index].DynamicBuffer;
+  }
   ResourceBindingInfo& GetDeviceSlotIndex(ezUInt32 resourceLayoutIndex);
 };

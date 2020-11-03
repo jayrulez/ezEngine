@@ -24,10 +24,7 @@
 class D3D11ResourceFactory : public RHIResourceFactory
 {
 public:
-  virtual ezEnum<RHIGraphicsBackend> GetBackendType() const override
-  {
-    return RHIGraphicsBackend::Direct3D11;
-  }
+  virtual ezEnum<RHIGraphicsBackend> GetBackendType() const override;
 
   D3D11ResourceFactory(D3D11GraphicsDevice* graphicsDevice);
 
@@ -42,23 +39,24 @@ public:
 
   virtual RHIPipeline* CreateComputePipelineCore(const RHIComputePipelineDescription& description) override;
 
+  virtual RHIResourceLayout* CreateResourceLayoutCore(const RHIResourceLayoutDescription& description) override;
+
+  virtual RHIResourceSet* CreateResourceSetCore(const RHIResourceSetDescription& description) override;
+  virtual RHIFence* CreateFenceCore(bool signaled) override;
+
+  virtual RHISwapchain* CreateSwapchainCore(const RHISwapchainDescription& description) override;
+
+protected:
+  virtual RHISampler* CreateSamplerCore(const RHISamplerDescription& description) override;
+  virtual RHIShader* CreateShaderCore(const RHIShaderDescription& description) override;
   virtual RHITexture* CreateTextureCore(ezUInt64 nativeTexture, const RHITextureDescription& description) override;
+
   virtual RHITexture* CreateTextureCore(const RHITextureDescription& description) override;
 
   virtual RHITextureView* CreateTextureViewCore(const RHITextureViewDescription& description) override;
 
   virtual RHIBuffer* CreateBufferCore(const RHIBufferDescription& description) override;
 
-  virtual RHISampler* CreateSamplerCore(const RHISamplerDescription& description) override { return new D3D11Sampler(Device, description); }
-
-  virtual RHIShader* CreateShaderCore(const RHIShaderDescription& description) override { return new D3D11Shader(Device, description); }
-
-  virtual RHIResourceLayout* CreateResourceLayoutCore(const RHIResourceLayoutDescription& description) override { return new D3D11ResourceLayout(description); }
-
-  virtual RHIResourceSet* CreateResourceSetCore(const RHIResourceSetDescription& description) override;
-  virtual RHIFence* CreateFenceCore(bool signaled) override { return new D3D11Fence(signaled); }
-
-  virtual RHISwapchain* CreateSwapchainCore(const RHISwapchainDescription& description) override { return new D3D11Swapchain(GraphicsDevice, description); }
 
 private:
   D3D11GraphicsDevice* GraphicsDevice = nullptr;

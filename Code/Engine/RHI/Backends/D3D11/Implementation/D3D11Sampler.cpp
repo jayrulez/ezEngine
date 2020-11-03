@@ -71,6 +71,6 @@ void D3D11Sampler::SetName(const ezString& name)
       return ezColor(1, 1, 1, 1);
     default:
       EZ_REPORT_FAILURE("Invalid RHISamplerBorderColor");
-      return ezColor::Blue;
+      return ezColor::Red;
   }
 }

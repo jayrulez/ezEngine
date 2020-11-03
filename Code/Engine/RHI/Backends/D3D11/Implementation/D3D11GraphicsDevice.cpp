@@ -1,4 +1,49 @@
+#include <Foundation/Threading/TaskSystem.h>
 #include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
+
+#include <dxgi1_3.h>
+#include <dxgidebug.h>
+
+struct FenceWaitTask final : public ezTask
+{
+  virtual void Execute() override
+  {
+    if (Event != nullptr)
+    {
+      Result = Event->WaitForSignal(ezTime::Nanoseconds((double)Timeout));
+      Signaled = true;
+    }
+  }
+
+  ezThreadSignal::WaitResult GetResult() const
+  {
+    return Result;
+  }
+
+  bool GetSignaled() const
+  {
+    return Signaled;
+  }
+
+  void SetEvent(ezThreadSignal* event, ezUInt64 timeout)
+  {
+    if (Event == nullptr)
+    {
+      Event = event;
+      Timeout = timeout;
+    }
+    else
+    {
+      EZ_REPORT_FAILURE("Cannot modify the event for a Fence wait task.");
+    }
+  }
+
+private:
+  ezThreadSignal::WaitResult Result = ezThreadSignal::WaitResult::Timeout;
+  ezThreadSignal* Event = nullptr;
+  ezUInt64 Timeout = 0;
+  bool Signaled = false;
+};
 
 D3D11GraphicsDevice::D3D11GraphicsDevice(const RHIGraphicsDeviceOptions& options, RHID3D11DeviceOptions& d3D11DeviceOptions, const std::optional<RHISwapchainDescription>& swapchainDesc)
   : D3D11GraphicsDevice(MergeOptions(options, d3D11DeviceOptions), swapchainDesc)
@@ -126,35 +171,93 @@ bool D3D11GraphicsDevice::WaitForFenceCore(RHIFence* fence, ezUInt64 nanosecondT
 
 bool D3D11GraphicsDevice::WaitForFencesCore(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout)
 {
-  //ezUInt32 msTimeout = (ezUInt32)(nanosecondTimeout / 1000000);
-  //ezDynamicArray<ezThreadSignal> events;
-  //{
-  //  ezLock lock(ResetEventsMutex);
-  //  events = ResetEvents;
-  //  ResetEvents.Clear();
-  //}
+  ezDynamicArray<ezThreadSignal*> events = GetResetEventArray(fences.GetCount());
 
-  //for (ezUInt32 i = 0; i < fences.GetCount(); i++)
-  //{
-  //  events.PushBack(Util::AssertSubtype<RHIFence, D3D11Fence>(fences[i])->GetResetSignal());
-  //  //events[i] = Util::AssertSubtype<RHIFence, D3D11Fence>(fences[i])->GetResetSignal();
-  //}
-  //bool result;
-  //if (waitAll)
-  //{
-  //  result = WaitHandle.WaitAll(events, msTimeout);
-  //}
-  //else
-  //{
-  //  int index = WaitHandle.WaitAny(events, msTimeout);
-  //  result = index != WaitHandle.WaitTimeout;
-  //}
 
-  //ReturnResetEventArray(events);
+  for (ezUInt32 i = 0; i < fences.GetCount(); i++)
+  {
+    events[i] = Util::AssertSubtype<RHIFence, D3D11Fence>(fences[i])->GetResetSignal();
+  }
+  bool result = true;
 
-  //return result;
+  ezTaskGroupID waitGroupId = ezTaskSystem::CreateTaskGroup(ezTaskPriority::ThisFrame);
+  ezDeque<ezSharedPtr<FenceWaitTask>> waitTasks;
 
-  return true;
+  for (ezUInt32 i = 0; i < events.GetCount(); i++)
+  {
+    ezSharedPtr<FenceWaitTask> pTask;
+    pTask->SetEvent(events[i], nanosecondTimeout);
+
+    ezTaskSystem::AddTaskToGroup(waitGroupId, pTask);
+    waitTasks.PushBack(pTask);
+  }
+  if (waitAll)
+  {
+    ezTaskSystem::WaitForGroup(waitGroupId);
+
+    for (auto& waitedTask : waitTasks)
+    {
+      if (waitedTask->GetResult() == ezThreadSignal::WaitResult::Timeout)
+        result = false;
+    }
+  }
+  else
+  {
+    ezTaskSystem::StartTaskGroup(waitGroupId);
+    ezThreadSignal::WaitResult waitedResult = ezThreadSignal::WaitResult::Timeout;
+    ezTaskSystem::WaitForCondition([&waitTasks, &waitedResult] {
+      for (;;)
+      {
+        for (auto& waitedTask : waitTasks)
+        {
+          if (waitedTask->GetSignaled())
+          {
+            waitedResult = waitedTask->GetResult();
+            true;
+          }
+        }
+      }
+
+      return false;
+    });
+
+    result = waitedResult == ezThreadSignal::WaitResult::Signaled;
+  }
+
+  ReturnResetEventArray(events);
+
+  return result;
+}
+
+ezDynamicArray<ezThreadSignal*> D3D11GraphicsDevice::GetResetEventArray(ezUInt32 length)
+{
+  {
+    ezLock lock(ResetEventsMutex);
+    for (ezUInt32 i = ResetEvents.GetCount() - 1; i > 0; i--)
+    {
+      ezDynamicArray<ezThreadSignal*> array = ResetEvents[i];
+      if (array.GetCount() == length)
+      {
+        ResetEvents.RemoveAndCopy(array);
+        return array;
+      }
+    }
+  }
+
+  ezDynamicArray<ezThreadSignal*> newArray;
+  newArray.SetCountUninitialized(length);
+  return newArray;
+}
+
+void D3D11GraphicsDevice::ReturnResetEventArray(ezDynamicArray<ezThreadSignal*> array)
+{
+  ezLock lock(ResetEventsMutex);
+  ResetEvents.PushBack(array);
+}
+
+void D3D11GraphicsDevice::ResetFenceCore(RHIFence* fence)
+{
+  Util::AssertSubtype<RHIFence, D3D11Fence>(fence)->Reset();
 }
 
 void D3D11GraphicsDevice::SwapBuffersCore(RHISwapchain* swapchain)
@@ -373,9 +476,9 @@ void D3D11GraphicsDevice::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOff
     }
     else
     {
-      ezMemoryUtils::Copy(
-        source,
+      ezMemoryUtils::CopyOverlapped(
         reinterpret_cast<ezUInt8*>(mr->GetData()) + bufferOffset,
+        source,
         //buffer->GetSize(),
         size);
     }
@@ -390,7 +493,7 @@ void D3D11GraphicsDevice::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOff
     {
       ezLock lock(ImmediateContextMutex);
       ImmediateContext->CopySubresourceRegion(
-        d3dBuffer->GetBuffer(), 0, (int)bufferOffset, 0, 0,
+        d3dBuffer->GetBuffer(), 0, bufferOffset, 0, 0,
         staging->GetBuffer(), 0,
         sourceRegion);
     }
@@ -418,10 +521,35 @@ void D3D11GraphicsDevice::DisposeCore()
 
   ImmediateContext->Release();
 
-  // TODO: Check Veldrid PlatformDispose to clean up debug stuff
+  ID3D11Debug* deviceDebug = nullptr;
+  HRESULT hr = Device->QueryInterface<ID3D11Debug>(&deviceDebug);
 
   Device->Release();
   DXGIAdapter->Release();
+
+  IDXGIDebug1* dxgiDebug = nullptr;
+  hr = DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), reinterpret_cast<void**>(&dxgiDebug));
+
+  // Report live objects using DXGI if available (DXGIGetDebugInterface1 will fail on pre Windows 8 OS).
+  if (SUCCEEDED(hr))
+  {
+    if (deviceDebug != nullptr)
+    {
+      deviceDebug->Release();
+    }
+
+    dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, (DXGI_DEBUG_RLO_FLAGS)(DXGI_DEBUG_RLO_ALL | DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+    dxgiDebug->Release();
+  }
+  else
+  {
+    // Need to enable native debugging to see live objects in VisualStudio console.
+    if (deviceDebug != nullptr)
+    {
+      deviceDebug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
+      deviceDebug->Release();
+    }
+  }
 }
 
 ezEnum<RHITextureSampleCount> D3D11GraphicsDevice::GetSampleCountLimit(ezEnum<RHIPixelFormat> format, bool depthFormat)

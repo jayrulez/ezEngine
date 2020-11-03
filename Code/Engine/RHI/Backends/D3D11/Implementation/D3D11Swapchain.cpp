@@ -1,6 +1,6 @@
 #include <RHI/Backends/D3D11/D3D11Swapchain.h>
 
- ezString D3D11Swapchain::GetName() const
+ezString D3D11Swapchain::GetName() const
 {
   ezUInt32 size = 1024 - 1;
   char* pName = new char[size + 1];
@@ -14,19 +14,19 @@
   return name;
 }
 
- void D3D11Swapchain::SetName(const ezString& name)
+void D3D11Swapchain::SetName(const ezString& name)
 {
   Name = name;
 
-  DXGISwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, 0, nullptr);
+  DXGISwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, Name.GetCharacterCount(), name.GetData());
 }
 
- bool D3D11Swapchain::IsDisposed() const
+bool D3D11Swapchain::IsDisposed() const
 {
   return Disposed;
 }
 
- void D3D11Swapchain::Dispose()
+void D3D11Swapchain::Dispose()
 {
   if (!Disposed)
   {
@@ -51,7 +51,7 @@ RHIFramebuffer* D3D11Swapchain::GetFramebuffer() const
   return Framebuffer;
 }
 
- void D3D11Swapchain::Resize(ezUInt32 width, ezUInt32 height)
+void D3D11Swapchain::Resize(ezUInt32 width, ezUInt32 height)
 {
   {
     ezLock lock(ReferencedCLsMutex);
@@ -80,12 +80,12 @@ RHIFramebuffer* D3D11Swapchain::GetFramebuffer() const
   ezUInt32 actualHeight = (ezUInt32)(height * PixelScale);
   if (resizeBuffers)
   {
-    DXGISwapChain->ResizeBuffers(2, (int)actualWidth, (int)actualHeight, ColorFormat, /*DXGI_SWAP_CHAIN_FLAG */ 0);
+    HRESULT hr = DXGISwapChain->ResizeBuffers(2, actualWidth, actualHeight, ColorFormat, /*DXGI_SWAP_CHAIN_FLAG */ 0);
   }
 
   {
     ID3D11Texture2D* backBufferTexture = nullptr;
-    HRESULT hr = DXGISwapChain->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<void**>(&backBufferTexture));
+    HRESULT hr = DXGISwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBufferTexture));
 
     if (DepthFormat.has_value())
     {
@@ -103,37 +103,39 @@ RHIFramebuffer* D3D11Swapchain::GetFramebuffer() const
       DepthTexture = new D3D11Texture(GraphicsDevice->GetDevice(), depthDesc);
     }
 
-    D3D11Texture* backBufferVdTexture = new D3D11Texture(
+    D3D11Texture* backBufferRHITexture = new D3D11Texture(
       backBufferTexture,
       RHITextureType::Texture2D,
       D3D11Formats::ToRHIFormat(ColorFormat));
 
     ezDynamicArray<RHITexture*> colorTargets;
-    colorTargets.PushBack(backBufferVdTexture);
+    colorTargets.PushBack(backBufferRHITexture);
 
     RHIFramebufferDescription desc(DepthTexture, colorTargets);
     Framebuffer = new D3D11Framebuffer(GraphicsDevice->GetDevice(), desc);
     Framebuffer->SetSwapchain(this);
+
+    //backBufferTexture->Release(); // TODO: confirm that this should be done, check veldrid and maybe message mellinoe
   }
 }
 
- bool D3D11Swapchain::GetSyncToVerticalBlank() const
+bool D3D11Swapchain::GetSyncToVerticalBlank() const
 {
   return VSync;
 }
 
- void D3D11Swapchain::SetSyncToVerticalBlank(bool value)
+void D3D11Swapchain::SetSyncToVerticalBlank(bool value)
 {
   VSync = value;
   SyncInterval = D3D11Util::GetSyncInterval(value);
 }
 
- IDXGISwapChain* D3D11Swapchain::GetIDXGISwapChain() const
+IDXGISwapChain* D3D11Swapchain::GetIDXGISwapChain() const
 {
   return DXGISwapChain;
 }
 
- ezUInt32 D3D11Swapchain::GetSyncInterval() const
+ezUInt32 D3D11Swapchain::GetSyncInterval() const
 {
   return SyncInterval;
 }
@@ -150,7 +152,7 @@ void D3D11Swapchain::RemoveCommandListReference(D3D11CommandList* cl)
   ReferencedCLs.Remove(cl);
 }
 
- D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwapchainDescription& description)
+D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwapchainDescription& description)
 {
   GraphicsDevice = graphicsDevice;
   DepthFormat = description.DepthFormat;
@@ -186,52 +188,66 @@ void D3D11Swapchain::RemoveCommandListReference(D3D11CommandList* cl)
 
       hr = dxgiFactory->CreateSwapChain(GraphicsDevice->GetDevice(), &dxgiSCDesc, &DXGISwapChain);
       dxgiFactory->MakeWindowAssociation((HWND)win32Source->GetHwnd(), DXGI_MWA_NO_ALT_ENTER);
+
+      dxgiFactory->Release();
     }
+
+    return;
   }
-  // TODO: uwp
-  /*
-    else if (description.Source is UwpSwapchainSource uwpSource)
-    {
-      _pixelScale = uwpSource.LogicalDpi / 96.0f;
 
-      // Properties of the swap chain
-      SwapChainDescription1 swapChainDescription = new SwapChainDescription1(){
-        AlphaMode = AlphaMode.Ignore,
-        BufferCount = 2,
-        Format = _colorFormat,
-        Height = (int)(description.Height * _pixelScale),
-        Width = (int)(description.Width * _pixelScale),
-        SampleDescription = new SampleDescription(1, 0),
-        SwapEffect = SwapEffect.FlipSequential,
-        Usage = Vortice.DXGI.Usage.RenderTargetOutput,
-      };
 
-      // Get the Vortice.DXGI factory automatically created when initializing the Direct3D device.
-      using(IDXGIFactory2 dxgiFactory = _gd.Adapter.GetParent<IDXGIFactory2>())
-      {
-        // Create the swap chain and get the highest version available.
-        using(IDXGISwapChain1 swapChain1 = dxgiFactory.CreateSwapChainForComposition(_gd.Device, swapChainDescription))
-        {
-          _dxgiSwapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
-        }
-      }
+  //RHIUWPSwapchainSource* uwpSource = dynamic_cast<RHIUWPSwapchainSource*>(description.Source);
+  //if (uwpSource)
+  //{
+  //  PixelScale = uwpSource->GetLogicalDpi() / 96.0f;
 
-      ComObject co = new ComObject(uwpSource.SwapChainPanelNative);
+  //  // Properties of the swap chain
+  //  DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
+  //  swapChainDescription.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+  //  swapChainDescription.BufferCount = 2;
+  //  swapChainDescription.Format = ColorFormat;
+  //  swapChainDescription.Height = (ezUInt32)(description.Height * PixelScale);
+  //  swapChainDescription.Width = (ezUInt32)(description.Width * PixelScale);
+  //  swapChainDescription.SampleDesc = {
+  //    1, // Count
+  //    0  // Quality
+  //  };
+  //  swapChainDescription.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+  //  swapChainDescription.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
-      ISwapChainPanelNative swapchainPanelNative = co.QueryInterfaceOrNull<ISwapChainPanelNative>();
-      if (swapchainPanelNative != null)
-      {
-        swapchainPanelNative.SetSwapChain(_dxgiSwapChain);
-      }
-      else
-      {
-        ISwapChainBackgroundPanelNative bgPanelNative = co.QueryInterfaceOrNull<ISwapChainBackgroundPanelNative>();
-        if (bgPanelNative != null)
-        {
-          bgPanelNative.SetSwapChain(_dxgiSwapChain);
-        }
-      }
-    }*/
+  //  {
+  //    // Get the Vortice.DXGI factory automatically created when initializing the Direct3D device.
+  //    IDXGIFactory2* dxgiFactory = nullptr;
+  //    HRESULT hr = GraphicsDevice->GetAdapter()->GetParent(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&dxgiFactory));
+
+  //    {
+  //      IDXGISwapChain1* swapChain1 = nullptr;
+  //      HRESULT hr = dxgiFactory->CreateSwapChainForComposition(GraphicsDevice->GetDevice(), &swapChainDescription, nullptr, &swapChain1);
+  //      // Create the swap chain and get the highest version available.
+
+  //      //HRESULT hr = swapChain1->QueryInterface(__uuidof(IDXGISwapChain2), reinterpret_cast<void**>(&DXGISwapChain)); // TODO
+  //      HRESULT hr = swapChain1->QueryInterface(__uuidof(IDXGISwapChain1), reinterpret_cast<void**>(&DXGISwapChain));
+  //    }
+  //  }
+
+  //  IUnknown* unknown = nullptr;
+  //  CoCreateInstance(__uuidof(IUnknown), )
+  //  ComObject co = new ComObject(uwpSource->GetSwapChainPanelNative());
+
+  //  ISwapChainPanelNative swapchainPanelNative = co.QueryInterfaceOrNull<ISwapChainPanelNative>();
+  //  if (swapchainPanelNative != null)
+  //  {
+  //    swapchainPanelNative.SetSwapChain(_dxgiSwapChain);
+  //  }
+  //  else
+  //  {
+  //    ISwapChainBackgroundPanelNative bgPanelNative = co.QueryInterfaceOrNull<ISwapChainBackgroundPanelNative>();
+  //    if (bgPanelNative != null)
+  //    {
+  //      bgPanelNative.SetSwapChain(_dxgiSwapChain);
+  //    }
+  //  }
+  //}
 
   Resize(description.Width, description.Height);
 }

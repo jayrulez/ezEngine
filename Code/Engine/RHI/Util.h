@@ -33,6 +33,8 @@ namespace Util
   template <typename T, typename Derived>
   void ClearArray(ezArrayBase<T, Derived> array)
   {
+    // on Veldrid size, The reason the array is cleared and not resized back down to length 0/1
+    // is because the code is trying to avoid allocating memory at runtime when it's not necessary
     ezUInt32 count = array.GetCount();
     array.Clear();
     array.SetCount(count);

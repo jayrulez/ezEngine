@@ -15,41 +15,12 @@
 #include <vector>
 
 
-bool D3D11CommandList::D3D11BufferRange::IsFullRange()
-{
-  return Offset == 0 && Size == Buffer->GetSize();
-}
-
-D3D11CommandList::D3D11BufferRange::D3D11BufferRange(D3D11DeviceBuffer* buffer, ezUInt32 offset, ezUInt32 size)
-{
-  Buffer = buffer;
-  Offset = offset;
-  Size = size;
-}
-
-D3D11CommandList::BoundTextureInfo::BoundTextureInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezUInt32 resourceSet)
-{
-  Slot = slot;
-  Stages = stages;
-  ResourceSet = resourceSet;
-}
-
-ezString D3D11CommandList::GetName() const
-{
-  return Name;
-}
-
 void D3D11CommandList::SetName(const ezString& name)
 {
   Name = name;
 
   if (Context != nullptr)
     Context->SetPrivateData(WKPDID_D3DDebugObjectName, name.GetCharacterCount(), name.GetData());
-}
-
-bool D3D11CommandList::IsDisposed() const
-{
-  return Disposed;
 }
 
 void D3D11CommandList::Dispose()
@@ -84,6 +55,7 @@ void D3D11CommandList::Dispose()
     {
       boundGraphicsSet.Offsets->Dispose();
     }
+
     for (RHIBoundResourceSetInfo& boundComputeSet : ComputeResourceSets)
     {
       boundComputeSet.Offsets->Dispose();
@@ -93,6 +65,7 @@ void D3D11CommandList::Dispose()
     {
       buffer->Dispose();
     }
+
     AvailableStagingBuffers.Clear();
 
     Disposed = true;
@@ -105,9 +78,9 @@ void D3D11CommandList::BeginCore()
   {
     CommandList->Release();
     CommandList = nullptr;
-    ClearState();
-    Begun = true;
   }
+  ClearState();
+  Begun = true;
 }
 
 void D3D11CommandList::EndCore()
@@ -117,7 +90,7 @@ void D3D11CommandList::EndCore()
     EZ_REPORT_FAILURE("Invalid use of EndCore().");
   }
 
-  Context->FinishCommandList(false, &CommandList);
+  HRESULT hr = Context->FinishCommandList(false, &CommandList);
 
   CommandList->SetPrivateData(WKPDID_D3DDebugObjectName, Name.GetCharacterCount(), Name.GetData());
 
@@ -139,7 +112,7 @@ void D3D11CommandList::SetPipelineCore(RHIPipeline* pipeline)
     if (BlendState != blendState)
     {
       BlendState = blendState;
-      Context->OMSetBlendState(blendState, nullptr, -1);
+      Context->OMSetBlendState(blendState, nullptr, 0xffffffff);
     }
 
     ID3D11DepthStencilState* depthStencilState = d3dPipeline->GetDepthStencilState();
@@ -148,7 +121,7 @@ void D3D11CommandList::SetPipelineCore(RHIPipeline* pipeline)
     {
       DepthStencilState = depthStencilState;
       StencilReference = stencilReference;
-      Context->OMSetDepthStencilState(depthStencilState, (int)stencilReference);
+      Context->OMSetDepthStencilState(depthStencilState, stencilReference);
     }
 
     ID3D11RasterizerState* rasterizerState = d3dPipeline->GetRasterizerState();
@@ -240,7 +213,7 @@ void D3D11CommandList::SetVertexBufferCore(ezUInt32 index, RHIBuffer* buffer, ez
     VertexBindingsChanged = true;
     UnbindUAVBuffer(buffer);
     VertexBindings[index] = d3d11Buffer->GetBuffer();
-    VertexOffsets[index] = (int)offset;
+    VertexOffsets[index] = offset;
     NumVertexBindings = ezMath::Max((index + 1), NumVertexBindings);
   }
 }
@@ -315,7 +288,16 @@ void D3D11CommandList::SetViewportCore(ezUInt32 index, const RHIViewport& viewpo
   ViewportsChanged = true;
   Viewports.EnsureCount(index + 1);
 
-  Viewports[index] = viewport;
+  D3D11_VIEWPORT vp;
+
+  vp.TopLeftX = viewport.X;
+  vp.TopLeftY = viewport.Y;
+  vp.Width = viewport.Width;
+  vp.Height = viewport.Height;
+  vp.MinDepth = viewport.MinDepth;
+  vp.MaxDepth = viewport.MaxDepth;
+
+  Viewports[index] = vp;
 }
 
 void D3D11CommandList::SetScissorRectCore(ezUInt32 index, ezUInt32 x, ezUInt32 y, ezUInt32 width, ezUInt32 height)
@@ -323,7 +305,13 @@ void D3D11CommandList::SetScissorRectCore(ezUInt32 index, ezUInt32 x, ezUInt32 y
   ScissorRectsChanged = true;
   Scissors.EnsureCount(index + 1);
 
-  Scissors[index] = {x, y, (x + width), (y + height)};
+  RECT rect;
+  rect.left = x;
+  rect.top = y;
+  rect.right = x + width;
+  rect.bottom = y + height;
+
+  Scissors[index] = rect;
 }
 
 void D3D11CommandList::DrawCore(ezUInt32 vertexCount, ezUInt32 instanceCount, ezUInt32 vertexStart, ezUInt32 instanceStart)
@@ -332,11 +320,11 @@ void D3D11CommandList::DrawCore(ezUInt32 vertexCount, ezUInt32 instanceCount, ez
 
   if (instanceCount == 1 && instanceStart == 0)
   {
-    Context->Draw((int)vertexCount, (int)vertexStart);
+    Context->Draw(vertexCount, vertexStart);
   }
   else
   {
-    Context->DrawInstanced((int)vertexCount, (int)instanceCount, (int)vertexStart, (int)instanceStart);
+    Context->DrawInstanced(vertexCount, instanceCount, vertexStart, instanceStart);
   }
 }
 
@@ -347,7 +335,7 @@ void D3D11CommandList::DrawIndexedCore(ezUInt32 indexCount, ezUInt32 instanceCou
   EZ_ASSERT_DEBUG(_ib != nullptr, "Index buffer is null");
   if (instanceCount == 1 && instanceStart == 0)
   {
-    Context->DrawIndexed((int)indexCount, (int)indexStart, vertexOffset);
+    Context->DrawIndexed(indexCount, indexStart, vertexOffset);
   }
   else
   {
@@ -364,7 +352,7 @@ void D3D11CommandList::DrawIndirectCore(RHIBuffer* indirectBuffer, ezUInt32 offs
   for (ezUInt32 i = 0; i < drawCount; i++)
   {
     Context->DrawInstancedIndirect(d3d11Buffer->GetBuffer(), currentOffset);
-    currentOffset += (int)stride;
+    currentOffset += stride;
   }
 }
 
@@ -377,7 +365,7 @@ void D3D11CommandList::DrawIndexedIndirectCore(RHIBuffer* indirectBuffer, ezUInt
   for (ezUInt32 i = 0; i < drawCount; i++)
   {
     Context->DrawIndexedInstancedIndirect(d3d11Buffer->GetBuffer(), currentOffset);
-    currentOffset += (int)stride;
+    currentOffset += stride;
   }
 }
 
@@ -385,7 +373,7 @@ void D3D11CommandList::DispatchCore(ezUInt32 groupCountX, ezUInt32 groupCountY, 
 {
   PreDispatchCommand();
 
-  Context->Dispatch((int)groupCountX, (int)groupCountY, (int)groupCountZ);
+  Context->Dispatch(groupCountX, groupCountY, groupCountZ);
 }
 
 void D3D11CommandList::DispatchIndirectCore(RHIBuffer* indirectBuffer, ezUInt32 offset)
@@ -432,14 +420,6 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
     subregion->front = 0;
     subregion->top = 0;
 
-    RawRect workAroundRegion;
-    workAroundRegion.left = bufferOffset;
-    workAroundRegion.right = size + bufferOffset;
-    workAroundRegion.bottom = 1;
-    workAroundRegion.back = 1;
-    workAroundRegion.front = 0;
-    workAroundRegion.top = 0;
-
     if (isUniformBuffer)
     {
       subregion = nullptr;
@@ -451,7 +431,7 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
     }
     else
     {
-      UpdateSubresource_Workaround(d3dBuffer->GetBuffer(), 0, workAroundRegion, source);
+      UpdateSubresource_Workaround(d3dBuffer->GetBuffer(), 0, *subregion, source);
     }
   }
   else if (useMap && updateFullBuffer) // Can only update full buffer with WriteDiscard.
@@ -470,7 +450,8 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
     else
     {
       //Buffer.MemoryCopy(source, msb.pData, buffer->GetSize(), size);
-      //ezMemoryUtils::CopyOverlapped(msb.pData, reinterpret_cast<void*>(source), size);
+      // TODO: confirm this works as expected
+      ezMemoryUtils::CopyOverlapped(reinterpret_cast<ezUInt64*>(source), reinterpret_cast<ezUInt64*>(msb.pData), size);
     }
     Context->Unmap(d3dBuffer->GetBuffer(), 0);
   }
@@ -493,7 +474,17 @@ void D3D11CommandList::CopyBufferCore(RHIBuffer* source, ezUInt32 sourceOffset, 
   Context->CopySubresourceRegion(dstD3D11Buffer->GetBuffer(), 0, destinationOffset, 0, 0, srcD3D11Buffer->GetBuffer(), 0, &region);
 }
 
-void D3D11CommandList::CopyTextureCore(RHITexture* source, ezUInt32 srcX, ezUInt32 srcY, ezUInt32 srcZ, ezUInt32 srcMipLevel, ezUInt32 srcBaseArrayLayer, RHITexture* destination, ezUInt32 dstX, ezUInt32 dstY, ezUInt32 dstZ, ezUInt32 dstMipLevel, ezUInt32 dstBaseArrayLayer, ezUInt32 width, ezUInt32 height, ezUInt32 depth, ezUInt32 layerCount)
+void D3D11CommandList::CopyTextureCore(
+  RHITexture* source,
+  ezUInt32 srcX, ezUInt32 srcY, ezUInt32 srcZ,
+  ezUInt32 srcMipLevel,
+  ezUInt32 srcBaseArrayLayer,
+  RHITexture* destination,
+  ezUInt32 dstX, ezUInt32 dstY, ezUInt32 dstZ,
+  ezUInt32 dstMipLevel,
+  ezUInt32 dstBaseArrayLayer,
+  ezUInt32 width, ezUInt32 height, ezUInt32 depth,
+  ezUInt32 layerCount)
 {
   D3D11Texture* srcD3D11Texture = Util::AssertSubtype<RHITexture, D3D11Texture>(source);
   D3D11Texture* dstD3D11Texture = Util::AssertSubtype<RHITexture, D3D11Texture>(destination);
@@ -571,18 +562,6 @@ D3D11CommandList::D3D11CommandList(D3D11GraphicsDevice* graphicsDevice, const RH
   hr = Context->QueryInterface<ID3DUserDefinedAnnotation>(&UDA);
 }
 
-ID3D11CommandList* D3D11CommandList::GetDeviceCommandList() const
-{
-  return CommandList;
-}
-
-//TODO: private friend
-
-ID3D11DeviceContext* D3D11CommandList::GetDeviceContext() const
-{
-  return Context;
-}
-
 void D3D11CommandList::Reset()
 {
   if (CommandList != nullptr)
@@ -617,18 +596,16 @@ void D3D11CommandList::ClearState()
 
 void D3D11CommandList::ResetManagedState()
 {
-  // TODO: ensure Clear does not remove array elements and just set them to unitialized instead
   NumVertexBindings = 0;
 
   Util::ClearArray(VertexBindings);
-  Util::ClearArray(VertexStrides);
+  VertexStrides.Clear();
   Util::ClearArray(VertexOffsets);
 
   m_pFramebuffer = nullptr;
 
   Util::ClearArray(Viewports);
   Util::ClearArray(Scissors);
-
   ViewportsChanged = false;
   ScissorRectsChanged = false;
 
@@ -658,17 +635,17 @@ void D3D11CommandList::ResetManagedState()
   ComputePipeline = nullptr;
   ClearSets(ComputeResourceSets);
 
-  for (auto kvp : BoundSRVs)
+  for (auto& kvp : BoundSRVs)
   {
-    ezDynamicArray<BoundTextureInfo> list = kvp.Value();
+    ezDynamicArray<BoundTextureInfo>& list = kvp.Value();
     list.Clear();
     PoolBoundTextureList(list);
   }
   BoundSRVs.Clear();
 
-  for (auto kvp : BoundUAVs)
+  for (auto& kvp : BoundUAVs)
   {
-    ezDynamicArray<BoundTextureInfo> list = kvp.Value();
+    ezDynamicArray<BoundTextureInfo>& list = kvp.Value();
     list.Clear();
     PoolBoundTextureList(list);
   }
@@ -690,7 +667,7 @@ void D3D11CommandList::UnbindUAVTexture(RHITexture* target)
 
   if (BoundUAVs.TryGetValue(target, btis))
   {
-    for (BoundTextureInfo bti : btis)
+    for (BoundTextureInfo& bti : btis)
     {
       BindUnorderedAccessView(nullptr, nullptr, nullptr, bti.Slot, bti.Stages, bti.ResourceSet);
       if ((bti.Stages & RHIShaderStages::Compute) == RHIShaderStages::Compute)
@@ -719,7 +696,7 @@ void D3D11CommandList::UnbindUAVBuffer(RHIBuffer* buffer)
 
 void D3D11CommandList::UnbindUAVBufferIndividual(RHIBuffer* buffer, bool compute)
 {
-  ezDynamicArray<std::tuple<RHIBuffer*, ezInt32>> list = compute ? BoundComputeUAVBuffers : BoundOMUAVBuffers;
+  ezDynamicArray<std::tuple<RHIBuffer*, ezUInt32>> list = compute ? BoundComputeUAVBuffers : BoundOMUAVBuffers;
   for (ezUInt32 i = 0; i < list.GetCount(); i++)
   {
     if (std::get<0>(list[i]) == buffer)
@@ -742,7 +719,7 @@ void D3D11CommandList::UnbindUAVBufferIndividual(RHIBuffer* buffer, bool compute
 
 void D3D11CommandList::TrackBoundUAVBuffer(RHIBuffer* buffer, ezUInt32 slot, bool compute)
 {
-  ezDynamicArray<std::tuple<RHIBuffer*, ezInt32>> list = compute ? BoundComputeUAVBuffers : BoundOMUAVBuffers;
+  ezDynamicArray<std::tuple<RHIBuffer*, ezUInt32>> list = compute ? BoundComputeUAVBuffers : BoundOMUAVBuffers;
 
   list.PushBack(std::make_tuple(buffer, slot));
 }
@@ -769,7 +746,7 @@ void D3D11CommandList::BindUnorderedAccessView(RHITexture* texture, RHIBuffer* b
   {
     baseSlot = m_pFramebuffer->GetColorTargets().GetCount();
   }
-  int actualSlot = baseSlot + slot;
+  ezUInt32 actualSlot = baseSlot + slot;
 
   if (buffer != nullptr)
   {
@@ -788,18 +765,18 @@ void D3D11CommandList::BindUnorderedAccessView(RHITexture* texture, RHIBuffer* b
 
 void D3D11CommandList::PackRangeParams(D3D11BufferRange* range)
 {
-  CBOut[0] = range->Buffer->GetBuffer();
-  FirstConstRef[0] = range->Offset / 16;
-  ezUInt32 roundedSize = range->Size < 256 ? 256u : range->Size;
+  CBOut[0] = range->GetBuffer()->GetBuffer();
+  FirstConstRef[0] = range->GetOffset() / 16;
+  ezUInt32 roundedSize = range->GetSize() < 256 ? 256u : range->GetSize();
   NumConstsRef[0] = roundedSize / 16;
 }
 
-void D3D11CommandList::BindStorageBufferView(D3D11BufferRange* range, int slot, ezBitflags<RHIShaderStages> stages)
+void D3D11CommandList::BindStorageBufferView(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages)
 {
   bool compute = (stages & RHIShaderStages::Compute) != 0;
-  UnbindUAVBuffer(range->Buffer);
+  UnbindUAVBuffer(range->GetBuffer());
 
-  ID3D11ShaderResourceView* srv = range->Buffer->GetShaderResourceView(range->Offset, range->Size);
+  ID3D11ShaderResourceView* srv = range->GetBuffer()->GetShaderResourceView(range->GetOffset(), range->GetSize());
 
   if ((stages & RHIShaderStages::Vertex) == RHIShaderStages::Vertex)
   {
@@ -848,7 +825,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
     {
       if (range->IsFullRange())
       {
-        ID3D11Buffer* buffer = range->Buffer->GetBuffer();
+        ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
         Context->VSSetConstantBuffers(slot, 1, &buffer);
       }
       else
@@ -866,7 +843,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   {
     if (range->IsFullRange())
     {
-      ID3D11Buffer* buffer = range->Buffer->GetBuffer();
+      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
       Context->GSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -876,14 +853,14 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
       {
         Context->GSSetConstantBuffers(slot, 1, nullptr);
       }
-      Context1->GSSetConstantBuffers1(slot, 1, CBOut.GetData(), FirstConstRef.GetData(), NumConstsRef.GetData()); // todo: check vortice
+      Context1->GSSetConstantBuffers1(slot, 1, CBOut.GetData(), FirstConstRef.GetData(), NumConstsRef.GetData());
     }
   }
   if ((stages & RHIShaderStages::TessellationControl) == RHIShaderStages::TessellationControl)
   {
     if (range->IsFullRange())
     {
-      ID3D11Buffer* buffer = range->Buffer->GetBuffer();
+      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
       Context->HSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -900,7 +877,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   {
     if (range->IsFullRange())
     {
-      ID3D11Buffer* buffer = range->Buffer->GetBuffer();
+      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
       Context->DSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -932,7 +909,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
     {
       if (range->IsFullRange())
       {
-        ID3D11Buffer* buffer = range->Buffer->GetBuffer();
+        ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
         Context->PSSetConstantBuffers(slot, 1, &buffer);
       }
       else
@@ -950,7 +927,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   {
     if (range->IsFullRange())
     {
-      ID3D11Buffer* buffer = range->Buffer->GetBuffer();
+      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
       Context->CSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -1099,25 +1076,17 @@ void D3D11CommandList::BindTextureView(D3D11TextureView* texView, ezUInt32 slot,
   }
 }
 
-void D3D11CommandList::UpdateSubresource_Workaround(ID3D11Resource* resource, int subresource, RawRect region, ezUInt8* data)
+void D3D11CommandList::UpdateSubresource_Workaround(ID3D11Resource* resource, ezUInt32 subresource, D3D11_BOX region, ezUInt8* data)
 {
   bool needWorkaround = !GraphicsDevice->SupportsCommandLists();
   void* pAdjustedSrcData = data;
   if (needWorkaround)
   {
     EZ_ASSERT_DEBUG(region.top == 0 && region.front == 0, "Region Top and Front are not 0.");
-    pAdjustedSrcData = (byte*)data - region.left;
+    pAdjustedSrcData = data - region.left;
   }
 
-  D3D11_BOX* subregion = new D3D11_BOX;
-  subregion->left = region.left;
-  subregion->right = region.right;
-  subregion->bottom = region.bottom;
-  subregion->back = region.back;
-  subregion->front = region.front;
-  subregion->top = region.top;
-
-  Context->UpdateSubresource(resource, subresource, subregion, pAdjustedSrcData, 0, 0);
+  Context->UpdateSubresource(resource, subresource, &region, pAdjustedSrcData, 0, 0);
 }
 
 D3D11DeviceBuffer* D3D11CommandList::GetFreeStagingBuffer(ezUInt32 size)
@@ -1131,8 +1100,7 @@ D3D11DeviceBuffer* D3D11CommandList::GetFreeStagingBuffer(ezUInt32 size)
     }
   }
 
-  RHIBuffer* staging = GraphicsDevice->GetResourceFactory()->CreateBuffer(
-    RHIBufferDescription(size, RHIBufferUsage::Staging));
+  RHIBuffer* staging = GraphicsDevice->GetResourceFactory()->CreateBuffer(RHIBufferDescription(size, RHIBufferUsage::Staging));
 
   return Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(staging);
 }
@@ -1194,21 +1162,7 @@ void D3D11CommandList::FlushScissorRects()
       // Because this array is resized using Util.EnsureMinimumArraySize, this might set more scissor rectangles
       // than are actually needed, but this is okay -- extras are essentially ignored and should be harmless.
 
-      ezDynamicArray<D3D11_RECT*> d3dRects;
-      d3dRects.SetCountUninitialized(Scissors.GetCount());
-
-      for (auto rect : Scissors)
-      {
-        D3D11_RECT d3dRect;
-        d3dRect.left = rect.left;
-        d3dRect.top = rect.top;
-        d3dRect.right = rect.right;
-        d3dRect.bottom = rect.bottom;
-
-        d3dRects.PushBack(&d3dRect);
-      }
-
-      Context->RSSetScissorRects(Scissors.GetCount(), *d3dRects.GetData());
+      Context->RSSetScissorRects(Scissors.GetCount(), Scissors.GetData());
     }
   }
 }
@@ -1219,22 +1173,7 @@ void D3D11CommandList::FlushViewports()
   {
     ViewportsChanged = false;
 
-    std::vector<D3D11_VIEWPORT> vps;
-    for (auto viewport : Viewports)
-    {
-      D3D11_VIEWPORT vp;
-      vp.TopLeftX = viewport.X;
-      vp.TopLeftY = viewport.Y;
-      vp.Width = viewport.Width;
-      vp.Height = viewport.Height;
-      vp.MinDepth = viewport.MinDepth;
-      vp.MaxDepth = viewport.MaxDepth;
-
-      vps.push_back(vp);
-    }
-
-    //vp.TopLeftX = viewp
-    Context->RSSetViewports(Viewports.GetCount(), vps.data());
+    Context->RSSetViewports(Viewports.GetCount(), Viewports.GetData());
   }
 }
 
@@ -1272,10 +1211,10 @@ void D3D11CommandList::ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInf
 {
   D3D11ResourceSet* d3d11RS = Util::AssertSubtype<RHIResourceSet, D3D11ResourceSet>(brsi.Set);
 
-  int cbBase = GetConstantBufferBase(slot, graphics);
-  int uaBase = GetUnorderedAccessBase(slot, graphics);
-  int textureBase = GetTextureBase(slot, graphics);
-  int samplerBase = GetSamplerBase(slot, graphics);
+  ezUInt32 cbBase = GetConstantBufferBase(slot, graphics);
+  ezUInt32 uaBase = GetUnorderedAccessBase(slot, graphics);
+  ezUInt32 textureBase = GetTextureBase(slot, graphics);
+  ezUInt32 samplerBase = GetSamplerBase(slot, graphics);
 
   D3D11ResourceLayout* layout = d3d11RS->GetLayout();
   ezDynamicArray<RHIResource*> resources = d3d11RS->GetResources();
@@ -1307,8 +1246,8 @@ void D3D11CommandList::ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInf
       case RHIResourceKind::StructuredBufferReadWrite:
       {
         D3D11BufferRange* range = GetBufferRange(resource, bufferOffset);
-        ID3D11UnorderedAccessView* uav = range->Buffer->GetUnorderedAccessView(range->Offset, range->Size);
-        BindUnorderedAccessView(nullptr, range->Buffer, uav, uaBase + rbi.Slot, rbi.Stages, slot);
+        ID3D11UnorderedAccessView* uav = range->GetBuffer()->GetUnorderedAccessView(range->GetOffset(), range->GetSize());
+        BindUnorderedAccessView(nullptr, range->GetBuffer(), uav, uaBase + rbi.Slot, rbi.Stages, slot);
       }
       break;
       case RHIResourceKind::TextureReadOnly:
@@ -1387,6 +1326,11 @@ void D3D11CommandList::UnbindSRVTexture(RHITexture* target)
     btis.Clear();
     PoolBoundTextureList(btis);
   }
+}
+
+void D3D11CommandList::PoolBoundTextureList(ezDynamicArray<BoundTextureInfo> btis)
+{
+  BoundTextureInfoPool.PushBack(btis);
 }
 
 ezUInt32 D3D11CommandList::GetConstantBufferBase(ezUInt32 slot, bool graphics)

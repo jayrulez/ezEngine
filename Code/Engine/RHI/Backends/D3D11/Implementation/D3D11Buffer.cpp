@@ -2,18 +2,6 @@
 #include <RHI/Backends/D3D11/D3D11Formats.h>
 #include <d3d11_1.h>
 
-template <>
-struct ezHashHelper<OffsetSizePair>
-{
-  EZ_ALWAYS_INLINE static ezUInt32 Hash(const OffsetSizePair& value) { return ezHashHelper<ezUInt64>::Hash(0); }
-
-  EZ_ALWAYS_INLINE static bool Equal(const OffsetSizePair& a, const OffsetSizePair& b) { return a == b; }
-};
-
-ezString D3D11DeviceBuffer::GetName() const
-{
-  return Name;
-}
 
 void D3D11DeviceBuffer::SetName(const ezString& name)
 {
@@ -30,11 +18,6 @@ void D3D11DeviceBuffer::SetName(const ezString& name)
 
     kvp.Value()->SetPrivateData(WKPDID_D3DDebugObjectName, sb.GetCharacterCount(), sb.GetData());
   }
-}
-
-bool D3D11DeviceBuffer::IsDisposed() const
-{
-  return Disposed;
 }
 
 void D3D11DeviceBuffer::Dispose()
@@ -60,21 +43,6 @@ void D3D11DeviceBuffer::Dispose()
   }
 }
 
-ezUInt32 D3D11DeviceBuffer::GetSize() const
-{
-  return Size;
-}
-
-ezBitflags<RHIBufferUsage> D3D11DeviceBuffer::GetUsage() const
-{
-  return Usage;
-}
-
-ID3D11Buffer* D3D11DeviceBuffer::GetBuffer() const
-{
-  return Buffer;
-}
-
 D3D11DeviceBuffer::D3D11DeviceBuffer(ID3D11Device* device, ezUInt32 size, ezBitflags<RHIBufferUsage> usage, ezUInt32 structureByteStride, bool rawBuffer)
 {
   Device = device;
@@ -97,7 +65,7 @@ D3D11DeviceBuffer::D3D11DeviceBuffer(ID3D11Device* device, ezUInt32 size, ezBitf
     else
     {
       bd.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-      bd.StructureByteStride = (int)structureByteStride;
+      bd.StructureByteStride = structureByteStride;
     }
   }
   if ((usage & RHIBufferUsage::IndirectBuffer) == RHIBufferUsage::IndirectBuffer)
@@ -153,7 +121,7 @@ ID3D11UnorderedAccessView* D3D11DeviceBuffer::GetUnorderedAccessView(ezUInt32 of
 ID3D11ShaderResourceView* D3D11DeviceBuffer::CreateShaderResourceView(ezUInt32 offset, ezUInt32 size)
 {
   ID3D11ShaderResourceView* srv = nullptr;
-  HRESULT hr = 0;
+  HRESULT hr;
   if (RawBuffer)
   {
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -161,13 +129,13 @@ ID3D11ShaderResourceView* D3D11DeviceBuffer::CreateShaderResourceView(ezUInt32 o
     srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
     srvDesc.BufferEx.NumElements = size / 4;
     srvDesc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
-    srvDesc.BufferEx.FirstElement = (int)offset / 4;
+    srvDesc.BufferEx.FirstElement = offset / 4;
     hr = Device->CreateShaderResourceView(Buffer, &srvDesc, &srv);
   }
   else
   {
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
     srvDesc.Buffer.NumElements = (size / StructureByteStride);
     srvDesc.Buffer.ElementOffset = (offset / StructureByteStride);
     hr = Device->CreateShaderResourceView(Buffer, &srvDesc, &srv);
@@ -179,7 +147,7 @@ ID3D11ShaderResourceView* D3D11DeviceBuffer::CreateShaderResourceView(ezUInt32 o
 ID3D11UnorderedAccessView* D3D11DeviceBuffer::CreateUnorderedAccessView(ezUInt32 offset, ezUInt32 size)
 {
   ID3D11UnorderedAccessView* uav = nullptr;
-  HRESULT hr = 0;
+  HRESULT hr;
   if (RawBuffer)
   {
     D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;

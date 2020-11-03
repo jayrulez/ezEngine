@@ -1,6 +1,11 @@
 #include <RHI/Backends/D3D11/D3D11ResourceFactory.h>
 #include <RHI/ValidationHelpers.h>
 
+ezEnum<RHIGraphicsBackend> D3D11ResourceFactory::GetBackendType() const
+{
+  return GraphicsDevice->GetBackendType();
+}
+
 D3D11ResourceFactory::D3D11ResourceFactory(D3D11GraphicsDevice* graphicsDevice)
   : RHIResourceFactory(graphicsDevice->GetFeatures())
 {
@@ -64,8 +69,33 @@ RHIBuffer* D3D11ResourceFactory::CreateBufferCore(const RHIBufferDescription& de
     description.RawBuffer);
 }
 
+RHISampler* D3D11ResourceFactory::CreateSamplerCore(const RHISamplerDescription& description)
+{
+  return new D3D11Sampler(Device, description);
+}
+
+RHIShader* D3D11ResourceFactory::CreateShaderCore(const RHIShaderDescription& description)
+{
+  return new D3D11Shader(Device, description);
+}
+
+RHIResourceLayout* D3D11ResourceFactory::CreateResourceLayoutCore(const RHIResourceLayoutDescription& description)
+{
+  return new D3D11ResourceLayout(description);
+}
+
 RHIResourceSet* D3D11ResourceFactory::CreateResourceSetCore(const RHIResourceSetDescription& description)
 {
   ValidationHelpers::ValidateResourceSet(GraphicsDevice, description);
   return new D3D11ResourceSet(description);
+}
+
+RHIFence* D3D11ResourceFactory::CreateFenceCore(bool signaled)
+{
+  return new D3D11Fence(signaled);
+}
+
+RHISwapchain* D3D11ResourceFactory::CreateSwapchainCore(const RHISwapchainDescription& description)
+{
+  return new D3D11Swapchain(GraphicsDevice, description);
 }

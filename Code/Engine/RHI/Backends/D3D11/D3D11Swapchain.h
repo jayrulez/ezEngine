@@ -21,10 +21,10 @@ private:
   D3D11GraphicsDevice* GraphicsDevice = nullptr;
   std::optional<ezEnum<RHIPixelFormat>> DepthFormat;
   IDXGISwapChain* DXGISwapChain = nullptr;
-  bool VSync;
-  ezUInt32 SyncInterval;
-  D3D11Framebuffer* Framebuffer;
-  D3D11Texture* DepthTexture;
+  bool VSync = false;
+  ezUInt32 SyncInterval = 0;
+  D3D11Framebuffer* Framebuffer = nullptr;
+  D3D11Texture* DepthTexture = nullptr;
   float PixelScale = 1.f;
   ezMutex ReferencedCLsMutex;
   ezHashSet<D3D11CommandList*> ReferencedCLs;

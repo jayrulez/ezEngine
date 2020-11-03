@@ -1,50 +1,19 @@
 #include <RHI/Backends/D3D11/D3D11ResourceLayout.h>
 
-D3D11ResourceLayout::ResourceBindingInfo::ResourceBindingInfo(ezUInt32 slot, ezBitflags<RHIShaderStages> stages, ezEnum<RHIResourceKind> kind, bool dynamicBuffer)
-{
-  Slot = slot;
-  Stages = stages;
-  Kind = kind;
-  DynamicBuffer = dynamicBuffer;
-}
-
-ezString D3D11ResourceLayout::GetName() const
-{
-  return Name;
-}
-
-void D3D11ResourceLayout::SetName(const ezString& name)
-{
-  Name = name;
-}
-
-bool D3D11ResourceLayout::IsDisposed() const
-{
-  return Disposed;
-}
-
-void D3D11ResourceLayout::Dispose()
-{
-  if (!Disposed)
-  {
-    Disposed = true;
-  }
-}
-
 D3D11ResourceLayout::D3D11ResourceLayout(const RHIResourceLayoutDescription& description)
   : RHIResourceLayout(description)
 {
   ezDynamicArray<RHIResourceLayoutElementDescription> elements = description.Elements;
   BindingInfosByRHIIndex.SetCountUninitialized(elements.GetCount());
 
-  int cbIndex = 0;
-  int texIndex = 0;
-  int samplerIndex = 0;
-  int unorderedAccessIndex = 0;
+  ezUInt32 cbIndex = 0;
+  ezUInt32 texIndex = 0;
+  ezUInt32 samplerIndex = 0;
+  ezUInt32 unorderedAccessIndex = 0;
 
   for (ezUInt32 i = 0; i < BindingInfosByRHIIndex.GetCount(); i++)
   {
-    int slot;
+    ezUInt32 slot;
     switch (elements[i].Kind)
     {
       case RHIResourceKind::UniformBuffer:
@@ -81,31 +50,6 @@ D3D11ResourceLayout::D3D11ResourceLayout(const RHIResourceLayoutDescription& des
   StorageBufferCount = unorderedAccessIndex;
   TextureCount = texIndex;
   SamplerCount = samplerIndex;
-}
-
-ezUInt32 D3D11ResourceLayout::GetUniformBufferCount() const
-{
-  return UniformBufferCount;
-}
-
-ezUInt32 D3D11ResourceLayout::GetStorageBufferCount() const
-{
-  return StorageBufferCount;
-}
-
-ezUInt32 D3D11ResourceLayout::GetTextureCount() const
-{
-  return TextureCount;
-}
-
-ezUInt32 D3D11ResourceLayout::GetSamplerCount() const
-{
-  return SamplerCount;
-}
-
-bool D3D11ResourceLayout::IsDynamicBuffer(ezUInt32 index) const
-{
-  return BindingInfosByRHIIndex[index].DynamicBuffer;
 }
 
 D3D11ResourceLayout::ResourceBindingInfo& D3D11ResourceLayout::GetDeviceSlotIndex(ezUInt32 resourceLayoutIndex)

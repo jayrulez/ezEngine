@@ -14,7 +14,7 @@ class D3D11Texture;
 
 namespace D3D11Util
 {
-  int ComputeSubresource(ezUInt32 mipLevel, ezUInt32 mipLevelCount, ezUInt32 arrayLayer);
+  ezUInt32 ComputeSubresource(ezUInt32 mipLevel, ezUInt32 mipLevelCount, ezUInt32 arrayLayer);
 
   D3D11_SHADER_RESOURCE_VIEW_DESC GetSrvDesc(
     D3D11Texture* tex,
