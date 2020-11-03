@@ -270,3 +270,7 @@ void RHIGraphicsDevice::PostDeviceCreated()
     Aniso4xSampler = GetResourceFactory()->CreateSampler(RHISamplerDescription::Aniso4x);
   }
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Device_Implementation_GraphicsDevice);
+

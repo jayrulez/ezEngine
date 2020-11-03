@@ -39,3 +39,7 @@ const RHIBlendAttachmentDescription RHIBlendAttachmentDescription::Disabled = RH
   RHIBlendFactor::Zero,  // DestinationAlphaFactor
   RHIBlendFunction::Add  // AlphaFunction
 };
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_BlendAttachmentDescription);
+

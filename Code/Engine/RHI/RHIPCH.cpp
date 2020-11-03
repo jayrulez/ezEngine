@@ -5,13 +5,41 @@ EZ_STATICLINK_LIBRARY(RHI)
   if (bReturn)
     return;
 
-  EZ_STATICLINK_REFERENCE(RHI_Implementation_Utils);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Buffer);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11CommandList);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Fence);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Formats);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Framebuffer);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11GraphicsDevice);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Pipeline);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11ResourceCache);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11ResourceFactory);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11ResourceLayout);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11ResourceSet);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Sampler);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Shader);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Swapchain);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Texture);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11TextureView);
+  EZ_STATICLINK_REFERENCE(RHI_Backends_D3D11_Implementation_D3D11Util);
   EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_BlendAttachmentDescription);
-  EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_BlendStencilStateDescription);
+  EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_DepthStencilStateDescription);
   EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_FramebufferAttachmentDescription);
   EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_OutputDescription);
   EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_RasterizerStateDescription);
   EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_SamplerDescription);
   EZ_STATICLINK_REFERENCE(RHI_Descriptors_Implementation_TextureViewDescription);
+  EZ_STATICLINK_REFERENCE(RHI_Device_Implementation_GraphicsDevice);
+  EZ_STATICLINK_REFERENCE(RHI_Implementation_FormatHelpers);
+  EZ_STATICLINK_REFERENCE(RHI_Implementation_GraphicsUtils);
+  EZ_STATICLINK_REFERENCE(RHI_Implementation_Util);
+  EZ_STATICLINK_REFERENCE(RHI_Implementation_ValidationHelpers);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_BoundResourceSetInfo);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_CommandList);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_Framebuffer);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_FramebufferAttachment);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_MappedResource);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_MappedResourceCacheKey);
+  EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_ResourceFactory);
   EZ_STATICLINK_REFERENCE(RHI_Resources_Implementation_Texture);
 }

@@ -692,3 +692,7 @@ RHID3D11DeviceOptions D3D11GraphicsDevice::MergeOptions(const RHIGraphicsDeviceO
 
   return d3D11DeviceOptions;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11GraphicsDevice);
+

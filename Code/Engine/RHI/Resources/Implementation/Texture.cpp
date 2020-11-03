@@ -30,3 +30,7 @@ RHITextureView* RHITexture::CreateFullTextureView(RHIGraphicsDevice* graphicsDev
 {
   return graphicsDevice->GetResourceFactory()->CreateTextureView(this);
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resources_Implementation_Texture);
+

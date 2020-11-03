@@ -1019,3 +1019,7 @@ void RHICommandList::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, cons
   ezUInt8* sourcePtr = reinterpret_cast<ezUInt8*>(&source);
   UpdateBuffer(buffer, bufferOffset, sourcePtr, size);
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resources_Implementation_CommandList);
+

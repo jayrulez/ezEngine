@@ -29,3 +29,7 @@ const RHIDepthStencilStateDescription RHIDepthStencilStateDescription::Disabled 
   false,                       // DepthWriteEnabled
   RHIComparisonKind::LessEqual // DepthComparison
 };
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_DepthStencilStateDescription);
+

@@ -45,3 +45,7 @@ bool RHIBoundResourceSetInfo::Equals(const RHIBoundResourceSetInfo& other) const
 
   return true;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resources_Implementation_BoundResourceSetInfo);
+

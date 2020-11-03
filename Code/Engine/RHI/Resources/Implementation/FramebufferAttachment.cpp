@@ -53,3 +53,7 @@ RHIFramebufferAttachment::RHIFramebufferAttachment(RHITexture* target, ezUInt32 
   ArrayLayer = arrayLayer;
   MipLevel = mipLevel;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resources_Implementation_FramebufferAttachment);
+

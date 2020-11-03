@@ -38,3 +38,7 @@ const RHISamplerDescription RHISamplerDescription::Aniso4x = RHISamplerDescripti
   0,                             // LodBias,
   RHISamplerBorderColor::Default // BorderColor
 };
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_SamplerDescription);
+

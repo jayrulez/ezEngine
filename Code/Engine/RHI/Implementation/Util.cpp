@@ -116,3 +116,7 @@ namespace Util
     }
   }
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Implementation_Util);
+

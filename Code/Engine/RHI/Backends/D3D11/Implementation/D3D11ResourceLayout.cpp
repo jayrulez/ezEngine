@@ -61,3 +61,7 @@ D3D11ResourceLayout::ResourceBindingInfo& D3D11ResourceLayout::GetDeviceSlotInde
 
   return BindingInfosByRHIIndex[resourceLayoutIndex];
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11ResourceLayout);
+

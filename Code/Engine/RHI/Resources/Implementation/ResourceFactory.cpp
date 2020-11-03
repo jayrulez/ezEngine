@@ -369,3 +369,7 @@ RHIResourceFactory::RHIResourceFactory(const RHIGraphicsDeviceFeatures& features
 {
   Features = features;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resources_Implementation_ResourceFactory);
+

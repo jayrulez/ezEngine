@@ -186,3 +186,7 @@ ezDynamicArray<ezUInt32> D3D11Pipeline::GetVertexStrides() const
 {
   return VertexStrides;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Pipeline);
+

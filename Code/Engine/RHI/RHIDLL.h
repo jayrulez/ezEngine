@@ -5,6 +5,10 @@
 #include <Foundation/Types/Id.h>
 #include <Foundation/Types/RefCounted.h>
 
+#if EZ_ENABLED(EZ_PLATFORM_WINDOWS_DESKTOP)
+#  include <Foundation/Basics/Platform/Win/MinWindows.h>
+#endif
+
 // Configure the DLL Import/Export Define
 #if EZ_ENABLED(EZ_COMPILE_ENGINE_AS_DLL)
 #  ifdef BUILDSYSTEM_BUILDING_RHI_LIB

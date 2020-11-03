@@ -99,3 +99,7 @@ RHISwapchain* D3D11ResourceFactory::CreateSwapchainCore(const RHISwapchainDescri
 {
   return new D3D11Swapchain(GraphicsDevice, description);
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11ResourceFactory);
+

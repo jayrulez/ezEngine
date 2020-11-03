@@ -15,3 +15,7 @@ const RHIRasterizerStateDescription RHIRasterizerStateDescription::CullNone = RH
   true,                      // DepthClipEnabled
   false                      // ScissorTestEnabled
 };
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_RasterizerStateDescription);
+

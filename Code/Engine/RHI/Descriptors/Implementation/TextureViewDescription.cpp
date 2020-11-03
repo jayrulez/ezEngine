@@ -40,3 +40,7 @@ RHITextureViewDescription::RHITextureViewDescription(RHITexture* target, ezEnum<
   ArrayLayers = arrayLayers;
   Format = std::make_optional(target->GetFormat());
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_TextureViewDescription);
+

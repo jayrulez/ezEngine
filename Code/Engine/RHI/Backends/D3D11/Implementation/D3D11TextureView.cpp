@@ -127,3 +127,7 @@ ID3D11UnorderedAccessView* D3D11TextureView::GetUnorderedAccessView() const
 {
   return UnorderedAccessView;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11TextureView);
+

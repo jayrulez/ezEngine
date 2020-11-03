@@ -874,3 +874,7 @@ namespace D3D11Formats
     }
   }
 } // namespace D3D11Formats
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Formats);
+

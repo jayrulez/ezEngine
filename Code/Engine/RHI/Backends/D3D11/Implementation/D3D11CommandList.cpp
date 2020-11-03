@@ -1384,3 +1384,7 @@ ezUInt32 D3D11CommandList::GetSamplerBase(ezUInt32 slot, bool graphics)
 
   return ret;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11CommandList);
+

@@ -54,3 +54,7 @@ bool D3D11Fence::Wait(ezUInt64 nanosecondTimeout)
 {
   return Signal->WaitForSignal(ezTime::Nanoseconds((double)nanosecondTimeout)) == ezThreadSignal::WaitResult::Signaled;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Fence);
+

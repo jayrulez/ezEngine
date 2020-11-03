@@ -112,3 +112,7 @@ ezDynamicArray<ezUInt8> D3D11Shader::CompileCode(const RHIShaderDescription& des
   return ezDynamicArray<ezUInt8>();
 }
 
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Shader);
+

@@ -25,3 +25,7 @@ RHIFramebufferAttachmentDescription::RHIFramebufferAttachmentDescription(RHIText
   ArrayLayer = arrayLayer;
   MipLevel = mipLevel;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_FramebufferAttachmentDescription);
+

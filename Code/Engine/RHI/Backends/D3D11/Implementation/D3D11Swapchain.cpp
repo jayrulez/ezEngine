@@ -251,3 +251,7 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
 
   Resize(description.Width, description.Height);
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Swapchain);
+

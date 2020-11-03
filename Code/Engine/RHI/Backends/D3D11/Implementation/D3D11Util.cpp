@@ -136,3 +136,7 @@ namespace D3D11DeviceUtils
     return EZ_SUCCESS;
   }
 } // namespace D3D11DeviceUtils
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Util);
+

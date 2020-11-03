@@ -87,3 +87,7 @@ ezUInt32 RHIFramebuffer::GetHeight() const
 {
   return Height;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resources_Implementation_Framebuffer);
+

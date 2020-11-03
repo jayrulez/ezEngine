@@ -22,3 +22,7 @@ RHIOutputDescription RHIOutputDescription::CreateFromFramebuffer(RHIFramebuffer*
 
   return RHIOutputDescription(depthAttachment, colorAttachments, sampleCount);
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Descriptors_Implementation_OutputDescription);
+

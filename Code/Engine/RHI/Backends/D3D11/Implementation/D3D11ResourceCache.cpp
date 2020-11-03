@@ -288,3 +288,7 @@ ezUInt32 D3D11ResourceCache::SemanticIndices::GetAndIncrement(SemanticIndices& s
       return 0;
   }
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11ResourceCache);
+

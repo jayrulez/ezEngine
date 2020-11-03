@@ -12,6 +12,7 @@
 #  ifdef EZ_RHI_D3D11_SUPPORTED
 #include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
 #include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
+#include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
 #  endif
 
 #endif
@@ -92,11 +93,7 @@ public:
   /// <param name="options">Describes several common properties of the GraphicsDevice.</param>
   /// <param name="swapchainDescription">A description of the main Swapchain to create.</param>
   /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
-  static RHIGraphicsDevice* CreateD3D11(const RHIGraphicsDeviceOptions& options, const RHISwapchainDescription& swapchainDescription)
-  {
-    //return new D3D11GraphicsDevice(options, D3D11DeviceOptions(), swapchainDescription);
-    return nullptr;
-  }
+  static RHIGraphicsDevice* CreateD3D11(const RHIGraphicsDeviceOptions& options, const RHISwapchainDescription& swapchainDescription);
 
   /// <summary>
   /// Creates a new <see cref="GraphicsDevice"/> using Direct3D 11.

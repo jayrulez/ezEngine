@@ -151,3 +151,7 @@ void D3D11Framebuffer::SetSwapchain(D3D11Swapchain* swapchain)
 {
   Swapchain = swapchain;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Framebuffer);
+
