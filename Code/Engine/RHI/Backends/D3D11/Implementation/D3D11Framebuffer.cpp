@@ -52,7 +52,7 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
     D3D11Texture* d3dDepthTarget = Util::AssertSubtype<RHITexture, D3D11Texture>(description.DepthTarget.value().Target);
 
     D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-    dsvDesc.Format = D3D11FormatUtils::GetDepthFormat(d3dDepthTarget->GetFormat());
+    dsvDesc.Format = D3D11Formats::GetDepthFormat(d3dDepthTarget->GetFormat());
 
     if (d3dDepthTarget->GetArrayLayers())
     {
@@ -95,7 +95,7 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
       D3D11Texture* d3dColorTarget = Util::AssertSubtype<RHITexture, D3D11Texture>(description.ColorTargets[i].Target);
 
       D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-      rtvDesc.Format = D3D11FormatUtils::ToDxgiFormat(d3dColorTarget->GetFormat(), false);
+      rtvDesc.Format = D3D11Formats::ToDxgiFormat(d3dColorTarget->GetFormat(), false);
 
 
       if (d3dColorTarget->GetArrayLayers() > 1 || (d3dColorTarget->GetUsage() & RHITextureUsage::Cubemap) != 0)

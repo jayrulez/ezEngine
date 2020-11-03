@@ -1,5 +1,6 @@
 #include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
 #include <RHI/Backends/D3D11/D3D11TextureView.h>
+#include <RHI/Util.h>
 
 #include <d3d11_1.h>
 
@@ -51,9 +52,7 @@ D3D11TextureView::D3D11TextureView(D3D11GraphicsDevice* graphicsDevice, const RH
   : RHITextureView(description)
 {
   ID3D11Device* device = graphicsDevice->GetDevice();
-  D3D11Texture* d3dTex = reinterpret_cast<D3D11Texture*>(description.Target);
-
-  EZ_ASSERT_ALWAYS(d3dTex != nullptr, "");
+  D3D11Texture* d3dTex = Util::AssertSubtype<RHITexture, D3D11Texture>(description.Target);
 
   D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = D3D11Util::GetSrvDesc(
     d3dTex,
@@ -68,7 +67,7 @@ D3D11TextureView::D3D11TextureView(D3D11GraphicsDevice* graphicsDevice, const RH
   if ((d3dTex->GetUsage() & RHITextureUsage::Storage) == RHITextureUsage::Storage)
   {
     D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-    uavDesc.Format = D3D11FormatUtils::GetViewFormat(d3dTex->GetDxgiFormat());
+    uavDesc.Format = D3D11Formats::GetViewFormat(d3dTex->GetDxgiFormat());
 
     if ((d3dTex->GetUsage() & RHITextureUsage::Cubemap) == RHITextureUsage::Cubemap)
     {

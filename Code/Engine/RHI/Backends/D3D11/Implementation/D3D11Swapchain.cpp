@@ -106,7 +106,7 @@ RHIFramebuffer* D3D11Swapchain::GetFramebuffer() const
     D3D11Texture* backBufferVdTexture = new D3D11Texture(
       backBufferTexture,
       RHITextureType::Texture2D,
-      D3D11FormatUtils::ToRHIFormat(ColorFormat));
+      D3D11Formats::ToRHIFormat(ColorFormat));
 
     ezDynamicArray<RHITexture*> colorTargets;
     colorTargets.PushBack(backBufferVdTexture);

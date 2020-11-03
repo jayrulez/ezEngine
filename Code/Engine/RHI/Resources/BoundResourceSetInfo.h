@@ -10,11 +10,12 @@ class RHIResourceSet;
 struct RHIBoundResourceSetInfo : public ezHashableStruct<RHIBoundResourceSetInfo>
 {
   RHIResourceSet* Set = nullptr;
-  ezHybridArray<ezUInt32, 5> Offsets;
+  RHISmallFixedOrDynamicArray* Offsets;
 
   RHIBoundResourceSetInfo() = default;
 
   RHIBoundResourceSetInfo(RHIResourceSet* set, ezDynamicArray<ezUInt32> offsets);
+  ~RHIBoundResourceSetInfo();
 
   bool Equals(RHIResourceSet* set, ezUInt32 offsetsCount, ezDynamicArray<ezUInt32> offsets) const;
 

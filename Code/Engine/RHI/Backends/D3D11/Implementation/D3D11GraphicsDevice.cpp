@@ -192,7 +192,7 @@ RHIMappedResource* D3D11GraphicsDevice::MapCore(RHIResource* resource, ezEnum<RH
         ezLock lock(ImmediateContextMutex);
         D3D11_MAPPED_SUBRESOURCE msr;
         HRESULT hr = ImmediateContext->Map(buffer->GetBuffer(), 0,
-          D3D11FormatUtils::RHIToD3D11MapMode((buffer->GetUsage() & RHIBufferUsage::Dynamic) == RHIBufferUsage::Dynamic, mode), 0, &msr);
+          D3D11Formats::RHIToD3D11MapMode((buffer->GetUsage() & RHIBufferUsage::Dynamic) == RHIBufferUsage::Dynamic, mode), 0, &msr);
 
         ezUInt64* data = reinterpret_cast<ezUInt64*>(msr.pData);
 
@@ -214,7 +214,7 @@ RHIMappedResource* D3D11GraphicsDevice::MapCore(RHIResource* resource, ezEnum<RH
         HRESULT hr = ImmediateContext->Map(
           texture->GetDeviceTexture(),
           subresource,
-          D3D11FormatUtils::RHIToD3D11MapMode(false, mode),
+          D3D11Formats::RHIToD3D11MapMode(false, mode),
           0,
           &msr);
 
@@ -426,7 +426,7 @@ void D3D11GraphicsDevice::DisposeCore()
 
 ezEnum<RHITextureSampleCount> D3D11GraphicsDevice::GetSampleCountLimit(ezEnum<RHIPixelFormat> format, bool depthFormat)
 {
-  DXGI_FORMAT dxgiFormat = D3D11FormatUtils::ToDxgiFormat(format, depthFormat);
+  DXGI_FORMAT dxgiFormat = D3D11Formats::ToDxgiFormat(format, depthFormat);
   if (CheckFormatMultisample(dxgiFormat, 32))
   {
     return RHITextureSampleCount::Count32;
@@ -453,13 +453,13 @@ ezEnum<RHITextureSampleCount> D3D11GraphicsDevice::GetSampleCountLimit(ezEnum<RH
 
 bool D3D11GraphicsDevice::GetPixelFormatSupportCore(ezEnum<RHIPixelFormat> format, ezEnum<RHITextureType> type, ezBitflags<RHITextureUsage> usage, RHIPixelFormatProperties& properties)
 {
-  if (D3D11FormatUtils::IsUnsupportedFormat(format))
+  if (D3D11Formats::IsUnsupportedFormat(format))
   {
     properties = RHIPixelFormatProperties();
     return false;
   }
 
-  DXGI_FORMAT dxgiFormat = D3D11FormatUtils::ToDxgiFormat(format, (usage & RHITextureUsage::DepthStencil) != 0);
+  DXGI_FORMAT dxgiFormat = D3D11Formats::ToDxgiFormat(format, (usage & RHITextureUsage::DepthStencil) != 0);
 
   D3D11_FORMAT_SUPPORT fs;
 

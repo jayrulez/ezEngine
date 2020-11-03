@@ -28,52 +28,52 @@ void D3D11Texture::Dispose()
   }
 }
 
- ezEnum<RHIPixelFormat> D3D11Texture::GetFormat() const
+ezEnum<RHIPixelFormat> D3D11Texture::GetFormat() const
 {
   return Format;
 }
 
- ezUInt32 D3D11Texture::GetWidth() const
+ezUInt32 D3D11Texture::GetWidth() const
 {
   return Width;
 }
 
- ezUInt32 D3D11Texture::GetHeight() const
+ezUInt32 D3D11Texture::GetHeight() const
 {
   return Height;
 }
 
- ezUInt32 D3D11Texture::GetDepth() const
+ezUInt32 D3D11Texture::GetDepth() const
 {
   return Depth;
 }
 
- ezUInt32 D3D11Texture::GetMipLevels() const
+ezUInt32 D3D11Texture::GetMipLevels() const
 {
   return MipLevels;
 }
 
- ezUInt32 D3D11Texture::GetArrayLayers() const
+ezUInt32 D3D11Texture::GetArrayLayers() const
 {
   return ArrayLayers;
 }
 
- ezBitflags<RHITextureUsage> D3D11Texture::GetUsage() const
+ezBitflags<RHITextureUsage> D3D11Texture::GetUsage() const
 {
   return TextureUsage;
 }
 
- ezEnum<RHITextureType> D3D11Texture::GetType() const
+ezEnum<RHITextureType> D3D11Texture::GetType() const
 {
   return TextureType;
 }
 
- ezEnum<RHITextureSampleCount> D3D11Texture::GetSampleCount() const
+ezEnum<RHITextureSampleCount> D3D11Texture::GetSampleCount() const
 {
   return SampleCount;
 }
 
-   ID3D11Resource* D3D11Texture::GetDeviceTexture()
+ID3D11Resource* D3D11Texture::GetDeviceTexture()
 {
   return DeviceTexture;
 }
@@ -102,8 +102,8 @@ D3D11Texture::D3D11Texture(ID3D11Device* device, const RHITextureDescription& de
   TextureType = description.Type;
   SampleCount = description.SampleCount;
 
-  DxgiFormat = D3D11FormatUtils::ToDxgiFormat(description.Format, (description.Usage & RHITextureUsage::DepthStencil) == RHITextureUsage::DepthStencil);
-  TypelessDxgiFormat = D3D11FormatUtils::GetTypelessFormat(DxgiFormat);
+  DxgiFormat = D3D11Formats::ToDxgiFormat(description.Format, (description.Usage & RHITextureUsage::DepthStencil) == RHITextureUsage::DepthStencil);
+  TypelessDxgiFormat = D3D11Formats::GetTypelessFormat(DxgiFormat);
 
   ezUInt32 cpuFlags = 0;      //D3D11_CPU_ACCESS_FLAG
   ezUInt32 resourceUsage = 0; //D3D11_USAGE
@@ -226,20 +226,17 @@ D3D11Texture::D3D11Texture(ID3D11Texture2D* existingTexture, ezEnum<RHITextureTy
   SampleCount = FormatHelpers::GetSampleCount(desc.SampleDesc.Count);
   TextureType = type;
 
-  TextureUsage = D3D11FormatUtils::GetRHIUsage((D3D11_BIND_FLAG)desc.BindFlags, (D3D11_CPU_ACCESS_FLAG)desc.CPUAccessFlags, (D3D11_RESOURCE_MISC_FLAG)desc.MiscFlags);
+  TextureUsage = D3D11Formats::GetRHIUsage((D3D11_BIND_FLAG)desc.BindFlags, (D3D11_CPU_ACCESS_FLAG)desc.CPUAccessFlags, (D3D11_RESOURCE_MISC_FLAG)desc.MiscFlags);
 
-  DxgiFormat = D3D11FormatUtils::ToDxgiFormat(
-    format,
-    (TextureUsage & RHITextureUsage::DepthStencil) == RHITextureUsage::DepthStencil);
-  TypelessDxgiFormat = D3D11FormatUtils::GetTypelessFormat(DxgiFormat);
+  DxgiFormat = D3D11Formats::ToDxgiFormat(format, (TextureUsage & RHITextureUsage::DepthStencil) == RHITextureUsage::DepthStencil);
+  TypelessDxgiFormat = D3D11Formats::GetTypelessFormat(DxgiFormat);
 }
 
 RHITextureView* D3D11Texture::CreateFullTextureView(RHIGraphicsDevice* graphicsDevice)
 {
-  RHITextureViewDescription desc(this);
+  const RHITextureViewDescription& desc(this);
 
-  D3D11GraphicsDevice* d3d11GD = reinterpret_cast<D3D11GraphicsDevice*>(graphicsDevice);
-  EZ_ASSERT_ALWAYS(graphicsDevice != nullptr, "");
+  D3D11GraphicsDevice* d3d11GD = Util::AssertSubtype<RHIGraphicsDevice, D3D11GraphicsDevice>(graphicsDevice);
 
   return new D3D11TextureView(d3d11GD, desc);
 }

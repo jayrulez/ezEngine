@@ -7,6 +7,7 @@
 #include <RHI/Backends/D3D11/D3D11Swapchain.h>
 #include <RHI/Backends/D3D11/D3D11Texture.h>
 #include <RHI/Backends/D3D11/D3D11TextureView.h>
+#include <RHI/Backends/D3D11/D3D11Util.h>
 
 #include <RHI/Util.h>
 
@@ -81,11 +82,11 @@ void D3D11CommandList::Dispose()
 
     for (RHIBoundResourceSetInfo& boundGraphicsSet : GraphicsResourceSets)
     {
-      boundGraphicsSet.Offsets.Clear();
+      boundGraphicsSet.Offsets->Dispose();
     }
     for (RHIBoundResourceSetInfo& boundComputeSet : ComputeResourceSets)
     {
-      boundComputeSet.Offsets.Clear();
+      boundComputeSet.Offsets->Dispose();
     }
 
     for (D3D11DeviceBuffer* buffer : AvailableStagingBuffers)
@@ -253,7 +254,7 @@ void D3D11CommandList::SetIndexBufferCore(RHIBuffer* buffer, ezEnum<RHIIndexForm
     D3D11DeviceBuffer* d3d11Buffer = Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(buffer);
 
     UnbindUAVBuffer(buffer);
-    Context->IASetIndexBuffer(d3d11Buffer->GetBuffer(), D3D11FormatUtils::ToDxgiFormat(format), offset);
+    Context->IASetIndexBuffer(d3d11Buffer->GetBuffer(), D3D11Formats::ToDxgiFormat(format), offset);
   }
 }
 
@@ -264,7 +265,7 @@ void D3D11CommandList::SetGraphicsResourceSetCore(ezUInt32 slot, RHIResourceSet*
     return;
   }
 
-  GraphicsResourceSets[slot].Offsets.Clear();
+  GraphicsResourceSets[slot].Offsets->Dispose();
   GraphicsResourceSets[slot] = RHIBoundResourceSetInfo(resourceSet /* TODO:, dynamicOffsetsCount*/, dynamicOffsets);
   ActivateResourceSet(slot, GraphicsResourceSets[slot], true);
 }
@@ -276,7 +277,7 @@ void D3D11CommandList::SetComputeResourceSetCore(ezUInt32 slot, RHIResourceSet* 
     return;
   }
 
-  ComputeResourceSets[slot].Offsets.Clear();
+  ComputeResourceSets[slot].Offsets->Dispose();
   ComputeResourceSets[slot] = RHIBoundResourceSetInfo(resourceSet, /*TODO dynamicOffsetsCount,*/ dynamicOffsets);
   ActivateResourceSet(slot, ComputeResourceSets[slot], false);
 }
@@ -459,7 +460,7 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
     HRESULT hr = Context->Map(
       d3dBuffer->GetBuffer(),
       0,
-      D3D11FormatUtils::RHIToD3D11MapMode(isDynamic, RHIMapMode::Write),
+      D3D11Formats::RHIToD3D11MapMode(isDynamic, RHIMapMode::Write),
       0,
       &msb);
     if (size < 1024)
@@ -678,10 +679,7 @@ void D3D11CommandList::ClearSets(ezDynamicArray<RHIBoundResourceSetInfo>& boundS
 {
   for (RHIBoundResourceSetInfo& boundSetInfo : boundSets)
   {
-    // TODO
-    ezUInt32 offsetsCount = boundSetInfo.Offsets.GetCount();
-    boundSetInfo.Offsets.Clear();
-    boundSetInfo.Offsets.SetCountUninitialized(offsetsCount);
+    boundSetInfo.Offsets->Dispose();
   }
   Util::ClearArray(boundSets);
 }
@@ -1288,7 +1286,7 @@ void D3D11CommandList::ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInf
     ezUInt32 bufferOffset = 0;
     if (layout->IsDynamicBuffer(i))
     {
-      bufferOffset = brsi.Offsets[dynamicOffsetIndex];
+      bufferOffset = brsi.Offsets->Get(dynamicOffsetIndex);
       dynamicOffsetIndex += 1;
     }
     D3D11ResourceLayout::ResourceBindingInfo rbi = layout->GetDeviceSlotIndex(i);

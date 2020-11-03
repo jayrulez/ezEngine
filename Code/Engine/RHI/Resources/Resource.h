@@ -37,7 +37,13 @@ EZ_DECLARE_FLAGS_OPERATORS(RHIResourceFlags);
 class EZ_RHI_DLL RHIResource : public ezRefCounted
 {
 public:
-  virtual ~RHIResource() {}
+  virtual ~RHIResource()
+  {
+    if (!IsDisposed())
+    {
+      Dispose();
+    }
+  }
 
   /// <summary>
   /// A string identifying this instance. Can be used to differentiate between objects in graphics debuggers and other
@@ -51,12 +57,12 @@ public:
   /// Checks if this device resource has been disposed
   /// </summary>
   /// <returns></returns>
-  virtual bool IsDisposed() const = 0;
+  virtual bool IsDisposed() const { return false; }
 
   /// <summary>
   /// Frees device resources controlled by this instance.
   /// </summary>
-  virtual void Dispose() = 0;
+  virtual void Dispose() {}
 
   const ezBitflags<RHIResourceFlags> GetFlags() const
   {

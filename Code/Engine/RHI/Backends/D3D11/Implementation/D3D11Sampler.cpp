@@ -38,13 +38,13 @@ void D3D11Sampler::SetName(const ezString& name)
 
  D3D11Sampler::D3D11Sampler(ID3D11Device* device, const RHISamplerDescription& description)
 {
-  D3D11_COMPARISON_FUNC comparision = !description.ComparisonKind.has_value() ? D3D11_COMPARISON_NEVER : D3D11FormatUtils::RHIToD3D11ComparisonFunc(description.ComparisonKind.value());
+  D3D11_COMPARISON_FUNC comparision = !description.ComparisonKind.has_value() ? D3D11_COMPARISON_NEVER : D3D11Formats::RHIToD3D11ComparisonFunc(description.ComparisonKind.value());
   D3D11_SAMPLER_DESC samplerStateDesc;
 
-  samplerStateDesc.AddressU = D3D11FormatUtils::RHIToD3D11AddressMode(description.AddressModeU);
-  samplerStateDesc.AddressV = D3D11FormatUtils::RHIToD3D11AddressMode(description.AddressModeV);
-  samplerStateDesc.AddressW = D3D11FormatUtils::RHIToD3D11AddressMode(description.AddressModeW);
-  samplerStateDesc.Filter = D3D11FormatUtils::ToD3D11Filter(description.Filter, description.ComparisonKind.has_value());
+  samplerStateDesc.AddressU = D3D11Formats::RHIToD3D11AddressMode(description.AddressModeU);
+  samplerStateDesc.AddressV = D3D11Formats::RHIToD3D11AddressMode(description.AddressModeV);
+  samplerStateDesc.AddressW = D3D11Formats::RHIToD3D11AddressMode(description.AddressModeW);
+  samplerStateDesc.Filter = D3D11Formats::ToD3D11Filter(description.Filter, description.ComparisonKind.has_value());
   samplerStateDesc.MinLOD = (float)description.MinimumLod;
   samplerStateDesc.MaxLOD = (float)description.MaximumLod;
   samplerStateDesc.MaxAnisotropy = description.MaximumAnisotropy;

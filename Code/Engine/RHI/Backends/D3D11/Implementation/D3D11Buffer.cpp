@@ -1,5 +1,5 @@
 #include <RHI/Backends/D3D11/D3D11Buffer.h>
-#include <RHI/Backends/D3D11/D3D11Utils.h>
+#include <RHI/Backends/D3D11/D3D11Formats.h>
 #include <d3d11_1.h>
 
 template <>
@@ -85,7 +85,7 @@ D3D11DeviceBuffer::D3D11DeviceBuffer(ID3D11Device* device, ezUInt32 size, ezBitf
 
   D3D11_BUFFER_DESC bd;
   bd.ByteWidth = size;
-  bd.BindFlags = D3D11FormatUtils::RHIToD3D11BindFlags(usage);
+  bd.BindFlags = D3D11Formats::RHIToD3D11BindFlags(usage);
   bd.Usage = D3D11_USAGE_DEFAULT;
 
   if ((usage & RHIBufferUsage::StructuredBufferReadOnly) == RHIBufferUsage::StructuredBufferReadOnly || (usage & RHIBufferUsage::StructuredBufferReadWrite) == RHIBufferUsage::StructuredBufferReadWrite)

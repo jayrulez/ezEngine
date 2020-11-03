@@ -78,7 +78,7 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
   DepthStencilState = depthStencilState;
   StencilReference = description.DepthStencilState.StencilReference;
   RasterizerState = rasterizerState;
-  PrimitiveTopology = D3D11FormatUtils::RHIToD3D11PrimitiveTopology(description.PrimitiveTopology);
+  PrimitiveTopology = D3D11Formats::RHIToD3D11PrimitiveTopology(description.PrimitiveTopology);
 
   ezDynamicArray<RHIResourceLayout*> genericLayouts = description.ResourceLayouts;
   ResourceLayouts.SetCountUninitialized(genericLayouts.GetCount());

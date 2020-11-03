@@ -685,9 +685,9 @@ struct EZ_RHI_DLL RHIPrimitiveTopology // : byte
 /// Identifies a particular binding model used when connecting elements in a <see cref="RHIResourceLayout"/> with resources
 /// defined in API-specific shader code.
 /// </summary>
-struct EZ_RHI_DLL RHIResourceBindingModel // : byte
+struct EZ_RHI_DLL RHIResourceBindingModel // : uint
 {
-  using StorageType = ezUInt8;
+  using StorageType = ezUInt32;
   enum Enum
   {
     /// <summary>
@@ -1676,4 +1676,56 @@ struct RHIRawRect
   /// <param name="value">The value to convert.</param>
   /// <returns>The result of the conversion.</returns>
   //static implicit operator RawRect(Rectangle value) = > new RawRect(value.Left, value.Top, value.Right, value.Bottom);
+};
+
+struct RHISmallFixedOrDynamicArray
+{
+private:
+  static constexpr ezUInt32 MaxFixedValues = 5;
+  ezUInt32 Count;
+  ezStaticArray<ezUInt32, MaxFixedValues> FixedData;
+  ezDynamicArray<ezUInt32> Data;
+
+public:
+  RHISmallFixedOrDynamicArray(ezUInt32 count, ezDynamicArray<ezUInt32> data)
+  {
+    if (count > MaxFixedValues)
+    {
+      Data.SetCountUninitialized(count);
+    }
+    else
+    {
+      for (ezUInt32 i = 0; i < count; i++)
+      {
+        FixedData[i] = data[i];
+      }
+      Data.Clear();
+    }
+    Count = count;
+  }
+
+  ezUInt32 Get(ezUInt32 index) const
+  {
+    if (Count > MaxFixedValues)
+    {
+      return Data[index];
+    }
+    else
+    {
+      return FixedData[index];
+    }
+  }
+
+  ezUInt32 GetCount() const
+  {
+    return Count;
+  }
+
+  void Dispose()
+  {
+    if (Data.GetCount() > 0)
+    {
+      Data.Clear();
+    }
+  }
 };

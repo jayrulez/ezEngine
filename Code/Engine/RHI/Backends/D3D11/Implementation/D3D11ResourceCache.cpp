@@ -1,5 +1,5 @@
 #include <RHI/Backends/D3D11/D3D11ResourceCache.h>
-#include <RHI/Backends/D3D11/D3D11Utils.h>
+#include <RHI/Backends/D3D11/D3D11Util.h>
 
 D3D11ResourceCache::D3D11ResourceCache(ID3D11Device* device)
 {
@@ -76,12 +76,12 @@ ID3D11BlendState* D3D11ResourceCache::CreateNewBlendState(const RHIBlendStateDes
     RHIBlendAttachmentDescription state = attachmentStates[i];
     d3dBlendStateDesc.RenderTarget[i].BlendEnable = state.BlendEnabled;
     d3dBlendStateDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    d3dBlendStateDesc.RenderTarget[i].SrcBlend = D3D11FormatUtils::RHIToD3D11Blend(state.SourceColorFactor);
-    d3dBlendStateDesc.RenderTarget[i].DestBlend = D3D11FormatUtils::RHIToD3D11Blend(state.DestinationColorFactor);
-    d3dBlendStateDesc.RenderTarget[i].BlendOp = D3D11FormatUtils::RHIToD3D11BlendOperation(state.ColorFunction);
-    d3dBlendStateDesc.RenderTarget[i].SrcBlendAlpha = D3D11FormatUtils::RHIToD3D11Blend(state.SourceAlphaFactor);
-    d3dBlendStateDesc.RenderTarget[i].DestBlendAlpha = D3D11FormatUtils::RHIToD3D11Blend(state.DestinationAlphaFactor);
-    d3dBlendStateDesc.RenderTarget[i].BlendOpAlpha = D3D11FormatUtils::RHIToD3D11BlendOperation(state.AlphaFunction);
+    d3dBlendStateDesc.RenderTarget[i].SrcBlend = D3D11Formats::RHIToD3D11Blend(state.SourceColorFactor);
+    d3dBlendStateDesc.RenderTarget[i].DestBlend = D3D11Formats::RHIToD3D11Blend(state.DestinationColorFactor);
+    d3dBlendStateDesc.RenderTarget[i].BlendOp = D3D11Formats::RHIToD3D11BlendOperation(state.ColorFunction);
+    d3dBlendStateDesc.RenderTarget[i].SrcBlendAlpha = D3D11Formats::RHIToD3D11Blend(state.SourceAlphaFactor);
+    d3dBlendStateDesc.RenderTarget[i].DestBlendAlpha = D3D11Formats::RHIToD3D11Blend(state.DestinationAlphaFactor);
+    d3dBlendStateDesc.RenderTarget[i].BlendOpAlpha = D3D11Formats::RHIToD3D11BlendOperation(state.AlphaFunction);
   }
 
   d3dBlendStateDesc.AlphaToCoverageEnable = description.AlphaToCoverageEnabled;
@@ -113,7 +113,7 @@ ID3D11DepthStencilState* D3D11ResourceCache::CreateNewDepthStencilState(const RH
 {
   D3D11_DEPTH_STENCIL_DESC dssDesc;
 
-  dssDesc.DepthFunc = D3D11FormatUtils::RHIToD3D11ComparisonFunc(description.DepthComparison);
+  dssDesc.DepthFunc = D3D11Formats::RHIToD3D11ComparisonFunc(description.DepthComparison);
   dssDesc.DepthEnable = description.DepthTestEnabled;
   dssDesc.DepthWriteMask = description.DepthWriteEnabled ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
   dssDesc.StencilEnable = description.StencilTestEnabled;
@@ -148,8 +148,8 @@ ID3D11RasterizerState* D3D11ResourceCache::CreateNewRasterizerState(const D3D11R
 {
   D3D11_RASTERIZER_DESC rssDesc;
 
-  rssDesc.CullMode = D3D11FormatUtils::RHIToD3D11CullMode(key.RHIDescription.CullMode);
-  rssDesc.FillMode = D3D11FormatUtils::RHIToD3D11FillMode(key.RHIDescription.FillMode);
+  rssDesc.CullMode = D3D11Formats::RHIToD3D11CullMode(key.RHIDescription.CullMode);
+  rssDesc.FillMode = D3D11Formats::RHIToD3D11FillMode(key.RHIDescription.FillMode);
   rssDesc.DepthClipEnable = key.RHIDescription.DepthClipEnabled;
   rssDesc.ScissorEnable = key.RHIDescription.ScissorTestEnabled;
   rssDesc.FrontCounterClockwise = key.RHIDescription.FrontFace == RHIFrontFace::CounterClockwise;
@@ -209,7 +209,7 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
       D3D11_INPUT_ELEMENT_DESC elementDesc;
       elementDesc.SemanticName = GetSemanticString(desc.Semantic);
       elementDesc.SemanticIndex = SemanticIndices::GetAndIncrement(si, desc.Semantic);
-      elementDesc.Format = D3D11FormatUtils::ToDxgiFormat(desc.Format);
+      elementDesc.Format = D3D11Formats::ToDxgiFormat(desc.Format);
       elementDesc.AlignedByteOffset = desc.Offset != 0 ? desc.Offset : currentOffset;
       elementDesc.InputSlot = slot;
       elementDesc.InputSlotClass = stepRate == 0 ? D3D11_INPUT_PER_VERTEX_DATA : D3D11_INPUT_PER_INSTANCE_DATA;
