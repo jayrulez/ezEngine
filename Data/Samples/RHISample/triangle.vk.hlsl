@@ -1,4 +1,4 @@
-#define VERTEX_ATTRIBUTE(type, name, index) type name : ATTRIBUTE##index
+#define VERTEX_ATTRIBUTE(type, name, index) [[vk::location(index)]] type name : ATTRIBUTE##index
 
 struct VS_INPUT
 {

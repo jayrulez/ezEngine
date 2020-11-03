@@ -159,7 +159,7 @@ public:
 
     // Create a device
     {
-      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_Vulkan, (HWND)m_pWindow->GetNativeWindowHandle(), false, false);
+      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX12, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -179,8 +179,8 @@ public:
       ezUInt64 psDataSize = 0;
 
       //fReader.Open("ps5_0.o");
-      fReader.Open("ps_sv10.o");
-      //fReader.Open("ps6_2.o");
+      //fReader.Open("ps_sv11.o");
+      fReader.Open("ps6_2.o");
       if (fReader.IsOpen())
       {
         psDataSize = fReader.ReadBytes(psData, fReader.GetFileSize());
@@ -194,8 +194,8 @@ public:
       ezUInt64 vsDataSize = 0;
 
       //fReader.Open("vs5_0.o");
-      fReader.Open("vs_sv10.o");
-      //fReader.Open("vs6_2.o");
+      //fReader.Open("vs_sv11.o");
+      fReader.Open("vs6_2.o");
       if (fReader.IsOpen())
       {
         vsDataSize = fReader.ReadBytes(vsData, fReader.GetFileSize());
@@ -228,19 +228,19 @@ public:
 
       //pipelineDesc.bs = &blendState;
 
-      BlendStateDesc bd;
-      bd.RenderTarget[0].BlendEnable = true;
-      bd.RenderTarget[0].SrcBlend = BLEND_SRC_ALPHA;
-      bd.RenderTarget[0].DestBlend = BLEND_INV_SRC_ALPHA;
-      bd.RenderTarget[0].BlendOp = BLEND_OP_ADD;
-      bd.RenderTarget[0].SrcBlendAlpha = BLEND_ONE;
-      bd.RenderTarget[0].DestBlendAlpha = BLEND_ONE;
-      bd.RenderTarget[0].BlendOpAlpha = BLEND_OP_ADD;
-      bd.RenderTarget[0].RenderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
-      bd.IndependentBlendEnable = false;
-      m_pDevice->CreateBlendState(&bd, &blendState);
+      //BlendStateDesc bd;
+      //bd.RenderTarget[0].BlendEnable = true;
+      //bd.RenderTarget[0].SrcBlend = BLEND_SRC_ALPHA;
+      //bd.RenderTarget[0].DestBlend = BLEND_INV_SRC_ALPHA;
+      //bd.RenderTarget[0].BlendOp = BLEND_OP_ADD;
+      //bd.RenderTarget[0].SrcBlendAlpha = BLEND_ONE;
+      //bd.RenderTarget[0].DestBlendAlpha = BLEND_ONE;
+      //bd.RenderTarget[0].BlendOpAlpha = BLEND_OP_ADD;
+      //bd.RenderTarget[0].RenderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
+      //bd.IndependentBlendEnable = false;
+      //m_pDevice->CreateBlendState(&bd, &blendState);
 
-      pipelineDesc.bs = &blendState;
+      //pipelineDesc.bs = &blendState;
 
       m_pDevice->CreatePipelineState(&pipelineDesc, &pipeline);
     }
