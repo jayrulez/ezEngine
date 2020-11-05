@@ -162,7 +162,7 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
                   ? DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
                   : DXGI_FORMAT_B8G8R8A8_UNORM;
 
-  RHIWin32SwapchainSource* win32Source = dynamic_cast<RHIWin32SwapchainSource*>(description.Source);
+  RHIWin32SwapchainSource* win32Source = reinterpret_cast<RHIWin32SwapchainSource*>(description.Source);
 
   if (win32Source)
   {
@@ -178,8 +178,9 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
       1, // Count
       0  // Quality
     };
-    dxgiSCDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    dxgiSCDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     dxgiSCDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    dxgiSCDesc.Flags = 0;
 
 
     {
@@ -191,8 +192,6 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
 
       dxgiFactory->Release();
     }
-
-    return;
   }
 
 

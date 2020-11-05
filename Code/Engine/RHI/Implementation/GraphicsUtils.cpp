@@ -1,3 +1,4 @@
+#include <Foundation/Basics/Platform/Win/IncludeWindows.h>
 #include <RHI/GraphicsUtils.h>
 
 

@@ -3,26 +3,25 @@
 RHIBoundResourceSetInfo::RHIBoundResourceSetInfo(RHIResourceSet* set, ezDynamicArray<ezUInt32> offsets)
 {
   Set = set;
-  Offsets = new RHISmallFixedOrDynamicArray(offsets.GetCount(), offsets);
+  Offsets = RHISmallFixedOrDynamicArray(offsets.GetCount(), offsets);
 }
 
 RHIBoundResourceSetInfo::~RHIBoundResourceSetInfo()
 {
-  Offsets->Dispose();
-  delete Offsets;
+  Offsets.Dispose();
 }
 
 bool RHIBoundResourceSetInfo::Equals(RHIResourceSet* set, ezUInt32 offsetsCount, ezDynamicArray<ezUInt32> offsets) const
 {
-  if (Set != set || offsetsCount != Offsets->GetCount())
+  if (Set != set || offsetsCount != Offsets.GetCount())
     return false;
 
-  if (Offsets->GetCount() != offsets.GetCount())
+  if (Offsets.GetCount() != offsets.GetCount())
     return false;
 
-  for (ezUInt32 i = 0; i < Offsets->GetCount(); i++)
+  for (ezUInt32 i = 0; i < Offsets.GetCount(); i++)
   {
-    if (Offsets->Get(i) != offsets[i])
+    if (Offsets.Get(i) != offsets[i])
       return false;
   }
 
@@ -31,15 +30,15 @@ bool RHIBoundResourceSetInfo::Equals(RHIResourceSet* set, ezUInt32 offsetsCount,
 
 bool RHIBoundResourceSetInfo::Equals(const RHIBoundResourceSetInfo& other) const
 {
-  if (Set != other.Set || Offsets->GetCount() != Offsets->GetCount())
+  if (Set != other.Set || Offsets.GetCount() != Offsets.GetCount())
     return false;
 
-  if (Offsets->GetCount() != other.Offsets->GetCount())
+  if (Offsets.GetCount() != other.Offsets.GetCount())
     return false;
 
-  for (ezUInt32 i = 0; i < Offsets->GetCount(); i++)
+  for (ezUInt32 i = 0; i < Offsets.GetCount(); i++)
   {
-    if (Offsets->Get(i) != other.Offsets->Get(i))
+    if (Offsets.Get(i) != other.Offsets.Get(i))
       return false;
   }
 

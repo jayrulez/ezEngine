@@ -20,6 +20,7 @@ class RHIResourceLayout;
 /// </summary>
 struct EZ_RHI_DLL RHIGraphicsPipelineDescription : public ezHashableStruct<RHIGraphicsPipelineDescription>
 {
+  EZ_DECLARE_POD_TYPE();
   /// <summary>
   /// A description of the blend state, which controls how color values are blended into each color target.
   /// </summary>
@@ -60,6 +61,8 @@ struct EZ_RHI_DLL RHIGraphicsPipelineDescription : public ezHashableStruct<RHIGr
   /// If <code>null</code>, the pipeline will use the value specified in <see cref="GraphicsDeviceOptions"/>.
   /// </summary>
   std::optional<ezEnum<RHIResourceBindingModel>> ResourceBindingModel;
+
+  RHIGraphicsPipelineDescription() = default;
 
   /// <summary>
   /// Constructs a new <see cref="GraphicsPipelineDescription"/>.

@@ -60,7 +60,7 @@ protected:
   virtual bool WaitForFencesCore(ezDynamicArray<RHIFence*> fences, bool waitAll, ezUInt64 nanosecondTimeout) override;
   virtual void ResetFenceCore(RHIFence* fence) override;
   virtual void SwapBuffersCore(RHISwapchain* swapchain) override;
-  virtual void WaitForIdleCore() override {}
+  inline virtual void WaitForIdleCore() override {}
 
   virtual RHIMappedResource* MapCore(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource) override;
   virtual void UnmapCore(RHIResource* resource, ezUInt32 subresource) override;
@@ -81,7 +81,7 @@ protected:
     RHIPixelFormatProperties& properties) override;
 
 private:
-  ezResult InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device* device, ID3D11DeviceContext* immediateContext, ezUInt32 flags);
+  ezResult InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device*& device, ID3D11DeviceContext*& immediateContext, ezUInt32 flags);
   bool CheckFormatMultisample(DXGI_FORMAT format, ezUInt32 sampleCount);
   D3D11DeviceBuffer* GetFreeStagingBuffer(ezUInt32 size);
 

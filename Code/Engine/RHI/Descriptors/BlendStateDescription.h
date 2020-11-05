@@ -22,21 +22,38 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// An array of <see cref="RHIBlendAttachmentDescription"/> describing how blending is performed for each color target
   /// used in the <see cref="RHIPipeline"/>.
   /// </summary>
-  ezDynamicArray<RHIBlendAttachmentDescription> AttachmentStates;
+  ezStaticArray<RHIBlendAttachmentDescription, 8> AttachmentStates;
 
   /// <summary>
   /// Enables alpha-to-coverage, which causes a fragment's alpha value to be used when determining multi-sample coverage.
   /// </summary>
   bool AlphaToCoverageEnabled = false;
 
-  RHIBlendStateDescription() = default;
+  RHIBlendStateDescription()
+  {
+    AttachmentStates.SetCount(8);
+  }
+
+  RHIBlendStateDescription& operator=(const RHIBlendStateDescription& other)
+  {
+    BlendFactor = other.BlendFactor;
+    //AttachmentStates.SetCountUninitialized(other.AttachmentStates.GetCount());
+    for (ezUInt32 i = 0; i < other.AttachmentStates.GetCount(); i++)
+    {
+      AttachmentStates[i] = other.AttachmentStates[i];
+    }
+
+    AlphaToCoverageEnabled = other.AlphaToCoverageEnabled;
+
+    return *this;
+  }
 
   /// <summary>
   /// Constructs a new <see cref="BlendStateDescription"/>,
   /// </summary>
   /// <param name="blendFactor">The constant blend color.</param>
   /// <param name="attachmentStates">The blend attachment states.</param>
-  RHIBlendStateDescription(ezColor blendFactor, ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates)
+  RHIBlendStateDescription(ezColor blendFactor, ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates)
   {
     BlendFactor = blendFactor;
     AttachmentStates = attachmentStates;
@@ -53,7 +70,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   RHIBlendStateDescription(
     ezColor blendFactor,
     bool alphaToCoverageEnabled,
-    ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates)
+    ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates)
   {
     BlendFactor = blendFactor;
     AttachmentStates = attachmentStates;
@@ -66,7 +83,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   static const RHIBlendStateDescription SingleOverrideBlend()
   {
     RHIBlendStateDescription desc;
-    desc.AttachmentStates.PushBack(RHIBlendAttachmentDescription::OverrideBlend);
+    desc.AttachmentStates[0] = RHIBlendAttachmentDescription::OverrideBlend;
     return desc;
   }
 
@@ -76,7 +93,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   static const RHIBlendStateDescription SingleAlphaBlend()
   {
     RHIBlendStateDescription desc;
-    desc.AttachmentStates.PushBack(RHIBlendAttachmentDescription::AlphaBlend);
+    desc.AttachmentStates[0] = RHIBlendAttachmentDescription::AlphaBlend;
     return desc;
   }
 
@@ -86,7 +103,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   static const RHIBlendStateDescription SingleAdditiveBlend()
   {
     RHIBlendStateDescription desc;
-    desc.AttachmentStates.PushBack(RHIBlendAttachmentDescription::AdditiveBlend);
+    desc.AttachmentStates[0] = RHIBlendAttachmentDescription::AdditiveBlend;
     return desc;
   }
 
@@ -96,7 +113,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   static const RHIBlendStateDescription SingleDisabled()
   {
     RHIBlendStateDescription desc;
-    desc.AttachmentStates.PushBack(RHIBlendAttachmentDescription::Disabled);
+    desc.AttachmentStates[0] = RHIBlendAttachmentDescription::Disabled;
     return desc;
   }
 
@@ -116,18 +133,25 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIBlendStateDescription& other) const
   {
-    return BlendFactor == other.BlendFactor &&
-           Util::AreEquatable(AttachmentStates, other.AttachmentStates) &&
-           AlphaToCoverageEnabled == other.AlphaToCoverageEnabled;
+    if (BlendFactor == other.BlendFactor && AlphaToCoverageEnabled == other.AlphaToCoverageEnabled)
+    {
+      for (ezUInt32 i = 0; i < AttachmentStates.GetCount(); i++)
+      {
+        if (!(AttachmentStates[i] == other.AttachmentStates[i]))
+        {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   RHIBlendStateDescription Clone()
   {
-    ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates;
+    ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates;
 
     // TODO: shallow copy
 
-    attachmentStates.SetCountUninitialized(this->AttachmentStates.GetCount());
     attachmentStates.GetArrayPtr().CopyFrom(this->AttachmentStates.GetArrayPtr());
 
     RHIBlendStateDescription result(this->BlendFactor, this->AlphaToCoverageEnabled, attachmentStates);

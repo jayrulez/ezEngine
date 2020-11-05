@@ -8,7 +8,7 @@ D3D11ResourceCache::D3D11ResourceCache(ID3D11Device* device)
   Device = device;
 }
 
-void D3D11ResourceCache::GetPipelineResources(const RHIBlendStateDescription& blendDesc, const RHIDepthStencilStateDescription& dssDesc, const RHIRasterizerStateDescription& rasterDesc, bool multisample, ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts, ezDynamicArray<ezUInt8> vsBytecode, ID3D11BlendState* blendState, ID3D11DepthStencilState* depthState, ID3D11RasterizerState* rasterState, ID3D11InputLayout* inputLayout)
+void D3D11ResourceCache::GetPipelineResources(const RHIBlendStateDescription& blendDesc, const RHIDepthStencilStateDescription& dssDesc, const RHIRasterizerStateDescription& rasterDesc, bool multisample, ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts, ezDynamicArray<ezUInt8> vsBytecode, ID3D11BlendState*& blendState, ID3D11DepthStencilState*& depthState, ID3D11RasterizerState*& rasterState, ID3D11InputLayout*& inputLayout)
 {
   ezLock lock(DeviceMutex);
   blendState = GetBlendState(blendDesc);
@@ -19,28 +19,28 @@ void D3D11ResourceCache::GetPipelineResources(const RHIBlendStateDescription& bl
 
 void D3D11ResourceCache::Dispose()
 {
-  for (auto it : BlendStates)
+  for (auto& it : BlendStates)
   {
     it.Value()->Release();
   }
 
   //BlendStates.Clear();
 
-  for (auto it : DepthStencilStates)
+  for (auto& it : DepthStencilStates)
   {
     it.Value()->Release();
   }
 
   //DepthStencilStates.Clear();
 
-  for (auto it : RasterizerStates)
+  for (auto& it : RasterizerStates)
   {
     it.Value()->Release();
   }
 
   //RasterizerStates.Clear();
 
-  for (auto it : InputLayouts)
+  for (auto& it : InputLayouts)
   {
     it.Value()->Release();
   }
@@ -59,7 +59,7 @@ ID3D11BlendState* D3D11ResourceCache::GetBlendState(const RHIBlendStateDescripti
     blendState = CreateNewBlendState(description);
     RHIBlendStateDescription key = description;
 
-    key.AttachmentStates.SetCountUninitialized(description.AttachmentStates.GetCount());
+    //key.AttachmentStates.SetCountUninitialized(description.AttachmentStates.GetCount());
     key.AttachmentStates.GetArrayPtr().CopyFrom(description.AttachmentStates.GetArrayPtr());
 
     BlendStates.Insert(key, blendState);
@@ -70,7 +70,7 @@ ID3D11BlendState* D3D11ResourceCache::GetBlendState(const RHIBlendStateDescripti
 
 ID3D11BlendState* D3D11ResourceCache::CreateNewBlendState(const RHIBlendStateDescription& description)
 {
-  ezDynamicArray<RHIBlendAttachmentDescription> attachmentStates = description.AttachmentStates;
+  ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates = description.AttachmentStates;
   D3D11_BLEND_DESC d3dBlendStateDesc;
 
   for (ezUInt32 i = 0; i < attachmentStates.GetCount(); i++)
@@ -156,6 +156,10 @@ ID3D11RasterizerState* D3D11ResourceCache::CreateNewRasterizerState(const D3D11R
   rssDesc.ScissorEnable = key.RHIDescription.ScissorTestEnabled;
   rssDesc.FrontCounterClockwise = key.RHIDescription.FrontFace == RHIFrontFace::CounterClockwise;
   rssDesc.MultisampleEnable = key.Multisampled;
+  rssDesc.DepthBias = 0;
+  rssDesc.DepthBiasClamp = 0.f;
+  rssDesc.SlopeScaledDepthBias = 0.f;
+  //rssDesc.AntialiasedLineEnable = false;
 
   ID3D11RasterizerState* rasterizerState;
 
@@ -197,7 +201,6 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
 
   ezUInt32 element = 0; // Total element index across slots.
   ezDynamicArray<D3D11_INPUT_ELEMENT_DESC> elements;
-  elements.SetCountUninitialized(totalCount);
 
   SemanticIndices si;
   for (ezUInt32 slot = 0; slot < vertexLayouts.GetCount(); slot++)
@@ -205,10 +208,13 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
     ezDynamicArray<RHIVertexElementDescription> elementDescs = vertexLayouts[slot].Elements;
     ezUInt32 stepRate = vertexLayouts[slot].InstanceStepRate;
     ezUInt32 currentOffset = 0;
+
     for (ezUInt32 i = 0; i < elementDescs.GetCount(); i++)
     {
-      RHIVertexElementDescription desc = elementDescs[i];
+      const RHIVertexElementDescription& desc = elementDescs[i];
+
       D3D11_INPUT_ELEMENT_DESC elementDesc;
+
       elementDesc.SemanticName = GetSemanticString(desc.Semantic);
       elementDesc.SemanticIndex = SemanticIndices::GetAndIncrement(si, desc.Semantic);
       elementDesc.Format = D3D11Formats::ToDxgiFormat(desc.Format);
@@ -217,12 +223,13 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
       elementDesc.InputSlotClass = stepRate == 0 ? D3D11_INPUT_PER_VERTEX_DATA : D3D11_INPUT_PER_INSTANCE_DATA;
       elementDesc.InstanceDataStepRate = stepRate;
 
-      elements[i] = elementDesc;
+      elements.PushBack(elementDesc);
 
       currentOffset += FormatHelpers::GetSize(desc.Format);
       element += 1;
     }
   }
+
   ID3D11InputLayout* layout = nullptr;
 
   HRESULT hr = Device->CreateInputLayout(elements.GetData(), elements.GetCount(), vsBytecode.GetData(), vsBytecode.GetCount(), &layout);
@@ -230,7 +237,7 @@ ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(ezDynamicArray<RHIVe
   return layout;
 }
 
-ezString D3D11ResourceCache::GetSemanticString(ezEnum<RHIVertexElementSemantic> semantic)
+const char* D3D11ResourceCache::GetSemanticString(ezEnum<RHIVertexElementSemantic> semantic)
 {
   switch (semantic)
   {
@@ -244,7 +251,7 @@ ezString D3D11ResourceCache::GetSemanticString(ezEnum<RHIVertexElementSemantic> 
       return "COLOR";
     default:
       EZ_REPORT_FAILURE("Invalid semantic");
-      return ezString();
+      return "";
   }
 }
 

@@ -21,27 +21,40 @@ struct EZ_RHI_DLL RHIBlendAttachmentDescription : public ezHashableStruct<RHIBle
   /// <summary>
   /// Controls the source color's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> SourceColorFactor = RHIBlendFactor::Default;
+  ezEnum<RHIBlendFactor> SourceColorFactor = RHIBlendFactor::One;
   /// <summary>
   /// Controls the destination color's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> DestinationColorFactor = RHIBlendFactor::Default;
+  ezEnum<RHIBlendFactor> DestinationColorFactor = RHIBlendFactor::Zero;
   /// <summary>
   /// Controls the function used to combine the source and destination color factors.
   /// </summary>
-  ezEnum<RHIBlendFunction> ColorFunction = RHIBlendFunction::Default;
+  ezEnum<RHIBlendFunction> ColorFunction = RHIBlendFunction::Add;
   /// <summary>
   /// Controls the source alpha's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> SourceAlphaFactor = RHIBlendFactor::Default;
+  ezEnum<RHIBlendFactor> SourceAlphaFactor = RHIBlendFactor::One;
   /// <summary>
   /// Controls the destination alpha's influence on the blend result.
   /// </summary>
-  ezEnum<RHIBlendFactor> DestinationAlphaFactor = RHIBlendFactor::Default;
+  ezEnum<RHIBlendFactor> DestinationAlphaFactor = RHIBlendFactor::Zero;
   /// <summary>
   /// Controls the function used to combine the source and destination alpha factors.
   /// </summary>
-  ezEnum<RHIBlendFunction> AlphaFunction = RHIBlendFunction::Default;
+  ezEnum<RHIBlendFunction> AlphaFunction = RHIBlendFunction::Add;
+
+  RHIBlendAttachmentDescription& operator=(const RHIBlendAttachmentDescription& other)
+  {
+    BlendEnabled = other.BlendEnabled;
+    SourceColorFactor = other.SourceColorFactor;
+    DestinationColorFactor = other.DestinationColorFactor;
+    ColorFunction = other.ColorFunction;
+    SourceAlphaFactor = other.SourceAlphaFactor;
+    DestinationAlphaFactor = other.DestinationAlphaFactor;
+    AlphaFunction = other.AlphaFunction;
+
+    return *this;
+  }
 
   RHIBlendAttachmentDescription() = default;
 

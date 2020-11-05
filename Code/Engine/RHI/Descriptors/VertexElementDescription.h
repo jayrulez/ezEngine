@@ -83,6 +83,14 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
     Offset = offset;
   }
 
+  RHIVertexElementDescription& operator=(const RHIVertexElementDescription& other)
+  {
+    Name = ezString(other.Name);
+    Format = other.Format;
+    Semantic = other.Semantic;
+    Offset = other.Offset;
+  }
+
   /// <summary>
   /// Element-wise equality.
   /// </summary>

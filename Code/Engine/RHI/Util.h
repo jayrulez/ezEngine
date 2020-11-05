@@ -37,7 +37,7 @@ namespace Util
     // is because the code is trying to avoid allocating memory at runtime when it's not necessary
     ezUInt32 count = array.GetCount();
     array.Clear();
-    array.SetCount(count);
+    //array.SetCount(count);
   }
 
   template <typename T, typename TDerived>

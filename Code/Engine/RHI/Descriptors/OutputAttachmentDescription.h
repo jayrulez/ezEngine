@@ -17,6 +17,12 @@ struct EZ_RHI_DLL RHIOutputAttachmentDescription : public ezHashableStruct<RHIOu
   /// </summary>
   ezEnum<RHIPixelFormat> Format;
 
+  RHIOutputAttachmentDescription& operator=(const RHIOutputAttachmentDescription& other)
+  {
+    Format = other.Format;
+    return *this;
+  }
+
   RHIOutputAttachmentDescription() = default;
 
   /// <summary>

@@ -5,6 +5,7 @@
 #include <Foundation/Application/Application.h>
 #include <Foundation/Communication/Telemetry.h>
 #include <Foundation/Configuration/Startup.h>
+#include <Foundation/Containers/Blob.h>
 #include <Foundation/Containers/Map.h>
 #include <Foundation/IO/FileSystem/DataDirTypeFolder.h>
 #include <Foundation/IO/FileSystem/FileReader.h>
@@ -22,7 +23,9 @@
 #include <RHI/Device/GraphicsDevice.h>
 #include <RHI/Device/GraphicsDeviceOptions.h>
 #include <RHI/GraphicsUtils.h>
-#include <Foundation/Containers/Blob.h>
+#include <RHI/Resources/Buffer.h>
+#include <RHI/Resources/ResourceFactory.h>
+#include <RHI/Resources/Shader.h>
 
 
 struct EZ_ALIGN_16(float4)
@@ -43,8 +46,14 @@ struct EZ_ALIGN_16(Color4)
 
 struct Vertex
 {
-  float4 position;
-  Color4 color;
+  ezVec3 Position;
+  ezColor Color;
+
+  Vertex(ezVec3 position, ezColor color)
+  {
+    Position = position;
+    Color = color;
+  }
 };
 
 class RHISampleWindow : public ezWindow
@@ -156,25 +165,93 @@ public:
     // Create a device
     {
       RHIGraphicsDeviceOptions options(true);
-      RHISwapchainDescription swapchainDesc(new RHIWin32SwapchainSource(m_pWindow->GetNativeWindowHandle(), nullptr), 648, 480, std::nullopt, true);
+      RHISwapchainDescription swapchainDesc(new RHIWin32SwapchainSource(m_pWindow->GetNativeWindowHandle(), nullptr), 640, 480, std::nullopt, true);
       m_pDevice = GraphicsUtils::CreateD3D11(options, swapchainDesc);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
     ezStartup::StartupHighLevelSystems();
 
-
+    RHIResourceFactory* factory = m_pDevice->GetResourceFactory();
     {
+      Vertex quadVertices[] = {
+        Vertex(ezVec3(-0.75f, 0.75f, 1.f), ezColor::Red),
+        Vertex(ezVec3(0.75f, 0.75f, 1.f), ezColor::Green),
+        Vertex(ezVec3(-0.75f, -0.75f, 1.f), ezColor::Blue),
+        Vertex(ezVec3(0.75f, -0.75f, 1.f), ezColor::Yellow),
+      };
 
-      
-    }
+      ezUInt16 quadIndices[] = {0, 1, 2, 0, 2, 3};
 
-    {
+      VertexBuffer = factory->CreateBuffer(RHIBufferDescription{4 * sizeof(Vertex), RHIBufferUsage::VertexBuffer});
+      IndexBuffer = factory->CreateBuffer(RHIBufferDescription{6 * sizeof(ezUInt16), RHIBufferUsage::IndexBuffer});
 
-    }
+      m_pDevice->UpdateBuffer(VertexBuffer, 0, quadVertices);
+      m_pDevice->UpdateBuffer(IndexBuffer, 0, quadIndices);
 
-    {
+      ezDynamicArray<RHIVertexElementDescription> layoutElements;
+      layoutElements.PushBack(RHIVertexElementDescription{"Position", RHIVertexElementSemantic::Position, RHIVertexElementFormat::Float3});
+      layoutElements.PushBack(RHIVertexElementDescription{"Color", RHIVertexElementSemantic::Color, RHIVertexElementFormat::Float4});
+      RHIVertexLayoutDescription layout(layoutElements);
 
+      ezFileReader fReader;
+
+      fReader.Open("vs.o");
+      if (fReader.IsOpen())
+      {
+        RHIShaderDescription vertexShaderDesc = RHIShaderDescription{
+          RHIShaderStages::Vertex,
+          ezDynamicArray<ezUInt8>(),
+          "VSMain",
+          false,
+        };
+
+        vertexShaderDesc.ShaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+        fReader.ReadBytes(vertexShaderDesc.ShaderBytes.GetData(), vertexShaderDesc.ShaderBytes.GetCount());
+
+
+        VertexShader = factory->CreateShader(vertexShaderDesc);
+
+        fReader.Close();
+      }
+
+      fReader.Open("ps.o");
+      if (fReader.IsOpen())
+      {
+        RHIShaderDescription fragmentShaderDesc = RHIShaderDescription{
+          RHIShaderStages::Fragment,
+          ezDynamicArray<ezUInt8>(),
+          "PSMain",
+          false,
+        };
+
+        fragmentShaderDesc.ShaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+        fReader.ReadBytes(fragmentShaderDesc.ShaderBytes.GetData(), fragmentShaderDesc.ShaderBytes.GetCount());
+
+        FragmentShader = factory->CreateShader(fragmentShaderDesc);
+
+        fReader.Close();
+      }
+
+      RHIGraphicsPipelineDescription pipelineDesc;
+      pipelineDesc.BlendState = RHIBlendStateDescription::SingleOverrideBlend();
+      pipelineDesc.DepthStencilState = RHIDepthStencilStateDescription(true, true, RHIComparisonKind::LessEqual);
+      pipelineDesc.RasterizerState = RHIRasterizerStateDescription(RHIFaceCullMode::Back, RHIPolygonFillMode::Solid, RHIFrontFace::Clockwise, true, false);
+      pipelineDesc.PrimitiveTopology = RHIPrimitiveTopology::TriangleList;
+
+      ezDynamicArray<RHIVertexLayoutDescription> layouts;
+      layouts.PushBack(layout);
+      ezDynamicArray<RHIShader*> shaders;
+      shaders.PushBack(VertexShader);
+      shaders.PushBack(FragmentShader);
+
+      //pipelineDesc.ShaderSet = RHIShaderSetDescription(layouts, shaders);
+      pipelineDesc.ShaderSet.VertexLayouts = layouts;
+      pipelineDesc.ShaderSet.Shaders = shaders;
+
+      pipelineDesc.Outputs = m_pDevice->GetSwapchainFramebuffer()->GetOutputDescription();
+      Pipeline = factory->CreateGraphicsPipeline(pipelineDesc);
+      CommandList = factory->CreateCommandList();
     }
   }
 
@@ -207,7 +284,7 @@ public:
       //CommandList commandList = m_pDevice->BeginCommandList();
       //m_pDevice->PresentBegin(commandList);
 
-      //OnDraw(commandList);
+      OnDraw();
 
       //m_pDevice->PresentEnd(commandList);
     }
@@ -225,7 +302,18 @@ public:
 
   void OnDraw()
   {
+    CommandList->Begin();
+    CommandList->SetFramebuffer(m_pDevice->GetSwapchainFramebuffer());
+    CommandList->ClearColorTarget(0, ezColor::Blue);
 
+    CommandList->SetVertexBuffer(0, VertexBuffer);
+    CommandList->SetIndexBuffer(IndexBuffer, RHIIndexFormat::UInt16);
+    CommandList->SetPipeline(Pipeline);
+    CommandList->DrawIndexed(4, 1, 0, 0, 0);
+    CommandList->End();
+
+    m_pDevice->SubmitCommands(CommandList);
+    m_pDevice->SwapBuffers();
   }
 
   void BeforeCoreSystemsShutdown() override
@@ -234,8 +322,16 @@ public:
     ezResourceManager::EngineAboutToShutdown();
 
     // now we can destroy the graphics device
+    Pipeline->Dispose();
+    VertexShader->Dispose();
+    FragmentShader->Dispose();
+    CommandList->Dispose();
+    VertexBuffer->Dispose();
+    IndexBuffer->Dispose();
 
-    EZ_DEFAULT_DELETE(m_pDevice);
+
+    m_pDevice->Dispose();
+    delete m_pDevice;
 
     // finally destroy the window
     m_pWindow->Destroy();
@@ -246,6 +342,14 @@ public:
 private:
   RHISampleWindow* m_pWindow = nullptr;
   RHIGraphicsDevice* m_pDevice = nullptr;
+
+  RHICommandList* CommandList = nullptr;
+  RHIBuffer* VertexBuffer = nullptr;
+  RHIBuffer* IndexBuffer = nullptr;
+  ezDynamicArray<RHIShader*> Shaders;
+  RHIPipeline* Pipeline = nullptr;
+  RHIShader* VertexShader = nullptr;
+  RHIShader* FragmentShader = nullptr;
 };
 
 EZ_CONSOLEAPP_ENTRY_POINT(RHISample);

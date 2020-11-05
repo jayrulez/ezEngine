@@ -1,8 +1,8 @@
 #pragma once
 
+#include <RHI/Descriptors/OutputAttachmentDescription.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/OutputAttachmentDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
 #include <RHI/Util.h>
@@ -16,6 +16,7 @@ class RHIFramebuffer;
 /// </summary>
 struct EZ_RHI_DLL RHIOutputDescription : public ezHashableStruct<RHIOutputDescription>
 {
+  EZ_DECLARE_POD_TYPE();
   /// <summary>
   /// A description of the depth attachment, or null if none exists.
   /// </summary>
@@ -32,6 +33,20 @@ struct EZ_RHI_DLL RHIOutputDescription : public ezHashableStruct<RHIOutputDescri
   ezEnum<RHITextureSampleCount> SampleCount;
 
   RHIOutputDescription() = default;
+
+  RHIOutputDescription& operator=(const RHIOutputDescription& other)
+  {
+    DepthAttachment = other.DepthAttachment;
+
+    ColorAttachments.SetCountUninitialized(other.ColorAttachments.GetCount());
+    for (ezUInt32 i = 0; i < other.ColorAttachments.GetCount(); i++)
+    {
+      ColorAttachments[i] = other.ColorAttachments[i];
+    }
+    SampleCount = other.SampleCount;
+
+    return *this;
+  }
 
   /// <summary>
   /// Constructs a new <see cref="RHIOutputDescription"/>.
@@ -71,7 +86,7 @@ struct EZ_RHI_DLL RHIOutputDescription : public ezHashableStruct<RHIOutputDescri
   bool operator==(const RHIOutputDescription& other) const
   {
     return DepthAttachment == other.DepthAttachment &&
-      Util::AreEquatable(ColorAttachments, other.ColorAttachments) &&
-      SampleCount == other.SampleCount;
+           Util::AreEquatable(ColorAttachments, other.ColorAttachments) &&
+           SampleCount == other.SampleCount;
   }
 };

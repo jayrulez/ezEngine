@@ -92,6 +92,19 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
     InstanceStepRate = 0;
   }
 
+  RHIVertexLayoutDescription& operator=(const RHIVertexLayoutDescription& other)
+  {
+    Stride = other.Stride;
+
+    Elements.SetCountUninitialized(other.Elements.GetCount());
+    for (ezUInt32 i = 0; i < other.Elements.GetCount(); i++)
+    {
+      Elements[i] = other.Elements[i];
+    }
+
+    InstanceStepRate = other.InstanceStepRate;
+  }
+
   /// <summary>
   /// Element-wise equality.
   /// </summary>

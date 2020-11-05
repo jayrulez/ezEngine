@@ -99,10 +99,10 @@ public:
     bool multisample,
     ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts,
     ezDynamicArray<ezUInt8> vsBytecode,
-    ID3D11BlendState* blendState,
-    ID3D11DepthStencilState* depthState,
-    ID3D11RasterizerState* rasterState,
-    ID3D11InputLayout* inputLayout);
+    ID3D11BlendState*& blendState,
+    ID3D11DepthStencilState*& depthState,
+    ID3D11RasterizerState*& rasterState,
+    ID3D11InputLayout*& inputLayout);
 
   void Dispose();
   bool IsDisposed() { return Disposed; }
@@ -130,7 +130,7 @@ private:
 
   ID3D11InputLayout* CreateNewInputLayout(ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts, ezDynamicArray<ezUInt8> vsBytecode);
 
-  ezString GetSemanticString(ezEnum<RHIVertexElementSemantic> semantic);
+  static const char* GetSemanticString(ezEnum<RHIVertexElementSemantic> semantic);
 
 
 private:

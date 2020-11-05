@@ -10,7 +10,7 @@ class RHIResourceSet;
 struct RHIBoundResourceSetInfo : public ezHashableStruct<RHIBoundResourceSetInfo>
 {
   RHIResourceSet* Set = nullptr;
-  RHISmallFixedOrDynamicArray* Offsets;
+  RHISmallFixedOrDynamicArray Offsets;
 
   RHIBoundResourceSetInfo() = default;
 

@@ -20,7 +20,7 @@
 /// <summary>
 /// Represents an abstract graphics device, capable of creating device resources and executing commands.
 /// </summary>
-class RHIGraphicsDevice
+class EZ_RHI_DLL RHIGraphicsDevice
 {
 public:
   /// <summary>
@@ -319,15 +319,15 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the single value to upload.</param>
-  template <typename T>
-  void UpdateBuffer(
-    RHIBuffer* buffer,
-    ezUInt32 bufferOffset,
-    const T& source)
-  {
-    ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-    UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-  }
+  //template <typename T>
+  //void UpdateBuffer(
+  //  RHIBuffer* buffer,
+  //  ezUInt32 bufferOffset,
+  //  const T& source)
+  //{
+  //  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  //  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+  //}
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -377,14 +377,14 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">A readonly span containing the data to upload.</param>
-  template <typename T, typename TDerived>
-  void UpdateBuffer(
-    RHIBuffer* buffer,
-    ezUInt32 bufferOffset,
-    ezArrayBase<T, TDerived> source)
-  {
-    UpdateBuffer(buffer, bufferOffset, source.GetByteArrayPtr().GetPtr(), (ezUInt32)(sizeof(T) * source.GetCount()));
-  }
+  //template <typename T, typename TDerived>
+  //void UpdateBuffer(
+  //  RHIBuffer* buffer,
+  //  ezUInt32 bufferOffset,
+  //  ezArrayBase<T, TDerived> source)
+  //{
+  //  UpdateBuffer(buffer, bufferOffset, source.GetByteArrayPtr().GetPtr(), (ezUInt32)(sizeof(T) * source.GetCount()));
+  //}
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.

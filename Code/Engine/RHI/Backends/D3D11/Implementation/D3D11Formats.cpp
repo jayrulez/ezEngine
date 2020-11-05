@@ -257,7 +257,7 @@ namespace D3D11Formats
 
   D3D11_BIND_FLAG RHIToD3D11BindFlags(ezBitflags<RHIBufferUsage> usage)
   {
-    ezUInt32 flags;
+    ezUInt32 flags = 0;
 
     if ((usage & RHIBufferUsage::VertexBuffer) == RHIBufferUsage::VertexBuffer)
     {
@@ -340,6 +340,8 @@ namespace D3D11Formats
 
   D3D11_BLEND RHIToD3D11Blend(ezEnum<RHIBlendFactor> factor)
   {
+    auto x = RHIBlendFactor::Default;
+
     switch (factor)
     {
       case RHIBlendFactor::Zero:

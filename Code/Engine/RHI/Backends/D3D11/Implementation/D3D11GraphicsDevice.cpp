@@ -112,7 +112,7 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(const RHID3D11DeviceOptions& options, c
   }
 
   D3D11_FEATURE_DATA_DOUBLES dataDoublesSupport;
-  if (SUCCEEDED(Device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &dataDoublesSupport, sizeof(D3D11_FEATURE_DATA_DOUBLES))))
+  if (SUCCEEDED(Device->CheckFeatureSupport(D3D11_FEATURE_DOUBLES, &dataDoublesSupport, sizeof(D3D11_FEATURE_DATA_DOUBLES))))
   {
   }
 
@@ -453,9 +453,11 @@ void D3D11GraphicsDevice::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOff
     D3D11_BOX* subregion = new D3D11_BOX;
 
     subregion->left = bufferOffset;
-    subregion->right = (int)(size + bufferOffset);
+    subregion->right = (size + bufferOffset);
     subregion->bottom = 1;
     subregion->back = 1;
+    subregion->top = 0;
+    subregion->front = 0;
 
     if (isUniformBuffer)
     {
@@ -464,7 +466,7 @@ void D3D11GraphicsDevice::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOff
 
     {
       ezLock lock(ImmediateContextMutex);
-      ImmediateContext->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregion, source, 0, 0);
+      ImmediateContext->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregion, reinterpret_cast<void*>(source), 0, 0);
     }
   }
   else if (useMap)
@@ -514,10 +516,11 @@ void D3D11GraphicsDevice::DisposeCore()
   }
   AvailableStagingBuffers.Clear();
 
-  ResourceFactory->Dispose();
 
   if (MainSwapchain != nullptr)
     MainSwapchain->Dispose();
+
+  ResourceFactory->Dispose();
 
   ImmediateContext->Release();
 
@@ -642,7 +645,7 @@ bool D3D11GraphicsDevice::GetPixelFormatSupportCore(ezEnum<RHIPixelFormat> forma
   return true;
 }
 
-ezResult D3D11GraphicsDevice::InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device* device, ID3D11DeviceContext* immediateContext, ezUInt32 flags)
+ezResult D3D11GraphicsDevice::InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11Device*& device, ID3D11DeviceContext*& immediateContext, ezUInt32 flags)
 {
   D3D_FEATURE_LEVEL FeatureLevels[] = {D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0, D3D_FEATURE_LEVEL_9_3};
 
@@ -652,7 +655,7 @@ ezResult D3D11GraphicsDevice::InitializeDevice(IDXGIAdapter* dxgiAdapter, ID3D11
       break;
   }
 
-  if (ImmediateContext == nullptr)
+  if (immediateContext == nullptr)
     return EZ_FAILURE;
   return EZ_SUCCESS;
 }

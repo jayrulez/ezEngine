@@ -32,7 +32,7 @@
 /// <summary>
 /// A device object responsible for the creation of graphics resources.
 /// </summary>
-class RHIResourceFactory
+class EZ_RHI_DLL RHIResourceFactory
 {
 public:
   /// <summary>

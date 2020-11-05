@@ -32,7 +32,7 @@
 #if EZ_ENABLED(EZ_PLATFORM_ANDROID)
 #endif
 
-class GraphicsUtils
+class EZ_RHI_DLL GraphicsUtils
 {
 public:
   /// <summary>
@@ -72,7 +72,6 @@ public:
       default:
         return false;
     }
-    return false;
   }
 
 #ifdef EZ_RHI_D3D11_SUPPORTED

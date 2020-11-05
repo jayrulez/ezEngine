@@ -53,12 +53,12 @@ void D3D11CommandList::Dispose()
 
     for (RHIBoundResourceSetInfo& boundGraphicsSet : GraphicsResourceSets)
     {
-      boundGraphicsSet.Offsets->Dispose();
+      boundGraphicsSet.Offsets.Dispose();
     }
 
     for (RHIBoundResourceSetInfo& boundComputeSet : ComputeResourceSets)
     {
-      boundComputeSet.Offsets->Dispose();
+      boundComputeSet.Offsets.Dispose();
     }
 
     for (D3D11DeviceBuffer* buffer : AvailableStagingBuffers)
@@ -106,7 +106,7 @@ void D3D11CommandList::SetPipelineCore(RHIPipeline* pipeline)
 
     GraphicsPipeline = d3dPipeline;
     ClearSets(GraphicsResourceSets); // Invalidate resource set bindings -- they may be invalid.
-    Util::ClearArray(InvalidatedGraphicsResourceSets);
+    InvalidatedGraphicsResourceSets.Clear(); //Util::ClearArray(InvalidatedGraphicsResourceSets);
 
     ID3D11BlendState* blendState = d3dPipeline->GetBlendState();
     if (BlendState != blendState)
@@ -196,7 +196,7 @@ void D3D11CommandList::SetPipelineCore(RHIPipeline* pipeline)
     D3D11Pipeline* d3dPipeline = Util::AssertSubtype<RHIPipeline, D3D11Pipeline>(pipeline);
     ComputePipeline = d3dPipeline;
     ClearSets(ComputeResourceSets); // Invalidate resource set bindings -- they may be invalid.
-    Util::ClearArray(InvalidatedComputeResourceSets);
+    InvalidatedComputeResourceSets.Clear(); //Util::ClearArray(InvalidatedComputeResourceSets);
 
     ID3D11ComputeShader* computeShader = d3dPipeline->GetComputeShader();
     Context->CSSetShader(computeShader, nullptr, 0);
@@ -238,7 +238,7 @@ void D3D11CommandList::SetGraphicsResourceSetCore(ezUInt32 slot, RHIResourceSet*
     return;
   }
 
-  GraphicsResourceSets[slot].Offsets->Dispose();
+  GraphicsResourceSets[slot].Offsets.Dispose();
   GraphicsResourceSets[slot] = RHIBoundResourceSetInfo(resourceSet /* TODO:, dynamicOffsetsCount*/, dynamicOffsets);
   ActivateResourceSet(slot, GraphicsResourceSets[slot], true);
 }
@@ -250,7 +250,7 @@ void D3D11CommandList::SetComputeResourceSetCore(ezUInt32 slot, RHIResourceSet* 
     return;
   }
 
-  ComputeResourceSets[slot].Offsets->Dispose();
+  ComputeResourceSets[slot].Offsets.Dispose();
   ComputeResourceSets[slot] = RHIBoundResourceSetInfo(resourceSet, /*TODO dynamicOffsetsCount,*/ dynamicOffsets);
   ActivateResourceSet(slot, ComputeResourceSets[slot], false);
 }
@@ -598,14 +598,16 @@ void D3D11CommandList::ResetManagedState()
 {
   NumVertexBindings = 0;
 
-  Util::ClearArray(VertexBindings);
+  VertexBindings.Clear(); //Util::ClearArray(VertexBindings);
+  VertexBindings.EnsureCount(1);
   VertexStrides.Clear();
-  Util::ClearArray(VertexOffsets);
+  VertexOffsets .Clear();//Util::ClearArray(VertexOffsets);
+  VertexOffsets.EnsureCount(1);
 
   m_pFramebuffer = nullptr;
 
-  Util::ClearArray(Viewports);
-  Util::ClearArray(Scissors);
+  Viewports.Clear(); //Util::ClearArray(Viewports);
+  Scissors.Clear();  //Util::ClearArray(Scissors);
   ViewportsChanged = false;
   ScissorRectsChanged = false;
 
@@ -623,17 +625,19 @@ void D3D11CommandList::ResetManagedState()
   PixelShader = nullptr;
 
   ClearSets(GraphicsResourceSets);
+  GraphicsResourceSets.EnsureCount(1);
 
-  Util::ClearArray(VertexBoundUniformBuffers);
-  Util::ClearArray(VertexBoundTextureViews);
-  Util::ClearArray(VertexBoundSamplers);
+  VertexBoundUniformBuffers.Clear(); //Util::ClearArray(VertexBoundUniformBuffers);
+  VertexBoundTextureViews.Clear();   //Util::ClearArray(VertexBoundTextureViews);
+  VertexBoundSamplers.Clear();       //Util::ClearArray(VertexBoundSamplers);
 
-  Util::ClearArray(FragmentBoundUniformBuffers);
-  Util::ClearArray(FragmentBoundTextureViews);
-  Util::ClearArray(FragmentBoundSamplers);
+  FragmentBoundUniformBuffers.Clear(); //Util::ClearArray(FragmentBoundUniformBuffers);
+  FragmentBoundTextureViews.Clear();   //Util::ClearArray(FragmentBoundTextureViews);
+  FragmentBoundSamplers.Clear();       //Util::ClearArray(FragmentBoundSamplers);
 
   ComputePipeline = nullptr;
   ClearSets(ComputeResourceSets);
+  ComputeResourceSets.EnsureCount(1);
 
   for (auto& kvp : BoundSRVs)
   {
@@ -656,9 +660,9 @@ void D3D11CommandList::ClearSets(ezDynamicArray<RHIBoundResourceSetInfo>& boundS
 {
   for (RHIBoundResourceSetInfo& boundSetInfo : boundSets)
   {
-    boundSetInfo.Offsets->Dispose();
+    boundSetInfo.Offsets.Dispose();
   }
-  Util::ClearArray(boundSets);
+  boundSets.Clear(); //Util::ClearArray(boundSets);
 }
 
 void D3D11CommandList::UnbindUAVTexture(RHITexture* target)
@@ -1225,7 +1229,7 @@ void D3D11CommandList::ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInf
     ezUInt32 bufferOffset = 0;
     if (layout->IsDynamicBuffer(i))
     {
-      bufferOffset = brsi.Offsets->Get(dynamicOffsetIndex);
+      bufferOffset = brsi.Offsets.Get(dynamicOffsetIndex);
       dynamicOffsetIndex += 1;
     }
     D3D11ResourceLayout::ResourceBindingInfo rbi = layout->GetDeviceSlotIndex(i);

@@ -14,7 +14,7 @@ class RHITexture;
 /// A device resource used to control which color and depth textures are rendered to.
 /// See <see cref="RHIFramebufferDescription"/>.
 /// </summary>
-class RHIFramebuffer : public RHIResource
+class EZ_RHI_DLL RHIFramebuffer : public RHIResource
 {
 protected:
   RHIFramebuffer() = default;

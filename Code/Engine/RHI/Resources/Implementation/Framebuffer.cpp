@@ -8,7 +8,7 @@ RHIFramebuffer::RHIFramebuffer(const std::optional<RHIFramebufferAttachmentDescr
     DepthTarget = RHIFramebufferAttachment(depthAttachment.Target, depthAttachment.ArrayLayer, depthAttachment.MipLevel);
   }
 
-  ColorTargets.SetCount(colorTargetDescs.GetCount());
+  //ColorTargets.SetCount(colorTargetDescs.GetCount());
 
   for (ezUInt32 i = 0; i < colorTargetDescs.GetCount(); i++)
   {

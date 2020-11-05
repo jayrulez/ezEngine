@@ -39,10 +39,10 @@ class EZ_RHI_DLL RHIResource : public ezRefCounted
 public:
   virtual ~RHIResource()
   {
-    if (!IsDisposed())
-    {
-      Dispose();
-    }
+    //if (!IsDisposed())
+    //{
+    //  Dispose();
+    //}
   }
 
   /// <summary>

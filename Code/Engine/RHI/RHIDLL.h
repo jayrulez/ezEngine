@@ -1686,11 +1686,12 @@ struct RHISmallFixedOrDynamicArray
 {
 private:
   static constexpr ezUInt32 MaxFixedValues = 5;
-  ezUInt32 Count;
+  ezUInt32 Count = 0;
   ezStaticArray<ezUInt32, MaxFixedValues> FixedData;
   ezDynamicArray<ezUInt32> Data;
 
 public:
+  RHISmallFixedOrDynamicArray() = default;
   RHISmallFixedOrDynamicArray(ezUInt32 count, ezDynamicArray<ezUInt32> data)
   {
     if (count > MaxFixedValues)
