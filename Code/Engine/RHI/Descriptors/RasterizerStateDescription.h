@@ -15,7 +15,7 @@ struct EZ_RHI_DLL RHIRasterizerStateDescription : public ezHashableStruct<RHIRas
   /// <summary>
   /// Controls which face will be culled.
   /// </summary>
-  ezEnum<RHIFaceCullMode> CullMode = RHIFaceCullMode::None;
+  ezEnum<RHIFaceCullMode> CullMode = RHIFaceCullMode::Back;
 
   /// <summary>
   /// Controls how the rasterizer fills polygons.

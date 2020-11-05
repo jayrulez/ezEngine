@@ -300,15 +300,15 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/> storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">The value to upload.</param>
-  template <typename T>
-  void UpdateBuffer(
-    RHIBuffer* buffer,
-    ezUInt32 bufferOffset,
-    T source)
-  {
-    ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-    UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-  }
+  //template <typename T>
+  //void UpdateBuffer(
+  //  RHIBuffer* buffer,
+  //  ezUInt32 bufferOffset,
+  //  T source)
+  //{
+  //  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  //  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+  //}
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -339,16 +339,16 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the first of a series of values to upload.</param>
   /// <param name="size">The total size of the uploaded data, in bytes.</param>
-  template <typename T>
-  void UpdateBuffer(
-    RHIBuffer* buffer,
-    ezUInt32 bufferOffset,
-    const T& source,
-    ezUInt32 size)
-  {
-    ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-    UpdateBuffer(buffer, bufferOffset, ptr, size);
-  }
+  //template <typename T>
+  //void UpdateBuffer(
+  //  RHIBuffer* buffer,
+  //  ezUInt32 bufferOffset,
+  //  const T& source,
+  //  ezUInt32 size)
+  //{
+  //  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  //  UpdateBuffer(buffer, bufferOffset, ptr, size);
+  //}
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.

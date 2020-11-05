@@ -1,7 +1,12 @@
+cbuffer Constants
+{
+    float4x4 Projection;
+};
+
 struct VS_INPUT
 {
-    float3 Position : POSITION0;
-    float4 Color: COLOR0;
+    float3 Position : POSITION;
+    float4 Color: COLOR;
 };
 
 struct PS_INPUT
@@ -14,7 +19,7 @@ struct PS_INPUT
 PS_INPUT VSMain(VS_INPUT input)
 {
     PS_INPUT output;
-    output.Position = float4(input.Position.xyz, 1.0f);
+    output.Position =  mul(float4(input.Position.xyz, 1.0f), Projection);
     output.Color = input.Color;
     return output;
 }

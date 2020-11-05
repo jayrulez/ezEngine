@@ -264,7 +264,7 @@ void D3D11GraphicsDevice::SwapBuffersCore(RHISwapchain* swapchain)
 {
   ezLock lock(ImmediateContextMutex);
   D3D11Swapchain* d3d11SC = Util::AssertSubtype<RHISwapchain, D3D11Swapchain>(swapchain);
-  d3d11SC->GetIDXGISwapChain()->Present(d3d11SC->GetSyncInterval(), 0);
+  HRESULT hr = d3d11SC->GetIDXGISwapChain()->Present(d3d11SC->GetSyncInterval(), 0);
 }
 
 RHIMappedResource* D3D11GraphicsDevice::MapCore(RHIResource* resource, ezEnum<RHIMapMode> mode, ezUInt32 subresource)

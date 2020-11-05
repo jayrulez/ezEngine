@@ -89,6 +89,8 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
     Format = other.Format;
     Semantic = other.Semantic;
     Offset = other.Offset;
+
+    return *this;
   }
 
   /// <summary>

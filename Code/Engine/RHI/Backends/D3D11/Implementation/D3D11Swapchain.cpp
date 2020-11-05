@@ -178,7 +178,8 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
       1, // Count
       0  // Quality
     };
-    dxgiSCDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+
+    dxgiSCDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     dxgiSCDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     dxgiSCDesc.Flags = 0;
 
@@ -188,7 +189,7 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
       HRESULT hr = GraphicsDevice->GetAdapter()->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(&dxgiFactory));
 
       hr = dxgiFactory->CreateSwapChain(GraphicsDevice->GetDevice(), &dxgiSCDesc, &DXGISwapChain);
-      dxgiFactory->MakeWindowAssociation((HWND)win32Source->GetHwnd(), DXGI_MWA_NO_ALT_ENTER);
+      hr = dxgiFactory->MakeWindowAssociation((HWND)win32Source->GetHwnd(), DXGI_MWA_NO_ALT_ENTER);
 
       dxgiFactory->Release();
     }

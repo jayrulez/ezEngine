@@ -103,6 +103,8 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
     }
 
     InstanceStepRate = other.InstanceStepRate;
+
+    return *this;
   }
 
   /// <summary>
