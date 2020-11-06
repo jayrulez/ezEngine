@@ -50,4 +50,6 @@ private:
   RHIShader* VertexShader = nullptr;
   RHIShader* FragmentShader = nullptr;
   ezMat4 WorldProjectionMatrix;
+  ezVec3 CameraPosition;
+  RHIResourceSet* ResourceSet = nullptr;
 };

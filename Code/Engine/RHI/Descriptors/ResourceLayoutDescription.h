@@ -30,6 +30,17 @@ struct EZ_RHI_DLL RHIResourceLayoutDescription : public ezHashableStruct<RHIReso
     Elements = elements;
   }
 
+  RHIResourceLayoutDescription& operator=(const RHIResourceLayoutDescription& other)
+  {
+    Elements.SetCount(other.Elements.GetCount());
+    for (ezUInt32 i = 0; i < other.Elements.GetCount(); i++)
+    {
+      Elements[i] = other.Elements[i];
+    }
+
+    return *this;
+  }
+
   /// <summary>
   /// Element-wise equality.
   /// </summary>

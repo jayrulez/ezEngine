@@ -81,7 +81,7 @@ namespace Util
   ezUInt32 GetDimension(ezUInt32 largestLevelDimension, ezUInt32 mipLevel);
 
   RHIBufferRange GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset);
-  bool GetDeviceBuffer(RHIResource* resource, RHIBuffer* buffer);
+  bool GetDeviceBuffer(RHIResource* resource, RHIBuffer*& buffer);
 
   RHITextureView* GetTextureView(RHIGraphicsDevice* gd, RHIResource* resource);
 

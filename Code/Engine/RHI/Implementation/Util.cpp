@@ -45,7 +45,7 @@ namespace Util
     }
   }
 
-  bool GetDeviceBuffer(RHIResource* resource, RHIBuffer* buffer)
+  bool GetDeviceBuffer(RHIResource* resource, RHIBuffer*& buffer)
   {
     RHIBuffer* db = dynamic_cast<RHIBuffer*>(resource);
     RHIBufferRange* dbr = dynamic_cast<RHIBufferRange*>(resource);

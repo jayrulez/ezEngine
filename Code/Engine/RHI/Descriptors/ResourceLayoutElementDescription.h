@@ -66,6 +66,15 @@ struct EZ_RHI_DLL RHIResourceLayoutElementDescription : public ezHashableStruct<
     Options = options;
   }
 
+  RHIResourceLayoutElementDescription& operator=(const RHIResourceLayoutElementDescription& other)
+  {
+    Name = other.Name;
+    Kind = other.Kind;
+    Stages = other.Stages;
+    Options = other.Options;
+    return *this;
+  }
+
   /// <summary>
   /// Element-wise equality.
   /// </summary>

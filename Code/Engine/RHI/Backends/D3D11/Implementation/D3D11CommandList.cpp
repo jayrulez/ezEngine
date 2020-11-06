@@ -628,12 +628,22 @@ void D3D11CommandList::ResetManagedState()
   GraphicsResourceSets.EnsureCount(1);
 
   VertexBoundUniformBuffers.Clear(); //Util::ClearArray(VertexBoundUniformBuffers);
+  VertexBoundUniformBuffers.EnsureCount(MaxCachedUniformBuffers);
+
   VertexBoundTextureViews.Clear();   //Util::ClearArray(VertexBoundTextureViews);
+  VertexBoundTextureViews.EnsureCount(MaxCachedTextureViews);
+  
   VertexBoundSamplers.Clear();       //Util::ClearArray(VertexBoundSamplers);
+  VertexBoundSamplers.EnsureCount(MaxCachedSamplers);       
 
   FragmentBoundUniformBuffers.Clear(); //Util::ClearArray(FragmentBoundUniformBuffers);
+  FragmentBoundUniformBuffers.EnsureCount(MaxCachedUniformBuffers); //Util::ClearArray(FragmentBoundUniformBuffers);
+
   FragmentBoundTextureViews.Clear();   //Util::ClearArray(FragmentBoundTextureViews);
+  FragmentBoundTextureViews.EnsureCount(MaxCachedTextureViews);
+
   FragmentBoundSamplers.Clear();       //Util::ClearArray(FragmentBoundSamplers);
+  FragmentBoundSamplers.EnsureCount(MaxCachedSamplers); 
 
   ComputePipeline = nullptr;
   ClearSets(ComputeResourceSets);
@@ -815,7 +825,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
     bool bind = false;
     if (slot < MaxCachedUniformBuffers)
     {
-      if (!(*VertexBoundUniformBuffers[slot] == *range))
+      if (!(VertexBoundUniformBuffers[slot] == range))
       {
         VertexBoundUniformBuffers[slot] = range;
         bind = true;

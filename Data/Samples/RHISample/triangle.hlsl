@@ -1,4 +1,4 @@
-cbuffer Constants
+cbuffer UB0 : register(b0)
 {
     float4x4 Projection;
 };
@@ -19,7 +19,8 @@ struct PS_INPUT
 PS_INPUT VSMain(VS_INPUT input)
 {
     PS_INPUT output;
-    output.Position =  mul(float4(input.Position.xyz, 1.0f), Projection);
+    //output.Position =  mul(float4(input.Position.xyz, 1.0f), Projection);
+    output.Position =  float4(input.Position.xyz, 1.0f);
     output.Color = input.Color;
     return output;
 }

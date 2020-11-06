@@ -18,7 +18,7 @@ class RHIResourceLayout : public RHIResource
 private:
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   RHIResourceLayoutDescription Description;
-  ezUInt32 DynamicBufferCount;
+  ezUInt32 DynamicBufferCount = 0;
 #endif
 
 protected:

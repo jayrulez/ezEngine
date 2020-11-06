@@ -1,3 +1,4 @@
+#include <Core/Graphics/Camera.h>
 #include <Core/Graphics/Geometry.h>
 #include <Core/ResourceManager/ResourceManager.h>
 #include <Foundation/Communication/Telemetry.h>
@@ -8,6 +9,7 @@
 #include <Foundation/Logging/Log.h>
 #include <Foundation/Logging/VisualStudioWriter.h>
 #include <Foundation/Time/Clock.h>
+#include <Foundation/Utilities/GraphicsUtils.h>
 #include <RHI/Device/GraphicsDevice.h>
 #include <RHI/Device/GraphicsDeviceOptions.h>
 #include <RHI/GraphicsUtils.h>
@@ -135,14 +137,15 @@ void RHISample::AfterCoreSystemsStartup()
   // Create a device
   {
     RHIGraphicsDeviceOptions options(true);
-    RHISwapchainDescription swapchainDesc(new RHIWin32SwapchainSource(m_pWindow->GetNativeWindowHandle(), nullptr), 1280, 720, std::nullopt, true);
+    RHISwapchainDescription swapchainDesc(new RHIWin32SwapchainSource(m_pWindow->GetNativeWindowHandle(), nullptr), 640, 480, std::nullopt, true);
     m_pDevice = GraphicsUtils::CreateD3D11(options, swapchainDesc);
   }
 
   // now that we have a window and device, tell the engine to initialize the rendering infrastructure
   ezStartup::StartupHighLevelSystems();
 
-  //WorldProjectionMatrix.SetIdentity();
+  WorldProjectionMatrix.SetIdentity();
+  CameraPosition = ezVec3(1, 1, 0);
 
   RHIResourceFactory* factory = m_pDevice->GetResourceFactory();
   {
@@ -156,16 +159,16 @@ void RHISample::AfterCoreSystemsStartup()
     ezUInt16 quadIndices[] = {0, 1, 2, 3};
 
     Vertex cubeVertices[] = {
-      Vertex(ezVec3(-1, -1, -1), ezColor(1, 0, 0, 1)),
-      Vertex(ezVec3(-1, +1, -1), ezColor(0, 1, 0, 1)),
-      Vertex(ezVec3(+1, +1, -1), ezColor(1, 0, 1, 1)),
-      Vertex(ezVec3(+1, -1, -1), ezColor(1, 1, 1, 1)),
+      Vertex(ezVec3(-0.5, -0.5, -0.5), ezColor(1, 0, 0, 1)),
+      Vertex(ezVec3(-0.5, +0.5, -0.5), ezColor(0, 1, 0, 1)),
+      Vertex(ezVec3(+0.5, +0.5, -0.5), ezColor(0, 0, 1, 1)),
+      Vertex(ezVec3(+0.5, -0.5, -0.5), ezColor(1, 1, 1, 1)),
 
 
-      Vertex(ezVec3(-1, -1, +1), ezColor(1, 1, 0, 1)),
-      Vertex(ezVec3(-1, +1, +1), ezColor(0, 1, 1, 1)),
-      Vertex(ezVec3(+1, +1, +1), ezColor(1, 0, 1, 1)),
-      Vertex(ezVec3(+1, -1, -1), ezColor(0.2f, 0.2f, 0.2f, 1)),
+      Vertex(ezVec3(-0.5, -0.5, +0.5), ezColor(1, 1, 0, 1)),
+      Vertex(ezVec3(-0.5, +0.5, +0.5), ezColor(0, 1, 1, 1)),
+      Vertex(ezVec3(+0.5, +0.5, +0.5), ezColor(1, 0, 1, 1)),
+      Vertex(ezVec3(+0.5, -0.5, +0.5), ezColor(0.2f, 0.2f, 0.2f, 1.f)),
     };
 
     ezUInt16 cubeIndices[] = {
@@ -186,7 +189,7 @@ void RHISample::AfterCoreSystemsStartup()
     ezDynamicArray<RHIVertexElementDescription> layoutElements;
     layoutElements.PushBack(RHIVertexElementDescription{"Position", RHIVertexElementSemantic::Position, RHIVertexElementFormat::Float3});
     layoutElements.PushBack(RHIVertexElementDescription{"Color", RHIVertexElementSemantic::Color, RHIVertexElementFormat::Float4});
-    RHIVertexLayoutDescription layout(layoutElements);
+    RHIVertexLayoutDescription vertexLayout(layoutElements);
 
     ezFileReader fReader;
 
@@ -230,30 +233,42 @@ void RHISample::AfterCoreSystemsStartup()
     RHIGraphicsPipelineDescription pipelineDesc;
     pipelineDesc.BlendState = RHIBlendStateDescription::SingleOverrideBlend();
     pipelineDesc.DepthStencilState = RHIDepthStencilStateDescription(true, true, RHIComparisonKind::LessEqual);
-    pipelineDesc.RasterizerState = RHIRasterizerStateDescription(RHIFaceCullMode::Back, RHIPolygonFillMode::Solid, RHIFrontFace::Clockwise, true, false);
+    pipelineDesc.RasterizerState = RHIRasterizerStateDescription(RHIFaceCullMode::None, RHIPolygonFillMode::Solid, RHIFrontFace::Clockwise, true, false);
     pipelineDesc.PrimitiveTopology = RHIPrimitiveTopology::TriangleStrip;
 
 
-    {
-      RHIResourceLayoutDescription resourceLayoutDesc;
-
-      RHIResourceLayoutElementDescription projectionElement("Projection", RHIResourceKind::UniformBuffer, RHIShaderStages::Vertex);
-
-      resourceLayoutDesc.Elements.PushBack(projectionElement);
-      RHIResourceLayout* viewProjectionLayout = factory->CreateResourceLayout(resourceLayoutDesc);
-
-      pipelineDesc.ResourceLayouts.PushBack(viewProjectionLayout);
-    }
-
-    ezDynamicArray<RHIVertexLayoutDescription> layouts;
-    layouts.PushBack(layout);
+    ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts;
+    vertexLayouts.PushBack(vertexLayout);
     ezDynamicArray<RHIShader*> shaders;
     shaders.PushBack(VertexShader);
     shaders.PushBack(FragmentShader);
 
     //pipelineDesc.ShaderSet = RHIShaderSetDescription(layouts, shaders);
-    pipelineDesc.ShaderSet.VertexLayouts = layouts;
+    pipelineDesc.ShaderSet.VertexLayouts = vertexLayouts;
     pipelineDesc.ShaderSet.Shaders = shaders;
+
+
+
+    RHIResourceLayoutDescription resourceLayoutDesc;
+
+    RHIResourceLayoutElementDescription projectionElement("Projection", RHIResourceKind::UniformBuffer, RHIShaderStages::Vertex);
+
+    resourceLayoutDesc.Elements.PushBack(projectionElement);
+
+
+    RHIResourceLayout* resourceLayout = factory->CreateResourceLayout(resourceLayoutDesc);
+
+    pipelineDesc.ResourceLayouts.PushBack(resourceLayout);
+
+
+    ezDynamicArray<RHIResource*> boundResources;
+
+    boundResources.PushBack(ConstantBuffer);
+
+
+    RHIResourceSetDescription resourceSetDesc = RHIResourceSetDescription(resourceLayout, boundResources);
+
+    ResourceSet = factory->CreateResourceSet(resourceSetDesc);
 
     pipelineDesc.Outputs = m_pDevice->GetSwapchainFramebuffer()->GetOutputDescription();
     Pipeline = factory->CreateGraphicsPipeline(pipelineDesc);
@@ -310,6 +325,46 @@ void RHISample::OnDraw()
   static float time = 0.f;
   WorldProjectionMatrix.Transpose();
 
+
+
+  ezMat4 yRot;
+  yRot.SetRotationMatrixY(ezAngle::Degree(time * 1.f));
+
+  ezMat4 xRot;
+  xRot.SetRotationMatrixY(ezAngle::Degree(-ezMath::Pi<float>() * 0.1f));
+
+  ezMat4 cubeTransform = yRot * xRot;
+
+  ezMat4 view;
+  view.SetIdentity();
+  view.SetTranslationVector(ezVec3(20.f, 20.f, 20.f));
+
+  constexpr float fov = ezMath::Pi<float>() / 4.f;
+  float aspect = (float)(m_pDevice->GetMainSwapchain()->GetFramebuffer()->GetWidth() / m_pDevice->GetMainSwapchain()->GetFramebuffer()->GetHeight());
+  float nearClip = 1.f;
+  float farClip = 1000.f;
+
+  ezMat4 proj = ezGraphicsUtils::CreatePerspectiveProjectionMatrixFromFovY(ezAngle::Degree(fov), aspect, nearClip, farClip);
+
+  WorldProjectionMatrix = cubeTransform * view * proj;
+
+
+
+  //ezCamera camera;
+  //camera.SetCameraMode(ezCameraMode::PerspectiveFixedFovX, ezMath::Pi<float>() / 4 *aspect, 1, 10000);
+  ////camera.LookAt(ezVec3(-10,-10,5), ezVec3(0,0,0), ezVec3::UnitYAxis());
+  //ezMat4 view = camera.GetViewMatrix(ezCameraEye::Right);
+  //ezMat4 proj;
+  //camera.GetProjectionMatrix(aspect, proj);
+
+  //ezMat4 t = view * proj;
+
+  //ezMat4 viewProj = world * t;
+
+  //bool isPerspective = camera.IsPerspective();
+
+  //WorldProjectionMatrix = viewProj;
+
   CommandList->Begin();
   CommandList->SetFramebuffer(m_pDevice->GetSwapchainFramebuffer());
   CommandList->ClearColorTarget(0, ezColor::Black);
@@ -318,27 +373,14 @@ void RHISample::OnDraw()
   CommandList->SetIndexBuffer(IndexBuffer, RHIIndexFormat::UInt16);
   CommandList->UpdateBuffer(ConstantBuffer, 0, reinterpret_cast<ezUInt8*>(&WorldProjectionMatrix), sizeof(ezMat4));
   CommandList->SetPipeline(Pipeline);
+  CommandList->SetGraphicsResourceSet(0, ResourceSet);
   CommandList->DrawIndexed(36, 1, 0, 0, 0);
   CommandList->End();
 
   m_pDevice->SubmitCommands(CommandList);
   m_pDevice->SwapBuffers();
 
-
-  ezMat4 timeFactor;
-  timeFactor.SetRotationMatrixY(ezAngle::Degree(time * 1.f));
-
-  ezMat4 piFactor;
-  piFactor.SetRotationMatrixX(ezAngle::Degree(-ezMath::Pi<float>() * 0.1f));
-
-  ezMat4 cubeTransform = timeFactor * piFactor;
-
-  ezMat4 view;
-  view.SetTranslationVector(ezVec3(0.f, 0.f, 5.f));
-
-  WorldProjectionMatrix = cubeTransform * view;
-
-  time += 0.01f;
+  time += 0.001f;
 }
 
 void RHISample::BeforeCoreSystemsShutdown()
