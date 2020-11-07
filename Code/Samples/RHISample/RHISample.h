@@ -32,7 +32,10 @@ public:
 
   ApplicationExecution Run() override;
 
+  void CreatePipelineState();
+
   void OnDraw();
+  void Update();
 
   void BeforeCoreSystemsShutdown() override;
 
@@ -49,7 +52,7 @@ private:
   RHIPipeline* Pipeline = nullptr;
   RHIShader* VertexShader = nullptr;
   RHIShader* FragmentShader = nullptr;
-  ezMat4 WorldProjectionMatrix;
-  ezVec3 CameraPosition;
+  ezMat4 WorldViewProjectionMatrix;
   RHIResourceSet* ResourceSet = nullptr;
+  RHIResourceFactory* ResourceFactory = nullptr;
 };

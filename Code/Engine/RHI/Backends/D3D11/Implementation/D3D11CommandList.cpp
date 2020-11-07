@@ -427,7 +427,7 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
 
     if (bufferOffset == 0)
     {
-      Context->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregion, source, 0, 0);
+      Context->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregion, reinterpret_cast<void*>(source), 0, 0);
     }
     else
     {
@@ -445,7 +445,7 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
       &msb);
     if (size < 1024)
     {
-      std::memcpy(msb.pData, source, size);
+      std::memcpy(msb.pData, reinterpret_cast<void*>(source), size);
     }
     else
     {

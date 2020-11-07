@@ -12,15 +12,16 @@ struct VS_INPUT
 struct PS_INPUT
 {
     float4 Position : SV_POSITION;
-    float4 Color: COLOR;
+    float4 Color: COLOR0;
 };
 
 
 PS_INPUT VSMain(VS_INPUT input)
 {
     PS_INPUT output;
-    //output.Position =  mul(float4(input.Position.xyz, 1.0f), Projection);
-    output.Position =  float4(input.Position.xyz, 1.0f);
+    //output.Position =  mul(float4(input.Position, 1.0), Projection);
+    output.Position =  mul(Projection, float4(input.Position, 1.0));
+    //output.Position =  float4(input.Position.xyz, 1.0f);
     output.Color = input.Color;
     return output;
 }
