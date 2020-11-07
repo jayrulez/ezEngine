@@ -450,23 +450,25 @@ void D3D11GraphicsDevice::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOff
 
   if (useUpdateSubresource)
   {
-    D3D11_BOX* subregion = new D3D11_BOX;
+    D3D11_BOX subregion = D3D11_BOX();
 
-    subregion->left = bufferOffset;
-    subregion->right = (size + bufferOffset);
-    subregion->bottom = 1;
-    subregion->back = 1;
-    subregion->top = 0;
-    subregion->front = 0;
+    subregion.left = bufferOffset;
+    subregion.right = (size + bufferOffset);
+    subregion.bottom = 1;
+    subregion.back = 1;
+    subregion.top = 0;
+    subregion.front = 0;
+
+    D3D11_BOX* subregionPtr = &subregion;
 
     if (isUniformBuffer)
     {
-      subregion = nullptr;
+      subregionPtr = nullptr;
     }
 
     {
       ezLock lock(ImmediateContextMutex);
-      ImmediateContext->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregion, reinterpret_cast<void*>(source), 0, 0);
+      ImmediateContext->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregionPtr, reinterpret_cast<void*>(source), 0, 0);
     }
   }
   else if (useMap)
@@ -518,7 +520,10 @@ void D3D11GraphicsDevice::DisposeCore()
 
 
   if (MainSwapchain != nullptr)
+  {
     MainSwapchain->Dispose();
+    delete MainSwapchain;
+  }
 
   ResourceFactory->Dispose();
 

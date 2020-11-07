@@ -27,11 +27,6 @@ namespace Util
 
   RHIBufferRange GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset)
   {
-
-#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-    EZ_VERIFY(resource->GetFlags().IsSet(RHIResourceFlags::Bindable), "Resource is not bindable.");
-#endif
-
     RHIBufferRange* range = dynamic_cast<RHIBufferRange*>(resource);
     if (range != nullptr)
     {
@@ -39,7 +34,7 @@ namespace Util
     }
     else
     {
-      RHIBuffer* buffer = static_cast<RHIBuffer*>(resource);
+      RHIBuffer* buffer = dynamic_cast<RHIBuffer*>(resource);
 
       return RHIBufferRange(buffer, additionalOffset, buffer->GetSize());
     }

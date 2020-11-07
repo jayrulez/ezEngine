@@ -412,26 +412,28 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
 
   if (useUpdateSubresource)
   {
-    D3D11_BOX* subregion = new D3D11_BOX;
-    subregion->left = bufferOffset;
-    subregion->right = size + bufferOffset;
-    subregion->bottom = 1;
-    subregion->back = 1;
-    subregion->front = 0;
-    subregion->top = 0;
+    D3D11_BOX subregion = D3D11_BOX();
+    subregion.left = bufferOffset;
+    subregion.right = size + bufferOffset;
+    subregion.bottom = 1;
+    subregion.back = 1;
+    subregion.front = 0;
+    subregion.top = 0;
+
+    D3D11_BOX* subregionPtr = &subregion;
 
     if (isUniformBuffer)
     {
-      subregion = nullptr;
+      subregionPtr = nullptr;
     }
 
     if (bufferOffset == 0)
     {
-      Context->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregion, reinterpret_cast<void*>(source), 0, 0);
+      Context->UpdateSubresource(d3dBuffer->GetBuffer(), 0, subregionPtr, reinterpret_cast<void*>(source), 0, 0);
     }
     else
     {
-      UpdateSubresource_Workaround(d3dBuffer->GetBuffer(), 0, *subregion, source);
+      UpdateSubresource_Workaround(d3dBuffer->GetBuffer(), 0, subregion, source);
     }
   }
   else if (useMap && updateFullBuffer) // Can only update full buffer with WriteDiscard.

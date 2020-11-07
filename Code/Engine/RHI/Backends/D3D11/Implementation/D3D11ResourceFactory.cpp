@@ -19,6 +19,7 @@ void D3D11ResourceFactory::Dispose()
   if (!Cache->IsDisposed())
   {
     Cache->Dispose();
+    delete Cache;
   }
 }
 

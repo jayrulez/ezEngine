@@ -153,15 +153,15 @@ void RHISample::CreatePipelineState()
   // Cube
 
   Vertex cubeVertices[] = {
-    {ezVec3(-.5f, -.5f, -.5f), ezColor(1, 0, 0, 1)},
-    {ezVec3(-.5f, +.5f, -.5f), ezColor(0, 1, 0, 1)},
-    {ezVec3(+.5f, +.5f, -.5f), ezColor(0, 0, 1, 1)},
-    {ezVec3(+.5f, -.5f, -.5f), ezColor(1, 1, 1, 1)},
+    {ezVec3(-.5f, -.5f, -.5f), ezColor::Red},
+    {ezVec3(-.5f, +.5f, -.5f), ezColor::Green},
+    {ezVec3(+.5f, +.5f, -.5f), ezColor::Blue},
+    {ezVec3(+.5f, -.5f, -.5f), ezColor::Violet},
 
-    {ezVec3(-.5f, -.5f, +.5f), ezColor(1, 1, 0, 1)},
-    {ezVec3(-.5f, +.5f, +.5f), ezColor(0, 1, 1, 1)},
-    {ezVec3(+.5f, +.5f, +.5f), ezColor(1, 0, 1, 1)},
-    {ezVec3(+.5f, -.5f, +.5f), ezColor(1, 1, 1, 1)},
+    {ezVec3(-.5f, -.5f, +.5f), ezColor::Yellow},
+    {ezVec3(-.5f, +.5f, +.5f), ezColor::Aqua},
+    {ezVec3(+.5f, +.5f, +.5f), ezColor::Fuchsia},
+    {ezVec3(+.5f, -.5f, +.5f), ezColor::Brown},
   };
 
   ezUInt16 cubeIndices[] = {
@@ -333,11 +333,15 @@ void RHISample::Update()
   ezMat4 rotX;
   rotX.SetRotationMatrixX(ezAngle::Radian(-ezMath::Pi<float>() * 0.4f));
 
-  ezMat4 transform = rotY * rotX;
+  ezMat4 rotZ;
+  rotZ.SetRotationMatrixZ(ezAngle::Radian(ezMath::Pi<float>() * 0.4f));
+
+
+  ezMat4 transform = rotY * rotZ/* * rotX*/;
 
   ezMat4 view;
   view.SetIdentity();
-  view.SetTranslationVector(ezVec3(0.f, 0.f, 5.f));
+  view.SetTranslationVector(ezVec3(0.f, -0.f, 5.f));
 
   ezMat4 proj = ezGraphicsUtils::CreatePerspectiveProjectionMatrixFromFovX(ezAngle::Radian(g_fov), aspect, g_nearClip, g_farClip);
 
