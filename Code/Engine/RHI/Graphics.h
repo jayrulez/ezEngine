@@ -117,29 +117,14 @@ inline Float3X4::Float3X4(
 
 
 
-enum FILL_MODE
-{
-  FILL_WIREFRAME,
-  FILL_SOLID,
-};
-enum CULL_MODE
-{
-  CULL_NONE,
-  CULL_FRONT,
-  CULL_BACK,
-};
+
+
 enum INPUT_CLASSIFICATION
 {
   INPUT_PER_VERTEX_DATA,
   INPUT_PER_INSTANCE_DATA,
 };
-enum USAGE
-{
-  USAGE_DEFAULT,
-  USAGE_IMMUTABLE,
-  USAGE_DYNAMIC,
-  USAGE_STAGING,
-};
+
 enum TEXTURE_ADDRESS_MODE
 {
   TEXTURE_ADDRESS_WRAP,
@@ -185,85 +170,6 @@ enum FILTER
   FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT,
   FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR,
   FILTER_MAXIMUM_ANISOTROPIC,
-};
-enum FORMAT
-{
-  FORMAT_UNKNOWN,
-
-  FORMAT_R32G32B32A32_FLOAT,
-  FORMAT_R32G32B32A32_UINT,
-  FORMAT_R32G32B32A32_SINT,
-
-  FORMAT_R32G32B32_FLOAT,
-  FORMAT_R32G32B32_UINT,
-  FORMAT_R32G32B32_SINT,
-
-  FORMAT_R16G16B16A16_FLOAT,
-  FORMAT_R16G16B16A16_UNORM,
-  FORMAT_R16G16B16A16_UINT,
-  FORMAT_R16G16B16A16_SNORM,
-  FORMAT_R16G16B16A16_SINT,
-
-  FORMAT_R32G32_FLOAT,
-  FORMAT_R32G32_UINT,
-  FORMAT_R32G32_SINT,
-  FORMAT_R32G8X24_TYPELESS,    // depth + stencil (alias)
-  FORMAT_D32_FLOAT_S8X24_UINT, // depth + stencil
-
-  FORMAT_R10G10B10A2_UNORM,
-  FORMAT_R10G10B10A2_UINT,
-  FORMAT_R11G11B10_FLOAT,
-  FORMAT_R8G8B8A8_UNORM,
-  FORMAT_R8G8B8A8_UNORM_SRGB,
-  FORMAT_R8G8B8A8_UINT,
-  FORMAT_R8G8B8A8_SNORM,
-  FORMAT_R8G8B8A8_SINT,
-  FORMAT_B8G8R8A8_UNORM,
-  FORMAT_B8G8R8A8_UNORM_SRGB,
-  FORMAT_R16G16_FLOAT,
-  FORMAT_R16G16_UNORM,
-  FORMAT_R16G16_UINT,
-  FORMAT_R16G16_SNORM,
-  FORMAT_R16G16_SINT,
-  FORMAT_R32_TYPELESS, // depth (alias)
-  FORMAT_D32_FLOAT,    // depth
-  FORMAT_R32_FLOAT,
-  FORMAT_R32_UINT,
-  FORMAT_R32_SINT,
-  FORMAT_R24G8_TYPELESS,    // depth + stencil (alias)
-  FORMAT_D24_UNORM_S8_UINT, // depth + stencil
-
-  FORMAT_R8G8_UNORM,
-  FORMAT_R8G8_UINT,
-  FORMAT_R8G8_SNORM,
-  FORMAT_R8G8_SINT,
-  FORMAT_R16_TYPELESS, // depth (alias)
-  FORMAT_R16_FLOAT,
-  FORMAT_D16_UNORM, // depth
-  FORMAT_R16_UNORM,
-  FORMAT_R16_UINT,
-  FORMAT_R16_SNORM,
-  FORMAT_R16_SINT,
-
-  FORMAT_R8_UNORM,
-  FORMAT_R8_UINT,
-  FORMAT_R8_SNORM,
-  FORMAT_R8_SINT,
-
-  FORMAT_BC1_UNORM,
-  FORMAT_BC1_UNORM_SRGB,
-  FORMAT_BC2_UNORM,
-  FORMAT_BC2_UNORM_SRGB,
-  FORMAT_BC3_UNORM,
-  FORMAT_BC3_UNORM_SRGB,
-  FORMAT_BC4_UNORM,
-  FORMAT_BC4_SNORM,
-  FORMAT_BC5_UNORM,
-  FORMAT_BC5_SNORM,
-  FORMAT_BC6H_UF16,
-  FORMAT_BC6H_SF16,
-  FORMAT_BC7_UNORM,
-  FORMAT_BC7_UNORM_SRGB
 };
 enum GPU_QUERY_TYPE
 {
@@ -380,7 +286,7 @@ struct EZ_RHI_DLL InputLayoutDesc
 
   std::string SemanticName;
   ezUInt32 SemanticIndex = 0;
-  FORMAT Format = FORMAT_UNKNOWN;
+  ezRHIFormat::Enum Format = ezRHIFormat::Unknown;
   ezUInt32 InputSlot = 0;
   ezUInt32 AlignedByteOffset = APPEND_ALIGNED_ELEMENT;
   INPUT_CLASSIFICATION InputSlotClass = INPUT_CLASSIFICATION::INPUT_PER_VERTEX_DATA;
@@ -408,9 +314,9 @@ struct EZ_RHI_DLL TextureDesc
   ezUInt32 Depth = 0;
   ezUInt32 ArraySize = 1;
   ezUInt32 MipLevels = 1;
-  FORMAT Format = FORMAT_UNKNOWN;
+  ezRHIFormat::Enum Format = ezRHIFormat::Unknown;
   ezUInt32 SampleCount = 1;
-  USAGE Usage = USAGE_DEFAULT;
+  ezBitflags<ezRHIUsage> Usage = ezRHIUsage::Default;
   ezUInt32 BindFlags = 0;
   ezUInt32 CPUAccessFlags = 0;
   ezUInt32 MiscFlags = 0;
@@ -428,12 +334,12 @@ struct EZ_RHI_DLL SamplerDesc
   ezRHIComparisonFunc::Enum ComparisonFunc = ezRHIComparisonFunc::Never;
   float BorderColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
   float MinLOD = 0.0f;
-  float MaxLOD = FLT_MAX;
+  float MaxLOD = ezMath::MaxValue<float>();
 };
 struct EZ_RHI_DLL RasterizerStateDesc
 {
-  FILL_MODE FillMode = FILL_SOLID;
-  CULL_MODE CullMode = CULL_NONE;
+  ezRHIFillMode::Enum FillMode = ezRHIFillMode::FILL_SOLID;
+  ezRHICullMode::Enum CullMode =ezRHICullMode::CULL_NONE;
   bool FrontCounterClockwise = false;
   int32_t DepthBias = 0;
   float DepthBiasClamp = 0.0f;
@@ -482,12 +388,12 @@ struct EZ_RHI_DLL BlendStateDesc
 struct EZ_RHI_DLL GPUBufferDesc
 {
   ezUInt32 ByteWidth = 0;
-  USAGE Usage = USAGE_DEFAULT;
+  ezBitflags<ezRHIUsage> Usage = ezRHIUsage::Default;
   ezUInt32 BindFlags = 0;
   ezUInt32 CPUAccessFlags = 0;
   ezUInt32 MiscFlags = 0;
   ezUInt32 StructureByteStride = 0; // needed for typed and structured buffer types!
-  FORMAT Format = FORMAT_UNKNOWN;   // only needed for typed buffer!
+  ezRHIFormat::Enum Format = ezRHIFormat::Unknown; // only needed for typed buffer!
 };
 struct EZ_RHI_DLL GPUQueryDesc
 {
@@ -858,7 +764,7 @@ struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
         ezUInt32 vertexByteOffset = 0;
         ezUInt32 vertexStride = 0;
         ezRHIIndexBufferFormat::Enum indexFormat = ezRHIIndexBufferFormat::UInt32;
-        FORMAT vertexFormat = FORMAT_R32G32B32_FLOAT;
+        ezRHIFormat::Enum vertexFormat = ezRHIFormat::R32G32B32_FLOAT;
         GPUBuffer transform3x4Buffer;
         ezUInt32 transform3x4BufferOffset = 0;
       } triangles;

@@ -176,6 +176,129 @@ struct EZ_RHI_DLL ezRHIShaderStage
   };
 };
 
+struct EZ_RHI_DLL ezRHIUsage
+{
+  typedef ezUInt8 StorageType;
+  enum Enum
+  {
+    Default,
+    Immutable,
+    Dynamic,
+    Staging,
+  };
+  struct Bits
+  {
+  };
+};
+EZ_DECLARE_FLAGS_OPERATORS(ezRHIUsage);
+
+struct EZ_RHI_DLL ezRHIFormat
+{
+  typedef ezUInt8 StorageType;
+  enum Enum
+  {
+    Unknown,
+
+    R32G32B32A32_FLOAT,
+    R32G32B32A32_UINT,
+    R32G32B32A32_SINT,
+
+    R32G32B32_FLOAT,
+    R32G32B32_UINT,
+    R32G32B32_SINT,
+
+    R16G16B16A16_FLOAT,
+    R16G16B16A16_UNORM,
+    R16G16B16A16_UINT,
+    R16G16B16A16_SNORM,
+    R16G16B16A16_SINT,
+
+    R32G32_FLOAT,
+    R32G32_UINT,
+    R32G32_SINT,
+    R32G8X24_TYPELESS,    // depth + stencil (alias)
+    D32_FLOAT_S8X24_UINT, // depth + stencil
+
+    R10G10B10A2_UNORM,
+    R10G10B10A2_UINT,
+    R11G11B10_FLOAT,
+    R8G8B8A8_UNORM,
+    R8G8B8A8_UNORM_SRGB,
+    R8G8B8A8_UINT,
+    R8G8B8A8_SNORM,
+    R8G8B8A8_SINT,
+    B8G8R8A8_UNORM,
+    B8G8R8A8_UNORM_SRGB,
+    R16G16_FLOAT,
+    R16G16_UNORM,
+    R16G16_UINT,
+    R16G16_SNORM,
+    R16G16_SINT,
+    R32_TYPELESS, // depth (alias)
+    D32_FLOAT,    // depth
+    R32_FLOAT,
+    R32_UINT,
+    R32_SINT,
+    R24G8_TYPELESS,    // depth + stencil (alias)
+    D24_UNORM_S8_UINT, // depth + stencil
+
+    R8G8_UNORM,
+    R8G8_UINT,
+    R8G8_SNORM,
+    R8G8_SINT,
+    R16_TYPELESS, // depth (alias)
+    R16_FLOAT,
+    D16_UNORM, // depth
+    R16_UNORM,
+    R16_UINT,
+    R16_SNORM,
+    R16_SINT,
+
+    R8_UNORM,
+    R8_UINT,
+    R8_SNORM,
+    R8_SINT,
+
+    BC1_UNORM,
+    BC1_UNORM_SRGB,
+    BC2_UNORM,
+    BC2_UNORM_SRGB,
+    BC3_UNORM,
+    BC3_UNORM_SRGB,
+    BC4_UNORM,
+    BC4_SNORM,
+    BC5_UNORM,
+    BC5_SNORM,
+    BC6H_UF16,
+    BC6H_SF16,
+    BC7_UNORM,
+    BC7_UNORM_SRGB
+  };
+};
+
+struct EZ_RHI_DLL ezRHIFillMode
+{
+  typedef ezUInt8 StorageType;
+  enum Enum
+  {
+    FILL_WIREFRAME,
+    FILL_SOLID,
+  };
+};
+
+
+struct EZ_RHI_DLL ezRHICullMode
+{
+  typedef ezUInt8 StorageType;
+  enum Enum
+  {
+    CULL_NONE,
+    CULL_FRONT,
+    CULL_BACK,
+  };
+};
+
+
 /*
 struct EZ_RHI_DLL ezRHIStruct
 {

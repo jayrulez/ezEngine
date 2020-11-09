@@ -19,7 +19,7 @@ protected:
   int RESOLUTIONHEIGHT = 0;
   bool DEBUGDEVICE = false;
   bool FULLSCREEN = false;
-  FORMAT BACKBUFFER_FORMAT = FORMAT_R10G10B10A2_UNORM;
+  ezRHIFormat::Enum BACKBUFFER_FORMAT = ezRHIFormat::R10G10B10A2_UNORM;
   static const ezUInt32 BACKBUFFER_COUNT = 2;
   bool TESSELLATION = false;
   bool CONSERVATIVE_RASTERIZATION = false;
@@ -100,17 +100,17 @@ public:
 
   bool CheckCapability(GRAPHICSDEVICE_CAPABILITY capability) const;
 
-  ezUInt32 GetFormatStride(FORMAT value) const;
-  bool IsFormatUnorm(FORMAT value) const;
-  bool IsFormatBlockCompressed(FORMAT value) const;
-  bool IsFormatStencilSupport(FORMAT value) const;
+  ezUInt32 GetFormatStride(ezEnum<ezRHIFormat> value) const;
+  bool IsFormatUnorm(ezEnum<ezRHIFormat> value) const;
+  bool IsFormatBlockCompressed(ezEnum<ezRHIFormat> value) const;
+  bool IsFormatStencilSupport(ezEnum<ezRHIFormat> value) const;
 
   inline ezMat4 GetScreenProjection() const
   {
     return ezGraphicsUtils::CreateOrthographicProjectionMatrix(0, (float)GetScreenWidth(), (float)GetScreenHeight(), 0, -1, 1);
     //return XMMatrixOrthographicOffCenterLH(0, (float)GetScreenWidth(), (float)GetScreenHeight(), 0, -1, 1);
   }
-  inline FORMAT GetBackBufferFormat() const { return BACKBUFFER_FORMAT; }
+  inline ezEnum<ezRHIFormat> GetBackBufferFormat() const { return BACKBUFFER_FORMAT; }
   static constexpr ezUInt32 GetBackBufferCount() { return BACKBUFFER_COUNT; }
 
   inline bool IsDebugDevice() const { return DEBUGDEVICE; }

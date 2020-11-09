@@ -230,14 +230,14 @@ namespace DX12_Internal
     }
     return D3D12_COMPARISON_FUNC_NEVER;
   }
-  constexpr D3D12_FILL_MODE _ConvertFillMode(FILL_MODE value)
+  inline D3D12_FILL_MODE _ConvertFillMode(ezEnum<ezRHIFillMode> value)
   {
     switch (value)
     {
-      case FILL_WIREFRAME:
+      case ezRHIFillMode::FILL_WIREFRAME:
         return D3D12_FILL_MODE_WIREFRAME;
         break;
-      case FILL_SOLID:
+      case ezRHIFillMode::FILL_SOLID:
         return D3D12_FILL_MODE_SOLID;
         break;
       default:
@@ -245,17 +245,17 @@ namespace DX12_Internal
     }
     return D3D12_FILL_MODE_WIREFRAME;
   }
-  constexpr D3D12_CULL_MODE _ConvertCullMode(CULL_MODE value)
+  inline D3D12_CULL_MODE _ConvertCullMode(ezEnum<ezRHICullMode> value)
   {
     switch (value)
     {
-      case CULL_NONE:
+      case ezRHICullMode::CULL_NONE:
         return D3D12_CULL_MODE_NONE;
         break;
-      case CULL_FRONT:
+      case ezRHICullMode::CULL_FRONT:
         return D3D12_CULL_MODE_FRONT;
         break;
-      case CULL_BACK:
+      case ezRHICullMode::CULL_BACK:
         return D3D12_CULL_MODE_BACK;
         break;
       default:
@@ -410,206 +410,206 @@ namespace DX12_Internal
     }
     return D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
   }
-  constexpr DXGI_FORMAT _ConvertFormat(FORMAT value)
+  inline DXGI_FORMAT _ConvertFormat(ezEnum<ezRHIFormat> value)
   {
     switch (value)
     {
-      case FORMAT_UNKNOWN:
+      case ezRHIFormat::Unknown:
         return DXGI_FORMAT_UNKNOWN;
         break;
-      case FORMAT_R32G32B32A32_FLOAT:
+      case ezRHIFormat::R32G32B32A32_FLOAT:
         return DXGI_FORMAT_R32G32B32A32_FLOAT;
         break;
-      case FORMAT_R32G32B32A32_UINT:
+      case ezRHIFormat::R32G32B32A32_UINT:
         return DXGI_FORMAT_R32G32B32A32_UINT;
         break;
-      case FORMAT_R32G32B32A32_SINT:
+      case ezRHIFormat::R32G32B32A32_SINT:
         return DXGI_FORMAT_R32G32B32A32_SINT;
         break;
-      case FORMAT_R32G32B32_FLOAT:
+      case ezRHIFormat::R32G32B32_FLOAT:
         return DXGI_FORMAT_R32G32B32_FLOAT;
         break;
-      case FORMAT_R32G32B32_UINT:
+      case ezRHIFormat::R32G32B32_UINT:
         return DXGI_FORMAT_R32G32B32_UINT;
         break;
-      case FORMAT_R32G32B32_SINT:
+      case ezRHIFormat::R32G32B32_SINT:
         return DXGI_FORMAT_R32G32B32_SINT;
         break;
-      case FORMAT_R16G16B16A16_FLOAT:
+      case ezRHIFormat::R16G16B16A16_FLOAT:
         return DXGI_FORMAT_R16G16B16A16_FLOAT;
         break;
-      case FORMAT_R16G16B16A16_UNORM:
+      case ezRHIFormat::R16G16B16A16_UNORM:
         return DXGI_FORMAT_R16G16B16A16_UNORM;
         break;
-      case FORMAT_R16G16B16A16_UINT:
+      case ezRHIFormat::R16G16B16A16_UINT:
         return DXGI_FORMAT_R16G16B16A16_UINT;
         break;
-      case FORMAT_R16G16B16A16_SNORM:
+      case ezRHIFormat::R16G16B16A16_SNORM:
         return DXGI_FORMAT_R16G16B16A16_SNORM;
         break;
-      case FORMAT_R16G16B16A16_SINT:
+      case ezRHIFormat::R16G16B16A16_SINT:
         return DXGI_FORMAT_R16G16B16A16_SINT;
         break;
-      case FORMAT_R32G32_FLOAT:
+      case ezRHIFormat::R32G32_FLOAT:
         return DXGI_FORMAT_R32G32_FLOAT;
         break;
-      case FORMAT_R32G32_UINT:
+      case ezRHIFormat::R32G32_UINT:
         return DXGI_FORMAT_R32G32_UINT;
         break;
-      case FORMAT_R32G32_SINT:
+      case ezRHIFormat::R32G32_SINT:
         return DXGI_FORMAT_R32G32_SINT;
         break;
-      case FORMAT_R32G8X24_TYPELESS:
+      case ezRHIFormat::R32G8X24_TYPELESS:
         return DXGI_FORMAT_R32G8X24_TYPELESS;
         break;
-      case FORMAT_D32_FLOAT_S8X24_UINT:
+      case ezRHIFormat::D32_FLOAT_S8X24_UINT:
         return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
         break;
-      case FORMAT_R10G10B10A2_UNORM:
+      case ezRHIFormat::R10G10B10A2_UNORM:
         return DXGI_FORMAT_R10G10B10A2_UNORM;
         break;
-      case FORMAT_R10G10B10A2_UINT:
+      case ezRHIFormat::R10G10B10A2_UINT:
         return DXGI_FORMAT_R10G10B10A2_UINT;
         break;
-      case FORMAT_R11G11B10_FLOAT:
+      case ezRHIFormat::R11G11B10_FLOAT:
         return DXGI_FORMAT_R11G11B10_FLOAT;
         break;
-      case FORMAT_R8G8B8A8_UNORM:
+      case ezRHIFormat::R8G8B8A8_UNORM:
         return DXGI_FORMAT_R8G8B8A8_UNORM;
         break;
-      case FORMAT_R8G8B8A8_UNORM_SRGB:
+      case ezRHIFormat::R8G8B8A8_UNORM_SRGB:
         return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         break;
-      case FORMAT_R8G8B8A8_UINT:
+      case ezRHIFormat::R8G8B8A8_UINT:
         return DXGI_FORMAT_R8G8B8A8_UINT;
         break;
-      case FORMAT_R8G8B8A8_SNORM:
+      case ezRHIFormat::R8G8B8A8_SNORM:
         return DXGI_FORMAT_R8G8B8A8_SNORM;
         break;
-      case FORMAT_R8G8B8A8_SINT:
+      case ezRHIFormat::R8G8B8A8_SINT:
         return DXGI_FORMAT_R8G8B8A8_SINT;
         break;
-      case FORMAT_R16G16_FLOAT:
+      case ezRHIFormat::R16G16_FLOAT:
         return DXGI_FORMAT_R16G16_FLOAT;
         break;
-      case FORMAT_R16G16_UNORM:
+      case ezRHIFormat::R16G16_UNORM:
         return DXGI_FORMAT_R16G16_UNORM;
         break;
-      case FORMAT_R16G16_UINT:
+      case ezRHIFormat::R16G16_UINT:
         return DXGI_FORMAT_R16G16_UINT;
         break;
-      case FORMAT_R16G16_SNORM:
+      case ezRHIFormat::R16G16_SNORM:
         return DXGI_FORMAT_R16G16_SNORM;
         break;
-      case FORMAT_R16G16_SINT:
+      case ezRHIFormat::R16G16_SINT:
         return DXGI_FORMAT_R16G16_SINT;
         break;
-      case FORMAT_R32_TYPELESS:
+      case ezRHIFormat::R32_TYPELESS:
         return DXGI_FORMAT_R32_TYPELESS;
         break;
-      case FORMAT_D32_FLOAT:
+      case ezRHIFormat::D32_FLOAT:
         return DXGI_FORMAT_D32_FLOAT;
         break;
-      case FORMAT_R32_FLOAT:
+      case ezRHIFormat::R32_FLOAT:
         return DXGI_FORMAT_R32_FLOAT;
         break;
-      case FORMAT_R32_UINT:
+      case ezRHIFormat::R32_UINT:
         return DXGI_FORMAT_R32_UINT;
         break;
-      case FORMAT_R32_SINT:
+      case ezRHIFormat::R32_SINT:
         return DXGI_FORMAT_R32_SINT;
         break;
-      case FORMAT_R8G8_UNORM:
+      case ezRHIFormat::R8G8_UNORM:
         return DXGI_FORMAT_R8G8_UNORM;
         break;
-      case FORMAT_R8G8_UINT:
+      case ezRHIFormat::R8G8_UINT:
         return DXGI_FORMAT_R8G8_UINT;
         break;
-      case FORMAT_R8G8_SNORM:
+      case ezRHIFormat::R8G8_SNORM:
         return DXGI_FORMAT_R8G8_SNORM;
         break;
-      case FORMAT_R8G8_SINT:
+      case ezRHIFormat::R8G8_SINT:
         return DXGI_FORMAT_R8G8_SINT;
         break;
-      case FORMAT_R16_TYPELESS:
+      case ezRHIFormat::R16_TYPELESS:
         return DXGI_FORMAT_R16_TYPELESS;
         break;
-      case FORMAT_R16_FLOAT:
+      case ezRHIFormat::R16_FLOAT:
         return DXGI_FORMAT_R16_FLOAT;
         break;
-      case FORMAT_D16_UNORM:
+      case ezRHIFormat::D16_UNORM:
         return DXGI_FORMAT_D16_UNORM;
         break;
-      case FORMAT_R16_UNORM:
+      case ezRHIFormat::R16_UNORM:
         return DXGI_FORMAT_R16_UNORM;
         break;
-      case FORMAT_R16_UINT:
+      case ezRHIFormat::R16_UINT:
         return DXGI_FORMAT_R16_UINT;
         break;
-      case FORMAT_R16_SNORM:
+      case ezRHIFormat::R16_SNORM:
         return DXGI_FORMAT_R16_SNORM;
         break;
-      case FORMAT_R16_SINT:
+      case ezRHIFormat::R16_SINT:
         return DXGI_FORMAT_R16_SINT;
         break;
-      case FORMAT_R8_UNORM:
+      case ezRHIFormat::R8_UNORM:
         return DXGI_FORMAT_R8_UNORM;
         break;
-      case FORMAT_R8_UINT:
+      case ezRHIFormat::R8_UINT:
         return DXGI_FORMAT_R8_UINT;
         break;
-      case FORMAT_R8_SNORM:
+      case ezRHIFormat::R8_SNORM:
         return DXGI_FORMAT_R8_SNORM;
         break;
-      case FORMAT_R8_SINT:
+      case ezRHIFormat::R8_SINT:
         return DXGI_FORMAT_R8_SINT;
         break;
-      case FORMAT_BC1_UNORM:
+      case ezRHIFormat::BC1_UNORM:
         return DXGI_FORMAT_BC1_UNORM;
         break;
-      case FORMAT_BC1_UNORM_SRGB:
+      case ezRHIFormat::BC1_UNORM_SRGB:
         return DXGI_FORMAT_BC1_UNORM_SRGB;
         break;
-      case FORMAT_BC2_UNORM:
+      case ezRHIFormat::BC2_UNORM:
         return DXGI_FORMAT_BC2_UNORM;
         break;
-      case FORMAT_BC2_UNORM_SRGB:
+      case ezRHIFormat::BC2_UNORM_SRGB:
         return DXGI_FORMAT_BC2_UNORM_SRGB;
         break;
-      case FORMAT_BC3_UNORM:
+      case ezRHIFormat::BC3_UNORM:
         return DXGI_FORMAT_BC3_UNORM;
         break;
-      case FORMAT_BC3_UNORM_SRGB:
+      case ezRHIFormat::BC3_UNORM_SRGB:
         return DXGI_FORMAT_BC3_UNORM_SRGB;
         break;
-      case FORMAT_BC4_UNORM:
+      case ezRHIFormat::BC4_UNORM:
         return DXGI_FORMAT_BC4_UNORM;
         break;
-      case FORMAT_BC4_SNORM:
+      case ezRHIFormat::BC4_SNORM:
         return DXGI_FORMAT_BC4_SNORM;
         break;
-      case FORMAT_BC5_UNORM:
+      case ezRHIFormat::BC5_UNORM:
         return DXGI_FORMAT_BC5_UNORM;
         break;
-      case FORMAT_BC5_SNORM:
+      case ezRHIFormat::BC5_SNORM:
         return DXGI_FORMAT_BC5_SNORM;
         break;
-      case FORMAT_B8G8R8A8_UNORM:
+      case ezRHIFormat::B8G8R8A8_UNORM:
         return DXGI_FORMAT_B8G8R8A8_UNORM;
         break;
-      case FORMAT_B8G8R8A8_UNORM_SRGB:
+      case ezRHIFormat::B8G8R8A8_UNORM_SRGB:
         return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
         break;
-      case FORMAT_BC6H_UF16:
+      case ezRHIFormat::BC6H_UF16:
         return DXGI_FORMAT_BC6H_UF16;
         break;
-      case FORMAT_BC6H_SF16:
+      case ezRHIFormat::BC6H_SF16:
         return DXGI_FORMAT_BC6H_SF16;
         break;
-      case FORMAT_BC7_UNORM:
+      case ezRHIFormat::BC7_UNORM:
         return DXGI_FORMAT_BC7_UNORM;
         break;
-      case FORMAT_BC7_UNORM_SRGB:
+      case ezRHIFormat::BC7_UNORM_SRGB:
         return DXGI_FORMAT_BC7_UNORM_SRGB;
         break;
     }
@@ -729,213 +729,213 @@ namespace DX12_Internal
 
   // Native -> Engine converters
 
-  constexpr FORMAT _ConvertFormat_Inv(DXGI_FORMAT value)
+  inline ezEnum<ezRHIFormat> _ConvertFormat_Inv(DXGI_FORMAT value)
   {
     switch (value)
     {
       case DXGI_FORMAT_UNKNOWN:
-        return FORMAT_UNKNOWN;
+        return ezRHIFormat::Unknown;
         break;
       case DXGI_FORMAT_R32G32B32A32_FLOAT:
-        return FORMAT_R32G32B32A32_FLOAT;
+        return ezRHIFormat::R32G32B32A32_FLOAT;
         break;
       case DXGI_FORMAT_R32G32B32A32_UINT:
-        return FORMAT_R32G32B32A32_UINT;
+        return ezRHIFormat::R32G32B32A32_UINT;
         break;
       case DXGI_FORMAT_R32G32B32A32_SINT:
-        return FORMAT_R32G32B32A32_SINT;
+        return ezRHIFormat::R32G32B32A32_SINT;
         break;
       case DXGI_FORMAT_R32G32B32_FLOAT:
-        return FORMAT_R32G32B32_FLOAT;
+        return ezRHIFormat::R32G32B32_FLOAT;
         break;
       case DXGI_FORMAT_R32G32B32_UINT:
-        return FORMAT_R32G32B32_UINT;
+        return ezRHIFormat::R32G32B32_UINT;
         break;
       case DXGI_FORMAT_R32G32B32_SINT:
-        return FORMAT_R32G32B32_SINT;
+        return ezRHIFormat::R32G32B32_SINT;
         break;
       case DXGI_FORMAT_R16G16B16A16_FLOAT:
-        return FORMAT_R16G16B16A16_FLOAT;
+        return ezRHIFormat::R16G16B16A16_FLOAT;
         break;
       case DXGI_FORMAT_R16G16B16A16_UNORM:
-        return FORMAT_R16G16B16A16_UNORM;
+        return ezRHIFormat::R16G16B16A16_UNORM;
         break;
       case DXGI_FORMAT_R16G16B16A16_UINT:
-        return FORMAT_R16G16B16A16_UINT;
+        return ezRHIFormat::R16G16B16A16_UINT;
         break;
       case DXGI_FORMAT_R16G16B16A16_SNORM:
-        return FORMAT_R16G16B16A16_SNORM;
+        return ezRHIFormat::R16G16B16A16_SNORM;
         break;
       case DXGI_FORMAT_R16G16B16A16_SINT:
-        return FORMAT_R16G16B16A16_SINT;
+        return ezRHIFormat::R16G16B16A16_SINT;
         break;
       case DXGI_FORMAT_R32G32_FLOAT:
-        return FORMAT_R32G32_FLOAT;
+        return ezRHIFormat::R32G32_FLOAT;
         break;
       case DXGI_FORMAT_R32G32_UINT:
-        return FORMAT_R32G32_UINT;
+        return ezRHIFormat::R32G32_UINT;
         break;
       case DXGI_FORMAT_R32G32_SINT:
-        return FORMAT_R32G32_SINT;
+        return ezRHIFormat::R32G32_SINT;
         break;
       case DXGI_FORMAT_R32G8X24_TYPELESS:
-        return FORMAT_R32G8X24_TYPELESS;
+        return ezRHIFormat::R32G8X24_TYPELESS;
         break;
       case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
-        return FORMAT_D32_FLOAT_S8X24_UINT;
+        return ezRHIFormat::D32_FLOAT_S8X24_UINT;
         break;
       case DXGI_FORMAT_R10G10B10A2_UNORM:
-        return FORMAT_R10G10B10A2_UNORM;
+        return ezRHIFormat::R10G10B10A2_UNORM;
         break;
       case DXGI_FORMAT_R10G10B10A2_UINT:
-        return FORMAT_R10G10B10A2_UINT;
+        return ezRHIFormat::R10G10B10A2_UINT;
         break;
       case DXGI_FORMAT_R11G11B10_FLOAT:
-        return FORMAT_R11G11B10_FLOAT;
+        return ezRHIFormat::R11G11B10_FLOAT;
         break;
       case DXGI_FORMAT_R8G8B8A8_UNORM:
-        return FORMAT_R8G8B8A8_UNORM;
+        return ezRHIFormat::R8G8B8A8_UNORM;
         break;
       case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-        return FORMAT_R8G8B8A8_UNORM_SRGB;
+        return ezRHIFormat::R8G8B8A8_UNORM_SRGB;
         break;
       case DXGI_FORMAT_R8G8B8A8_UINT:
-        return FORMAT_R8G8B8A8_UINT;
+        return ezRHIFormat::R8G8B8A8_UINT;
         break;
       case DXGI_FORMAT_R8G8B8A8_SNORM:
-        return FORMAT_R8G8B8A8_SNORM;
+        return ezRHIFormat::R8G8B8A8_SNORM;
         break;
       case DXGI_FORMAT_R8G8B8A8_SINT:
-        return FORMAT_R8G8B8A8_SINT;
+        return ezRHIFormat::R8G8B8A8_SINT;
         break;
       case DXGI_FORMAT_R16G16_FLOAT:
-        return FORMAT_R16G16_FLOAT;
+        return ezRHIFormat::R16G16_FLOAT;
         break;
       case DXGI_FORMAT_R16G16_UNORM:
-        return FORMAT_R16G16_UNORM;
+        return ezRHIFormat::R16G16_UNORM;
         break;
       case DXGI_FORMAT_R16G16_UINT:
-        return FORMAT_R16G16_UINT;
+        return ezRHIFormat::R16G16_UINT;
         break;
       case DXGI_FORMAT_R16G16_SNORM:
-        return FORMAT_R16G16_SNORM;
+        return ezRHIFormat::R16G16_SNORM;
         break;
       case DXGI_FORMAT_R16G16_SINT:
-        return FORMAT_R16G16_SINT;
+        return ezRHIFormat::R16G16_SINT;
         break;
       case DXGI_FORMAT_R32_TYPELESS:
-        return FORMAT_R32_TYPELESS;
+        return ezRHIFormat::R32_TYPELESS;
         break;
       case DXGI_FORMAT_D32_FLOAT:
-        return FORMAT_D32_FLOAT;
+        return ezRHIFormat::D32_FLOAT;
         break;
       case DXGI_FORMAT_R32_FLOAT:
-        return FORMAT_R32_FLOAT;
+        return ezRHIFormat::R32_FLOAT;
         break;
       case DXGI_FORMAT_R32_UINT:
-        return FORMAT_R32_UINT;
+        return ezRHIFormat::R32_UINT;
         break;
       case DXGI_FORMAT_R32_SINT:
-        return FORMAT_R32_SINT;
+        return ezRHIFormat::R32_SINT;
         break;
       case DXGI_FORMAT_R8G8_UNORM:
-        return FORMAT_R8G8_UNORM;
+        return ezRHIFormat::R8G8_UNORM;
         break;
       case DXGI_FORMAT_R8G8_UINT:
-        return FORMAT_R8G8_UINT;
+        return ezRHIFormat::R8G8_UINT;
         break;
       case DXGI_FORMAT_R8G8_SNORM:
-        return FORMAT_R8G8_SNORM;
+        return ezRHIFormat::R8G8_SNORM;
         break;
       case DXGI_FORMAT_R8G8_SINT:
-        return FORMAT_R8G8_SINT;
+        return ezRHIFormat::R8G8_SINT;
         break;
       case DXGI_FORMAT_R16_TYPELESS:
-        return FORMAT_R16_TYPELESS;
+        return ezRHIFormat::R16_TYPELESS;
         break;
       case DXGI_FORMAT_R16_FLOAT:
-        return FORMAT_R16_FLOAT;
+        return ezRHIFormat::R16_FLOAT;
         break;
       case DXGI_FORMAT_D16_UNORM:
-        return FORMAT_D16_UNORM;
+        return ezRHIFormat::D16_UNORM;
         break;
       case DXGI_FORMAT_R16_UNORM:
-        return FORMAT_R16_UNORM;
+        return ezRHIFormat::R16_UNORM;
         break;
       case DXGI_FORMAT_R16_UINT:
-        return FORMAT_R16_UINT;
+        return ezRHIFormat::R16_UINT;
         break;
       case DXGI_FORMAT_R16_SNORM:
-        return FORMAT_R16_SNORM;
+        return ezRHIFormat::R16_SNORM;
         break;
       case DXGI_FORMAT_R16_SINT:
-        return FORMAT_R16_SINT;
+        return ezRHIFormat::R16_SINT;
         break;
       case DXGI_FORMAT_R8_UNORM:
-        return FORMAT_R8_UNORM;
+        return ezRHIFormat::R8_UNORM;
         break;
       case DXGI_FORMAT_R8_UINT:
-        return FORMAT_R8_UINT;
+        return ezRHIFormat::R8_UINT;
         break;
       case DXGI_FORMAT_R8_SNORM:
-        return FORMAT_R8_SNORM;
+        return ezRHIFormat::R8_SNORM;
         break;
       case DXGI_FORMAT_R8_SINT:
-        return FORMAT_R8_SINT;
+        return ezRHIFormat::R8_SINT;
         break;
       case DXGI_FORMAT_BC1_UNORM:
-        return FORMAT_BC1_UNORM;
+        return ezRHIFormat::BC1_UNORM;
         break;
       case DXGI_FORMAT_BC1_UNORM_SRGB:
-        return FORMAT_BC1_UNORM_SRGB;
+        return ezRHIFormat::BC1_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC2_UNORM:
-        return FORMAT_BC2_UNORM;
+        return ezRHIFormat::BC2_UNORM;
         break;
       case DXGI_FORMAT_BC2_UNORM_SRGB:
-        return FORMAT_BC2_UNORM_SRGB;
+        return ezRHIFormat::BC2_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC3_UNORM:
-        return FORMAT_BC3_UNORM;
+        return ezRHIFormat::BC3_UNORM;
         break;
       case DXGI_FORMAT_BC3_UNORM_SRGB:
-        return FORMAT_BC3_UNORM_SRGB;
+        return ezRHIFormat::BC3_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC4_UNORM:
-        return FORMAT_BC4_UNORM;
+        return ezRHIFormat::BC4_UNORM;
         break;
       case DXGI_FORMAT_BC4_SNORM:
-        return FORMAT_BC4_SNORM;
+        return ezRHIFormat::BC4_SNORM;
         break;
       case DXGI_FORMAT_BC5_UNORM:
-        return FORMAT_BC5_UNORM;
+        return ezRHIFormat::BC5_UNORM;
         break;
       case DXGI_FORMAT_BC5_SNORM:
-        return FORMAT_BC5_SNORM;
+        return ezRHIFormat::BC5_SNORM;
         break;
       case DXGI_FORMAT_B8G8R8A8_UNORM:
-        return FORMAT_B8G8R8A8_UNORM;
+        return ezRHIFormat::B8G8R8A8_UNORM;
         break;
       case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-        return FORMAT_B8G8R8A8_UNORM_SRGB;
+        return ezRHIFormat::B8G8R8A8_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC6H_UF16:
-        return FORMAT_BC6H_UF16;
+        return ezRHIFormat::BC6H_UF16;
         break;
       case DXGI_FORMAT_BC6H_SF16:
-        return FORMAT_BC6H_SF16;
+        return ezRHIFormat::BC6H_SF16;
         break;
       case DXGI_FORMAT_BC7_UNORM:
-        return FORMAT_BC7_UNORM;
+        return ezRHIFormat::BC7_UNORM;
         break;
       case DXGI_FORMAT_BC7_UNORM_SRGB:
-        return FORMAT_BC7_UNORM_SRGB;
+        return ezRHIFormat::BC7_UNORM_SRGB;
         break;
     }
-    return FORMAT_UNKNOWN;
+    return ezRHIFormat::Unknown;
   }
 
-  constexpr TextureDesc _ConvertTextureDesc_Inv(const D3D12_RESOURCE_DESC& desc)
+  inline TextureDesc _ConvertTextureDesc_Inv(const D3D12_RESOURCE_DESC& desc)
   {
     TextureDesc retVal;
 
@@ -1247,7 +1247,7 @@ void GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::init(GraphicsD
   // Because the "buffer" is created by hand in this, fill the desc to indicate how it can be used:
   buffer.type = GPUResource::GPU_RESOURCE_TYPE::BUFFER;
   buffer.desc.ByteWidth = (ezUInt32)((size_t)dataEnd - (size_t)dataBegin);
-  buffer.desc.Usage = USAGE_DYNAMIC;
+  buffer.desc.Usage = ezRHIUsage::Dynamic;
   buffer.desc.BindFlags = BIND_VERTEX_BUFFER | BIND_INDEX_BUFFER | BIND_SHADER_RESOURCE;
   buffer.desc.MiscFlags = RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
   internal_state->srv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
@@ -1533,7 +1533,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validat
               {
                 auto internal_state = to_internal(buffer);
 
-                if (buffer->desc.Usage == USAGE_DYNAMIC)
+                if (buffer->desc.Usage == ezRHIUsage::Dynamic)
                 {
                   GraphicsDevice::GPUAllocation allocation = internal_state->dynamic[cmd];
                   D3D12_CONSTANT_BUFFER_VIEW_DESC cbv;
@@ -1839,16 +1839,16 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
             case RenderPassAttachment::RENDERTARGET:
               switch (attachment.texture->desc.Format)
               {
-                case FORMAT_R16_TYPELESS:
+                case ezRHIFormat::R16_TYPELESS:
                   formats.RTFormats[formats.NumRenderTargets] = DXGI_FORMAT_R16_UNORM;
                   break;
-                case FORMAT_R32_TYPELESS:
+                case ezRHIFormat::R32_TYPELESS:
                   formats.RTFormats[formats.NumRenderTargets] = DXGI_FORMAT_R32_FLOAT;
                   break;
-                case FORMAT_R24G8_TYPELESS:
+                case ezRHIFormat::R24G8_TYPELESS:
                   formats.RTFormats[formats.NumRenderTargets] = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
                   break;
-                case FORMAT_R32G8X24_TYPELESS:
+                case ezRHIFormat::R32G8X24_TYPELESS:
                   formats.RTFormats[formats.NumRenderTargets] = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
                   break;
                 default:
@@ -1860,16 +1860,16 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
             case RenderPassAttachment::DEPTH_STENCIL:
               switch (attachment.texture->desc.Format)
               {
-                case FORMAT_R16_TYPELESS:
+                case ezRHIFormat::R16_TYPELESS:
                   DSFormat = DXGI_FORMAT_D16_UNORM;
                   break;
-                case FORMAT_R32_TYPELESS:
+                case ezRHIFormat::R32_TYPELESS:
                   DSFormat = DXGI_FORMAT_D32_FLOAT;
                   break;
-                case FORMAT_R24G8_TYPELESS:
+                case ezRHIFormat::R24G8_TYPELESS:
                   DSFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
                   break;
-                case FORMAT_R32G8X24_TYPELESS:
+                case ezRHIFormat::R32G8X24_TYPELESS:
                   DSFormat = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
                   break;
                 default:
@@ -2368,7 +2368,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
 
   pBuffer->desc = *pDesc;
 
-  if (pDesc->Usage == USAGE_DYNAMIC && pDesc->BindFlags & BIND_CONSTANT_BUFFER)
+  if (pDesc->Usage == ezRHIUsage::Dynamic && pDesc->BindFlags & BIND_CONSTANT_BUFFER)
   {
     // this special case will use frame allocator
     return true;
@@ -2404,7 +2404,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
 
   D3D12MA::ALLOCATION_DESC allocationDesc = {};
   allocationDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
-  if (pDesc->Usage == USAGE_STAGING)
+  if (pDesc->Usage == ezRHIUsage::Staging)
   {
     if (pDesc->CPUAccessFlags & CPU_ACCESS_READ)
     {
@@ -2435,7 +2435,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
   {
     GPUBufferDesc uploaddesc;
     uploaddesc.ByteWidth = pDesc->ByteWidth;
-    uploaddesc.Usage = USAGE_STAGING;
+    uploaddesc.Usage = ezRHIUsage::Staging;
     GPUBuffer uploadbuffer;
     bool upload_success = CreateBuffer(&uploaddesc, nullptr, &uploadbuffer);
     assert(upload_success);
@@ -2577,7 +2577,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
 
   D3D12_RESOURCE_STATES resourceState = _ConvertImageLayout(pTexture->desc.layout);
 
-  if (pTexture->desc.Usage == USAGE_STAGING)
+  if (pTexture->desc.Usage == ezRHIUsage::Staging)
   {
     UINT64 RequiredSize = 0;
     device->GetCopyableFootprints(&desc, 0, 1, 0, &internal_state->footprint, nullptr, nullptr, &RequiredSize);
@@ -2634,7 +2634,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
 
     GPUBufferDesc uploaddesc;
     uploaddesc.ByteWidth = (ezUInt32)RequiredSize;
-    uploaddesc.Usage = USAGE_STAGING;
+    uploaddesc.Usage = ezRHIUsage::Staging;
     GPUBuffer uploadbuffer;
     bool upload_success = CreateBuffer(&uploaddesc, nullptr, &uploadbuffer);
     assert(upload_success);
@@ -3805,16 +3805,16 @@ int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
       // Try to resolve resource format:
       switch (texture->desc.Format)
       {
-        case FORMAT_R16_TYPELESS:
+        case ezRHIFormat::R16_TYPELESS:
           srv_desc.Format = DXGI_FORMAT_R16_UNORM;
           break;
-        case FORMAT_R32_TYPELESS:
+        case ezRHIFormat::R32_TYPELESS:
           srv_desc.Format = DXGI_FORMAT_R32_FLOAT;
           break;
-        case FORMAT_R24G8_TYPELESS:
+        case ezRHIFormat::R24G8_TYPELESS:
           srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
           break;
-        case FORMAT_R32G8X24_TYPELESS:
+        case ezRHIFormat::R32G8X24_TYPELESS:
           srv_desc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
           break;
         default:
@@ -3915,16 +3915,16 @@ int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
       // Try to resolve resource format:
       switch (texture->desc.Format)
       {
-        case FORMAT_R16_TYPELESS:
+        case ezRHIFormat::R16_TYPELESS:
           uav_desc.Format = DXGI_FORMAT_R16_UNORM;
           break;
-        case FORMAT_R32_TYPELESS:
+        case ezRHIFormat::R32_TYPELESS:
           uav_desc.Format = DXGI_FORMAT_R32_FLOAT;
           break;
-        case FORMAT_R24G8_TYPELESS:
+        case ezRHIFormat::R24G8_TYPELESS:
           uav_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
           break;
-        case FORMAT_R32G8X24_TYPELESS:
+        case ezRHIFormat::R32G8X24_TYPELESS:
           uav_desc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
           break;
         default:
@@ -3986,16 +3986,16 @@ int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
       // Try to resolve resource format:
       switch (texture->desc.Format)
       {
-        case FORMAT_R16_TYPELESS:
+        case ezRHIFormat::R16_TYPELESS:
           rtv_desc.Format = DXGI_FORMAT_R16_UNORM;
           break;
-        case FORMAT_R32_TYPELESS:
+        case ezRHIFormat::R32_TYPELESS:
           rtv_desc.Format = DXGI_FORMAT_R32_FLOAT;
           break;
-        case FORMAT_R24G8_TYPELESS:
+        case ezRHIFormat::R24G8_TYPELESS:
           rtv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
           break;
-        case FORMAT_R32G8X24_TYPELESS:
+        case ezRHIFormat::R32G8X24_TYPELESS:
           rtv_desc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
           break;
         default:
@@ -4073,16 +4073,16 @@ int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
       // Try to resolve resource format:
       switch (texture->desc.Format)
       {
-        case FORMAT_R16_TYPELESS:
+        case ezRHIFormat::R16_TYPELESS:
           dsv_desc.Format = DXGI_FORMAT_D16_UNORM;
           break;
-        case FORMAT_R32_TYPELESS:
+        case ezRHIFormat::R32_TYPELESS:
           dsv_desc.Format = DXGI_FORMAT_D32_FLOAT;
           break;
-        case FORMAT_R24G8_TYPELESS:
+        case ezRHIFormat::R24G8_TYPELESS:
           dsv_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
           break;
-        case FORMAT_R32G8X24_TYPELESS:
+        case ezRHIFormat::R32G8X24_TYPELESS:
           dsv_desc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
           break;
         default:
@@ -5103,7 +5103,7 @@ void GraphicsDevice_DX12::BindConstantBuffer(ezEnum<ezRHIShaderStage> stage, con
 {
   assert(slot < GPU_RESOURCE_HEAP_CBV_COUNT);
   auto& descriptors = GetFrameResources().descriptors[cmd];
-  if (buffer->desc.Usage == USAGE_DYNAMIC || descriptors.CBV[slot] != buffer)
+  if (buffer->desc.Usage == ezRHIUsage::Dynamic || descriptors.CBV[slot] != buffer)
   {
     descriptors.CBV[slot] = buffer;
     descriptors.dirty = true;
@@ -5173,7 +5173,7 @@ void GraphicsDevice_DX12::BindShadingRateImage(const Texture* texture, CommandLi
     }
     else
     {
-      assert(texture->desc.Format == FORMAT_R8_UINT);
+      assert(texture->desc.Format == ezRHIFormat::R8_UINT);
       GetDirectCommandList(cmd)->RSSetShadingRateImage(to_internal(texture)->resource.Get());
     }
   }
@@ -5310,7 +5310,7 @@ void GraphicsDevice_DX12::CopyResource(const GPUResource* pDst, const GPUResourc
 }
 void GraphicsDevice_DX12::UpdateBuffer(const GPUBuffer* buffer, const void* data, CommandList cmd, int dataSize)
 {
-  assert(buffer->desc.Usage != USAGE_IMMUTABLE && "Cannot update IMMUTABLE GPUBuffer!");
+  assert(buffer->desc.Usage != ezRHIUsage::Immutable && "Cannot update IMMUTABLE GPUBuffer!");
   assert((int)buffer->desc.ByteWidth >= dataSize || dataSize < 0 && "Data size is too big!");
 
   if (dataSize == 0)
@@ -5321,7 +5321,7 @@ void GraphicsDevice_DX12::UpdateBuffer(const GPUBuffer* buffer, const void* data
   dataSize = ezMath::Min((int)buffer->desc.ByteWidth, dataSize);
   dataSize = (dataSize >= 0 ? dataSize : buffer->desc.ByteWidth);
 
-  if (buffer->desc.Usage == USAGE_DYNAMIC && buffer->desc.BindFlags & BIND_CONSTANT_BUFFER)
+  if (buffer->desc.Usage == ezRHIUsage::Dynamic && buffer->desc.BindFlags & BIND_CONSTANT_BUFFER)
   {
     // Dynamic buffer will be used from host memory directly:
     auto internal_state = to_internal(buffer);

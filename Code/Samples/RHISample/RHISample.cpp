@@ -189,8 +189,8 @@ public:
 
     {
       InputLayoutDesc layout[] = {
-        {"ATTRIBUTE", 0, FORMAT_R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, INPUT_PER_VERTEX_DATA, 0},
-        {"ATTRIBUTE", 1, FORMAT_R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, INPUT_PER_VERTEX_DATA, 0},
+        {"ATTRIBUTE", 0, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, INPUT_PER_VERTEX_DATA, 0},
+        {"ATTRIBUTE", 1, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, INPUT_PER_VERTEX_DATA, 0},
       };
 
       m_pDevice->CreateInputLayout(layout, EZ_ARRAY_SIZE(layout), vertexShader, &inputLayout);
@@ -239,7 +239,7 @@ public:
       };
 
       GPUBufferDesc bufferDesc{};
-      bufferDesc.Usage = USAGE_IMMUTABLE;
+      bufferDesc.Usage = ezRHIUsage::Immutable;
       bufferDesc.BindFlags = BIND_VERTEX_BUFFER;
       bufferDesc.ByteWidth = sizeof(cubeVertices);
       bufferDesc.StructureByteStride = sizeof(Vertex);
@@ -287,7 +287,7 @@ public:
         6,
       };
 
-      bufferDesc.Usage = USAGE_IMMUTABLE;
+      bufferDesc.Usage = ezRHIUsage::Immutable;
       bufferDesc.BindFlags = BIND_INDEX_BUFFER;
       bufferDesc.ByteWidth = sizeof(indices);
       SubresourceData indexData;
@@ -295,7 +295,7 @@ public:
       m_pDevice->CreateBuffer(&bufferDesc, &indexData, &indexBuffer);
 
       GPUBufferDesc bd;
-      bd.Usage = USAGE_DYNAMIC;
+      bd.Usage = ezRHIUsage::Dynamic;
       bd.ByteWidth = sizeof(ezMat4);
       bd.BindFlags = BIND_CONSTANT_BUFFER;
       bd.CPUAccessFlags = CPU_ACCESS_WRITE;

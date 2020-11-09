@@ -44,212 +44,212 @@ PFN_vkCmdDrawMeshTasksIndirectNV GraphicsDevice_Vulkan::cmdDrawMeshTasksIndirect
 namespace Vulkan_Internal
 {
   // Converters:
-  constexpr VkFormat _ConvertFormat(FORMAT value)
+  inline VkFormat _ConvertFormat(ezEnum<ezRHIFormat> value)
   {
     switch (value)
     {
-      case FORMAT_UNKNOWN:
+      case ezRHIFormat::Unknown:
         return VK_FORMAT_UNDEFINED;
         break;
-      case FORMAT_R32G32B32A32_FLOAT:
+      case ezRHIFormat::R32G32B32A32_FLOAT:
         return VK_FORMAT_R32G32B32A32_SFLOAT;
         break;
-      case FORMAT_R32G32B32A32_UINT:
+      case ezRHIFormat::R32G32B32A32_UINT:
         return VK_FORMAT_R32G32B32A32_UINT;
         break;
-      case FORMAT_R32G32B32A32_SINT:
+      case ezRHIFormat::R32G32B32A32_SINT:
         return VK_FORMAT_R32G32B32A32_SINT;
         break;
-      case FORMAT_R32G32B32_FLOAT:
+      case ezRHIFormat::R32G32B32_FLOAT:
         return VK_FORMAT_R32G32B32_SFLOAT;
         break;
-      case FORMAT_R32G32B32_UINT:
+      case ezRHIFormat::R32G32B32_UINT:
         return VK_FORMAT_R32G32B32_UINT;
         break;
-      case FORMAT_R32G32B32_SINT:
+      case ezRHIFormat::R32G32B32_SINT:
         return VK_FORMAT_R32G32B32_SINT;
         break;
-      case FORMAT_R16G16B16A16_FLOAT:
+      case ezRHIFormat::R16G16B16A16_FLOAT:
         return VK_FORMAT_R16G16B16A16_SFLOAT;
         break;
-      case FORMAT_R16G16B16A16_UNORM:
+      case ezRHIFormat::R16G16B16A16_UNORM:
         return VK_FORMAT_R16G16B16A16_UNORM;
         break;
-      case FORMAT_R16G16B16A16_UINT:
+      case ezRHIFormat::R16G16B16A16_UINT:
         return VK_FORMAT_R16G16B16A16_UINT;
         break;
-      case FORMAT_R16G16B16A16_SNORM:
+      case ezRHIFormat::R16G16B16A16_SNORM:
         return VK_FORMAT_R16G16B16A16_SNORM;
         break;
-      case FORMAT_R16G16B16A16_SINT:
+      case ezRHIFormat::R16G16B16A16_SINT:
         return VK_FORMAT_R16G16B16A16_SINT;
         break;
-      case FORMAT_R32G32_FLOAT:
+      case ezRHIFormat::R32G32_FLOAT:
         return VK_FORMAT_R32G32_SFLOAT;
         break;
-      case FORMAT_R32G32_UINT:
+      case ezRHIFormat::R32G32_UINT:
         return VK_FORMAT_R32G32_UINT;
         break;
-      case FORMAT_R32G32_SINT:
+      case ezRHIFormat::R32G32_SINT:
         return VK_FORMAT_R32G32_SINT;
         break;
-      case FORMAT_R32G8X24_TYPELESS:
+      case ezRHIFormat::R32G8X24_TYPELESS:
         return VK_FORMAT_D32_SFLOAT_S8_UINT;
         break;
-      case FORMAT_D32_FLOAT_S8X24_UINT:
+      case ezRHIFormat::D32_FLOAT_S8X24_UINT:
         return VK_FORMAT_D32_SFLOAT_S8_UINT;
         break;
-      case FORMAT_R10G10B10A2_UNORM:
+      case ezRHIFormat::R10G10B10A2_UNORM:
         return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
         break;
-      case FORMAT_R10G10B10A2_UINT:
+      case ezRHIFormat::R10G10B10A2_UINT:
         return VK_FORMAT_A2B10G10R10_UINT_PACK32;
         break;
-      case FORMAT_R11G11B10_FLOAT:
+      case ezRHIFormat::R11G11B10_FLOAT:
         return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
         break;
-      case FORMAT_R8G8B8A8_UNORM:
+      case ezRHIFormat::R8G8B8A8_UNORM:
         return VK_FORMAT_R8G8B8A8_UNORM;
         break;
-      case FORMAT_R8G8B8A8_UNORM_SRGB:
+      case ezRHIFormat::R8G8B8A8_UNORM_SRGB:
         return VK_FORMAT_R8G8B8A8_SRGB;
         break;
-      case FORMAT_R8G8B8A8_UINT:
+      case ezRHIFormat::R8G8B8A8_UINT:
         return VK_FORMAT_R8G8B8A8_UINT;
         break;
-      case FORMAT_R8G8B8A8_SNORM:
+      case ezRHIFormat::R8G8B8A8_SNORM:
         return VK_FORMAT_R8G8B8A8_SNORM;
         break;
-      case FORMAT_R8G8B8A8_SINT:
+      case ezRHIFormat::R8G8B8A8_SINT:
         return VK_FORMAT_R8G8B8A8_SINT;
         break;
-      case FORMAT_R16G16_FLOAT:
+      case ezRHIFormat::R16G16_FLOAT:
         return VK_FORMAT_R16G16_SFLOAT;
         break;
-      case FORMAT_R16G16_UNORM:
+      case ezRHIFormat::R16G16_UNORM:
         return VK_FORMAT_R16G16_UNORM;
         break;
-      case FORMAT_R16G16_UINT:
+      case ezRHIFormat::R16G16_UINT:
         return VK_FORMAT_R16G16_UINT;
         break;
-      case FORMAT_R16G16_SNORM:
+      case ezRHIFormat::R16G16_SNORM:
         return VK_FORMAT_R16G16_SNORM;
         break;
-      case FORMAT_R16G16_SINT:
+      case ezRHIFormat::R16G16_SINT:
         return VK_FORMAT_R16G16_SINT;
         break;
-      case FORMAT_R32_TYPELESS:
+      case ezRHIFormat::R32_TYPELESS:
         return VK_FORMAT_D32_SFLOAT;
         break;
-      case FORMAT_D32_FLOAT:
+      case ezRHIFormat::D32_FLOAT:
         return VK_FORMAT_D32_SFLOAT;
         break;
-      case FORMAT_R32_FLOAT:
+      case ezRHIFormat::R32_FLOAT:
         return VK_FORMAT_R32_SFLOAT;
         break;
-      case FORMAT_R32_UINT:
+      case ezRHIFormat::R32_UINT:
         return VK_FORMAT_R32_UINT;
         break;
-      case FORMAT_R32_SINT:
+      case ezRHIFormat::R32_SINT:
         return VK_FORMAT_R32_SINT;
         break;
-      case FORMAT_R24G8_TYPELESS:
+      case ezRHIFormat::R24G8_TYPELESS:
         return VK_FORMAT_D24_UNORM_S8_UINT;
         break;
-      case FORMAT_D24_UNORM_S8_UINT:
+      case ezRHIFormat::D24_UNORM_S8_UINT:
         return VK_FORMAT_D24_UNORM_S8_UINT;
         break;
-      case FORMAT_R8G8_UNORM:
+      case ezRHIFormat::R8G8_UNORM:
         return VK_FORMAT_R8G8_UNORM;
         break;
-      case FORMAT_R8G8_UINT:
+      case ezRHIFormat::R8G8_UINT:
         return VK_FORMAT_R8G8_UINT;
         break;
-      case FORMAT_R8G8_SNORM:
+      case ezRHIFormat::R8G8_SNORM:
         return VK_FORMAT_R8G8_SNORM;
         break;
-      case FORMAT_R8G8_SINT:
+      case ezRHIFormat::R8G8_SINT:
         return VK_FORMAT_R8G8_SINT;
         break;
-      case FORMAT_R16_TYPELESS:
+      case ezRHIFormat::R16_TYPELESS:
         return VK_FORMAT_D16_UNORM;
         break;
-      case FORMAT_R16_FLOAT:
+      case ezRHIFormat::R16_FLOAT:
         return VK_FORMAT_R16_SFLOAT;
         break;
-      case FORMAT_D16_UNORM:
+      case ezRHIFormat::D16_UNORM:
         return VK_FORMAT_D16_UNORM;
         break;
-      case FORMAT_R16_UNORM:
+      case ezRHIFormat::R16_UNORM:
         return VK_FORMAT_R16_UNORM;
         break;
-      case FORMAT_R16_UINT:
+      case ezRHIFormat::R16_UINT:
         return VK_FORMAT_R16_UINT;
         break;
-      case FORMAT_R16_SNORM:
+      case ezRHIFormat::R16_SNORM:
         return VK_FORMAT_R16_SNORM;
         break;
-      case FORMAT_R16_SINT:
+      case ezRHIFormat::R16_SINT:
         return VK_FORMAT_R16_SINT;
         break;
-      case FORMAT_R8_UNORM:
+      case ezRHIFormat::R8_UNORM:
         return VK_FORMAT_R8_UNORM;
         break;
-      case FORMAT_R8_UINT:
+      case ezRHIFormat::R8_UINT:
         return VK_FORMAT_R8_UINT;
         break;
-      case FORMAT_R8_SNORM:
+      case ezRHIFormat::R8_SNORM:
         return VK_FORMAT_R8_SNORM;
         break;
-      case FORMAT_R8_SINT:
+      case ezRHIFormat::R8_SINT:
         return VK_FORMAT_R8_SINT;
         break;
-      case FORMAT_BC1_UNORM:
+      case ezRHIFormat::BC1_UNORM:
         return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
         break;
-      case FORMAT_BC1_UNORM_SRGB:
+      case ezRHIFormat::BC1_UNORM_SRGB:
         return VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
         break;
-      case FORMAT_BC2_UNORM:
+      case ezRHIFormat::BC2_UNORM:
         return VK_FORMAT_BC2_UNORM_BLOCK;
         break;
-      case FORMAT_BC2_UNORM_SRGB:
+      case ezRHIFormat::BC2_UNORM_SRGB:
         return VK_FORMAT_BC2_SRGB_BLOCK;
         break;
-      case FORMAT_BC3_UNORM:
+      case ezRHIFormat::BC3_UNORM:
         return VK_FORMAT_BC3_UNORM_BLOCK;
         break;
-      case FORMAT_BC3_UNORM_SRGB:
+      case ezRHIFormat::BC3_UNORM_SRGB:
         return VK_FORMAT_BC3_SRGB_BLOCK;
         break;
-      case FORMAT_BC4_UNORM:
+      case ezRHIFormat::BC4_UNORM:
         return VK_FORMAT_BC4_UNORM_BLOCK;
         break;
-      case FORMAT_BC4_SNORM:
+      case ezRHIFormat::BC4_SNORM:
         return VK_FORMAT_BC4_SNORM_BLOCK;
         break;
-      case FORMAT_BC5_UNORM:
+      case ezRHIFormat::BC5_UNORM:
         return VK_FORMAT_BC5_UNORM_BLOCK;
         break;
-      case FORMAT_BC5_SNORM:
+      case ezRHIFormat::BC5_SNORM:
         return VK_FORMAT_BC5_SNORM_BLOCK;
         break;
-      case FORMAT_B8G8R8A8_UNORM:
+      case ezRHIFormat::B8G8R8A8_UNORM:
         return VK_FORMAT_B8G8R8A8_UNORM;
         break;
-      case FORMAT_B8G8R8A8_UNORM_SRGB:
+      case ezRHIFormat::B8G8R8A8_UNORM_SRGB:
         return VK_FORMAT_B8G8R8A8_SRGB;
         break;
-      case FORMAT_BC6H_UF16:
+      case ezRHIFormat::BC6H_UF16:
         return VK_FORMAT_BC6H_UFLOAT_BLOCK;
         break;
-      case FORMAT_BC6H_SF16:
+      case ezRHIFormat::BC6H_SF16:
         return VK_FORMAT_BC6H_SFLOAT_BLOCK;
         break;
-      case FORMAT_BC7_UNORM:
+      case ezRHIFormat::BC7_UNORM:
         return VK_FORMAT_BC7_UNORM_BLOCK;
         break;
-      case FORMAT_BC7_UNORM_SRGB:
+      case ezRHIFormat::BC7_UNORM_SRGB:
         return VK_FORMAT_BC7_SRGB_BLOCK;
         break;
     }
@@ -1256,7 +1256,7 @@ void GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::init(Graphic
   // Because the "buffer" is created by hand in this, fill the desc to indicate how it can be used:
   this->buffer.type = GPUResource::GPU_RESOURCE_TYPE::BUFFER;
   this->buffer.desc.ByteWidth = (ezUInt32)((size_t)dataEnd - (size_t)dataBegin);
-  this->buffer.desc.Usage = USAGE_DYNAMIC;
+  this->buffer.desc.Usage = ezRHIUsage::Dynamic;
   this->buffer.desc.BindFlags = BIND_VERTEX_BUFFER | BIND_INDEX_BUFFER | BIND_SHADER_RESOURCE;
   this->buffer.desc.MiscFlags = RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
 }
@@ -1587,7 +1587,7 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
         else
         {
           auto internal_state = to_internal(buffer);
-          if (buffer->desc.Usage == USAGE_DYNAMIC)
+          if (buffer->desc.Usage == ezRHIUsage::Dynamic)
           {
             const GPUAllocation& allocation = internal_state->dynamic[cmd];
             bufferInfos.back().buffer = to_internal(allocation.buffer)->resource;
@@ -1964,10 +1964,10 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
         switch (desc.FillMode)
         {
-          case FILL_WIREFRAME:
+          case ezRHIFillMode::FILL_WIREFRAME:
             rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
             break;
-          case FILL_SOLID:
+          case ezRHIFillMode::FILL_SOLID:
           default:
             rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
             break;
@@ -1975,13 +1975,13 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
         switch (desc.CullMode)
         {
-          case CULL_BACK:
+          case ezRHICullMode::CULL_BACK:
             rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
             break;
-          case CULL_FRONT:
+          case ezRHICullMode::CULL_FRONT:
             rasterizer.cullMode = VK_CULL_MODE_FRONT_BIT;
             break;
-          case CULL_NONE:
+          case ezRHICullMode::CULL_NONE:
           default:
             rasterizer.cullMode = VK_CULL_MODE_NONE;
             break;
@@ -2536,7 +2536,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     }
 
     VkFormatProperties formatProperties = {0};
-    vkGetPhysicalDeviceFormatProperties(physicalDevice, _ConvertFormat(FORMAT_R11G11B10_FLOAT), &formatProperties);
+    vkGetPhysicalDeviceFormatProperties(physicalDevice, _ConvertFormat(ezRHIFormat::R11G11B10_FLOAT), &formatProperties);
     UAV_LOAD_FORMAT_R11G11B10_FLOAT = formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
 
     VkDeviceCreateInfo createInfo = {};
@@ -2989,7 +2989,7 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
   if (!valid)
   {
     surfaceFormat = {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
-    BACKBUFFER_FORMAT = FORMAT_B8G8R8A8_UNORM;
+    BACKBUFFER_FORMAT = ezRHIFormat::B8G8R8A8_UNORM;
   }
 
   swapChainExtent = {static_cast<ezUInt32>(RESOLUTIONWIDTH), static_cast<ezUInt32>(RESOLUTIONHEIGHT)};
@@ -3200,7 +3200,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
 
   pBuffer->desc = *pDesc;
 
-  if (pDesc->Usage == USAGE_DYNAMIC && pDesc->BindFlags & BIND_CONSTANT_BUFFER)
+  if (pDesc->Usage == ezRHIUsage::Dynamic && pDesc->BindFlags & BIND_CONSTANT_BUFFER)
   {
     // this special case will use frame allocator
     return true;
@@ -3224,7 +3224,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
   }
   if (pBuffer->desc.BindFlags & BIND_SHADER_RESOURCE)
   {
-    if (pBuffer->desc.Format == FORMAT_UNKNOWN)
+    if (pBuffer->desc.Format == ezRHIFormat::Unknown)
     {
       bufferInfo.usage |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     }
@@ -3235,7 +3235,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
   }
   if (pBuffer->desc.BindFlags & BIND_UNORDERED_ACCESS)
   {
-    if (pBuffer->desc.Format == FORMAT_UNKNOWN)
+    if (pBuffer->desc.Format == ezRHIFormat::Unknown)
     {
       bufferInfo.usage |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     }
@@ -3269,7 +3269,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
 
   VmaAllocationCreateInfo allocInfo = {};
   allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-  if (pDesc->Usage == USAGE_STAGING)
+  if (pDesc->Usage == ezRHIUsage::Staging)
   {
     if (pDesc->CPUAccessFlags & CPU_ACCESS_READ)
     {
@@ -3292,7 +3292,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
   {
     GPUBufferDesc uploaddesc;
     uploaddesc.ByteWidth = pDesc->ByteWidth;
-    uploaddesc.Usage = USAGE_STAGING;
+    uploaddesc.Usage = ezRHIUsage::Staging;
     GPUBuffer uploadbuffer;
     bool upload_success = CreateBuffer(&uploaddesc, nullptr, &uploadbuffer);
     assert(upload_success);
@@ -3484,7 +3484,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
 
   VkResult res;
 
-  if (pTexture->desc.Usage == USAGE_STAGING)
+  if (pTexture->desc.Usage == ezRHIUsage::Staging)
   {
     VkBufferCreateInfo bufferInfo = {};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -3492,7 +3492,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
                       GetFormatStride(pTexture->desc.Format);
 
     allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-    if (pDesc->Usage == USAGE_STAGING)
+    if (pDesc->Usage == ezRHIUsage::Staging)
     {
       if (pDesc->CPUAccessFlags & CPU_ACCESS_READ)
       {
@@ -3533,7 +3533,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
   {
     GPUBufferDesc uploaddesc;
     uploaddesc.ByteWidth = (ezUInt32)internal_state->allocation->GetSize();
-    uploaddesc.Usage = USAGE_STAGING;
+    uploaddesc.Usage = ezRHIUsage::Staging;
     GPUBuffer uploadbuffer;
     bool upload_success = CreateBuffer(&uploaddesc, nullptr, &uploadbuffer);
     assert(upload_success);
@@ -5158,19 +5158,19 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
     {
       switch (texture->desc.Format)
       {
-        case FORMAT_R16_TYPELESS:
+        case ezRHIFormat::R16_TYPELESS:
           view_desc.format = VK_FORMAT_D16_UNORM;
           view_desc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
           break;
-        case FORMAT_R32_TYPELESS:
+        case ezRHIFormat::R32_TYPELESS:
           view_desc.format = VK_FORMAT_D32_SFLOAT;
           view_desc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
           break;
-        case FORMAT_R24G8_TYPELESS:
+        case ezRHIFormat::R24G8_TYPELESS:
           view_desc.format = VK_FORMAT_D24_UNORM_S8_UINT;
           view_desc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
           break;
-        case FORMAT_R32G8X24_TYPELESS:
+        case ezRHIFormat::R32G8X24_TYPELESS:
           view_desc.format = VK_FORMAT_D32_SFLOAT_S8_UINT;
           view_desc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
           break;
@@ -5250,17 +5250,17 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
 
       switch (texture->desc.Format)
       {
-        case FORMAT_R16_TYPELESS:
+        case ezRHIFormat::R16_TYPELESS:
           view_desc.format = VK_FORMAT_D16_UNORM;
           break;
-        case FORMAT_R32_TYPELESS:
+        case ezRHIFormat::R32_TYPELESS:
           view_desc.format = VK_FORMAT_D32_SFLOAT;
           break;
-        case FORMAT_R24G8_TYPELESS:
+        case ezRHIFormat::R24G8_TYPELESS:
           view_desc.format = VK_FORMAT_D24_UNORM_S8_UINT;
           view_desc.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
           break;
-        case FORMAT_R32G8X24_TYPELESS:
+        case ezRHIFormat::R32G8X24_TYPELESS:
           view_desc.format = VK_FORMAT_D32_SFLOAT_S8_UINT;
           view_desc.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
           break;
@@ -5301,7 +5301,7 @@ int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE
     case SRV:
     case UAV:
     {
-      if (desc.Format == FORMAT_UNKNOWN)
+      if (desc.Format == ezRHIFormat::Unknown)
       {
         return -1;
       }
@@ -6160,7 +6160,7 @@ void GraphicsDevice_Vulkan::BindConstantBuffer(ezEnum<ezRHIShaderStage> stage, c
 {
   assert(slot < GPU_RESOURCE_HEAP_CBV_COUNT);
   auto& descriptors = GetFrameResources().descriptors[cmd];
-  if (buffer->desc.Usage == USAGE_DYNAMIC || descriptors.CBV[slot] != buffer)
+  if (buffer->desc.Usage == ezRHIUsage::Dynamic || descriptors.CBV[slot] != buffer)
   {
     descriptors.CBV[slot] = buffer;
     descriptors.dirty = true;
@@ -6300,7 +6300,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
     const TextureDesc& src_desc = ((const Texture*)pSrc)->GetDesc();
     const TextureDesc& dst_desc = ((const Texture*)pDst)->GetDesc();
 
-    if (src_desc.Usage & USAGE_STAGING)
+    if (src_desc.Usage.IsSet(ezRHIUsage::Staging))
     {
       VkBufferImageCopy copy = {};
       copy.imageExtent.width = dst_desc.Width;
@@ -6317,7 +6317,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
         1,
         &copy);
     }
-    else if (dst_desc.Usage & USAGE_STAGING)
+    else if (dst_desc.Usage.IsSet(ezRHIUsage::Staging))
     {
       VkBufferImageCopy copy = {};
       copy.imageExtent.width = src_desc.Width;
@@ -6408,7 +6408,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
 }
 void GraphicsDevice_Vulkan::UpdateBuffer(const GPUBuffer* buffer, const void* data, CommandList cmd, int dataSize)
 {
-  assert(buffer->desc.Usage != USAGE_IMMUTABLE && "Cannot update IMMUTABLE GPUBuffer!");
+  assert(buffer->desc.Usage != ezRHIUsage::Immutable && "Cannot update IMMUTABLE GPUBuffer!");
   assert((int)buffer->desc.ByteWidth >= dataSize || dataSize < 0 && "Data size is too big!");
 
   if (dataSize == 0)
@@ -6421,7 +6421,7 @@ void GraphicsDevice_Vulkan::UpdateBuffer(const GPUBuffer* buffer, const void* da
   dataSize = (dataSize >= 0 ? dataSize : buffer->desc.ByteWidth);
 
 
-  if (buffer->desc.Usage == USAGE_DYNAMIC && buffer->desc.BindFlags & BIND_CONSTANT_BUFFER)
+  if (buffer->desc.Usage == ezRHIUsage::Dynamic && buffer->desc.BindFlags & BIND_CONSTANT_BUFFER)
   {
     // Dynamic buffer will be used from host memory directly:
     GPUAllocation allocation = AllocateGPU(dataSize, cmd);
