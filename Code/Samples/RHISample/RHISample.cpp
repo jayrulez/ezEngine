@@ -27,8 +27,6 @@
 #include <RHI/GraphicsDevice.h>
 #include <RHI/Vulkan/GraphicsDevice_Vulkan.h>
 
-using namespace wiGraphics;
-
 struct Vertex
 {
   ezVec3 position;
@@ -62,7 +60,7 @@ public:
   typedef ezApplication SUPER;
 
   RHISample()
-    : ezApplication("Texture Sample")
+    : ezApplication("RHI Sample")
   {
   }
 
@@ -85,7 +83,7 @@ public:
     ezFileSystem::AddDataDirectory("", "", ":", ezFileSystem::AllowWrites).IgnoreResult();
     ezFileSystem::AddDataDirectory(">appdir/", "AppBin", "bin", ezFileSystem::AllowWrites).IgnoreResult();              // writing to the binary directory
     ezFileSystem::AddDataDirectory(">appdir/", "ShaderCache", "shadercache", ezFileSystem::AllowWrites).IgnoreResult(); // for shader files
-    ezFileSystem::AddDataDirectory(">user/ezEngine Project/TextureSample", "AppData", "appdata",
+    ezFileSystem::AddDataDirectory(">user/ezEngine Project/RHISample", "AppData", "appdata",
       ezFileSystem::AllowWrites)
       .IgnoreResult(); // app user data
 
@@ -228,7 +226,7 @@ public:
     }
 
     {
-      Vertex quadVertices[] = {
+      Vertex cubeVertices[] = {
         {ezVec3(-.5f, -.5f, -.5f), ezColor::Red},
         {ezVec3(-.5f, +.5f, -.5f), ezColor::Green},
         {ezVec3(+.5f, +.5f, -.5f), ezColor::Blue},
@@ -243,10 +241,10 @@ public:
       GPUBufferDesc bufferDesc{};
       bufferDesc.Usage = USAGE_IMMUTABLE;
       bufferDesc.BindFlags = BIND_VERTEX_BUFFER;
-      bufferDesc.ByteWidth = sizeof(quadVertices);
+      bufferDesc.ByteWidth = sizeof(cubeVertices);
       bufferDesc.StructureByteStride = sizeof(Vertex);
       SubresourceData quadData;
-      quadData.pSysMem = quadVertices;
+      quadData.pSysMem = cubeVertices;
       m_pDevice->CreateBuffer(&bufferDesc, &quadData, &vertexBuffer);
 
       // Index buffer

@@ -16,6 +16,24 @@
 #  define EZ_RHI_DLL
 #endif
 
+// Descriptor layout counts per shader stage:
+//	Rebuilding shaders and graphics devices are necessary after changing these values
+#define GPU_RESOURCE_HEAP_CBV_COUNT 12
+#define GPU_RESOURCE_HEAP_SRV_COUNT 48
+#define GPU_RESOURCE_HEAP_UAV_COUNT 8
+#define GPU_SAMPLER_HEAP_COUNT 16
+
+// Forward declarations
+struct Shader;
+struct BlendState;
+struct RasterizerState;
+struct DepthStencilState;
+struct InputLayout;
+struct GPUResource;
+struct GPUBuffer;
+struct Texture;
+struct RootSignature;
+
 /*
 struct EZ_RHI_DLL ezRHIStruct
 {
@@ -28,5 +46,3 @@ struct EZ_RHI_DLL ezRHIStruct
 };
 EZ_DECLARE_FLAGS_OPERATORS(_bitFlagName);
 */
-
-

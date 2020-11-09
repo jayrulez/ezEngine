@@ -9,8 +9,6 @@ extern "C"
 }
 #endif // _WIN32
 
-using namespace wiGraphics;
-
 bool GraphicsDevice::CheckCapability(GRAPHICSDEVICE_CAPABILITY capability) const
 {
   switch (capability)
