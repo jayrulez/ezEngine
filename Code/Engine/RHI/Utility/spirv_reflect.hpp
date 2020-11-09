@@ -32,13 +32,13 @@ class CompilerReflection : public CompilerGLSL
 	using Parent = CompilerGLSL;
 
 public:
-	explicit CompilerReflection(std::vector<uint32_t> spirv_)
+	explicit CompilerReflection(std::vector<ezUInt32> spirv_)
 	    : Parent(std::move(spirv_))
 	{
 		options.vulkan_semantics = true;
 	}
 
-	CompilerReflection(const uint32_t *ir_, size_t word_count)
+	CompilerReflection(const ezUInt32 *ir_, size_t word_count)
 	    : Parent(ir_, word_count)
 	{
 		options.vulkan_semantics = true;
@@ -67,14 +67,14 @@ private:
 	void emit_resources();
 	void emit_specialization_constants();
 
-	void emit_type(uint32_t type_id, bool &emitted_open_tag);
-	void emit_type_member(const SPIRType &type, uint32_t index);
-	void emit_type_member_qualifiers(const SPIRType &type, uint32_t index);
+	void emit_type(ezUInt32 type_id, bool &emitted_open_tag);
+	void emit_type_member(const SPIRType &type, ezUInt32 index);
+	void emit_type_member_qualifiers(const SPIRType &type, ezUInt32 index);
 	void emit_type_array(const SPIRType &type);
 	void emit_resources(const char *tag, const SmallVector<Resource> &resources);
 	bool type_is_reference(const SPIRType &type) const;
 
-	std::string to_member_name(const SPIRType &type, uint32_t index) const;
+	std::string to_member_name(const SPIRType &type, ezUInt32 index) const;
 
 	std::shared_ptr<simple_json::Stream> json_stream;
 };

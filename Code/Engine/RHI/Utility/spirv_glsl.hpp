@@ -47,7 +47,7 @@ enum PlsFormat
 
 struct PlsRemap
 {
-	uint32_t id;
+	ezUInt32 id;
 	PlsFormat format;
 };
 
@@ -59,7 +59,7 @@ enum AccessChainFlagBits
 	ACCESS_CHAIN_SKIP_REGISTER_EXPRESSION_READ_BIT = 1 << 3,
 	ACCESS_CHAIN_LITERAL_MSB_FORCE_ID = 1 << 4
 };
-typedef uint32_t AccessChainFlags;
+typedef ezUInt32 AccessChainFlags;
 
 class CompilerGLSL : public Compiler
 {
@@ -67,7 +67,7 @@ public:
 	struct Options
 	{
 		// The shading language version. Corresponds to #version $VALUE.
-		uint32_t version = 450;
+		ezUInt32 version = 450;
 
 		// Emit the OpenGL ES shading language instead of desktop OpenGL.
 		bool es = false;
@@ -163,15 +163,15 @@ public:
 
 	// Redirect a subpassInput reading from input_attachment_index to instead load its value from
 	// the color attachment at location = color_location. Requires ESSL.
-	void remap_ext_framebuffer_fetch(uint32_t input_attachment_index, uint32_t color_location);
+	void remap_ext_framebuffer_fetch(ezUInt32 input_attachment_index, ezUInt32 color_location);
 
-	explicit CompilerGLSL(std::vector<uint32_t> spirv_)
+	explicit CompilerGLSL(std::vector<ezUInt32> spirv_)
 	    : Compiler(std::move(spirv_))
 	{
 		init();
 	}
 
-	CompilerGLSL(const uint32_t *ir_, size_t word_count)
+	CompilerGLSL(const ezUInt32 *ir_, size_t word_count)
 	    : Compiler(ir_, word_count)
 	{
 		init();
@@ -252,38 +252,38 @@ protected:
 
 	virtual void emit_instruction(const Instruction &instr);
 	void emit_block_instructions(SPIRBlock &block);
-	virtual void emit_glsl_op(uint32_t result_type, uint32_t result_id, uint32_t op, const uint32_t *args,
-	                          uint32_t count);
-	virtual void emit_spv_amd_shader_ballot_op(uint32_t result_type, uint32_t result_id, uint32_t op,
-	                                           const uint32_t *args, uint32_t count);
-	virtual void emit_spv_amd_shader_explicit_vertex_parameter_op(uint32_t result_type, uint32_t result_id, uint32_t op,
-	                                                              const uint32_t *args, uint32_t count);
-	virtual void emit_spv_amd_shader_trinary_minmax_op(uint32_t result_type, uint32_t result_id, uint32_t op,
-	                                                   const uint32_t *args, uint32_t count);
-	virtual void emit_spv_amd_gcn_shader_op(uint32_t result_type, uint32_t result_id, uint32_t op, const uint32_t *args,
-	                                        uint32_t count);
+	virtual void emit_glsl_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op, const ezUInt32 *args,
+	                          ezUInt32 count);
+	virtual void emit_spv_amd_shader_ballot_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op,
+	                                           const ezUInt32 *args, ezUInt32 count);
+	virtual void emit_spv_amd_shader_explicit_vertex_parameter_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op,
+	                                                              const ezUInt32 *args, ezUInt32 count);
+	virtual void emit_spv_amd_shader_trinary_minmax_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op,
+	                                                   const ezUInt32 *args, ezUInt32 count);
+	virtual void emit_spv_amd_gcn_shader_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op, const ezUInt32 *args,
+	                                        ezUInt32 count);
 	virtual void emit_header();
-	void emit_line_directive(uint32_t file_id, uint32_t line_literal);
+	void emit_line_directive(ezUInt32 file_id, ezUInt32 line_literal);
 	void build_workgroup_size(SmallVector<std::string> &arguments, const SpecializationConstant &x,
 	                          const SpecializationConstant &y, const SpecializationConstant &z);
 
-	virtual void emit_sampled_image_op(uint32_t result_type, uint32_t result_id, uint32_t image_id, uint32_t samp_id);
+	virtual void emit_sampled_image_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 image_id, ezUInt32 samp_id);
 	virtual void emit_texture_op(const Instruction &i, bool sparse);
 	virtual std::string to_texture_op(const Instruction &i, bool sparse, bool *forward,
-	                                  SmallVector<uint32_t> &inherited_expressions);
+	                                  SmallVector<ezUInt32> &inherited_expressions);
 	virtual void emit_subgroup_op(const Instruction &i);
-	virtual std::string type_to_glsl(const SPIRType &type, uint32_t id = 0);
+	virtual std::string type_to_glsl(const SPIRType &type, ezUInt32 id = 0);
 	virtual std::string builtin_to_glsl(spv::BuiltIn builtin, spv::StorageClass storage);
-	virtual void emit_struct_member(const SPIRType &type, uint32_t member_type_id, uint32_t index,
-	                                const std::string &qualifier = "", uint32_t base_offset = 0);
+	virtual void emit_struct_member(const SPIRType &type, ezUInt32 member_type_id, ezUInt32 index,
+	                                const std::string &qualifier = "", ezUInt32 base_offset = 0);
 	virtual void emit_struct_padding_target(const SPIRType &type);
-	virtual std::string image_type_glsl(const SPIRType &type, uint32_t id = 0);
+	virtual std::string image_type_glsl(const SPIRType &type, ezUInt32 id = 0);
 	std::string constant_expression(const SPIRConstant &c);
 	std::string constant_op_expression(const SPIRConstantOp &cop);
-	virtual std::string constant_expression_vector(const SPIRConstant &c, uint32_t vector);
+	virtual std::string constant_expression_vector(const SPIRConstant &c, ezUInt32 vector);
 	virtual void emit_fixup();
-	virtual std::string variable_decl(const SPIRType &type, const std::string &name, uint32_t id = 0);
-	virtual std::string to_func_call_arg(const SPIRFunction::Parameter &arg, uint32_t id);
+	virtual std::string variable_decl(const SPIRType &type, const std::string &name, ezUInt32 id = 0);
+	virtual std::string to_func_call_arg(const SPIRFunction::Parameter &arg, ezUInt32 id);
 
 	struct TextureFunctionBaseArguments
 	{
@@ -301,7 +301,7 @@ protected:
 		TextureFunctionBaseArguments base;
 		bool has_array_offsets = false, has_offset = false, has_grad = false;
 		bool has_dref = false, is_sparse_feedback = false, has_min_lod = false;
-		uint32_t lod = 0;
+		ezUInt32 lod = 0;
 	};
 	virtual std::string to_function_name(const TextureFunctionNameArguments &args);
 
@@ -310,24 +310,24 @@ protected:
 		// GCC 4.8 workarounds, it doesn't understand '{}' constructor here, use explicit default constructor.
 		TextureFunctionArguments() = default;
 		TextureFunctionBaseArguments base;
-		uint32_t coord = 0, coord_components = 0, dref = 0;
-		uint32_t grad_x = 0, grad_y = 0, lod = 0, coffset = 0, offset = 0;
-		uint32_t bias = 0, component = 0, sample = 0, sparse_texel = 0, min_lod = 0;
+		ezUInt32 coord = 0, coord_components = 0, dref = 0;
+		ezUInt32 grad_x = 0, grad_y = 0, lod = 0, coffset = 0, offset = 0;
+		ezUInt32 bias = 0, component = 0, sample = 0, sparse_texel = 0, min_lod = 0;
 	};
 	virtual std::string to_function_args(const TextureFunctionArguments &args, bool *p_forward);
 
-	void emit_sparse_feedback_temporaries(uint32_t result_type_id, uint32_t id, uint32_t &feedback_id, uint32_t &texel_id);
-	uint32_t get_sparse_feedback_texel_id(uint32_t id) const;
+	void emit_sparse_feedback_temporaries(ezUInt32 result_type_id, ezUInt32 id, ezUInt32 &feedback_id, ezUInt32 &texel_id);
+	ezUInt32 get_sparse_feedback_texel_id(ezUInt32 id) const;
 	virtual void emit_buffer_block(const SPIRVariable &type);
 	virtual void emit_push_constant_block(const SPIRVariable &var);
 	virtual void emit_uniform(const SPIRVariable &var);
-	virtual std::string unpack_expression_type(std::string expr_str, const SPIRType &type, uint32_t physical_type_id,
+	virtual std::string unpack_expression_type(std::string expr_str, const SPIRType &type, ezUInt32 physical_type_id,
 	                                           bool packed_type, bool row_major);
 
 	virtual bool builtin_translates_to_nonarray(spv::BuiltIn builtin) const;
 
-	void emit_copy_logical_type(uint32_t lhs_id, uint32_t lhs_type_id, uint32_t rhs_id, uint32_t rhs_type_id,
-	                            SmallVector<uint32_t> chain);
+	void emit_copy_logical_type(ezUInt32 lhs_id, ezUInt32 lhs_type_id, ezUInt32 rhs_id, ezUInt32 rhs_type_id,
+	                            SmallVector<ezUInt32> chain);
 
 	StringStream<> buffer;
 
@@ -364,7 +364,7 @@ protected:
 		}
 		else
 		{
-			for (uint32_t i = 0; i < indent; i++)
+			for (ezUInt32 i = 0; i < indent; i++)
 				buffer << "    ";
 			statement_inner(std::forward<Ts>(ts)...);
 			buffer << '\n';
@@ -396,23 +396,23 @@ protected:
 
 	virtual std::string type_to_array_glsl(
 	    const SPIRType &type); // Allow Metal to use the array<T> template to make arrays a value type
-	std::string to_array_size(const SPIRType &type, uint32_t index);
-	uint32_t to_array_size_literal(const SPIRType &type, uint32_t index) const;
-	uint32_t to_array_size_literal(const SPIRType &type) const;
+	std::string to_array_size(const SPIRType &type, ezUInt32 index);
+	ezUInt32 to_array_size_literal(const SPIRType &type, ezUInt32 index) const;
+	ezUInt32 to_array_size_literal(const SPIRType &type) const;
 	virtual std::string variable_decl(const SPIRVariable &variable); // Threadgroup arrays can't have a wrapper type
 	std::string variable_decl_function_local(SPIRVariable &variable);
 
-	void add_local_variable_name(uint32_t id);
-	void add_resource_name(uint32_t id);
-	void add_member_name(SPIRType &type, uint32_t name);
+	void add_local_variable_name(ezUInt32 id);
+	void add_resource_name(ezUInt32 id);
+	void add_member_name(SPIRType &type, ezUInt32 name);
 	void add_function_overload(const SPIRFunction &func);
 
-	virtual bool is_non_native_row_major_matrix(uint32_t id);
-	virtual bool member_is_non_native_row_major_matrix(const SPIRType &type, uint32_t index);
-	bool member_is_remapped_physical_type(const SPIRType &type, uint32_t index) const;
-	bool member_is_packed_physical_type(const SPIRType &type, uint32_t index) const;
+	virtual bool is_non_native_row_major_matrix(ezUInt32 id);
+	virtual bool member_is_non_native_row_major_matrix(const SPIRType &type, ezUInt32 index);
+	bool member_is_remapped_physical_type(const SPIRType &type, ezUInt32 index) const;
+	bool member_is_packed_physical_type(const SPIRType &type, ezUInt32 index) const;
 	virtual std::string convert_row_major_matrix(std::string exp_str, const SPIRType &exp_type,
-	                                             uint32_t physical_type_id, bool is_packed);
+	                                             ezUInt32 physical_type_id, bool is_packed);
 
 	std::unordered_set<std::string> local_variable_names;
 	std::unordered_set<std::string> resource_names;
@@ -422,8 +422,8 @@ protected:
 	std::unordered_set<std::string> block_ssbo_names;
 	std::unordered_set<std::string> block_names; // A union of all block_*_names.
 	std::unordered_map<std::string, std::unordered_set<uint64_t>> function_overloads;
-	std::unordered_map<uint32_t, std::string> preserved_aliases;
-	void preserve_alias_on_reset(uint32_t id);
+	std::unordered_map<ezUInt32, std::string> preserved_aliases;
+	void preserve_alias_on_reset(ezUInt32 id);
 	void reset_name_caches();
 
 	bool processing_entry_point = false;
@@ -444,7 +444,7 @@ protected:
 		const char *basic_int8_type = "int8_t";
 		const char *basic_uint8_type = "uint8_t";
 		const char *basic_int16_type = "int16_t";
-		const char *basic_uint16_type = "uint16_t";
+		const char *basic_uint16_type = "ezUInt16";
 		const char *int16_t_literal_suffix = "s";
 		const char *uint16_t_literal_suffix = "us";
 		const char *nonuniform_qualifier = "nonuniformEXT";
@@ -489,161 +489,161 @@ protected:
 	void emit_flattened_io_block(const SPIRVariable &var, const char *qual);
 	void emit_block_chain(SPIRBlock &block);
 	void emit_hoisted_temporaries(SmallVector<std::pair<TypeID, ID>> &temporaries);
-	std::string constant_value_macro_name(uint32_t id);
+	std::string constant_value_macro_name(ezUInt32 id);
 	void emit_constant(const SPIRConstant &constant);
 	void emit_specialization_constant_op(const SPIRConstantOp &constant);
-	std::string emit_continue_block(uint32_t continue_block, bool follow_true_block, bool follow_false_block);
+	std::string emit_continue_block(ezUInt32 continue_block, bool follow_true_block, bool follow_false_block);
 	bool attempt_emit_loop_header(SPIRBlock &block, SPIRBlock::Method method);
 
 	void branch(BlockID from, BlockID to);
 	void branch_to_continue(BlockID from, BlockID to);
-	void branch(BlockID from, uint32_t cond, BlockID true_block, BlockID false_block);
+	void branch(BlockID from, ezUInt32 cond, BlockID true_block, BlockID false_block);
 	void flush_phi(BlockID from, BlockID to);
-	void flush_variable_declaration(uint32_t id);
+	void flush_variable_declaration(ezUInt32 id);
 	void flush_undeclared_variables(SPIRBlock &block);
 	void emit_variable_temporary_copies(const SPIRVariable &var);
 
-	bool should_dereference(uint32_t id);
-	bool should_forward(uint32_t id) const;
-	bool should_suppress_usage_tracking(uint32_t id) const;
-	void emit_mix_op(uint32_t result_type, uint32_t id, uint32_t left, uint32_t right, uint32_t lerp);
-	void emit_nminmax_op(uint32_t result_type, uint32_t id, uint32_t op0, uint32_t op1, GLSLstd450 op);
-	bool to_trivial_mix_op(const SPIRType &type, std::string &op, uint32_t left, uint32_t right, uint32_t lerp);
-	void emit_quaternary_func_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, uint32_t op2,
-	                             uint32_t op3, const char *op);
-	void emit_trinary_func_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, uint32_t op2,
+	bool should_dereference(ezUInt32 id);
+	bool should_forward(ezUInt32 id) const;
+	bool should_suppress_usage_tracking(ezUInt32 id) const;
+	void emit_mix_op(ezUInt32 result_type, ezUInt32 id, ezUInt32 left, ezUInt32 right, ezUInt32 lerp);
+	void emit_nminmax_op(ezUInt32 result_type, ezUInt32 id, ezUInt32 op0, ezUInt32 op1, GLSLstd450 op);
+	bool to_trivial_mix_op(const SPIRType &type, std::string &op, ezUInt32 left, ezUInt32 right, ezUInt32 lerp);
+	void emit_quaternary_func_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, ezUInt32 op2,
+	                             ezUInt32 op3, const char *op);
+	void emit_trinary_func_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, ezUInt32 op2,
 	                          const char *op);
-	void emit_binary_func_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, const char *op);
+	void emit_binary_func_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, const char *op);
 
-	void emit_unary_func_op_cast(uint32_t result_type, uint32_t result_id, uint32_t op0, const char *op,
+	void emit_unary_func_op_cast(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, const char *op,
 	                             SPIRType::BaseType input_type, SPIRType::BaseType expected_result_type);
-	void emit_binary_func_op_cast(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, const char *op,
+	void emit_binary_func_op_cast(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, const char *op,
 	                              SPIRType::BaseType input_type, bool skip_cast_if_equal_type);
-	void emit_binary_func_op_cast_clustered(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1,
+	void emit_binary_func_op_cast_clustered(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1,
 	                                        const char *op, SPIRType::BaseType input_type);
-	void emit_trinary_func_op_cast(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, uint32_t op2,
+	void emit_trinary_func_op_cast(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, ezUInt32 op2,
 	                               const char *op, SPIRType::BaseType input_type);
-	void emit_trinary_func_op_bitextract(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1,
-	                                     uint32_t op2, const char *op, SPIRType::BaseType expected_result_type,
+	void emit_trinary_func_op_bitextract(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1,
+	                                     ezUInt32 op2, const char *op, SPIRType::BaseType expected_result_type,
 	                                     SPIRType::BaseType input_type0, SPIRType::BaseType input_type1,
 	                                     SPIRType::BaseType input_type2);
-	void emit_bitfield_insert_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, uint32_t op2,
-	                             uint32_t op3, const char *op, SPIRType::BaseType offset_count_type);
+	void emit_bitfield_insert_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, ezUInt32 op2,
+	                             ezUInt32 op3, const char *op, SPIRType::BaseType offset_count_type);
 
-	void emit_unary_func_op(uint32_t result_type, uint32_t result_id, uint32_t op0, const char *op);
-	void emit_unrolled_unary_op(uint32_t result_type, uint32_t result_id, uint32_t operand, const char *op);
-	void emit_binary_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, const char *op);
-	void emit_unrolled_binary_op(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, const char *op,
+	void emit_unary_func_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, const char *op);
+	void emit_unrolled_unary_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 operand, const char *op);
+	void emit_binary_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, const char *op);
+	void emit_unrolled_binary_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, const char *op,
 	                             bool negate, SPIRType::BaseType expected_type);
-	void emit_binary_op_cast(uint32_t result_type, uint32_t result_id, uint32_t op0, uint32_t op1, const char *op,
+	void emit_binary_op_cast(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, ezUInt32 op1, const char *op,
 	                         SPIRType::BaseType input_type, bool skip_cast_if_equal_type);
 
 	SPIRType binary_op_bitcast_helper(std::string &cast_op0, std::string &cast_op1, SPIRType::BaseType &input_type,
-	                                  uint32_t op0, uint32_t op1, bool skip_cast_if_equal_type);
+	                                  ezUInt32 op0, ezUInt32 op1, bool skip_cast_if_equal_type);
 
-	virtual bool emit_complex_bitcast(uint32_t result_type, uint32_t id, uint32_t op0);
+	virtual bool emit_complex_bitcast(ezUInt32 result_type, ezUInt32 id, ezUInt32 op0);
 
-	std::string to_ternary_expression(const SPIRType &result_type, uint32_t select, uint32_t true_value,
-	                                  uint32_t false_value);
+	std::string to_ternary_expression(const SPIRType &result_type, ezUInt32 select, ezUInt32 true_value,
+	                                  ezUInt32 false_value);
 
-	void emit_unary_op(uint32_t result_type, uint32_t result_id, uint32_t op0, const char *op);
-	bool expression_is_forwarded(uint32_t id) const;
-	bool expression_suppresses_usage_tracking(uint32_t id) const;
-	SPIRExpression &emit_op(uint32_t result_type, uint32_t result_id, const std::string &rhs, bool forward_rhs,
+	void emit_unary_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op0, const char *op);
+	bool expression_is_forwarded(ezUInt32 id) const;
+	bool expression_suppresses_usage_tracking(ezUInt32 id) const;
+	SPIRExpression &emit_op(ezUInt32 result_type, ezUInt32 result_id, const std::string &rhs, bool forward_rhs,
 	                        bool suppress_usage_tracking = false);
 
-	void access_chain_internal_append_index(std::string &expr, uint32_t base, const SPIRType *type,
-	                                        AccessChainFlags flags, bool &access_chain_is_arrayed, uint32_t index);
+	void access_chain_internal_append_index(std::string &expr, ezUInt32 base, const SPIRType *type,
+	                                        AccessChainFlags flags, bool &access_chain_is_arrayed, ezUInt32 index);
 
-	std::string access_chain_internal(uint32_t base, const uint32_t *indices, uint32_t count, AccessChainFlags flags,
+	std::string access_chain_internal(ezUInt32 base, const ezUInt32 *indices, ezUInt32 count, AccessChainFlags flags,
 	                                  AccessChainMeta *meta);
 
-	std::string access_chain(uint32_t base, const uint32_t *indices, uint32_t count, const SPIRType &target_type,
+	std::string access_chain(ezUInt32 base, const ezUInt32 *indices, ezUInt32 count, const SPIRType &target_type,
 	                         AccessChainMeta *meta = nullptr, bool ptr_chain = false);
 
-	std::string flattened_access_chain(uint32_t base, const uint32_t *indices, uint32_t count,
-	                                   const SPIRType &target_type, uint32_t offset, uint32_t matrix_stride,
-	                                   uint32_t array_stride, bool need_transpose);
-	std::string flattened_access_chain_struct(uint32_t base, const uint32_t *indices, uint32_t count,
-	                                          const SPIRType &target_type, uint32_t offset);
-	std::string flattened_access_chain_matrix(uint32_t base, const uint32_t *indices, uint32_t count,
-	                                          const SPIRType &target_type, uint32_t offset, uint32_t matrix_stride,
+	std::string flattened_access_chain(ezUInt32 base, const ezUInt32 *indices, ezUInt32 count,
+	                                   const SPIRType &target_type, ezUInt32 offset, ezUInt32 matrix_stride,
+	                                   ezUInt32 array_stride, bool need_transpose);
+	std::string flattened_access_chain_struct(ezUInt32 base, const ezUInt32 *indices, ezUInt32 count,
+	                                          const SPIRType &target_type, ezUInt32 offset);
+	std::string flattened_access_chain_matrix(ezUInt32 base, const ezUInt32 *indices, ezUInt32 count,
+	                                          const SPIRType &target_type, ezUInt32 offset, ezUInt32 matrix_stride,
 	                                          bool need_transpose);
-	std::string flattened_access_chain_vector(uint32_t base, const uint32_t *indices, uint32_t count,
-	                                          const SPIRType &target_type, uint32_t offset, uint32_t matrix_stride,
+	std::string flattened_access_chain_vector(ezUInt32 base, const ezUInt32 *indices, ezUInt32 count,
+	                                          const SPIRType &target_type, ezUInt32 offset, ezUInt32 matrix_stride,
 	                                          bool need_transpose);
-	std::pair<std::string, uint32_t> flattened_access_chain_offset(const SPIRType &basetype, const uint32_t *indices,
-	                                                               uint32_t count, uint32_t offset,
-	                                                               uint32_t word_stride, bool *need_transpose = nullptr,
-	                                                               uint32_t *matrix_stride = nullptr,
-	                                                               uint32_t *array_stride = nullptr,
+	std::pair<std::string, ezUInt32> flattened_access_chain_offset(const SPIRType &basetype, const ezUInt32 *indices,
+	                                                               ezUInt32 count, ezUInt32 offset,
+	                                                               ezUInt32 word_stride, bool *need_transpose = nullptr,
+	                                                               ezUInt32 *matrix_stride = nullptr,
+	                                                               ezUInt32 *array_stride = nullptr,
 	                                                               bool ptr_chain = false);
 
-	const char *index_to_swizzle(uint32_t index);
-	std::string remap_swizzle(const SPIRType &result_type, uint32_t input_components, const std::string &expr);
-	std::string declare_temporary(uint32_t type, uint32_t id);
-	void emit_uninitialized_temporary(uint32_t type, uint32_t id);
-	SPIRExpression &emit_uninitialized_temporary_expression(uint32_t type, uint32_t id);
-	void append_global_func_args(const SPIRFunction &func, uint32_t index, SmallVector<std::string> &arglist);
-	std::string to_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_composite_constructor_expression(uint32_t id, bool uses_buffer_offset);
+	const char *index_to_swizzle(ezUInt32 index);
+	std::string remap_swizzle(const SPIRType &result_type, ezUInt32 input_components, const std::string &expr);
+	std::string declare_temporary(ezUInt32 type, ezUInt32 id);
+	void emit_uninitialized_temporary(ezUInt32 type, ezUInt32 id);
+	SPIRExpression &emit_uninitialized_temporary_expression(ezUInt32 type, ezUInt32 id);
+	void append_global_func_args(const SPIRFunction &func, ezUInt32 index, SmallVector<std::string> &arglist);
+	std::string to_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_composite_constructor_expression(ezUInt32 id, bool uses_buffer_offset);
 	std::string to_rerolled_array_expression(const std::string &expr, const SPIRType &type);
-	std::string to_enclosed_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_unpacked_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_unpacked_row_major_matrix_expression(uint32_t id);
-	std::string to_enclosed_unpacked_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_dereferenced_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_pointer_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_enclosed_pointer_expression(uint32_t id, bool register_expression_read = true);
-	std::string to_extract_component_expression(uint32_t id, uint32_t index);
+	std::string to_enclosed_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_unpacked_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_unpacked_row_major_matrix_expression(ezUInt32 id);
+	std::string to_enclosed_unpacked_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_dereferenced_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_pointer_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_enclosed_pointer_expression(ezUInt32 id, bool register_expression_read = true);
+	std::string to_extract_component_expression(ezUInt32 id, ezUInt32 index);
 	std::string enclose_expression(const std::string &expr);
 	std::string dereference_expression(const SPIRType &expression_type, const std::string &expr);
 	std::string address_of_expression(const std::string &expr);
 	void strip_enclosed_expression(std::string &expr);
-	std::string to_member_name(const SPIRType &type, uint32_t index);
-	virtual std::string to_member_reference(uint32_t base, const SPIRType &type, uint32_t index, bool ptr_chain);
+	std::string to_member_name(const SPIRType &type, ezUInt32 index);
+	virtual std::string to_member_reference(ezUInt32 base, const SPIRType &type, ezUInt32 index, bool ptr_chain);
 	std::string type_to_glsl_constructor(const SPIRType &type);
 	std::string argument_decl(const SPIRFunction::Parameter &arg);
-	virtual std::string to_qualifiers_glsl(uint32_t id);
-	const char *to_precision_qualifiers_glsl(uint32_t id);
+	virtual std::string to_qualifiers_glsl(ezUInt32 id);
+	const char *to_precision_qualifiers_glsl(ezUInt32 id);
 	virtual const char *to_storage_qualifiers_glsl(const SPIRVariable &var);
 	const char *flags_to_qualifiers_glsl(const SPIRType &type, const Bitset &flags);
 	const char *format_to_glsl(spv::ImageFormat format);
-	virtual std::string layout_for_member(const SPIRType &type, uint32_t index);
+	virtual std::string layout_for_member(const SPIRType &type, ezUInt32 index);
 	virtual std::string to_interpolation_qualifiers(const Bitset &flags);
 	std::string layout_for_variable(const SPIRVariable &variable);
 	std::string to_combined_image_sampler(VariableID image_id, VariableID samp_id);
-	virtual bool skip_argument(uint32_t id) const;
-	virtual void emit_array_copy(const std::string &lhs, uint32_t rhs_id, spv::StorageClass lhs_storage,
+	virtual bool skip_argument(ezUInt32 id) const;
+	virtual void emit_array_copy(const std::string &lhs, ezUInt32 rhs_id, spv::StorageClass lhs_storage,
 	                             spv::StorageClass rhs_storage);
 	virtual void emit_block_hints(const SPIRBlock &block);
 	virtual std::string to_initializer_expression(const SPIRVariable &var);
-	virtual std::string to_zero_initialized_expression(uint32_t type_id);
+	virtual std::string to_zero_initialized_expression(ezUInt32 type_id);
 	bool type_can_zero_initialize(const SPIRType &type) const;
 
 	bool buffer_is_packing_standard(const SPIRType &type, BufferPackingStandard packing,
-	                                uint32_t *failed_index = nullptr, uint32_t start_offset = 0,
-	                                uint32_t end_offset = ~(0u));
+	                                ezUInt32 *failed_index = nullptr, ezUInt32 start_offset = 0,
+	                                ezUInt32 end_offset = ~(0u));
 	std::string buffer_to_packing_standard(const SPIRType &type, bool support_std430_without_scalar_layout);
 
-	uint32_t type_to_packed_base_size(const SPIRType &type, BufferPackingStandard packing);
-	uint32_t type_to_packed_alignment(const SPIRType &type, const Bitset &flags, BufferPackingStandard packing);
-	uint32_t type_to_packed_array_stride(const SPIRType &type, const Bitset &flags, BufferPackingStandard packing);
-	uint32_t type_to_packed_size(const SPIRType &type, const Bitset &flags, BufferPackingStandard packing);
+	ezUInt32 type_to_packed_base_size(const SPIRType &type, BufferPackingStandard packing);
+	ezUInt32 type_to_packed_alignment(const SPIRType &type, const Bitset &flags, BufferPackingStandard packing);
+	ezUInt32 type_to_packed_array_stride(const SPIRType &type, const Bitset &flags, BufferPackingStandard packing);
+	ezUInt32 type_to_packed_size(const SPIRType &type, const Bitset &flags, BufferPackingStandard packing);
 
-	std::string bitcast_glsl(const SPIRType &result_type, uint32_t arg);
+	std::string bitcast_glsl(const SPIRType &result_type, ezUInt32 arg);
 	virtual std::string bitcast_glsl_op(const SPIRType &result_type, const SPIRType &argument_type);
 
-	std::string bitcast_expression(SPIRType::BaseType target_type, uint32_t arg);
+	std::string bitcast_expression(SPIRType::BaseType target_type, ezUInt32 arg);
 	std::string bitcast_expression(const SPIRType &target_type, SPIRType::BaseType expr_type, const std::string &expr);
 
-	std::string build_composite_combiner(uint32_t result_type, const uint32_t *elems, uint32_t length);
+	std::string build_composite_combiner(ezUInt32 result_type, const ezUInt32 *elems, ezUInt32 length);
 	bool remove_duplicate_swizzle(std::string &op);
-	bool remove_unity_swizzle(uint32_t base, std::string &op);
+	bool remove_unity_swizzle(ezUInt32 base, std::string &op);
 
 	// Can modify flags to remote readonly/writeonly if image type
 	// and force recompile.
-	bool check_atomic_image(uint32_t id);
+	bool check_atomic_image(ezUInt32 id);
 
 	virtual void replace_illegal_names();
 	void replace_illegal_names(const std::unordered_set<std::string> &keywords);
@@ -651,27 +651,27 @@ protected:
 
 	void replace_fragment_output(SPIRVariable &var);
 	void replace_fragment_outputs();
-	bool check_explicit_lod_allowed(uint32_t lod);
-	std::string legacy_tex_op(const std::string &op, const SPIRType &imgtype, uint32_t lod, uint32_t id);
+	bool check_explicit_lod_allowed(ezUInt32 lod);
+	std::string legacy_tex_op(const std::string &op, const SPIRType &imgtype, ezUInt32 lod, ezUInt32 id);
 
-	uint32_t indent = 0;
+	ezUInt32 indent = 0;
 
-	std::unordered_set<uint32_t> emitted_functions;
+	std::unordered_set<ezUInt32> emitted_functions;
 
 	// Ensure that we declare phi-variable copies even if the original declaration isn't deferred
-	std::unordered_set<uint32_t> flushed_phi_variables;
+	std::unordered_set<ezUInt32> flushed_phi_variables;
 
-	std::unordered_set<uint32_t> flattened_buffer_blocks;
-	std::unordered_set<uint32_t> flattened_structs;
+	std::unordered_set<ezUInt32> flattened_buffer_blocks;
+	std::unordered_set<ezUInt32> flattened_structs;
 
 	std::string load_flattened_struct(SPIRVariable &var);
-	std::string to_flattened_struct_member(const SPIRVariable &var, uint32_t index);
-	void store_flattened_struct(SPIRVariable &var, uint32_t value);
+	std::string to_flattened_struct_member(const SPIRVariable &var, ezUInt32 index);
+	void store_flattened_struct(SPIRVariable &var, ezUInt32 value);
 
 	// Usage tracking. If a temporary is used more than once, use the temporary instead to
 	// avoid AST explosion when SPIRV is generated with pure SSA and doesn't write stuff to variables.
-	std::unordered_map<uint32_t, uint32_t> expression_usage_counts;
-	void track_expression_read(uint32_t id);
+	std::unordered_map<ezUInt32, ezUInt32> expression_usage_counts;
+	void track_expression_read(ezUInt32 id);
 
 	SmallVector<std::string> forced_extensions;
 	SmallVector<std::string> header_lines;
@@ -679,9 +679,9 @@ protected:
 	// Used when expressions emit extra opcodes with their own unique IDs,
 	// and we need to reuse the IDs across recompilation loops.
 	// Currently used by NMin/Max/Clamp implementations.
-	std::unordered_map<uint32_t, uint32_t> extra_sub_expressions;
+	std::unordered_map<ezUInt32, ezUInt32> extra_sub_expressions;
 
-	uint32_t statement_count = 0;
+	ezUInt32 statement_count = 0;
 
 	inline bool is_legacy() const
 	{
@@ -698,10 +698,10 @@ protected:
 		return !options.es && options.version < 130;
 	}
 
-	bool args_will_forward(uint32_t id, const uint32_t *args, uint32_t num_args, bool pure);
-	void register_call_out_argument(uint32_t id);
+	bool args_will_forward(ezUInt32 id, const ezUInt32 *args, ezUInt32 num_args, bool pure);
+	void register_call_out_argument(ezUInt32 id);
 	void register_impure_function_call();
-	void register_control_dependent_expression(uint32_t expr);
+	void register_control_dependent_expression(ezUInt32 expr);
 
 	// GL_EXT_shader_pixel_local_storage support.
 	std::vector<PlsRemap> pls_inputs;
@@ -712,12 +712,12 @@ protected:
 	void remap_pls_variables();
 
 	// GL_EXT_shader_framebuffer_fetch support.
-	std::vector<std::pair<uint32_t, uint32_t>> subpass_to_framebuffer_fetch_attachment;
-	std::unordered_set<uint32_t> inout_color_attachments;
-	bool subpass_input_is_framebuffer_fetch(uint32_t id) const;
+	std::vector<std::pair<ezUInt32, ezUInt32>> subpass_to_framebuffer_fetch_attachment;
+	std::unordered_set<ezUInt32> inout_color_attachments;
+	bool subpass_input_is_framebuffer_fetch(ezUInt32 id) const;
 	void emit_inout_fragment_outputs_copy_to_subpass_inputs();
-	const SPIRVariable *find_subpass_input_by_attachment_index(uint32_t index) const;
-	const SPIRVariable *find_color_output_by_location(uint32_t location) const;
+	const SPIRVariable *find_subpass_input_by_attachment_index(ezUInt32 index) const;
+	const SPIRVariable *find_color_output_by_location(ezUInt32 location) const;
 
 	// A variant which takes two sets of name. The secondary is only used to verify there are no collisions,
 	// but the set is not updated when we have found a new name.
@@ -725,8 +725,8 @@ protected:
 	void add_variable(std::unordered_set<std::string> &variables_primary,
 	                  const std::unordered_set<std::string> &variables_secondary, std::string &name);
 
-	void check_function_call_constraints(const uint32_t *args, uint32_t length);
-	void handle_invalid_expression(uint32_t id);
+	void check_function_call_constraints(const ezUInt32 *args, ezUInt32 length);
+	void handle_invalid_expression(ezUInt32 id);
 	void find_static_extensions();
 
 	std::string emit_for_loop_initializers(const SPIRBlock &block);
@@ -743,31 +743,31 @@ protected:
 
 	bool can_use_io_location(spv::StorageClass storage, bool block);
 	const Instruction *get_next_instruction_in_block(const Instruction &instr);
-	static uint32_t mask_relevant_memory_semantics(uint32_t semantics);
+	static ezUInt32 mask_relevant_memory_semantics(ezUInt32 semantics);
 
-	std::string convert_half_to_string(const SPIRConstant &value, uint32_t col, uint32_t row);
-	std::string convert_float_to_string(const SPIRConstant &value, uint32_t col, uint32_t row);
-	std::string convert_double_to_string(const SPIRConstant &value, uint32_t col, uint32_t row);
+	std::string convert_half_to_string(const SPIRConstant &value, ezUInt32 col, ezUInt32 row);
+	std::string convert_float_to_string(const SPIRConstant &value, ezUInt32 col, ezUInt32 row);
+	std::string convert_double_to_string(const SPIRConstant &value, ezUInt32 col, ezUInt32 row);
 
-	std::string convert_separate_image_to_expression(uint32_t id);
+	std::string convert_separate_image_to_expression(ezUInt32 id);
 
 	// Builtins in GLSL are always specific signedness, but the SPIR-V can declare them
 	// as either unsigned or signed.
 	// Sometimes we will need to automatically perform bitcasts on load and store to make this work.
-	virtual void bitcast_to_builtin_store(uint32_t target_id, std::string &expr, const SPIRType &expr_type);
-	virtual void bitcast_from_builtin_load(uint32_t source_id, std::string &expr, const SPIRType &expr_type);
-	void unroll_array_from_complex_load(uint32_t target_id, uint32_t source_id, std::string &expr);
+	virtual void bitcast_to_builtin_store(ezUInt32 target_id, std::string &expr, const SPIRType &expr_type);
+	virtual void bitcast_from_builtin_load(ezUInt32 source_id, std::string &expr, const SPIRType &expr_type);
+	void unroll_array_from_complex_load(ezUInt32 target_id, ezUInt32 source_id, std::string &expr);
 	void convert_non_uniform_expression(const SPIRType &type, std::string &expr);
 
-	void handle_store_to_invariant_variable(uint32_t store_id, uint32_t value_id);
+	void handle_store_to_invariant_variable(ezUInt32 store_id, ezUInt32 value_id);
 	void disallow_forwarding_in_expression_chain(const SPIRExpression &expr);
 
-	bool expression_is_constant_null(uint32_t id) const;
-	bool expression_is_non_value_type_array(uint32_t ptr);
-	virtual void emit_store_statement(uint32_t lhs_expression, uint32_t rhs_expression);
+	bool expression_is_constant_null(ezUInt32 id) const;
+	bool expression_is_non_value_type_array(ezUInt32 ptr);
+	virtual void emit_store_statement(ezUInt32 lhs_expression, ezUInt32 rhs_expression);
 
-	uint32_t get_integer_width_for_instruction(const Instruction &instr) const;
-	uint32_t get_integer_width_for_glsl_instruction(GLSLstd450 op, const uint32_t *arguments, uint32_t length) const;
+	ezUInt32 get_integer_width_for_instruction(const Instruction &instr) const;
+	ezUInt32 get_integer_width_for_glsl_instruction(GLSLstd450 op, const ezUInt32 *arguments, ezUInt32 length) const;
 
 	bool variable_is_lut(const SPIRVariable &var) const;
 
@@ -776,7 +776,7 @@ protected:
 	void fixup_type_alias();
 	void reorder_type_alias();
 
-	void propagate_nonuniform_qualifier(uint32_t id);
+	void propagate_nonuniform_qualifier(ezUInt32 id);
 
 	static const char *vector_swizzle(int vecsize, int index);
 

@@ -48,10 +48,10 @@ public:
 	ParsedIR &operator=(ParsedIR &&other) SPIRV_CROSS_NOEXCEPT;
 
 	// Resizes ids, meta and block_meta.
-	void set_id_bounds(uint32_t bounds);
+	void set_id_bounds(ezUInt32 bounds);
 
 	// The raw SPIR-V, instructions and opcodes refer to this by offset + count.
-	std::vector<uint32_t> spirv;
+	std::vector<ezUInt32> spirv;
 
 	// Holds various data structures which inherit from IVariant.
 	SmallVector<Variant> ids;
@@ -97,7 +97,7 @@ public:
 
 	struct Source
 	{
-		uint32_t version = 0;
+		ezUInt32 version = 0;
 		bool es = false;
 		bool known = false;
 		bool hlsl = false;
@@ -116,28 +116,28 @@ public:
 	// and might as well just have the whole suite of decoration/name handling in one place.
 	void set_name(ID id, const std::string &name);
 	const std::string &get_name(ID id) const;
-	void set_decoration(ID id, spv::Decoration decoration, uint32_t argument = 0);
+	void set_decoration(ID id, spv::Decoration decoration, ezUInt32 argument = 0);
 	void set_decoration_string(ID id, spv::Decoration decoration, const std::string &argument);
 	bool has_decoration(ID id, spv::Decoration decoration) const;
-	uint32_t get_decoration(ID id, spv::Decoration decoration) const;
+	ezUInt32 get_decoration(ID id, spv::Decoration decoration) const;
 	const std::string &get_decoration_string(ID id, spv::Decoration decoration) const;
 	const Bitset &get_decoration_bitset(ID id) const;
 	void unset_decoration(ID id, spv::Decoration decoration);
 
 	// Decoration handling methods (for members of a struct).
-	void set_member_name(TypeID id, uint32_t index, const std::string &name);
-	const std::string &get_member_name(TypeID id, uint32_t index) const;
-	void set_member_decoration(TypeID id, uint32_t index, spv::Decoration decoration, uint32_t argument = 0);
-	void set_member_decoration_string(TypeID id, uint32_t index, spv::Decoration decoration,
+	void set_member_name(TypeID id, ezUInt32 index, const std::string &name);
+	const std::string &get_member_name(TypeID id, ezUInt32 index) const;
+	void set_member_decoration(TypeID id, ezUInt32 index, spv::Decoration decoration, ezUInt32 argument = 0);
+	void set_member_decoration_string(TypeID id, ezUInt32 index, spv::Decoration decoration,
 	                                  const std::string &argument);
-	uint32_t get_member_decoration(TypeID id, uint32_t index, spv::Decoration decoration) const;
-	const std::string &get_member_decoration_string(TypeID id, uint32_t index, spv::Decoration decoration) const;
-	bool has_member_decoration(TypeID id, uint32_t index, spv::Decoration decoration) const;
-	const Bitset &get_member_decoration_bitset(TypeID id, uint32_t index) const;
-	void unset_member_decoration(TypeID id, uint32_t index, spv::Decoration decoration);
+	ezUInt32 get_member_decoration(TypeID id, ezUInt32 index, spv::Decoration decoration) const;
+	const std::string &get_member_decoration_string(TypeID id, ezUInt32 index, spv::Decoration decoration) const;
+	bool has_member_decoration(TypeID id, ezUInt32 index, spv::Decoration decoration) const;
+	const Bitset &get_member_decoration_bitset(TypeID id, ezUInt32 index) const;
+	void unset_member_decoration(TypeID id, ezUInt32 index, spv::Decoration decoration);
 
 	void mark_used_as_array_length(ID id);
-	uint32_t increase_bound_by(uint32_t count);
+	ezUInt32 increase_bound_by(ezUInt32 count);
 	Bitset get_buffer_block_flags(const SPIRVariable &var) const;
 
 	void add_typed_id(Types type, ID id);
@@ -146,7 +146,7 @@ public:
 	class LoopLock
 	{
 	public:
-		explicit LoopLock(uint32_t *counter);
+		explicit LoopLock(ezUInt32 *counter);
 		LoopLock(const LoopLock &) = delete;
 		void operator=(const LoopLock &) = delete;
 		LoopLock(LoopLock &&other) SPIRV_CROSS_NOEXCEPT;
@@ -154,7 +154,7 @@ public:
 		~LoopLock();
 
 	private:
-		uint32_t *lock;
+		ezUInt32 *lock;
 	};
 
 	// This must be held while iterating over a type ID array.
@@ -206,23 +206,23 @@ public:
 		return empty_string;
 	}
 
-	void make_constant_null(uint32_t id, uint32_t type, bool add_to_typed_id_set);
+	void make_constant_null(ezUInt32 id, ezUInt32 type, bool add_to_typed_id_set);
 
 private:
 	template <typename T>
-	T &get(uint32_t id)
+	T &get(ezUInt32 id)
 	{
 		return variant_get<T>(ids[id]);
 	}
 
 	template <typename T>
-	const T &get(uint32_t id) const
+	const T &get(ezUInt32 id) const
 	{
 		return variant_get<T>(ids[id]);
 	}
 
-	mutable uint32_t loop_iteration_depth_hard = 0;
-	mutable uint32_t loop_iteration_depth_soft = 0;
+	mutable ezUInt32 loop_iteration_depth_hard = 0;
+	mutable ezUInt32 loop_iteration_depth_soft = 0;
 	std::string empty_string;
 	Bitset cleared_bitset;
 };

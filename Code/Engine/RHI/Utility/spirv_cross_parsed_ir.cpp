@@ -119,7 +119,7 @@ ParsedIR &ParsedIR::operator=(const ParsedIR &other)
 	return *this;
 }
 
-void ParsedIR::set_id_bounds(uint32_t bounds)
+void ParsedIR::set_id_bounds(ezUInt32 bounds)
 {
 	ids.reserve(bounds);
 	while (ids.size() < bounds)
@@ -145,7 +145,7 @@ static string ensure_valid_identifier(const string &name, bool member)
 	// Normally, we would never see '(' in any legal identifiers, so just strip them out.
 	auto str = name.substr(0, name.find('('));
 
-	for (uint32_t i = 0; i < str.size(); i++)
+	for (ezUInt32 i = 0; i < str.size(); i++)
 	{
 		auto &c = str[i];
 
@@ -182,7 +182,7 @@ const string &ParsedIR::get_name(ID id) const
 		return empty_string;
 }
 
-const string &ParsedIR::get_member_name(TypeID id, uint32_t index) const
+const string &ParsedIR::get_member_name(TypeID id, ezUInt32 index) const
 {
 	auto *m = find_meta(id);
 	if (m)
@@ -210,7 +210,7 @@ void ParsedIR::set_name(ID id, const string &name)
 	str = ensure_valid_identifier(name, false);
 }
 
-void ParsedIR::set_member_name(TypeID id, uint32_t index, const string &name)
+void ParsedIR::set_member_name(TypeID id, ezUInt32 index, const string &name)
 {
 	meta[id].members.resize(max(meta[id].members.size(), size_t(index) + 1));
 
@@ -242,7 +242,7 @@ void ParsedIR::set_decoration_string(ID id, Decoration decoration, const string 
 	}
 }
 
-void ParsedIR::set_decoration(ID id, Decoration decoration, uint32_t argument)
+void ParsedIR::set_decoration(ID id, Decoration decoration, ezUInt32 argument)
 {
 	auto &dec = meta[id].decoration;
 	dec.decoration_flags.set(decoration);
@@ -316,7 +316,7 @@ void ParsedIR::set_decoration(ID id, Decoration decoration, uint32_t argument)
 	}
 }
 
-void ParsedIR::set_member_decoration(TypeID id, uint32_t index, Decoration decoration, uint32_t argument)
+void ParsedIR::set_member_decoration(TypeID id, ezUInt32 index, Decoration decoration, ezUInt32 argument)
 {
 	meta[id].members.resize(max(meta[id].members.size(), size_t(index) + 1));
 	auto &dec = meta[id].members[index];
@@ -391,7 +391,7 @@ void ParsedIR::mark_used_as_array_length(ID id)
 			mark_used_as_array_length(cop.arguments[1]);
 		}
 		else
-			for (uint32_t arg_id : cop.arguments)
+			for (ezUInt32 arg_id : cop.arguments)
 				mark_used_as_array_length(arg_id);
 		break;
 	}
@@ -421,14 +421,14 @@ Bitset ParsedIR::get_buffer_block_flags(const SPIRVariable &var) const
 		return base_flags;
 
 	Bitset all_members_flags = get_member_decoration_bitset(type.self, 0);
-	for (uint32_t i = 1; i < uint32_t(type.member_types.size()); i++)
+	for (ezUInt32 i = 1; i < ezUInt32(type.member_types.size()); i++)
 		all_members_flags.merge_and(get_member_decoration_bitset(type.self, i));
 
 	base_flags.merge_or(all_members_flags);
 	return base_flags;
 }
 
-const Bitset &ParsedIR::get_member_decoration_bitset(TypeID id, uint32_t index) const
+const Bitset &ParsedIR::get_member_decoration_bitset(TypeID id, ezUInt32 index) const
 {
 	auto *m = find_meta(id);
 	if (m)
@@ -446,7 +446,7 @@ bool ParsedIR::has_decoration(ID id, Decoration decoration) const
 	return get_decoration_bitset(id).get(decoration);
 }
 
-uint32_t ParsedIR::get_decoration(ID id, Decoration decoration) const
+ezUInt32 ParsedIR::get_decoration(ID id, Decoration decoration) const
 {
 	auto *m = find_meta(id);
 	if (!m)
@@ -582,12 +582,12 @@ void ParsedIR::unset_decoration(ID id, Decoration decoration)
 	}
 }
 
-bool ParsedIR::has_member_decoration(TypeID id, uint32_t index, Decoration decoration) const
+bool ParsedIR::has_member_decoration(TypeID id, ezUInt32 index, Decoration decoration) const
 {
 	return get_member_decoration_bitset(id, index).get(decoration);
 }
 
-uint32_t ParsedIR::get_member_decoration(TypeID id, uint32_t index, Decoration decoration) const
+ezUInt32 ParsedIR::get_member_decoration(TypeID id, ezUInt32 index, Decoration decoration) const
 {
 	auto *m = find_meta(id);
 	if (!m)
@@ -637,7 +637,7 @@ const Bitset &ParsedIR::get_decoration_bitset(ID id) const
 		return cleared_bitset;
 }
 
-void ParsedIR::set_member_decoration_string(TypeID id, uint32_t index, Decoration decoration, const string &argument)
+void ParsedIR::set_member_decoration_string(TypeID id, ezUInt32 index, Decoration decoration, const string &argument)
 {
 	meta[id].members.resize(max(meta[id].members.size(), size_t(index) + 1));
 	auto &dec = meta[id].members[index];
@@ -654,7 +654,7 @@ void ParsedIR::set_member_decoration_string(TypeID id, uint32_t index, Decoratio
 	}
 }
 
-const string &ParsedIR::get_member_decoration_string(TypeID id, uint32_t index, Decoration decoration) const
+const string &ParsedIR::get_member_decoration_string(TypeID id, ezUInt32 index, Decoration decoration) const
 {
 	auto *m = find_meta(id);
 	if (m)
@@ -677,7 +677,7 @@ const string &ParsedIR::get_member_decoration_string(TypeID id, uint32_t index, 
 		return empty_string;
 }
 
-void ParsedIR::unset_member_decoration(TypeID id, uint32_t index, Decoration decoration)
+void ParsedIR::unset_member_decoration(TypeID id, ezUInt32 index, Decoration decoration)
 {
 	auto &m = meta[id];
 	if (index >= m.members.size())
@@ -725,17 +725,17 @@ void ParsedIR::unset_member_decoration(TypeID id, uint32_t index, Decoration dec
 	}
 }
 
-uint32_t ParsedIR::increase_bound_by(uint32_t incr_amount)
+ezUInt32 ParsedIR::increase_bound_by(ezUInt32 incr_amount)
 {
 	auto curr_bound = ids.size();
 	auto new_bound = curr_bound + incr_amount;
 
 	ids.reserve(ids.size() + incr_amount);
-	for (uint32_t i = 0; i < incr_amount; i++)
+	for (ezUInt32 i = 0; i < incr_amount; i++)
 		ids.emplace_back(pool_group.get());
 
 	block_meta.resize(new_bound);
-	return uint32_t(curr_bound);
+	return ezUInt32(curr_bound);
 }
 
 void ParsedIR::remove_typed_id(Types type, ID id)
@@ -833,7 +833,7 @@ ParsedIR::LoopLock::~LoopLock()
 		(*lock)--;
 }
 
-ParsedIR::LoopLock::LoopLock(uint32_t *lock_)
+ParsedIR::LoopLock::LoopLock(ezUInt32 *lock_)
     : lock(lock_)
 {
 	if (lock)
@@ -854,7 +854,7 @@ ParsedIR::LoopLock &ParsedIR::LoopLock::operator=(LoopLock &&other) SPIRV_CROSS_
 	return *this;
 }
 
-void ParsedIR::make_constant_null(uint32_t id, uint32_t type, bool add_to_typed_id_set)
+void ParsedIR::make_constant_null(ezUInt32 id, ezUInt32 type, bool add_to_typed_id_set)
 {
 	auto &constant_type = get<SPIRType>(type);
 
@@ -869,25 +869,25 @@ void ParsedIR::make_constant_null(uint32_t id, uint32_t type, bool add_to_typed_
 	else if (!constant_type.array.empty())
 	{
 		assert(constant_type.parent_type);
-		uint32_t parent_id = increase_bound_by(1);
+		ezUInt32 parent_id = increase_bound_by(1);
 		make_constant_null(parent_id, constant_type.parent_type, add_to_typed_id_set);
 
 		if (!constant_type.array_size_literal.back())
 			SPIRV_CROSS_THROW("Array size of OpConstantNull must be a literal.");
 
-		SmallVector<uint32_t> elements(constant_type.array.back());
-		for (uint32_t i = 0; i < constant_type.array.back(); i++)
+		SmallVector<ezUInt32> elements(constant_type.array.back());
+		for (ezUInt32 i = 0; i < constant_type.array.back(); i++)
 			elements[i] = parent_id;
 
 		if (add_to_typed_id_set)
 			add_typed_id(TypeConstant, id);
-		variant_set<SPIRConstant>(ids[id], type, elements.data(), uint32_t(elements.size()), false).self = id;
+		variant_set<SPIRConstant>(ids[id], type, elements.data(), ezUInt32(elements.size()), false).self = id;
 	}
 	else if (!constant_type.member_types.empty())
 	{
-		uint32_t member_ids = increase_bound_by(uint32_t(constant_type.member_types.size()));
-		SmallVector<uint32_t> elements(constant_type.member_types.size());
-		for (uint32_t i = 0; i < constant_type.member_types.size(); i++)
+		ezUInt32 member_ids = increase_bound_by(ezUInt32(constant_type.member_types.size()));
+		SmallVector<ezUInt32> elements(constant_type.member_types.size());
+		for (ezUInt32 i = 0; i < constant_type.member_types.size(); i++)
 		{
 			make_constant_null(member_ids + i, constant_type.member_types[i], add_to_typed_id_set);
 			elements[i] = member_ids + i;
@@ -895,7 +895,7 @@ void ParsedIR::make_constant_null(uint32_t id, uint32_t type, bool add_to_typed_
 
 		if (add_to_typed_id_set)
 			add_typed_id(TypeConstant, id);
-		variant_set<SPIRConstant>(ids[id], type, elements.data(), uint32_t(elements.size()), false).self = id;
+		variant_set<SPIRConstant>(ids[id], type, elements.data(), ezUInt32(elements.size()), false).self = id;
 	}
 	else
 	{

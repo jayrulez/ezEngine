@@ -43,7 +43,7 @@ public:
 		return func;
 	}
 
-	uint32_t get_immediate_dominator(uint32_t block) const
+	ezUInt32 get_immediate_dominator(ezUInt32 block) const
 	{
 		auto itr = immediate_dominators.find(block);
 		if (itr != std::end(immediate_dominators))
@@ -52,18 +52,18 @@ public:
 			return 0;
 	}
 
-	uint32_t get_visit_order(uint32_t block) const
+	ezUInt32 get_visit_order(ezUInt32 block) const
 	{
 		auto itr = visit_order.find(block);
 		assert(itr != std::end(visit_order));
 		int v = itr->second.get();
 		assert(v > 0);
-		return uint32_t(v);
+		return ezUInt32(v);
 	}
 
-	uint32_t find_common_dominator(uint32_t a, uint32_t b) const;
+	ezUInt32 find_common_dominator(ezUInt32 a, ezUInt32 b) const;
 
-	const SmallVector<uint32_t> &get_preceding_edges(uint32_t block) const
+	const SmallVector<ezUInt32> &get_preceding_edges(ezUInt32 block) const
 	{
 		auto itr = preceding_edges.find(block);
 		if (itr != std::end(preceding_edges))
@@ -72,7 +72,7 @@ public:
 			return empty_vector;
 	}
 
-	const SmallVector<uint32_t> &get_succeeding_edges(uint32_t block) const
+	const SmallVector<ezUInt32> &get_succeeding_edges(ezUInt32 block) const
 	{
 		auto itr = succeeding_edges.find(block);
 		if (itr != std::end(succeeding_edges))
@@ -82,7 +82,7 @@ public:
 	}
 
 	template <typename Op>
-	void walk_from(std::unordered_set<uint32_t> &seen_blocks, uint32_t block, const Op &op) const
+	void walk_from(std::unordered_set<ezUInt32> &seen_blocks, ezUInt32 block, const Op &op) const
 	{
 		if (seen_blocks.count(block))
 			return;
@@ -95,7 +95,7 @@ public:
 		}
 	}
 
-	uint32_t find_loop_dominator(uint32_t block) const;
+	ezUInt32 find_loop_dominator(ezUInt32 block) const;
 
 	bool node_terminates_control_flow_in_sub_graph(BlockID from, BlockID to) const;
 
@@ -117,21 +117,21 @@ private:
 
 	Compiler &compiler;
 	const SPIRFunction &func;
-	std::unordered_map<uint32_t, SmallVector<uint32_t>> preceding_edges;
-	std::unordered_map<uint32_t, SmallVector<uint32_t>> succeeding_edges;
-	std::unordered_map<uint32_t, uint32_t> immediate_dominators;
-	std::unordered_map<uint32_t, VisitOrder> visit_order;
-	SmallVector<uint32_t> post_order;
-	SmallVector<uint32_t> empty_vector;
+	std::unordered_map<ezUInt32, SmallVector<ezUInt32>> preceding_edges;
+	std::unordered_map<ezUInt32, SmallVector<ezUInt32>> succeeding_edges;
+	std::unordered_map<ezUInt32, ezUInt32> immediate_dominators;
+	std::unordered_map<ezUInt32, VisitOrder> visit_order;
+	SmallVector<ezUInt32> post_order;
+	SmallVector<ezUInt32> empty_vector;
 
-	void add_branch(uint32_t from, uint32_t to);
+	void add_branch(ezUInt32 from, ezUInt32 to);
 	void build_post_order_visit_order();
 	void build_immediate_dominators();
-	bool post_order_visit(uint32_t block);
-	uint32_t visit_count = 0;
+	bool post_order_visit(ezUInt32 block);
+	ezUInt32 visit_count = 0;
 
-	bool is_back_edge(uint32_t to) const;
-	bool has_visited_forward_edge(uint32_t to) const;
+	bool is_back_edge(ezUInt32 to) const;
+	bool has_visited_forward_edge(ezUInt32 to) const;
 };
 
 class DominatorBuilder
@@ -139,8 +139,8 @@ class DominatorBuilder
 public:
 	DominatorBuilder(const CFG &cfg);
 
-	void add_block(uint32_t block);
-	uint32_t get_dominator() const
+	void add_block(ezUInt32 block);
+	ezUInt32 get_dominator() const
 	{
 		return dominator;
 	}
@@ -149,7 +149,7 @@ public:
 
 private:
 	const CFG &cfg;
-	uint32_t dominator = 0;
+	ezUInt32 dominator = 0;
 };
 } // namespace SPIRV_CROSS_NAMESPACE
 

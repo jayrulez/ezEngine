@@ -626,7 +626,7 @@ public:
 	}
 
 	// Only overload this to make float/double conversions ambiguous.
-	StringStream &operator<<(uint32_t v)
+	StringStream &operator<<(ezUInt32 v)
 	{
 		auto s = std::to_string(v);
 		append(s.data(), s.size());

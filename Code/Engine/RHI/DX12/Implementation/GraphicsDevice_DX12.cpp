@@ -6,7 +6,6 @@
 #  include <Foundation/Logging/Log.h>
 #  include <RHI/DX12/D3D12MemAlloc.h>
 #  include <RHI/DX12/d3dx12.h>
-#  include <RHI/GraphicsDevice_SharedInternals.h>
 
 #  include <d3d12shader.h>
 #  include <dxcapi.h>
@@ -37,9 +36,9 @@ namespace DX12_Internal
 {
   // Engine -> Native converters
 
-  inline uint32_t _ParseColorWriteMask(uint32_t value)
+  inline ezUInt32 _ParseColorWriteMask(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value == D3D12_COLOR_WRITE_ENABLE_ALL)
     {
@@ -680,23 +679,24 @@ namespace DX12_Internal
 
     return D3D12_RESOURCE_STATE_COMMON;
   }
-  constexpr D3D12_SHADER_VISIBILITY _ConvertShaderVisibility(SHADERSTAGE value)
+
+  inline D3D12_SHADER_VISIBILITY _ConvertShaderVisibility(ezEnum<ezRHIShaderStage> value)
   {
     switch (value)
     {
-      case MS:
+      case ezRHIShaderStage::MeshShader:
         return D3D12_SHADER_VISIBILITY_MESH;
-      case AS:
+      case ezRHIShaderStage::AmplificationShader:
         return D3D12_SHADER_VISIBILITY_AMPLIFICATION;
-      case VS:
+      case ezRHIShaderStage::VertexShader:
         return D3D12_SHADER_VISIBILITY_VERTEX;
-      case HS:
+      case ezRHIShaderStage::HullShader:
         return D3D12_SHADER_VISIBILITY_HULL;
-      case DS:
+      case ezRHIShaderStage::DomainShader:
         return D3D12_SHADER_VISIBILITY_DOMAIN;
-      case GS:
+      case ezRHIShaderStage::GeometryShader:
         return D3D12_SHADER_VISIBILITY_GEOMETRY;
-      case PS:
+      case ezRHIShaderStage::PixelShader:
         return D3D12_SHADER_VISIBILITY_PIXEL;
       default:
         return D3D12_SHADER_VISIBILITY_ALL;
@@ -956,7 +956,7 @@ namespace DX12_Internal
         break;
     }
     retVal.Format = _ConvertFormat_Inv(desc.Format);
-    retVal.Width = (uint32_t)desc.Width;
+    retVal.Width = (ezUInt32)desc.Width;
     retVal.Height = desc.Height;
     retVal.MipLevels = desc.MipLevels;
 
@@ -1033,7 +1033,7 @@ namespace DX12_Internal
   {
     std::shared_ptr<GraphicsDevice_DX12::AllocationHandler> allocationhandler;
     GPU_QUERY_TYPE query_type = GPU_QUERY_TYPE_INVALID;
-    uint32_t query_index = ~0;
+    ezUInt32 query_index = ~0;
 
     ~Query_DX12()
     {
@@ -1105,9 +1105,9 @@ namespace DX12_Internal
   struct RenderPass_DX12
   {
     D3D12_RESOURCE_BARRIER barrierdescs_begin[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
-    uint32_t num_barriers_begin = 0;
+    ezUInt32 num_barriers_begin = 0;
     D3D12_RESOURCE_BARRIER barrierdescs_end[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
-    uint32_t num_barriers_end = 0;
+    ezUInt32 num_barriers_end = 0;
   };
   struct DescriptorTable_DX12
   {
@@ -1142,13 +1142,13 @@ namespace DX12_Internal
     ComPtr<ID3D12RootSignature> resource;
     std::vector<D3D12_ROOT_PARAMETER> params;
 
-    std::vector<uint32_t> table_bind_point_remap;
-    uint32_t root_constant_bind_remap = 0;
+    std::vector<ezUInt32> table_bind_point_remap;
+    ezUInt32 root_constant_bind_remap = 0;
 
     struct RootRemap
     {
-      uint32_t space = 0;
-      uint32_t rangeIndex = 0;
+      ezUInt32 space = 0;
+      ezUInt32 rangeIndex = 0;
     };
     std::vector<RootRemap> root_remap;
 
@@ -1246,14 +1246,14 @@ void GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::init(GraphicsD
 
   // Because the "buffer" is created by hand in this, fill the desc to indicate how it can be used:
   buffer.type = GPUResource::GPU_RESOURCE_TYPE::BUFFER;
-  buffer.desc.ByteWidth = (uint32_t)((size_t)dataEnd - (size_t)dataBegin);
+  buffer.desc.ByteWidth = (ezUInt32)((size_t)dataEnd - (size_t)dataBegin);
   buffer.desc.Usage = USAGE_DYNAMIC;
   buffer.desc.BindFlags = BIND_VERTEX_BUFFER | BIND_INDEX_BUFFER | BIND_SHADER_RESOURCE;
   buffer.desc.MiscFlags = RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
   internal_state->srv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
   internal_state->srv.Format = DXGI_FORMAT_R32_TYPELESS;
   internal_state->srv.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
-  internal_state->srv.Buffer.NumElements = buffer.desc.ByteWidth / sizeof(uint32_t);
+  internal_state->srv.Buffer.NumElements = buffer.desc.ByteWidth / sizeof(ezUInt32);
   internal_state->srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 }
 uint8_t* GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::allocate(size_t dataSize, size_t alignment)
@@ -1313,7 +1313,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::reset()
   memset(UAV_index, -1, sizeof(UAV_index));
   memset(SAM, 0, sizeof(SAM));
 }
-void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request_heaps(uint32_t resources, uint32_t samplers, CommandList cmd)
+void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request_heaps(ezUInt32 resources, ezUInt32 samplers, CommandList cmd)
 {
   // This function allocatesGPU visible descriptor heaps that can fit the requested table sizes.
   //	First, they grow the heaps until the size fits the dx12 resource limits (tier 1 resource limit = 1 million, sampler limit is 2048)
@@ -1322,7 +1322,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
   //	The function will automatically bind descriptor heaps when there was a new (growing or block allocation)
 
   DescriptorHeap& heap_resource = heaps_resource[current_resource_heap];
-  uint32_t allocation = heap_resource.ringOffset + resources;
+  ezUInt32 allocation = heap_resource.ringOffset + resources;
   if (heap_resource.heapDesc.NumDescriptors <= allocation)
   {
     if (allocation > 1000000) // tier 1 limit
@@ -1429,7 +1429,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validat
 
   auto pso_internal = graphics ? to_internal(device->active_pso[cmd]) : to_internal(device->active_cs[cmd]);
 
-  request_heaps((uint32_t)pso_internal->resources.size(), (uint32_t)pso_internal->samplers.size(), cmd);
+  request_heaps((ezUInt32)pso_internal->resources.size(), (ezUInt32)pso_internal->samplers.size(), cmd);
 
   UINT root_parameter_index = 0;
 
@@ -1452,7 +1452,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validat
         uav_desc.Format = DXGI_FORMAT_R32_UINT;
         uav_desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 
-        uint32_t index = 0;
+        ezUInt32 index = 0;
         for (auto& x : pso_internal->resources)
         {
           D3D12_CPU_DESCRIPTOR_HANDLE dst = heap.start_cpu;
@@ -1539,7 +1539,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validat
                   D3D12_CONSTANT_BUFFER_VIEW_DESC cbv;
                   cbv.BufferLocation = to_internal(allocation.buffer)->resource->GetGPUVirtualAddress();
                   cbv.BufferLocation += (D3D12_GPU_VIRTUAL_ADDRESS)allocation.offset;
-                  cbv.SizeInBytes = (uint32_t)Align((size_t)buffer->desc.ByteWidth, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
+                  cbv.SizeInBytes = (ezUInt32)Align((size_t)buffer->desc.ByteWidth, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
 
                   device->device->CreateConstantBufferView(&cbv, dst);
                 }
@@ -1567,7 +1567,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validat
           device->GetDirectCommandList(cmd)->SetComputeRootDescriptorTable(root_parameter_index, binding_table);
         }
 
-        heap.ringOffset += (uint32_t)pso_internal->resources.size();
+        heap.ringOffset += (ezUInt32)pso_internal->resources.size();
         root_parameter_index++;
       }
 
@@ -1615,7 +1615,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validat
           device->GetDirectCommandList(cmd)->SetComputeRootDescriptorTable(root_parameter_index, binding_table);
         }
 
-        heap.ringOffset += (uint32_t)pso_internal->samplers.size();
+        heap.ringOffset += (ezUInt32)pso_internal->samplers.size();
         root_parameter_index++;
       }
     }
@@ -1798,9 +1798,9 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
       D3D12_INPUT_LAYOUT_DESC il = {};
       if (pso->desc.il != nullptr)
       {
-        il.NumElements = (uint32_t)pso->desc.il->desc.size();
+        il.NumElements = (ezUInt32)pso->desc.il->desc.size();
         elements.resize(il.NumElements);
-        for (uint32_t i = 0; i < il.NumElements; ++i)
+        for (ezUInt32 i = 0; i < il.NumElements; ++i)
         {
           elements[i].SemanticName = pso->desc.il->desc[i].SemanticName.c_str();
           elements[i].SemanticIndex = pso->desc.il->desc[i].SemanticIndex;
@@ -1893,18 +1893,18 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
 
       switch (pso->desc.pt)
       {
-        case POINTLIST:
+        case ezRHIPrimitiveTopology::PointList:
           stream.PT = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
           break;
-        case LINELIST:
-        case LINESTRIP:
+        case ezRHIPrimitiveTopology::LineList:
+        case ezRHIPrimitiveTopology::LineStrip:
           stream.PT = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
           break;
-        case TRIANGLELIST:
-        case TRIANGLESTRIP:
+        case ezRHIPrimitiveTopology::TriangleList:
+        case ezRHIPrimitiveTopology::TriangleStrip:
           stream.PT = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
           break;
-        case PATCHLIST:
+        case ezRHIPrimitiveTopology::PatchList:
           stream.PT = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
           break;
         default:
@@ -1950,22 +1950,22 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
     D3D12_PRIMITIVE_TOPOLOGY d3dType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     switch (pso->desc.pt)
     {
-      case TRIANGLELIST:
+      case ezRHIPrimitiveTopology::TriangleList:
         d3dType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         break;
-      case TRIANGLESTRIP:
+      case ezRHIPrimitiveTopology::TriangleStrip:
         d3dType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
         break;
-      case POINTLIST:
+      case ezRHIPrimitiveTopology::PointList:
         d3dType = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
         break;
-      case LINELIST:
+      case ezRHIPrimitiveTopology::LineList:
         d3dType = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
         break;
-      case LINESTRIP:
+      case ezRHIPrimitiveTopology::LineStrip:
         d3dType = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
         break;
-      case PATCHLIST:
+      case ezRHIPrimitiveTopology::PatchList:
         d3dType = D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
         break;
       default:
@@ -2151,7 +2151,7 @@ GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, 
   sampler_descriptor_size = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
   // Create frame-resident resources:
-  for (uint32_t fr = 0; fr < BACKBUFFER_COUNT; ++fr)
+  for (ezUInt32 fr = 0; fr < BACKBUFFER_COUNT; ++fr)
   {
     hr = swapChain->GetBuffer(fr, IID_PPV_ARGS(&backBuffers[fr]));
     assert(SUCCEEDED(hr));
@@ -2260,7 +2260,7 @@ GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, 
     D3D12_QUERY_HEAP_DESC queryheapdesc = {};
     queryheapdesc.NodeMask = 0;
 
-    for (uint32_t i = 0; i < timestamp_query_count; ++i)
+    for (ezUInt32 i = 0; i < timestamp_query_count; ++i)
     {
       allocationhandler->free_timestampqueries.push_back(i);
     }
@@ -2269,7 +2269,7 @@ GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, 
     hr = device->CreateQueryHeap(&queryheapdesc, IID_PPV_ARGS(&querypool_timestamp));
     assert(SUCCEEDED(hr));
 
-    for (uint32_t i = 0; i < occlusion_query_count; ++i)
+    for (ezUInt32 i = 0; i < occlusion_query_count; ++i)
     {
       allocationhandler->free_occlusionqueries.push_back(i);
     }
@@ -2324,7 +2324,7 @@ void GraphicsDevice_DX12::SetResolution(int width, int height)
     RESOLUTIONWIDTH = width;
     RESOLUTIONHEIGHT = height;
 
-    for (uint32_t fr = 0; fr < BACKBUFFER_COUNT; ++fr)
+    for (ezUInt32 fr = 0; fr < BACKBUFFER_COUNT; ++fr)
     {
       backBuffers[fr].Reset();
     }
@@ -2332,9 +2332,9 @@ void GraphicsDevice_DX12::SetResolution(int width, int height)
     HRESULT hr = swapChain->ResizeBuffers(GetBackBufferCount(), width, height, _ConvertFormat(GetBackBufferFormat()), 0);
     assert(SUCCEEDED(hr));
 
-    for (uint32_t i = 0; i < BACKBUFFER_COUNT; ++i)
+    for (ezUInt32 i = 0; i < BACKBUFFER_COUNT; ++i)
     {
-      uint32_t fr = (GetFrameCount() + i) % BACKBUFFER_COUNT;
+      ezUInt32 fr = (GetFrameCount() + i) % BACKBUFFER_COUNT;
       hr = swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[fr]));
       assert(SUCCEEDED(hr));
     }
@@ -2376,7 +2376,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
 
   HRESULT hr = E_FAIL;
 
-  uint32_t alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+  ezUInt32 alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
   if (pDesc->BindFlags & BIND_CONSTANT_BUFFER)
   {
     alignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
@@ -2469,7 +2469,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
   if (pDesc->BindFlags & BIND_CONSTANT_BUFFER)
   {
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc = {};
-    cbv_desc.SizeInBytes = (uint32_t)alignedSize;
+    cbv_desc.SizeInBytes = (ezUInt32)alignedSize;
     cbv_desc.BufferLocation = internal_state->resource->GetGPUVirtualAddress();
 
     internal_state->cbv = cbv_desc;
@@ -2612,16 +2612,16 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
 
   if (pTexture->desc.MipLevels == 0)
   {
-    pTexture->desc.MipLevels = (uint32_t)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
+    pTexture->desc.MipLevels = (ezUInt32)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
   }
 
 
   // Issue data copy on request:
   if (pInitialData != nullptr)
   {
-    uint32_t dataCount = pDesc->ArraySize * ezMath::Max(1u, pDesc->MipLevels);
+    ezUInt32 dataCount = pDesc->ArraySize * ezMath::Max(1u, pDesc->MipLevels);
     std::vector<D3D12_SUBRESOURCE_DATA> data(dataCount);
-    for (uint32_t slice = 0; slice < dataCount; ++slice)
+    for (ezUInt32 slice = 0; slice < dataCount; ++slice)
     {
       data[slice] = _ConvertSubresourceData(pInitialData[slice]);
     }
@@ -2633,7 +2633,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
     device->GetCopyableFootprints(&desc, 0, dataCount, 0, layouts.data(), numRows.data(), rowSizesInBytes.data(), &RequiredSize);
 
     GPUBufferDesc uploaddesc;
-    uploaddesc.ByteWidth = (uint32_t)RequiredSize;
+    uploaddesc.ByteWidth = (ezUInt32)RequiredSize;
     uploaddesc.Usage = USAGE_STAGING;
     GPUBuffer uploadbuffer;
     bool upload_success = CreateBuffer(&uploaddesc, nullptr, &uploadbuffer);
@@ -2645,7 +2645,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
     hr = upload_resource->Map(0, &readRange, (void**)&pData);
     assert(SUCCEEDED(hr));
 
-    for (uint32_t i = 0; i < dataCount; ++i)
+    for (ezUInt32 i = 0; i < dataCount; ++i)
     {
       if (rowSizesInBytes[i] > (SIZE_T)-1)
         return 0;
@@ -2695,20 +2695,20 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
 
   return SUCCEEDED(hr);
 }
-bool GraphicsDevice_DX12::CreateInputLayout(const InputLayoutDesc* pInputElementDescs, uint32_t NumElements, const Shader* shader, InputLayout* pInputLayout)
+bool GraphicsDevice_DX12::CreateInputLayout(const InputLayoutDesc* pInputElementDescs, ezUInt32 NumElements, const Shader* shader, InputLayout* pInputLayout)
 {
   pInputLayout->internal_state = allocationhandler;
 
   pInputLayout->desc.clear();
   pInputLayout->desc.reserve((size_t)NumElements);
-  for (uint32_t i = 0; i < NumElements; ++i)
+  for (ezUInt32 i = 0; i < NumElements; ++i)
   {
     pInputLayout->desc.push_back(pInputElementDescs[i]);
   }
 
   return true;
 }
-bool GraphicsDevice_DX12::CreateShader(SHADERSTAGE stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
+bool GraphicsDevice_DX12::CreateShader(ezEnum<ezRHIShaderStage> stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
 {
   auto internal_state = std::make_shared<PipelineState_DX12>();
   internal_state->allocationhandler = allocationhandler;
@@ -2797,7 +2797,7 @@ bool GraphicsDevice_DX12::CreateShader(SHADERSTAGE stage, const void* pShaderByt
       }
     };
 
-    if (stage == SHADERSTAGE_COUNT) // Library reflection
+    if (stage == ezRHIShaderStage::ENUM_COUNT) // Library reflection
     {
       ComPtr<ID3D12LibraryReflection> reflection;
       hr = container_reflection->GetPartReflection(shaderIdx, IID_PPV_ARGS(&reflection));
@@ -2846,7 +2846,7 @@ bool GraphicsDevice_DX12::CreateShader(SHADERSTAGE stage, const void* pShaderByt
 #  endif   // _X64
 
 
-    if (stage == CS || stage == SHADERSTAGE_COUNT)
+    if (stage == ezRHIShaderStage::ComputeShader || stage == ezRHIShaderStage::ENUM_COUNT)
     {
       std::vector<D3D12_ROOT_PARAMETER> params;
 
@@ -2887,7 +2887,7 @@ bool GraphicsDevice_DX12::CreateShader(SHADERSTAGE stage, const void* pShaderByt
       hr = device->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&internal_state->rootSignature));
       assert(SUCCEEDED(hr));
 
-      if (stage == CS)
+      if (stage == ezRHIShaderStage::ComputeShader)
       {
         struct PSO_STREAM
         {
@@ -3269,9 +3269,9 @@ bool GraphicsDevice_DX12::CreateRaytracingAccelerationStructure(const Raytracing
           geometry.Triangles.VertexBuffer.StrideInBytes = (UINT64)x.triangles.vertexStride;
           geometry.Triangles.VertexCount = x.triangles.vertexCount;
           geometry.Triangles.VertexFormat = _ConvertFormat(x.triangles.vertexFormat);
-          geometry.Triangles.IndexFormat = (x.triangles.indexFormat == INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
+          geometry.Triangles.IndexFormat = (x.triangles.indexFormat == ezRHIIndexBufferFormat::UInt16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
           geometry.Triangles.IndexBuffer = to_internal(&x.triangles.indexBuffer)->resource->GetGPUVirtualAddress() +
-                                           (D3D12_GPU_VIRTUAL_ADDRESS)x.triangles.indexOffset * (x.triangles.indexFormat == INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT ? sizeof(uint16_t) : sizeof(uint32_t));
+                                           (D3D12_GPU_VIRTUAL_ADDRESS)x.triangles.indexOffset * (x.triangles.indexFormat == ezRHIIndexBufferFormat::UInt16 ? sizeof(ezUInt16) : sizeof(ezUInt32));
           geometry.Triangles.IndexCount = x.triangles.indexCount;
 
           if (x._flags & RaytracingAccelerationStructureDesc::BottomLevel::Geometry::FLAG_USE_TRANSFORM)
@@ -3348,7 +3348,7 @@ bool GraphicsDevice_DX12::CreateRaytracingAccelerationStructure(const Raytracing
   internal_state->srv = srv_desc;
 
   GPUBufferDesc scratch_desc;
-  scratch_desc.ByteWidth = (uint32_t)ezMath::Max(internal_state->info.ScratchDataSizeInBytes, internal_state->info.UpdateScratchDataSizeInBytes);
+  scratch_desc.ByteWidth = (ezUInt32)ezMath::Max(internal_state->info.ScratchDataSizeInBytes, internal_state->info.UpdateScratchDataSizeInBytes);
 
   return CreateBuffer(&scratch_desc, nullptr, &internal_state->scratch);
 }
@@ -3596,10 +3596,10 @@ bool GraphicsDevice_DX12::CreateDescriptorTable(DescriptorTable* table)
     assert(SUCCEEDED(hr));
     internal_state->resource_heap.address = internal_state->resource_heap.heap->GetCPUDescriptorHandleForHeapStart();
 
-    uint32_t slot = 0;
+    ezUInt32 slot = 0;
     for (auto& x : table->resources)
     {
-      for (uint32_t i = 0; i < x.count; ++i)
+      for (ezUInt32 i = 0; i < x.count; ++i)
       {
         WriteDescriptor(table, slot, i, (const GPUResource*)nullptr);
       }
@@ -3612,10 +3612,10 @@ bool GraphicsDevice_DX12::CreateDescriptorTable(DescriptorTable* table)
     assert(SUCCEEDED(hr));
     internal_state->sampler_heap.address = internal_state->sampler_heap.heap->GetCPUDescriptorHandleForHeapStart();
 
-    uint32_t slot = 0;
+    ezUInt32 slot = 0;
     for (auto& x : table->samplers)
     {
-      for (uint32_t i = 0; i < x.count; ++i)
+      for (ezUInt32 i = 0; i < x.count; ++i)
       {
         WriteDescriptor(table, slot, i, (const Sampler*)nullptr);
       }
@@ -3639,13 +3639,13 @@ bool GraphicsDevice_DX12::CreateRootSignature(RootSignature* rootsig)
   table_ranges_resource.reserve(rootsig->tables.size());
   table_ranges_sampler.reserve(rootsig->tables.size());
 
-  uint32_t space = 0;
+  ezUInt32 space = 0;
   for (auto& x : rootsig->tables)
   {
     table_ranges_resource.emplace_back();
     table_ranges_sampler.emplace_back();
 
-    uint32_t rangeIndex = 0;
+    ezUInt32 rangeIndex = 0;
     for (auto& binding : x.resources)
     {
       if (binding.binding < CONSTANTBUFFER)
@@ -3701,7 +3701,7 @@ bool GraphicsDevice_DX12::CreateRootSignature(RootSignature* rootsig)
   }
 
   space = 0;
-  uint32_t bind_point = (uint32_t)internal_state->params.size();
+  ezUInt32 bind_point = (ezUInt32)internal_state->params.size();
   for (auto& x : rootsig->tables)
   {
     auto table_internal = to_internal(&x);
@@ -3764,7 +3764,7 @@ bool GraphicsDevice_DX12::CreateRootSignature(RootSignature* rootsig)
     param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
     param.Constants.ShaderRegister = x.slot;
     param.Constants.RegisterSpace = 0;
-    param.Constants.Num32BitValues = x.size / sizeof(uint32_t);
+    param.Constants.Num32BitValues = x.size / sizeof(ezUInt32);
   }
 
   D3D12_ROOT_SIGNATURE_DESC desc = {};
@@ -3791,7 +3791,7 @@ bool GraphicsDevice_DX12::CreateRootSignature(RootSignature* rootsig)
   return SUCCEEDED(hr);
 }
 
-int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, uint32_t firstSlice, uint32_t sliceCount, uint32_t firstMip, uint32_t mipCount)
+int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, ezUInt32 firstSlice, ezUInt32 sliceCount, ezUInt32 firstMip, ezUInt32 mipCount)
 {
   auto internal_state = to_internal(texture);
 
@@ -4168,9 +4168,9 @@ int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
         // This is a Raw Buffer
         srv_desc.Format = DXGI_FORMAT_R32_TYPELESS;
         srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-        srv_desc.Buffer.FirstElement = (UINT)offset / sizeof(uint32_t);
+        srv_desc.Buffer.FirstElement = (UINT)offset / sizeof(ezUInt32);
         srv_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
-        srv_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
+        srv_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(ezUInt32);
       }
       else if (desc.MiscFlags & RESOURCE_MISC_BUFFER_STRUCTURED)
       {
@@ -4184,7 +4184,7 @@ int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        uint32_t stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = GetFormatStride(desc.Format);
         srv_desc.Format = _ConvertFormat(desc.Format);
         srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
         srv_desc.Buffer.FirstElement = offset / stride;
@@ -4212,8 +4212,8 @@ int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
         // This is a Raw Buffer
         uav_desc.Format = DXGI_FORMAT_R32_TYPELESS;
         uav_desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
-        uav_desc.Buffer.FirstElement = (UINT)offset / sizeof(uint32_t);
-        uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
+        uav_desc.Buffer.FirstElement = (UINT)offset / sizeof(ezUInt32);
+        uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(ezUInt32);
       }
       else if (desc.MiscFlags & RESOURCE_MISC_BUFFER_STRUCTURED)
       {
@@ -4226,7 +4226,7 @@ int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        uint32_t stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = GetFormatStride(desc.Format);
         uav_desc.Format = _ConvertFormat(desc.Format);
         uav_desc.Buffer.FirstElement = (UINT)offset / stride;
         uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
@@ -4268,7 +4268,7 @@ void GraphicsDevice_DX12::WriteTopLevelAccelerationStructureInstance(const Raytr
   desc->InstanceContributionToHitGroupIndex = instance->InstanceContributionToHitGroupIndex;
   desc->Flags = instance->Flags;
 }
-void GraphicsDevice_DX12::WriteShaderIdentifier(const RaytracingPipelineState* rtpso, uint32_t group_index, void* dest)
+void GraphicsDevice_DX12::WriteShaderIdentifier(const RaytracingPipelineState* rtpso, ezUInt32 group_index, void* dest)
 {
   auto internal_state = to_internal(rtpso);
 
@@ -4279,7 +4279,7 @@ void GraphicsDevice_DX12::WriteShaderIdentifier(const RaytracingPipelineState* r
   void* identifier = stateObjectProperties->GetShaderIdentifier(internal_state->group_strings[group_index].c_str());
   memcpy(dest, identifier, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
 }
-void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, uint32_t rangeIndex, uint32_t arrayIndex, const GPUResource* resource, int subresource, uint64_t offset)
+void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource, uint64_t offset)
 {
   auto table_internal = to_internal(table);
   D3D12_CPU_DESCRIPTOR_HANDLE dst = table_internal->resource_heap.address;
@@ -4383,7 +4383,7 @@ void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, uint32_t
         {
           default:
           case RAWBUFFER:
-            srv.Buffer.FirstElement += offset / sizeof(uint32_t);
+            srv.Buffer.FirstElement += offset / sizeof(ezUInt32);
             break;
           case STRUCTUREDBUFFER:
             srv.Buffer.FirstElement += offset / srv.Buffer.StructureByteStride;
@@ -4461,7 +4461,7 @@ void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, uint32_t
         {
           default:
           case RWRAWBUFFER:
-            uav.Buffer.FirstElement += offset / sizeof(uint32_t);
+            uav.Buffer.FirstElement += offset / sizeof(ezUInt32);
             break;
           case RWSTRUCTUREDBUFFER:
             uav.Buffer.FirstElement += offset / uav.Buffer.StructureByteStride;
@@ -4477,7 +4477,7 @@ void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, uint32_t
       break;
   }
 }
-void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, uint32_t rangeIndex, uint32_t arrayIndex, const Sampler* sampler)
+void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const Sampler* sampler)
 {
   auto table_internal = to_internal(table);
   D3D12_CPU_DESCRIPTOR_HANDLE dst = table_internal->sampler_heap.address;
@@ -4636,7 +4636,7 @@ CommandList GraphicsDevice_DX12::BeginCommandList()
     assert(cmd < COMMANDLIST_COUNT);
 
     HRESULT hr;
-    for (uint32_t fr = 0; fr < BACKBUFFER_COUNT; ++fr)
+    for (ezUInt32 fr = 0; fr < BACKBUFFER_COUNT; ++fr)
     {
       hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&frames[fr].commandAllocators[cmd]));
       hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, frames[fr].commandAllocators[cmd].Get(), nullptr, IID_PPV_ARGS(&frames[fr].commandLists[cmd]));
@@ -4672,7 +4672,7 @@ CommandList GraphicsDevice_DX12::BeginCommandList()
   GetDirectCommandList(cmd)->RSSetViewports(1, &vp);
 
   D3D12_RECT pRects[8];
-  for (uint32_t i = 0; i < 8; ++i)
+  for (ezUInt32 i = 0; i < 8; ++i)
   {
     pRects[i].bottom = INT32_MAX;
     pRects[i].left = INT32_MIN;
@@ -4681,7 +4681,7 @@ CommandList GraphicsDevice_DX12::BeginCommandList()
   }
   GetDirectCommandList(cmd)->RSSetScissorRects(8, pRects);
 
-  prev_pt[cmd] = PRIMITIVETOPOLOGY::UNDEFINED;
+  prev_pt[cmd] = ezRHIPrimitiveTopology::Undefined;
   prev_pipeline_hash[cmd] = 0;
   active_pso[cmd] = nullptr;
   active_cs[cmd] = nullptr;
@@ -4728,7 +4728,7 @@ void GraphicsDevice_DX12::SubmitCommandLists()
   {
     ID3D12CommandList* cmdLists[COMMANDLIST_COUNT];
     CommandList cmds[COMMANDLIST_COUNT];
-    uint32_t counter = 0;
+    ezUInt32 counter = 0;
 
     CommandList cmd_last = cmd_count.load();
     cmd_count.store(0);
@@ -4843,7 +4843,7 @@ void GraphicsDevice_DX12::RenderPassBegin(const RenderPass* renderpass, CommandL
   D3D12_CPU_DESCRIPTOR_HANDLE descriptors_DSV = dsv_descriptor_heap_start;
   descriptors_DSV.ptr += dsv_descriptor_size * cmd;
 
-  uint32_t rt_count = 0;
+  ezUInt32 rt_count = 0;
   D3D12_RENDER_PASS_RENDER_TARGET_DESC RTVs[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
   bool dsv = false;
   D3D12_RENDER_PASS_DEPTH_STENCIL_DESC DSV = {};
@@ -5012,12 +5012,12 @@ void GraphicsDevice_DX12::RenderPassEnd(CommandList cmd)
 
   active_renderpass[cmd] = nullptr;
 }
-void GraphicsDevice_DX12::BindScissorRects(uint32_t numRects, const Rect* rects, CommandList cmd)
+void GraphicsDevice_DX12::BindScissorRects(ezUInt32 numRects, const Rect* rects, CommandList cmd)
 {
   assert(rects != nullptr);
   assert(numRects <= 8);
   D3D12_RECT pRects[8];
-  for (uint32_t i = 0; i < numRects; ++i)
+  for (ezUInt32 i = 0; i < numRects; ++i)
   {
     pRects[i].bottom = (LONG)rects[i].bottom;
     pRects[i].left = (LONG)rects[i].left;
@@ -5026,11 +5026,11 @@ void GraphicsDevice_DX12::BindScissorRects(uint32_t numRects, const Rect* rects,
   }
   GetDirectCommandList(cmd)->RSSetScissorRects(numRects, pRects);
 }
-void GraphicsDevice_DX12::BindViewports(uint32_t NumViewports, const Viewport* pViewports, CommandList cmd)
+void GraphicsDevice_DX12::BindViewports(ezUInt32 NumViewports, const Viewport* pViewports, CommandList cmd)
 {
   assert(NumViewports <= 6);
   D3D12_VIEWPORT d3dViewPorts[6];
-  for (uint32_t i = 0; i < NumViewports; ++i)
+  for (ezUInt32 i = 0; i < NumViewports; ++i)
   {
     d3dViewPorts[i].TopLeftX = pViewports[i].TopLeftX;
     d3dViewPorts[i].TopLeftY = pViewports[i].TopLeftY;
@@ -5041,7 +5041,7 @@ void GraphicsDevice_DX12::BindViewports(uint32_t NumViewports, const Viewport* p
   }
   GetDirectCommandList(cmd)->RSSetViewports(NumViewports, d3dViewPorts);
 }
-void GraphicsDevice_DX12::BindResource(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource)
+void GraphicsDevice_DX12::BindResource(ezEnum<ezRHIShaderStage> stage, const GPUResource* resource, ezUInt32 slot, CommandList cmd, int subresource)
 {
   assert(slot < GPU_RESOURCE_HEAP_SRV_COUNT);
   auto& descriptors = GetFrameResources().descriptors[cmd];
@@ -5052,17 +5052,17 @@ void GraphicsDevice_DX12::BindResource(SHADERSTAGE stage, const GPUResource* res
     descriptors.dirty = true;
   }
 }
-void GraphicsDevice_DX12::BindResources(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd)
+void GraphicsDevice_DX12::BindResources(ezEnum<ezRHIShaderStage> stage, const GPUResource* const* resources, ezUInt32 slot, ezUInt32 count, CommandList cmd)
 {
   if (resources != nullptr)
   {
-    for (uint32_t i = 0; i < count; ++i)
+    for (ezUInt32 i = 0; i < count; ++i)
     {
       BindResource(stage, resources[i], slot + i, cmd, -1);
     }
   }
 }
-void GraphicsDevice_DX12::BindUAV(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource)
+void GraphicsDevice_DX12::BindUAV(ezEnum<ezRHIShaderStage> stage, const GPUResource* resource, ezUInt32 slot, CommandList cmd, int subresource)
 {
   assert(slot < GPU_RESOURCE_HEAP_UAV_COUNT);
   auto& descriptors = GetFrameResources().descriptors[cmd];
@@ -5073,23 +5073,23 @@ void GraphicsDevice_DX12::BindUAV(SHADERSTAGE stage, const GPUResource* resource
     descriptors.dirty = true;
   }
 }
-void GraphicsDevice_DX12::BindUAVs(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd)
+void GraphicsDevice_DX12::BindUAVs(ezEnum<ezRHIShaderStage> stage, const GPUResource* const* resources, ezUInt32 slot, ezUInt32 count, CommandList cmd)
 {
   if (resources != nullptr)
   {
-    for (uint32_t i = 0; i < count; ++i)
+    for (ezUInt32 i = 0; i < count; ++i)
     {
       BindUAV(stage, resources[i], slot + i, cmd, -1);
     }
   }
 }
-void GraphicsDevice_DX12::UnbindResources(uint32_t slot, uint32_t num, CommandList cmd)
+void GraphicsDevice_DX12::UnbindResources(ezUInt32 slot, ezUInt32 num, CommandList cmd)
 {
 }
-void GraphicsDevice_DX12::UnbindUAVs(uint32_t slot, uint32_t num, CommandList cmd)
+void GraphicsDevice_DX12::UnbindUAVs(ezUInt32 slot, ezUInt32 num, CommandList cmd)
 {
 }
-void GraphicsDevice_DX12::BindSampler(SHADERSTAGE stage, const Sampler* sampler, uint32_t slot, CommandList cmd)
+void GraphicsDevice_DX12::BindSampler(ezEnum<ezRHIShaderStage> stage, const Sampler* sampler, ezUInt32 slot, CommandList cmd)
 {
   assert(slot < GPU_SAMPLER_HEAP_COUNT);
   auto& descriptors = GetFrameResources().descriptors[cmd];
@@ -5099,7 +5099,7 @@ void GraphicsDevice_DX12::BindSampler(SHADERSTAGE stage, const Sampler* sampler,
     descriptors.dirty = true;
   }
 }
-void GraphicsDevice_DX12::BindConstantBuffer(SHADERSTAGE stage, const GPUBuffer* buffer, uint32_t slot, CommandList cmd)
+void GraphicsDevice_DX12::BindConstantBuffer(ezEnum<ezRHIShaderStage> stage, const GPUBuffer* buffer, ezUInt32 slot, CommandList cmd)
 {
   assert(slot < GPU_RESOURCE_HEAP_CBV_COUNT);
   auto& descriptors = GetFrameResources().descriptors[cmd];
@@ -5109,11 +5109,11 @@ void GraphicsDevice_DX12::BindConstantBuffer(SHADERSTAGE stage, const GPUBuffer*
     descriptors.dirty = true;
   }
 }
-void GraphicsDevice_DX12::BindVertexBuffers(const GPUBuffer* const* vertexBuffers, uint32_t slot, uint32_t count, const uint32_t* strides, const uint32_t* offsets, CommandList cmd)
+void GraphicsDevice_DX12::BindVertexBuffers(const GPUBuffer* const* vertexBuffers, ezUInt32 slot, ezUInt32 count, const ezUInt32* strides, const ezUInt32* offsets, CommandList cmd)
 {
   assert(count <= 8);
   D3D12_VERTEX_BUFFER_VIEW res[8] = {0};
-  for (uint32_t i = 0; i < count; ++i)
+  for (ezUInt32 i = 0; i < count; ++i)
   {
     if (vertexBuffers[i] != nullptr)
     {
@@ -5127,9 +5127,9 @@ void GraphicsDevice_DX12::BindVertexBuffers(const GPUBuffer* const* vertexBuffer
       res[i].StrideInBytes = strides[i];
     }
   }
-  GetDirectCommandList(cmd)->IASetVertexBuffers(static_cast<uint32_t>(slot), static_cast<uint32_t>(count), res);
+  GetDirectCommandList(cmd)->IASetVertexBuffers(static_cast<ezUInt32>(slot), static_cast<ezUInt32>(count), res);
 }
-void GraphicsDevice_DX12::BindIndexBuffer(const GPUBuffer* indexBuffer, const INDEXBUFFER_FORMAT format, uint32_t offset, CommandList cmd)
+void GraphicsDevice_DX12::BindIndexBuffer(const GPUBuffer* indexBuffer, const ezEnum<ezRHIIndexBufferFormat> format, ezUInt32 offset, CommandList cmd)
 {
   D3D12_INDEX_BUFFER_VIEW res = {};
   if (indexBuffer != nullptr)
@@ -5137,12 +5137,12 @@ void GraphicsDevice_DX12::BindIndexBuffer(const GPUBuffer* indexBuffer, const IN
     auto internal_state = to_internal(indexBuffer);
 
     res.BufferLocation = internal_state->resource->GetGPUVirtualAddress() + (D3D12_GPU_VIRTUAL_ADDRESS)offset;
-    res.Format = (format == INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
+    res.Format = (format == ezRHIIndexBufferFormat::UInt16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
     res.SizeInBytes = indexBuffer->desc.ByteWidth;
   }
   GetDirectCommandList(cmd)->IASetIndexBuffer(&res);
 }
-void GraphicsDevice_DX12::BindStencilRef(uint32_t value, CommandList cmd)
+void GraphicsDevice_DX12::BindStencilRef(ezUInt32 value, CommandList cmd)
 {
   GetDirectCommandList(cmd)->OMSetStencilRef(value);
 }
@@ -5209,7 +5209,7 @@ void GraphicsDevice_DX12::BindPipelineState(const PipelineState* pso, CommandLis
 }
 void GraphicsDevice_DX12::BindComputeShader(const Shader* cs, CommandList cmd)
 {
-  assert(cs->stage == CS);
+  assert(cs->stage == ezRHIShaderStage::ComputeShader);
   if (active_cs[cmd] != cs)
   {
     prev_pipeline_hash[cmd] = 0;
@@ -5231,55 +5231,55 @@ void GraphicsDevice_DX12::BindComputeShader(const Shader* cs, CommandList cmd)
     }
   }
 }
-void GraphicsDevice_DX12::Draw(uint32_t vertexCount, uint32_t startVertexLocation, CommandList cmd)
+void GraphicsDevice_DX12::Draw(ezUInt32 vertexCount, ezUInt32 startVertexLocation, CommandList cmd)
 {
   predraw(cmd);
   GetDirectCommandList(cmd)->DrawInstanced(vertexCount, 1, startVertexLocation, 0);
 }
-void GraphicsDevice_DX12::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, CommandList cmd)
+void GraphicsDevice_DX12::DrawIndexed(ezUInt32 indexCount, ezUInt32 startIndexLocation, ezUInt32 baseVertexLocation, CommandList cmd)
 {
   predraw(cmd);
   GetDirectCommandList(cmd)->DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
 }
-void GraphicsDevice_DX12::DrawInstanced(uint32_t vertexCount, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation, CommandList cmd)
+void GraphicsDevice_DX12::DrawInstanced(ezUInt32 vertexCount, ezUInt32 instanceCount, ezUInt32 startVertexLocation, ezUInt32 startInstanceLocation, CommandList cmd)
 {
   predraw(cmd);
   GetDirectCommandList(cmd)->DrawInstanced(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 }
-void GraphicsDevice_DX12::DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation, CommandList cmd)
+void GraphicsDevice_DX12::DrawIndexedInstanced(ezUInt32 indexCount, ezUInt32 instanceCount, ezUInt32 startIndexLocation, ezUInt32 baseVertexLocation, ezUInt32 startInstanceLocation, CommandList cmd)
 {
   predraw(cmd);
   GetDirectCommandList(cmd)->DrawIndexedInstanced(indexCount, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
-void GraphicsDevice_DX12::DrawInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX12::DrawInstancedIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   predraw(cmd);
   auto internal_state = to_internal(args);
   GetDirectCommandList(cmd)->ExecuteIndirect(drawInstancedIndirectCommandSignature.Get(), 1, internal_state->resource.Get(), args_offset, nullptr, 0);
 }
-void GraphicsDevice_DX12::DrawIndexedInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX12::DrawIndexedInstancedIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   predraw(cmd);
   auto internal_state = to_internal(args);
   GetDirectCommandList(cmd)->ExecuteIndirect(drawIndexedInstancedIndirectCommandSignature.Get(), 1, internal_state->resource.Get(), args_offset, nullptr, 0);
 }
-void GraphicsDevice_DX12::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ, CommandList cmd)
+void GraphicsDevice_DX12::Dispatch(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ, CommandList cmd)
 {
   predispatch(cmd);
   GetDirectCommandList(cmd)->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
-void GraphicsDevice_DX12::DispatchIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX12::DispatchIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   predispatch(cmd);
   auto internal_state = to_internal(args);
   GetDirectCommandList(cmd)->ExecuteIndirect(dispatchIndirectCommandSignature.Get(), 1, internal_state->resource.Get(), args_offset, nullptr, 0);
 }
-void GraphicsDevice_DX12::DispatchMesh(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ, CommandList cmd)
+void GraphicsDevice_DX12::DispatchMesh(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ, CommandList cmd)
 {
   predraw(cmd);
   GetDirectCommandList(cmd)->DispatchMesh(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
-void GraphicsDevice_DX12::DispatchMeshIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX12::DispatchMeshIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   predraw(cmd);
   auto internal_state = to_internal(args);
@@ -5407,11 +5407,11 @@ void GraphicsDevice_DX12::QueryEnd(const GPUQuery* query, CommandList cmd)
   resolver.type = query->desc.Type;
   resolver.index = internal_state->query_index;
 }
-void GraphicsDevice_DX12::Barrier(const GPUBarrier* barriers, uint32_t numBarriers, CommandList cmd)
+void GraphicsDevice_DX12::Barrier(const GPUBarrier* barriers, ezUInt32 numBarriers, CommandList cmd)
 {
   D3D12_RESOURCE_BARRIER barrierdescs[8];
 
-  for (uint32_t i = 0; i < numBarriers; ++i)
+  for (ezUInt32 i = 0; i < numBarriers; ++i)
   {
     const GPUBarrier& barrier = barriers[i];
     D3D12_RESOURCE_BARRIER& barrierdesc = barrierdescs[i];
@@ -5486,7 +5486,7 @@ void GraphicsDevice_DX12::BuildRaytracingAccelerationStructure(const RaytracingA
           geometry.Triangles.VertexBuffer.StartAddress = to_internal(&x.triangles.vertexBuffer)->resource->GetGPUVirtualAddress() +
                                                          (D3D12_GPU_VIRTUAL_ADDRESS)x.triangles.vertexByteOffset;
           geometry.Triangles.IndexBuffer = to_internal(&x.triangles.indexBuffer)->resource->GetGPUVirtualAddress() +
-                                           (D3D12_GPU_VIRTUAL_ADDRESS)x.triangles.indexOffset * (x.triangles.indexFormat == INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT ? sizeof(uint16_t) : sizeof(uint32_t));
+                                           (D3D12_GPU_VIRTUAL_ADDRESS)x.triangles.indexOffset * (x.triangles.indexFormat == ezRHIIndexBufferFormat::UInt16 ? sizeof(ezUInt16) : sizeof(ezUInt32));
 
           if (x._flags & RaytracingAccelerationStructureDesc::BottomLevel::Geometry::FLAG_USE_TRANSFORM)
           {
@@ -5601,7 +5601,7 @@ void GraphicsDevice_DX12::DispatchRays(const DispatchRaysDesc* desc, CommandList
   GetDirectCommandList(cmd)->DispatchRays(&dispatchrays_desc);
 }
 
-void GraphicsDevice_DX12::BindDescriptorTable(BINDPOINT bindpoint, uint32_t space, const DescriptorTable* table, CommandList cmd)
+void GraphicsDevice_DX12::BindDescriptorTable(BINDPOINT bindpoint, ezUInt32 space, const DescriptorTable* table, CommandList cmd)
 {
   const RootSignature* rootsig = nullptr;
   switch (bindpoint)
@@ -5618,7 +5618,7 @@ void GraphicsDevice_DX12::BindDescriptorTable(BINDPOINT bindpoint, uint32_t spac
       break;
   }
   auto rootsig_internal = to_internal(rootsig);
-  uint32_t bind_point_remap = rootsig_internal->table_bind_point_remap[space];
+  ezUInt32 bind_point_remap = rootsig_internal->table_bind_point_remap[space];
   auto& descriptors = GetFrameResources().descriptors[cmd];
   auto handles = descriptors.commit(table, cmd);
   if (handles.resource_handle.ptr != 0)
@@ -5651,7 +5651,7 @@ void GraphicsDevice_DX12::BindDescriptorTable(BINDPOINT bindpoint, uint32_t spac
     }
   }
 }
-void GraphicsDevice_DX12::BindRootDescriptor(BINDPOINT bindpoint, uint32_t index, const GPUBuffer* buffer, uint32_t offset, CommandList cmd)
+void GraphicsDevice_DX12::BindRootDescriptor(BINDPOINT bindpoint, ezUInt32 index, const GPUBuffer* buffer, ezUInt32 offset, CommandList cmd)
 {
   const RootSignature* rootsig = nullptr;
   switch (bindpoint)
@@ -5720,7 +5720,7 @@ void GraphicsDevice_DX12::BindRootDescriptor(BINDPOINT bindpoint, uint32_t index
       break;
   }
 }
-void GraphicsDevice_DX12::BindRootConstants(BINDPOINT bindpoint, uint32_t index, const void* srcdata, CommandList cmd)
+void GraphicsDevice_DX12::BindRootConstants(BINDPOINT bindpoint, ezUInt32 index, const void* srcdata, CommandList cmd)
 {
   const RootSignature* rootsig = nullptr;
   switch (bindpoint)
@@ -5745,17 +5745,17 @@ void GraphicsDevice_DX12::BindRootConstants(BINDPOINT bindpoint, uint32_t index,
     case GRAPHICS:
       GetDirectCommandList(cmd)->SetGraphicsRoot32BitConstants(
         rootsig_internal->root_constant_bind_remap + index,
-        range.size / sizeof(uint32_t),
+        range.size / sizeof(ezUInt32),
         srcdata,
-        range.offset / sizeof(uint32_t));
+        range.offset / sizeof(ezUInt32));
       break;
     case COMPUTE:
     case ::RAYTRACING:
       GetDirectCommandList(cmd)->SetComputeRoot32BitConstants(
         rootsig_internal->root_constant_bind_remap + index,
-        range.size / sizeof(uint32_t),
+        range.size / sizeof(ezUInt32),
         srcdata,
-        range.offset / sizeof(uint32_t));
+        range.offset / sizeof(ezUInt32));
       break;
   }
 }
@@ -5773,7 +5773,7 @@ GraphicsDevice::GPUAllocation GraphicsDevice_DX12::AllocateGPU(size_t dataSize, 
   assert(dest != nullptr);
 
   result.buffer = &allocator.buffer;
-  result.offset = (uint32_t)allocator.calculateOffset(dest);
+  result.offset = (ezUInt32)allocator.calculateOffset(dest);
   result.data = (void*)dest;
   return result;
 }

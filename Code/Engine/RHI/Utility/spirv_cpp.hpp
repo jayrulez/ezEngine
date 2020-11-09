@@ -25,12 +25,12 @@ namespace SPIRV_CROSS_NAMESPACE
 class CompilerCPP : public CompilerGLSL
 {
 public:
-	explicit CompilerCPP(std::vector<uint32_t> spirv_)
+	explicit CompilerCPP(std::vector<ezUInt32> spirv_)
 	    : CompilerGLSL(std::move(spirv_))
 	{
 	}
 
-	CompilerCPP(const uint32_t *ir_, size_t word_count)
+	CompilerCPP(const ezUInt32 *ir_, size_t word_count)
 	    : CompilerGLSL(ir_, word_count)
 	{
 	}
@@ -70,14 +70,14 @@ private:
 	void emit_uniform(const SPIRVariable &var) override;
 	void emit_shared(const SPIRVariable &var);
 	void emit_block_struct(SPIRType &type);
-	std::string variable_decl(const SPIRType &type, const std::string &name, uint32_t id) override;
+	std::string variable_decl(const SPIRType &type, const std::string &name, ezUInt32 id) override;
 
 	std::string argument_decl(const SPIRFunction::Parameter &arg);
 
 	SmallVector<std::string> resource_registrations;
 	std::string impl_type;
 	std::string resource_type;
-	uint32_t shared_counter = 0;
+	ezUInt32 shared_counter = 0;
 
 	std::string interface_name;
 };

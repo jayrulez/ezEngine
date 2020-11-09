@@ -25,7 +25,7 @@ namespace SPIRV_CROSS_NAMESPACE
 // Interface which remaps vertex inputs to a fixed semantic name to make linking easier.
 struct HLSLVertexAttributeRemap
 {
-	uint32_t location;
+	ezUInt32 location;
 	std::string semantic;
 };
 // Specifying a root constant (d3d12) or push constant range (vulkan).
@@ -34,11 +34,11 @@ struct HLSLVertexAttributeRemap
 // Both values need to be multiple of 4.
 struct RootConstants
 {
-	uint32_t start;
-	uint32_t end;
+	ezUInt32 start;
+	ezUInt32 end;
 
-	uint32_t binding;
-	uint32_t space;
+	ezUInt32 binding;
+	ezUInt32 space;
 };
 
 // For finer control, decorations may be removed from specific resources instead with unset_decoration().
@@ -67,7 +67,7 @@ enum HLSLBindingFlagBits
 	// No resources will be declared with register().
 	HLSL_BINDING_AUTO_ALL = 0x7fffffff
 };
-using HLSLBindingFlags = uint32_t;
+using HLSLBindingFlags = ezUInt32;
 
 // By matching stage, desc_set and binding for a SPIR-V resource,
 // register bindings are set based on whether the HLSL resource is a
@@ -81,13 +81,13 @@ using HLSLBindingFlags = uint32_t;
 struct HLSLResourceBinding
 {
 	spv::ExecutionModel stage = spv::ExecutionModelMax;
-	uint32_t desc_set = 0;
-	uint32_t binding = 0;
+	ezUInt32 desc_set = 0;
+	ezUInt32 binding = 0;
 
 	struct Binding
 	{
-		uint32_t register_space = 0;
-		uint32_t register_binding = 0;
+		ezUInt32 register_space = 0;
+		ezUInt32 register_binding = 0;
 	} cbv, uav, srv, sampler;
 };
 
@@ -96,7 +96,7 @@ class CompilerHLSL : public CompilerGLSL
 public:
 	struct Options
 	{
-		uint32_t shader_model = 30; // TODO: map ps_4_0_level_9_0,... somehow
+		ezUInt32 shader_model = 30; // TODO: map ps_4_0_level_9_0,... somehow
 
 		// Allows the PointSize builtin, and ignores it, as PointSize is not supported in HLSL.
 		bool point_size_compat = false;
@@ -121,17 +121,17 @@ public:
 		bool nonwritable_uav_texture_as_srv = false;
 
 		// Enables native 16-bit types. Needs SM 6.2.
-		// Uses half/int16_t/uint16_t instead of min16* types.
+		// Uses half/int16_t/ezUInt16 instead of min16* types.
 		// Also adds support for 16-bit load-store from (RW)ByteAddressBuffer.
 		bool enable_16bit_types = false;
 	};
 
-	explicit CompilerHLSL(std::vector<uint32_t> spirv_)
+	explicit CompilerHLSL(std::vector<ezUInt32> spirv_)
 	    : CompilerGLSL(std::move(spirv_))
 	{
 	}
 
-	CompilerHLSL(const uint32_t *ir_, size_t size)
+	CompilerHLSL(const ezUInt32 *ir_, size_t size)
 	    : CompilerGLSL(ir_, size)
 	{
 	}
@@ -190,29 +190,29 @@ public:
 	// is_hlsl_resource_binding_used() will return true after calling ::compile() if
 	// the set/binding combination was used by the HLSL code.
 	void add_hlsl_resource_binding(const HLSLResourceBinding &resource);
-	bool is_hlsl_resource_binding_used(spv::ExecutionModel model, uint32_t set, uint32_t binding) const;
+	bool is_hlsl_resource_binding_used(spv::ExecutionModel model, ezUInt32 set, ezUInt32 binding) const;
 
 	// Controls which storage buffer bindings will be forced to be declared as UAVs.
-	void set_hlsl_force_storage_buffer_as_uav(uint32_t desc_set, uint32_t binding);
+	void set_hlsl_force_storage_buffer_as_uav(ezUInt32 desc_set, ezUInt32 binding);
 
 private:
-	std::string type_to_glsl(const SPIRType &type, uint32_t id = 0) override;
-	std::string image_type_hlsl(const SPIRType &type, uint32_t id);
-	std::string image_type_hlsl_modern(const SPIRType &type, uint32_t id);
-	std::string image_type_hlsl_legacy(const SPIRType &type, uint32_t id);
+	std::string type_to_glsl(const SPIRType &type, ezUInt32 id = 0) override;
+	std::string image_type_hlsl(const SPIRType &type, ezUInt32 id);
+	std::string image_type_hlsl_modern(const SPIRType &type, ezUInt32 id);
+	std::string image_type_hlsl_legacy(const SPIRType &type, ezUInt32 id);
 	void emit_function_prototype(SPIRFunction &func, const Bitset &return_flags) override;
 	void emit_hlsl_entry_point();
 	void emit_header() override;
 	void emit_resources();
 	void declare_undefined_values() override;
 	void emit_interface_block_globally(const SPIRVariable &type);
-	void emit_interface_block_in_struct(const SPIRVariable &type, std::unordered_set<uint32_t> &active_locations);
+	void emit_interface_block_in_struct(const SPIRVariable &type, std::unordered_set<ezUInt32> &active_locations);
 	void emit_builtin_inputs_in_struct();
 	void emit_builtin_outputs_in_struct();
 	void emit_texture_op(const Instruction &i, bool sparse) override;
 	void emit_instruction(const Instruction &instruction) override;
-	void emit_glsl_op(uint32_t result_type, uint32_t result_id, uint32_t op, const uint32_t *args,
-	                  uint32_t count) override;
+	void emit_glsl_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 op, const ezUInt32 *args,
+	                  ezUInt32 count) override;
 	void emit_buffer_block(const SPIRVariable &type) override;
 	void emit_push_constant_block(const SPIRVariable &var) override;
 	void emit_uniform(const SPIRVariable &var) override;
@@ -222,34 +222,34 @@ private:
 	void emit_composite_constants();
 	void emit_fixup() override;
 	std::string builtin_to_glsl(spv::BuiltIn builtin, spv::StorageClass storage) override;
-	std::string layout_for_member(const SPIRType &type, uint32_t index) override;
+	std::string layout_for_member(const SPIRType &type, ezUInt32 index) override;
 	std::string to_interpolation_qualifiers(const Bitset &flags) override;
 	std::string bitcast_glsl_op(const SPIRType &result_type, const SPIRType &argument_type) override;
-	bool emit_complex_bitcast(uint32_t result_type, uint32_t id, uint32_t op0) override;
-	std::string to_func_call_arg(const SPIRFunction::Parameter &arg, uint32_t id) override;
-	std::string to_sampler_expression(uint32_t id);
+	bool emit_complex_bitcast(ezUInt32 result_type, ezUInt32 id, ezUInt32 op0) override;
+	std::string to_func_call_arg(const SPIRFunction::Parameter &arg, ezUInt32 id) override;
+	std::string to_sampler_expression(ezUInt32 id);
 	std::string to_resource_binding(const SPIRVariable &var);
 	std::string to_resource_binding_sampler(const SPIRVariable &var);
-	std::string to_resource_register(HLSLBindingFlagBits flag, char space, uint32_t binding, uint32_t set);
-	void emit_sampled_image_op(uint32_t result_type, uint32_t result_id, uint32_t image_id, uint32_t samp_id) override;
+	std::string to_resource_register(HLSLBindingFlagBits flag, char space, ezUInt32 binding, ezUInt32 set);
+	void emit_sampled_image_op(ezUInt32 result_type, ezUInt32 result_id, ezUInt32 image_id, ezUInt32 samp_id) override;
 	void emit_access_chain(const Instruction &instruction);
 	void emit_load(const Instruction &instruction);
 	void read_access_chain(std::string *expr, const std::string &lhs, const SPIRAccessChain &chain);
 	void read_access_chain_struct(const std::string &lhs, const SPIRAccessChain &chain);
 	void read_access_chain_array(const std::string &lhs, const SPIRAccessChain &chain);
-	void write_access_chain(const SPIRAccessChain &chain, uint32_t value, const SmallVector<uint32_t> &composite_chain);
-	void write_access_chain_struct(const SPIRAccessChain &chain, uint32_t value,
-	                               const SmallVector<uint32_t> &composite_chain);
-	void write_access_chain_array(const SPIRAccessChain &chain, uint32_t value,
-	                              const SmallVector<uint32_t> &composite_chain);
-	std::string write_access_chain_value(uint32_t value, const SmallVector<uint32_t> &composite_chain, bool enclose);
+	void write_access_chain(const SPIRAccessChain &chain, ezUInt32 value, const SmallVector<ezUInt32> &composite_chain);
+	void write_access_chain_struct(const SPIRAccessChain &chain, ezUInt32 value,
+	                               const SmallVector<ezUInt32> &composite_chain);
+	void write_access_chain_array(const SPIRAccessChain &chain, ezUInt32 value,
+	                              const SmallVector<ezUInt32> &composite_chain);
+	std::string write_access_chain_value(ezUInt32 value, const SmallVector<ezUInt32> &composite_chain, bool enclose);
 	void emit_store(const Instruction &instruction);
-	void emit_atomic(const uint32_t *ops, uint32_t length, spv::Op op);
+	void emit_atomic(const ezUInt32 *ops, ezUInt32 length, spv::Op op);
 	void emit_subgroup_op(const Instruction &i) override;
 	void emit_block_hints(const SPIRBlock &block) override;
 
-	void emit_struct_member(const SPIRType &type, uint32_t member_type_id, uint32_t index, const std::string &qualifier,
-	                        uint32_t base_offset = 0) override;
+	void emit_struct_member(const SPIRType &type, ezUInt32 member_type_id, ezUInt32 index, const std::string &qualifier,
+	                        ezUInt32 base_offset = 0) override;
 
 	const char *to_storage_qualifiers_glsl(const SPIRVariable &var) override;
 	void replace_illegal_names() override;
@@ -290,7 +290,7 @@ private:
 		uint64_t uav[3][4];
 	} required_texture_size_variants;
 
-	void require_texture_query_variant(uint32_t var_id);
+	void require_texture_query_variant(ezUInt32 var_id);
 	void emit_texture_size_variants(uint64_t variant_mask, const char *vecsize_qualifier, bool uav, const char *type_qualifier);
 
 	enum TextureQueryVariantDim
@@ -323,19 +323,19 @@ private:
 		TypeUnpackUint64
 	};
 
-	BitcastType get_bitcast_type(uint32_t result_type, uint32_t op0);
+	BitcastType get_bitcast_type(ezUInt32 result_type, ezUInt32 op0);
 
 	void emit_builtin_variables();
 	bool require_output = false;
 	bool require_input = false;
 	SmallVector<HLSLVertexAttributeRemap> remap_vertex_attributes;
 
-	uint32_t type_to_consumed_locations(const SPIRType &type) const;
+	ezUInt32 type_to_consumed_locations(const SPIRType &type) const;
 
 	void emit_io_block(const SPIRVariable &var);
-	std::string to_semantic(uint32_t location, spv::ExecutionModel em, spv::StorageClass sc);
+	std::string to_semantic(ezUInt32 location, spv::ExecutionModel em, spv::StorageClass sc);
 
-	uint32_t num_workgroups_builtin = 0;
+	ezUInt32 num_workgroups_builtin = 0;
 	HLSLBindingFlags resource_binding_flags = 0;
 
 	// Custom root constant layout, which should be emitted
@@ -345,10 +345,10 @@ private:
 	void validate_shader_model();
 
 	std::string get_unique_identifier();
-	uint32_t unique_identifier_count = 0;
+	ezUInt32 unique_identifier_count = 0;
 
 	std::unordered_map<StageSetBinding, std::pair<HLSLResourceBinding, bool>, InternalHasher> resource_bindings;
-	void remap_hlsl_resource_binding(HLSLBindingFlagBits type, uint32_t &desc_set, uint32_t &binding);
+	void remap_hlsl_resource_binding(HLSLBindingFlagBits type, ezUInt32 &desc_set, ezUInt32 &binding);
 
 	std::unordered_set<SetBindingPair, InternalHasher> force_uav_buffer_bindings;
 };

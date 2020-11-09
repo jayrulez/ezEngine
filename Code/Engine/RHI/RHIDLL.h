@@ -34,6 +34,48 @@ struct GPUBuffer;
 struct Texture;
 struct RootSignature;
 
+struct EZ_RHI_DLL ezRHIPrimitiveTopology
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    Undefined,
+    TriangleList,
+    TriangleStrip,
+    PointList,
+    LineList,
+    LineStrip,
+    PatchList,
+  };
+};
+
+struct EZ_RHI_DLL ezRHIIndexBufferFormat
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    UInt16,
+    UInt32
+  };
+};
+
+struct EZ_RHI_DLL ezRHIShaderStage
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    MeshShader,
+    AmplificationShader,
+    VertexShader,
+    HullShader,
+    DomainShader,
+    GeometryShader,
+    PixelShader,
+    ComputeShader,
+    ENUM_COUNT,
+  };
+};
+
 /*
 struct EZ_RHI_DLL ezRHIStruct
 {

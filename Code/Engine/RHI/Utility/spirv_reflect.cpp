@@ -37,7 +37,7 @@ class Stream
 {
 	Stack stack;
 	StringStream<> buffer;
-	uint32_t indent{ 0 };
+	ezUInt32 indent{ 0 };
 	char current_locale_radix_character = '.';
 
 public:
@@ -51,7 +51,7 @@ public:
 	void emit_json_key(const std::string &key);
 	void emit_json_key_value(const std::string &key, const std::string &value);
 	void emit_json_key_value(const std::string &key, bool value);
-	void emit_json_key_value(const std::string &key, uint32_t value);
+	void emit_json_key_value(const std::string &key, ezUInt32 value);
 	void emit_json_key_value(const std::string &key, int32_t value);
 	void emit_json_key_value(const std::string &key, float value);
 	void emit_json_key_object(const std::string &key);
@@ -60,7 +60,7 @@ public:
 	void begin_json_array();
 	void end_json_array();
 	void emit_json_array_value(const std::string &value);
-	void emit_json_array_value(uint32_t value);
+	void emit_json_array_value(ezUInt32 value);
 	void emit_json_array_value(bool value);
 
 	std::string str() const
@@ -71,7 +71,7 @@ public:
 private:
 	inline void statement_indent()
 	{
-		for (uint32_t i = 0; i < indent; i++)
+		for (ezUInt32 i = 0; i < indent; i++)
 			buffer << "    ";
 	}
 
@@ -149,7 +149,7 @@ void Stream::emit_json_array_value(const std::string &value)
 	stack.top().second = true;
 }
 
-void Stream::emit_json_array_value(uint32_t value)
+void Stream::emit_json_array_value(ezUInt32 value)
 {
 	if (stack.empty() || stack.top().first != Type::Array)
 		SPIRV_CROSS_THROW("Invalid JSON state");
@@ -214,7 +214,7 @@ void Stream::emit_json_key_value(const std::string &key, const std::string &valu
 	statement_inner("\"", value, "\"");
 }
 
-void Stream::emit_json_key_value(const std::string &key, uint32_t value)
+void Stream::emit_json_key_value(const std::string &key, ezUInt32 value)
 {
 	emit_json_key(key);
 	statement_inner(value);
@@ -293,11 +293,11 @@ void CompilerReflection::emit_types()
 {
 	bool emitted_open_tag = false;
 
-	SmallVector<uint32_t> physical_pointee_types;
+	SmallVector<ezUInt32> physical_pointee_types;
 
 	// If we have physical pointers or arrays of physical pointers, it's also helpful to emit the pointee type
 	// and chain the type hierarchy. For POD, arrays can emit the entire type in-place.
-	ir.for_each_typed_id<SPIRType>([&](uint32_t self, SPIRType &type) {
+	ir.for_each_typed_id<SPIRType>([&](ezUInt32 self, SPIRType &type) {
 		if (naturally_emit_type(type))
 		{
 			emit_type(self, emitted_open_tag);
@@ -313,7 +313,7 @@ void CompilerReflection::emit_types()
 		}
 	});
 
-	for (uint32_t pointee_type : physical_pointee_types)
+	for (ezUInt32 pointee_type : physical_pointee_types)
 		emit_type(pointee_type, emitted_open_tag);
 
 	if (emitted_open_tag)
@@ -322,7 +322,7 @@ void CompilerReflection::emit_types()
 	}
 }
 
-void CompilerReflection::emit_type(uint32_t type_id, bool &emitted_open_tag)
+void CompilerReflection::emit_type(ezUInt32 type_id, bool &emitted_open_tag)
 {
 	auto &type = get<SPIRType>(type_id);
 	auto name = type_to_glsl(type);
@@ -364,7 +364,7 @@ void CompilerReflection::emit_type(uint32_t type_id, bool &emitted_open_tag)
 		// some additional logic being written in this class, or in the
 		// parent CompilerGLSL class.
 		auto size = type.member_types.size();
-		for (uint32_t i = 0; i < size; ++i)
+		for (ezUInt32 i = 0; i < size; ++i)
 		{
 			emit_type_member(type, i);
 		}
@@ -374,7 +374,7 @@ void CompilerReflection::emit_type(uint32_t type_id, bool &emitted_open_tag)
 	json_stream->end_json_object();
 }
 
-void CompilerReflection::emit_type_member(const SPIRType &type, uint32_t index)
+void CompilerReflection::emit_type_member(const SPIRType &type, ezUInt32 index)
 {
 	auto &membertype = get<SPIRType>(type.member_types[index]);
 	json_stream->begin_json_object();
@@ -418,7 +418,7 @@ void CompilerReflection::emit_type_array(const SPIRType &type)
 	}
 }
 
-void CompilerReflection::emit_type_member_qualifiers(const SPIRType &type, uint32_t index)
+void CompilerReflection::emit_type_member_qualifiers(const SPIRType &type, ezUInt32 index)
 {
 	auto &membertype = get<SPIRType>(type.member_types[index]);
 	emit_type_array(membertype);
@@ -606,7 +606,7 @@ void CompilerReflection::emit_resources(const char *tag, const SmallVector<Resou
 			                                   get_storage_class(res.id) == StorageClassStorageBuffer);
 			if (is_sized_block)
 			{
-				uint32_t block_size = uint32_t(get_declared_struct_size(get_type(res.base_type_id)));
+				ezUInt32 block_size = ezUInt32(get_declared_struct_size(get_type(res.base_type_id)));
 				json_stream->emit_json_key_value("block_size", block_size);
 			}
 		}
@@ -686,7 +686,7 @@ void CompilerReflection::emit_specialization_constants()
 	json_stream->end_json_array();
 }
 
-string CompilerReflection::to_member_name(const SPIRType &type, uint32_t index) const
+string CompilerReflection::to_member_name(const SPIRType &type, ezUInt32 index) const
 {
 	auto *type_meta = ir.find_meta(type.self);
 

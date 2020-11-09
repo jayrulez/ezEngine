@@ -25,8 +25,8 @@ namespace SPIRV_CROSS_NAMESPACE
 class Parser
 {
 public:
-	Parser(const uint32_t *spirv_data, size_t word_count);
-	Parser(std::vector<uint32_t> spirv);
+	Parser(const ezUInt32 *spirv_data, size_t word_count);
+	Parser(std::vector<ezUInt32> spirv);
 
 	void parse();
 
@@ -41,10 +41,10 @@ private:
 	SPIRBlock *current_block = nullptr;
 
 	void parse(const Instruction &instr);
-	const uint32_t *stream(const Instruction &instr) const;
+	const ezUInt32 *stream(const Instruction &instr) const;
 
 	template <typename T, typename... P>
-	T &set(uint32_t id, P &&... args)
+	T &set(ezUInt32 id, P &&... args)
 	{
 		ir.add_typed_id(static_cast<Types>(T::type), id);
 		auto &var = variant_set<T>(ir.ids[id], std::forward<P>(args)...);
@@ -53,13 +53,13 @@ private:
 	}
 
 	template <typename T>
-	T &get(uint32_t id)
+	T &get(ezUInt32 id)
 	{
 		return variant_get<T>(ir.ids[id]);
 	}
 
 	template <typename T>
-	T *maybe_get(uint32_t id)
+	T *maybe_get(ezUInt32 id)
 	{
 		if (ir.ids[id].get_type() == static_cast<Types>(T::type))
 			return &get<T>(id);
@@ -68,13 +68,13 @@ private:
 	}
 
 	template <typename T>
-	const T &get(uint32_t id) const
+	const T &get(ezUInt32 id) const
 	{
 		return variant_get<T>(ir.ids[id]);
 	}
 
 	template <typename T>
-	const T *maybe_get(uint32_t id) const
+	const T *maybe_get(ezUInt32 id) const
 	{
 		if (ir.ids[id].get_type() == T::type)
 			return &get<T>(id);
@@ -83,8 +83,8 @@ private:
 	}
 
 	// This must be an ordered data structure so we always pick the same type aliases.
-	SmallVector<uint32_t> global_struct_cache;
-	SmallVector<std::pair<uint32_t, uint32_t>> forward_pointer_fixups;
+	SmallVector<ezUInt32> global_struct_cache;
+	SmallVector<std::pair<ezUInt32, ezUInt32>> forward_pointer_fixups;
 
 	bool types_are_logically_equivalent(const SPIRType &a, const SPIRType &b) const;
 	bool variable_storage_is_aliased(const SPIRVariable &v) const;

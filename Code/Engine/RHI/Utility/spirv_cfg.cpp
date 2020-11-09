@@ -31,7 +31,7 @@ CFG::CFG(Compiler &compiler_, const SPIRFunction &func_)
 	build_immediate_dominators();
 }
 
-uint32_t CFG::find_common_dominator(uint32_t a, uint32_t b) const
+ezUInt32 CFG::find_common_dominator(ezUInt32 a, ezUInt32 b) const
 {
 	while (a != b)
 	{
@@ -51,7 +51,7 @@ void CFG::build_immediate_dominators()
 
 	for (auto i = post_order.size(); i; i--)
 	{
-		uint32_t block = post_order[i - 1];
+		ezUInt32 block = post_order[i - 1];
 		auto &pred = preceding_edges[block];
 		if (pred.empty()) // This is for the entry block, but we've already set up the dominators.
 			continue;
@@ -69,7 +69,7 @@ void CFG::build_immediate_dominators()
 	}
 }
 
-bool CFG::is_back_edge(uint32_t to) const
+bool CFG::is_back_edge(ezUInt32 to) const
 {
 	// We have a back edge if the visit order is set with the temporary magic value 0.
 	// Crossing edges will have already been recorded with a visit order.
@@ -77,14 +77,14 @@ bool CFG::is_back_edge(uint32_t to) const
 	return itr != end(visit_order) && itr->second.get() == 0;
 }
 
-bool CFG::has_visited_forward_edge(uint32_t to) const
+bool CFG::has_visited_forward_edge(ezUInt32 to) const
 {
 	// If > 0, we have visited the edge already, and this is not a back edge branch.
 	auto itr = visit_order.find(to);
 	return itr != end(visit_order) && itr->second.get() > 0;
 }
 
-bool CFG::post_order_visit(uint32_t block_id)
+bool CFG::post_order_visit(ezUInt32 block_id)
 {
 	// If we have already branched to this block (back edge), stop recursion.
 	// If our branches are back-edges, we do not record them.
@@ -200,16 +200,16 @@ bool CFG::post_order_visit(uint32_t block_id)
 
 void CFG::build_post_order_visit_order()
 {
-	uint32_t block = func.entry_block;
+	ezUInt32 block = func.entry_block;
 	visit_count = 0;
 	visit_order.clear();
 	post_order.clear();
 	post_order_visit(block);
 }
 
-void CFG::add_branch(uint32_t from, uint32_t to)
+void CFG::add_branch(ezUInt32 from, ezUInt32 to)
 {
-	const auto add_unique = [](SmallVector<uint32_t> &l, uint32_t value) {
+	const auto add_unique = [](SmallVector<ezUInt32> &l, ezUInt32 value) {
 		auto itr = find(begin(l), end(l), value);
 		if (itr == end(l))
 			l.push_back(value);
@@ -218,7 +218,7 @@ void CFG::add_branch(uint32_t from, uint32_t to)
 	add_unique(succeeding_edges[from], to);
 }
 
-uint32_t CFG::find_loop_dominator(uint32_t block_id) const
+ezUInt32 CFG::find_loop_dominator(ezUInt32 block_id) const
 {
 	while (block_id != SPIRBlock::NoDominator)
 	{
@@ -228,7 +228,7 @@ uint32_t CFG::find_loop_dominator(uint32_t block_id) const
 		if (itr->second.empty())
 			return SPIRBlock::NoDominator;
 
-		uint32_t pred_block_id = SPIRBlock::NoDominator;
+		ezUInt32 pred_block_id = SPIRBlock::NoDominator;
 		bool ignore_loop_header = false;
 
 		// If we are a merge block, go directly to the header block.
@@ -289,7 +289,7 @@ bool CFG::node_terminates_control_flow_in_sub_graph(BlockID from, BlockID to) co
 		for (auto &edge : pred_itr->second)
 			builder.add_block(edge);
 
-		uint32_t dominator = builder.get_dominator();
+		ezUInt32 dominator = builder.get_dominator();
 		if (dominator == 0)
 			return false;
 
@@ -328,7 +328,7 @@ DominatorBuilder::DominatorBuilder(const CFG &cfg_)
 {
 }
 
-void DominatorBuilder::add_block(uint32_t block)
+void DominatorBuilder::add_block(ezUInt32 block)
 {
 	if (!cfg.get_immediate_dominator(block))
 	{

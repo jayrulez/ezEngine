@@ -22,7 +22,7 @@ using namespace SPIRV_CROSS_NAMESPACE;
 
 namespace spirv_cross_util
 {
-void rename_interface_variable(Compiler &compiler, const SmallVector<Resource> &resources, uint32_t location,
+void rename_interface_variable(Compiler &compiler, const SmallVector<Resource> &resources, ezUInt32 location,
                                const std::string &name)
 {
 	for (auto &v : resources)
@@ -41,7 +41,7 @@ void rename_interface_variable(Compiler &compiler, const SmallVector<Resource> &
 		if (type.basetype == SPIRType::Struct)
 		{
 			compiler.set_name(v.base_type_id, join("SPIRV_Cross_Interface_Location", location));
-			for (uint32_t i = 0; i < uint32_t(type.member_types.size()); i++)
+			for (ezUInt32 i = 0; i < ezUInt32(type.member_types.size()); i++)
 				compiler.set_member_name(v.base_type_id, i, join("InterfaceMember", i));
 		}
 
@@ -56,13 +56,13 @@ void inherit_combined_sampler_bindings(Compiler &compiler)
 	{
 		if (compiler.has_decoration(s.image_id, spv::DecorationDescriptorSet))
 		{
-			uint32_t set = compiler.get_decoration(s.image_id, spv::DecorationDescriptorSet);
+			ezUInt32 set = compiler.get_decoration(s.image_id, spv::DecorationDescriptorSet);
 			compiler.set_decoration(s.combined_id, spv::DecorationDescriptorSet, set);
 		}
 
 		if (compiler.has_decoration(s.image_id, spv::DecorationBinding))
 		{
-			uint32_t binding = compiler.get_decoration(s.image_id, spv::DecorationBinding);
+			ezUInt32 binding = compiler.get_decoration(s.image_id, spv::DecorationBinding);
 			compiler.set_decoration(s.combined_id, spv::DecorationBinding, binding);
 		}
 	}

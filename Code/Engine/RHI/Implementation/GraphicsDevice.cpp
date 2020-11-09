@@ -41,7 +41,7 @@ bool GraphicsDevice::CheckCapability(GRAPHICSDEVICE_CAPABILITY capability) const
   return false;
 }
 
-uint32_t GraphicsDevice::GetFormatStride(FORMAT value) const
+ezUInt32 GraphicsDevice::GetFormatStride(FORMAT value) const
 {
   switch (value)
   {

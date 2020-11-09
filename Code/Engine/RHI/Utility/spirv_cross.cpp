@@ -27,14 +27,14 @@ using namespace std;
 using namespace spv;
 using namespace SPIRV_CROSS_NAMESPACE;
 
-Compiler::Compiler(vector<uint32_t> ir_)
+Compiler::Compiler(vector<ezUInt32> ir_)
 {
 	Parser parser(move(ir_));
 	parser.parse();
 	set_ir(move(parser.get_parsed_ir()));
 }
 
-Compiler::Compiler(const uint32_t *ir_, size_t word_count)
+Compiler::Compiler(const ezUInt32 *ir_, size_t word_count)
 {
 	Parser parser(ir_, word_count);
 	parser.parse();
@@ -101,7 +101,7 @@ bool Compiler::block_is_pure(const SPIRBlock &block)
 		{
 		case OpFunctionCall:
 		{
-			uint32_t func = ops[2];
+			ezUInt32 func = ops[2];
 			if (!function_is_pure(get<SPIRFunction>(func)))
 				return false;
 			break;
@@ -172,7 +172,7 @@ bool Compiler::block_is_pure(const SPIRBlock &block)
 	return true;
 }
 
-string Compiler::to_name(uint32_t id, bool allow_alias) const
+string Compiler::to_name(ezUInt32 id, bool allow_alias) const
 {
 	if (allow_alias && ir.ids[id].get_type() == TypeType)
 	{
@@ -212,7 +212,7 @@ bool Compiler::function_is_pure(const SPIRFunction &func)
 	return true;
 }
 
-void Compiler::register_global_read_dependencies(const SPIRBlock &block, uint32_t id)
+void Compiler::register_global_read_dependencies(const SPIRBlock &block, ezUInt32 id)
 {
 	for (auto &i : block.ops)
 	{
@@ -223,7 +223,7 @@ void Compiler::register_global_read_dependencies(const SPIRBlock &block, uint32_
 		{
 		case OpFunctionCall:
 		{
-			uint32_t func = ops[2];
+			ezUInt32 func = ops[2];
 			register_global_read_dependencies(get<SPIRFunction>(func), id);
 			break;
 		}
@@ -250,13 +250,13 @@ void Compiler::register_global_read_dependencies(const SPIRBlock &block, uint32_
 	}
 }
 
-void Compiler::register_global_read_dependencies(const SPIRFunction &func, uint32_t id)
+void Compiler::register_global_read_dependencies(const SPIRFunction &func, ezUInt32 id)
 {
 	for (auto block : func.blocks)
 		register_global_read_dependencies(get<SPIRBlock>(block), id);
 }
 
-SPIRVariable *Compiler::maybe_get_backing_variable(uint32_t chain)
+SPIRVariable *Compiler::maybe_get_backing_variable(ezUInt32 chain)
 {
 	auto *var = maybe_get<SPIRVariable>(chain);
 	if (!var)
@@ -273,7 +273,7 @@ SPIRVariable *Compiler::maybe_get_backing_variable(uint32_t chain)
 	return var;
 }
 
-StorageClass Compiler::get_expression_effective_storage_class(uint32_t ptr)
+StorageClass Compiler::get_expression_effective_storage_class(ezUInt32 ptr)
 {
 	auto *var = maybe_get_backing_variable(ptr);
 
@@ -298,7 +298,7 @@ StorageClass Compiler::get_expression_effective_storage_class(uint32_t ptr)
 		return expression_type(ptr).storage;
 }
 
-void Compiler::register_read(uint32_t expr, uint32_t chain, bool forwarded)
+void Compiler::register_read(ezUInt32 expr, ezUInt32 chain, bool forwarded)
 {
 	auto &e = get<SPIRExpression>(expr);
 	auto *var = maybe_get_backing_variable(chain);
@@ -318,7 +318,7 @@ void Compiler::register_read(uint32_t expr, uint32_t chain, bool forwarded)
 	}
 }
 
-void Compiler::register_write(uint32_t chain)
+void Compiler::register_write(ezUInt32 chain)
 {
 	auto *var = maybe_get<SPIRVariable>(chain);
 	if (!var)
@@ -411,7 +411,7 @@ void Compiler::flush_all_atomic_capable_variables()
 	flush_all_aliased_variables();
 }
 
-void Compiler::flush_control_dependent_expressions(uint32_t block_id)
+void Compiler::flush_control_dependent_expressions(ezUInt32 block_id)
 {
 	auto &block = get<SPIRBlock>(block_id);
 	for (auto &expr : block.invalidate_expressions)
@@ -433,7 +433,7 @@ void Compiler::flush_all_active_variables()
 	flush_all_aliased_variables();
 }
 
-uint32_t Compiler::expression_type_id(uint32_t id) const
+ezUInt32 Compiler::expression_type_id(ezUInt32 id) const
 {
 	switch (ir.ids[id].get_type())
 	{
@@ -463,12 +463,12 @@ uint32_t Compiler::expression_type_id(uint32_t id) const
 	}
 }
 
-const SPIRType &Compiler::expression_type(uint32_t id) const
+const SPIRType &Compiler::expression_type(ezUInt32 id) const
 {
 	return get<SPIRType>(expression_type_id(id));
 }
 
-bool Compiler::expression_is_lvalue(uint32_t id) const
+bool Compiler::expression_is_lvalue(ezUInt32 id) const
 {
 	auto &type = expression_type(id);
 	switch (type.basetype)
@@ -483,7 +483,7 @@ bool Compiler::expression_is_lvalue(uint32_t id) const
 	}
 }
 
-bool Compiler::is_immutable(uint32_t id) const
+bool Compiler::is_immutable(ezUInt32 id) const
 {
 	if (ir.ids[id].get_type() == TypeVariable)
 	{
@@ -564,7 +564,7 @@ bool Compiler::is_builtin_variable(const SPIRVariable &var) const
 		return is_builtin_type(get<SPIRType>(var.basetype));
 }
 
-bool Compiler::is_member_builtin(const SPIRType &type, uint32_t index, BuiltIn *builtin) const
+bool Compiler::is_member_builtin(const SPIRType &type, ezUInt32 index, BuiltIn *builtin) const
 {
 	auto *type_meta = ir.find_meta(type.self);
 
@@ -612,9 +612,9 @@ ShaderResources Compiler::get_shader_resources(const unordered_set<VariableID> &
 	return get_shader_resources(&active_variables);
 }
 
-bool Compiler::InterfaceVariableAccessHandler::handle(Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::InterfaceVariableAccessHandler::handle(Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
-	uint32_t variable = 0;
+	ezUInt32 variable = 0;
 	switch (opcode)
 	{
 	// Need this first, otherwise, GCC complains about unhandled switch statements.
@@ -627,9 +627,9 @@ bool Compiler::InterfaceVariableAccessHandler::handle(Op opcode, const uint32_t 
 		if (length < 3)
 			return false;
 
-		uint32_t count = length - 3;
+		ezUInt32 count = length - 3;
 		args += 3;
-		for (uint32_t i = 0; i < count; i++)
+		for (ezUInt32 i = 0; i < count; i++)
 		{
 			auto *var = compiler.maybe_get<SPIRVariable>(args[i]);
 			if (var && storage_class_is_interface(var->storage))
@@ -644,9 +644,9 @@ bool Compiler::InterfaceVariableAccessHandler::handle(Op opcode, const uint32_t 
 		if (length < 5)
 			return false;
 
-		uint32_t count = length - 3;
+		ezUInt32 count = length - 3;
 		args += 3;
-		for (uint32_t i = 0; i < count; i++)
+		for (ezUInt32 i = 0; i < count; i++)
 		{
 			auto *var = compiler.maybe_get<SPIRVariable>(args[i]);
 			if (var && storage_class_is_interface(var->storage))
@@ -661,9 +661,9 @@ bool Compiler::InterfaceVariableAccessHandler::handle(Op opcode, const uint32_t 
 		if (length < 2)
 			return false;
 
-		uint32_t count = length - 2;
+		ezUInt32 count = length - 2;
 		args += 2;
-		for (uint32_t i = 0; i < count; i += 2)
+		for (ezUInt32 i = 0; i < count; i += 2)
 		{
 			auto *var = compiler.maybe_get<SPIRVariable>(args[i]);
 			if (var && storage_class_is_interface(var->storage))
@@ -699,7 +699,7 @@ bool Compiler::InterfaceVariableAccessHandler::handle(Op opcode, const uint32_t 
 	{
 		if (length < 5)
 			return false;
-		uint32_t extension_set = args[2];
+		ezUInt32 extension_set = args[2];
 		if (compiler.get<SPIRExtension>(extension_set).ext == SPIRExtension::SPV_AMD_shader_explicit_vertex_parameter)
 		{
 			enum AMDShaderExplicitVertexParameter
@@ -772,7 +772,7 @@ unordered_set<VariableID> Compiler::get_active_interface_variables() const
 	traverse_all_reachable_opcodes(get<SPIRFunction>(ir.default_entry_point), handler);
 
 	// Make sure we preserve output variables which are only initialized, but never accessed by any code.
-	ir.for_each_typed_id<SPIRVariable>([&](uint32_t, const SPIRVariable &var) {
+	ir.for_each_typed_id<SPIRVariable>([&](ezUInt32, const SPIRVariable &var) {
 		if (var.storage == StorageClassOutput && var.initializer != ID(0))
 			variables.insert(var.self);
 	});
@@ -796,7 +796,7 @@ ShaderResources Compiler::get_shader_resources(const unordered_set<VariableID> *
 
 	bool ssbo_instance_name = reflection_ssbo_instance_name_is_significant();
 
-	ir.for_each_typed_id<SPIRVariable>([&](uint32_t, const SPIRVariable &var) {
+	ir.for_each_typed_id<SPIRVariable>([&](ezUInt32, const SPIRVariable &var) {
 		auto &type = this->get<SPIRType>(var.basetype);
 
 		// It is possible for uniform storage classes to be passed as function parameters, so detect
@@ -907,7 +907,7 @@ bool Compiler::type_is_block_like(const SPIRType &type) const
 	}
 
 	// Block-like types may have Offset decorations.
-	for (uint32_t i = 0; i < uint32_t(type.member_types.size()); i++)
+	for (ezUInt32 i = 0; i < ezUInt32(type.member_types.size()); i++)
 		if (has_member_decoration(type.self, i, DecorationOffset))
 			return true;
 
@@ -974,7 +974,7 @@ void Compiler::update_name_cache(unordered_set<string> &cache_primary, const uno
 		return;
 	}
 
-	uint32_t counter = 0;
+	ezUInt32 counter = 0;
 	auto tmpname = name;
 
 	bool use_linked_underscore = true;
@@ -1022,7 +1022,7 @@ const SPIRType &Compiler::get_type_from_variable(VariableID id) const
 	return get<SPIRType>(get<SPIRVariable>(id).basetype);
 }
 
-uint32_t Compiler::get_pointee_type_id(uint32_t type_id) const
+ezUInt32 Compiler::get_pointee_type_id(ezUInt32 type_id) const
 {
 	auto *p_type = &get<SPIRType>(type_id);
 	if (p_type->pointer)
@@ -1044,12 +1044,12 @@ const SPIRType &Compiler::get_pointee_type(const SPIRType &type) const
 	return *p_type;
 }
 
-const SPIRType &Compiler::get_pointee_type(uint32_t type_id) const
+const SPIRType &Compiler::get_pointee_type(ezUInt32 type_id) const
 {
 	return get_pointee_type(get<SPIRType>(type_id));
 }
 
-uint32_t Compiler::get_variable_data_type_id(const SPIRVariable &var) const
+ezUInt32 Compiler::get_variable_data_type_id(const SPIRVariable &var) const
 {
 	if (var.phi_variable)
 		return var.basetype;
@@ -1088,39 +1088,39 @@ bool Compiler::is_sampled_image_type(const SPIRType &type)
 	       type.image.dim != DimBuffer;
 }
 
-void Compiler::set_member_decoration_string(TypeID id, uint32_t index, spv::Decoration decoration,
+void Compiler::set_member_decoration_string(TypeID id, ezUInt32 index, spv::Decoration decoration,
                                             const std::string &argument)
 {
 	ir.set_member_decoration_string(id, index, decoration, argument);
 }
 
-void Compiler::set_member_decoration(TypeID id, uint32_t index, Decoration decoration, uint32_t argument)
+void Compiler::set_member_decoration(TypeID id, ezUInt32 index, Decoration decoration, ezUInt32 argument)
 {
 	ir.set_member_decoration(id, index, decoration, argument);
 }
 
-void Compiler::set_member_name(TypeID id, uint32_t index, const std::string &name)
+void Compiler::set_member_name(TypeID id, ezUInt32 index, const std::string &name)
 {
 	ir.set_member_name(id, index, name);
 }
 
-const std::string &Compiler::get_member_name(TypeID id, uint32_t index) const
+const std::string &Compiler::get_member_name(TypeID id, ezUInt32 index) const
 {
 	return ir.get_member_name(id, index);
 }
 
-void Compiler::set_qualified_name(uint32_t id, const string &name)
+void Compiler::set_qualified_name(ezUInt32 id, const string &name)
 {
 	ir.meta[id].decoration.qualified_alias = name;
 }
 
-void Compiler::set_member_qualified_name(uint32_t type_id, uint32_t index, const std::string &name)
+void Compiler::set_member_qualified_name(ezUInt32 type_id, ezUInt32 index, const std::string &name)
 {
 	ir.meta[type_id].members.resize(max(ir.meta[type_id].members.size(), size_t(index) + 1));
 	ir.meta[type_id].members[index].qualified_alias = name;
 }
 
-const string &Compiler::get_member_qualified_name(TypeID type_id, uint32_t index) const
+const string &Compiler::get_member_qualified_name(TypeID type_id, ezUInt32 index) const
 {
 	auto *m = ir.find_meta(type_id);
 	if (m && index < m->members.size())
@@ -1129,22 +1129,22 @@ const string &Compiler::get_member_qualified_name(TypeID type_id, uint32_t index
 		return ir.get_empty_string();
 }
 
-uint32_t Compiler::get_member_decoration(TypeID id, uint32_t index, Decoration decoration) const
+ezUInt32 Compiler::get_member_decoration(TypeID id, ezUInt32 index, Decoration decoration) const
 {
 	return ir.get_member_decoration(id, index, decoration);
 }
 
-const Bitset &Compiler::get_member_decoration_bitset(TypeID id, uint32_t index) const
+const Bitset &Compiler::get_member_decoration_bitset(TypeID id, ezUInt32 index) const
 {
 	return ir.get_member_decoration_bitset(id, index);
 }
 
-bool Compiler::has_member_decoration(TypeID id, uint32_t index, Decoration decoration) const
+bool Compiler::has_member_decoration(TypeID id, ezUInt32 index, Decoration decoration) const
 {
 	return ir.has_member_decoration(id, index, decoration);
 }
 
-void Compiler::unset_member_decoration(TypeID id, uint32_t index, Decoration decoration)
+void Compiler::unset_member_decoration(TypeID id, ezUInt32 index, Decoration decoration)
 {
 	ir.unset_member_decoration(id, index, decoration);
 }
@@ -1154,20 +1154,20 @@ void Compiler::set_decoration_string(ID id, spv::Decoration decoration, const st
 	ir.set_decoration_string(id, decoration, argument);
 }
 
-void Compiler::set_decoration(ID id, Decoration decoration, uint32_t argument)
+void Compiler::set_decoration(ID id, Decoration decoration, ezUInt32 argument)
 {
 	ir.set_decoration(id, decoration, argument);
 }
 
-void Compiler::set_extended_decoration(uint32_t id, ExtendedDecorations decoration, uint32_t value)
+void Compiler::set_extended_decoration(ezUInt32 id, ExtendedDecorations decoration, ezUInt32 value)
 {
 	auto &dec = ir.meta[id].decoration;
 	dec.extended.flags.set(decoration);
 	dec.extended.values[decoration] = value;
 }
 
-void Compiler::set_extended_member_decoration(uint32_t type, uint32_t index, ExtendedDecorations decoration,
-                                              uint32_t value)
+void Compiler::set_extended_member_decoration(ezUInt32 type, ezUInt32 index, ExtendedDecorations decoration,
+                                              ezUInt32 value)
 {
 	ir.meta[type].members.resize(max(ir.meta[type].members.size(), size_t(index) + 1));
 	auto &dec = ir.meta[type].members[index];
@@ -1175,7 +1175,7 @@ void Compiler::set_extended_member_decoration(uint32_t type, uint32_t index, Ext
 	dec.extended.values[decoration] = value;
 }
 
-static uint32_t get_default_extended_decoration(ExtendedDecorations decoration)
+static ezUInt32 get_default_extended_decoration(ExtendedDecorations decoration)
 {
 	switch (decoration)
 	{
@@ -1191,7 +1191,7 @@ static uint32_t get_default_extended_decoration(ExtendedDecorations decoration)
 	}
 }
 
-uint32_t Compiler::get_extended_decoration(uint32_t id, ExtendedDecorations decoration) const
+ezUInt32 Compiler::get_extended_decoration(ezUInt32 id, ExtendedDecorations decoration) const
 {
 	auto *m = ir.find_meta(id);
 	if (!m)
@@ -1205,7 +1205,7 @@ uint32_t Compiler::get_extended_decoration(uint32_t id, ExtendedDecorations deco
 	return dec.extended.values[decoration];
 }
 
-uint32_t Compiler::get_extended_member_decoration(uint32_t type, uint32_t index, ExtendedDecorations decoration) const
+ezUInt32 Compiler::get_extended_member_decoration(ezUInt32 type, ezUInt32 index, ExtendedDecorations decoration) const
 {
 	auto *m = ir.find_meta(type);
 	if (!m)
@@ -1220,7 +1220,7 @@ uint32_t Compiler::get_extended_member_decoration(uint32_t type, uint32_t index,
 	return dec.extended.values[decoration];
 }
 
-bool Compiler::has_extended_decoration(uint32_t id, ExtendedDecorations decoration) const
+bool Compiler::has_extended_decoration(ezUInt32 id, ExtendedDecorations decoration) const
 {
 	auto *m = ir.find_meta(id);
 	if (!m)
@@ -1230,7 +1230,7 @@ bool Compiler::has_extended_decoration(uint32_t id, ExtendedDecorations decorati
 	return dec.extended.flags.get(decoration);
 }
 
-bool Compiler::has_extended_member_decoration(uint32_t type, uint32_t index, ExtendedDecorations decoration) const
+bool Compiler::has_extended_member_decoration(ezUInt32 type, ezUInt32 index, ExtendedDecorations decoration) const
 {
 	auto *m = ir.find_meta(type);
 	if (!m)
@@ -1243,14 +1243,14 @@ bool Compiler::has_extended_member_decoration(uint32_t type, uint32_t index, Ext
 	return dec.extended.flags.get(decoration);
 }
 
-void Compiler::unset_extended_decoration(uint32_t id, ExtendedDecorations decoration)
+void Compiler::unset_extended_decoration(ezUInt32 id, ExtendedDecorations decoration)
 {
 	auto &dec = ir.meta[id].decoration;
 	dec.extended.flags.clear(decoration);
 	dec.extended.values[decoration] = 0;
 }
 
-void Compiler::unset_extended_member_decoration(uint32_t type, uint32_t index, ExtendedDecorations decoration)
+void Compiler::unset_extended_member_decoration(ezUInt32 type, ezUInt32 index, ExtendedDecorations decoration)
 {
 	ir.meta[type].members.resize(max(ir.meta[type].members.size(), size_t(index) + 1));
 	auto &dec = ir.meta[type].members[index];
@@ -1297,12 +1297,12 @@ const string &Compiler::get_decoration_string(ID id, Decoration decoration) cons
 	return ir.get_decoration_string(id, decoration);
 }
 
-const string &Compiler::get_member_decoration_string(TypeID id, uint32_t index, Decoration decoration) const
+const string &Compiler::get_member_decoration_string(TypeID id, ezUInt32 index, Decoration decoration) const
 {
 	return ir.get_member_decoration_string(id, index, decoration);
 }
 
-uint32_t Compiler::get_decoration(ID id, Decoration decoration) const
+ezUInt32 Compiler::get_decoration(ID id, Decoration decoration) const
 {
 	return ir.get_decoration(id, decoration);
 }
@@ -1312,7 +1312,7 @@ void Compiler::unset_decoration(ID id, Decoration decoration)
 	ir.unset_decoration(id, decoration);
 }
 
-bool Compiler::get_binary_offset_for_decoration(VariableID id, spv::Decoration decoration, uint32_t &word_offset) const
+bool Compiler::get_binary_offset_for_decoration(VariableID id, spv::Decoration decoration, ezUInt32 &word_offset) const
 {
 	auto *m = ir.find_meta(id);
 	if (!m)
@@ -1578,7 +1578,7 @@ bool Compiler::traverse_all_reachable_opcodes(const SPIRFunction &func, OpcodeHa
 	return true;
 }
 
-uint32_t Compiler::type_struct_member_offset(const SPIRType &type, uint32_t index) const
+ezUInt32 Compiler::type_struct_member_offset(const SPIRType &type, ezUInt32 index) const
 {
 	auto *type_meta = ir.find_meta(type.self);
 	if (type_meta)
@@ -1594,7 +1594,7 @@ uint32_t Compiler::type_struct_member_offset(const SPIRType &type, uint32_t inde
 		SPIRV_CROSS_THROW("Struct member does not have Offset set.");
 }
 
-uint32_t Compiler::type_struct_member_array_stride(const SPIRType &type, uint32_t index) const
+ezUInt32 Compiler::type_struct_member_array_stride(const SPIRType &type, ezUInt32 index) const
 {
 	auto *type_meta = ir.find_meta(type.member_types[index]);
 	if (type_meta)
@@ -1611,7 +1611,7 @@ uint32_t Compiler::type_struct_member_array_stride(const SPIRType &type, uint32_
 		SPIRV_CROSS_THROW("Struct member does not have ArrayStride set.");
 }
 
-uint32_t Compiler::type_struct_member_matrix_stride(const SPIRType &type, uint32_t index) const
+ezUInt32 Compiler::type_struct_member_matrix_stride(const SPIRType &type, ezUInt32 index) const
 {
 	auto *type_meta = ir.find_meta(type.self);
 	if (type_meta)
@@ -1633,7 +1633,7 @@ size_t Compiler::get_declared_struct_size(const SPIRType &type) const
 	if (type.member_types.empty())
 		SPIRV_CROSS_THROW("Declared struct in block cannot be empty.");
 
-	uint32_t last = uint32_t(type.member_types.size() - 1);
+	ezUInt32 last = ezUInt32(type.member_types.size() - 1);
 	size_t offset = type_struct_member_offset(type, last);
 	size_t size = get_declared_struct_member_size(type, last);
 	return offset + size;
@@ -1647,12 +1647,12 @@ size_t Compiler::get_declared_struct_size_runtime_array(const SPIRType &type, si
 	size_t size = get_declared_struct_size(type);
 	auto &last_type = get<SPIRType>(type.member_types.back());
 	if (!last_type.array.empty() && last_type.array_size_literal[0] && last_type.array[0] == 0) // Runtime array
-		size += array_size * type_struct_member_array_stride(type, uint32_t(type.member_types.size() - 1));
+		size += array_size * type_struct_member_array_stride(type, ezUInt32(type.member_types.size() - 1));
 
 	return size;
 }
 
-size_t Compiler::get_declared_struct_member_size(const SPIRType &struct_type, uint32_t index) const
+size_t Compiler::get_declared_struct_member_size(const SPIRType &struct_type, ezUInt32 index) const
 {
 	if (struct_type.member_types.empty())
 		SPIRV_CROSS_THROW("Declared struct in block cannot be empty.");
@@ -1686,7 +1686,7 @@ size_t Compiler::get_declared_struct_member_size(const SPIRType &struct_type, ui
 	{
 		// For arrays, we can use ArrayStride to get an easy check.
 		bool array_size_literal = type.array_size_literal.back();
-		uint32_t array_size = array_size_literal ? type.array.back() : get<SPIRConstant>(type.array.back()).scalar();
+		ezUInt32 array_size = array_size_literal ? type.array.back() : get<SPIRConstant>(type.array.back()).scalar();
 		return type_struct_member_array_stride(struct_type, index) * array_size;
 	}
 	else if (type.basetype == SPIRType::Struct)
@@ -1706,7 +1706,7 @@ size_t Compiler::get_declared_struct_member_size(const SPIRType &struct_type, ui
 		}
 		else
 		{
-			uint32_t matrix_stride = type_struct_member_matrix_stride(struct_type, index);
+			ezUInt32 matrix_stride = type_struct_member_matrix_stride(struct_type, index);
 
 			// Per SPIR-V spec, matrices must be tightly packed and aligned up for vec3 accesses.
 			if (flags.get(DecorationRowMajor))
@@ -1719,7 +1719,7 @@ size_t Compiler::get_declared_struct_member_size(const SPIRType &struct_type, ui
 	}
 }
 
-bool Compiler::BufferAccessHandler::handle(Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::BufferAccessHandler::handle(Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
 	if (opcode != OpAccessChain && opcode != OpInBoundsAccessChain && opcode != OpPtrAccessChain)
 		return true;
@@ -1735,7 +1735,7 @@ bool Compiler::BufferAccessHandler::handle(Op opcode, const uint32_t *args, uint
 
 	// Don't bother traversing the entire access chain tree yet.
 	// If we access a struct member, assume we access the entire member.
-	uint32_t index = compiler.get<SPIRConstant>(args[ptr_chain ? 4 : 3]).scalar();
+	ezUInt32 index = compiler.get<SPIRConstant>(args[ptr_chain ? 4 : 3]).scalar();
 
 	// Seen this index already.
 	if (seen.find(index) != end(seen))
@@ -1743,7 +1743,7 @@ bool Compiler::BufferAccessHandler::handle(Op opcode, const uint32_t *args, uint
 	seen.insert(index);
 
 	auto &type = compiler.expression_type(id);
-	uint32_t offset = compiler.type_struct_member_offset(type, index);
+	ezUInt32 offset = compiler.type_struct_member_offset(type, index);
 
 	size_t range;
 	// If we have another member in the struct, deduce the range by looking at the next member.
@@ -1787,7 +1787,7 @@ bool Compiler::types_are_logically_equivalent(const SPIRType &a, const SPIRType 
 		return false;
 
 	size_t array_count = a.array.size();
-	if (array_count && memcmp(a.array.data(), b.array.data(), array_count * sizeof(uint32_t)) != 0)
+	if (array_count && memcmp(a.array.data(), b.array.data(), array_count * sizeof(ezUInt32)) != 0)
 		return false;
 
 	if (a.basetype == SPIRType::Image || a.basetype == SPIRType::SampledImage)
@@ -1814,7 +1814,7 @@ const Bitset &Compiler::get_execution_mode_bitset() const
 	return get_entry_point().flags;
 }
 
-void Compiler::set_execution_mode(ExecutionMode mode, uint32_t arg0, uint32_t arg1, uint32_t arg2)
+void Compiler::set_execution_mode(ExecutionMode mode, ezUInt32 arg0, ezUInt32 arg1, ezUInt32 arg2)
 {
 	auto &execution = get_entry_point();
 
@@ -1846,7 +1846,7 @@ void Compiler::unset_execution_mode(ExecutionMode mode)
 	execution.flags.clear(mode);
 }
 
-uint32_t Compiler::get_work_group_size_specialization_constants(SpecializationConstant &x, SpecializationConstant &y,
+ezUInt32 Compiler::get_work_group_size_specialization_constants(SpecializationConstant &x, SpecializationConstant &y,
                                                                 SpecializationConstant &z) const
 {
 	auto &execution = get_entry_point();
@@ -1880,7 +1880,7 @@ uint32_t Compiler::get_work_group_size_specialization_constants(SpecializationCo
 	return execution.workgroup_size.constant;
 }
 
-uint32_t Compiler::get_execution_mode_argument(spv::ExecutionMode mode, uint32_t index) const
+ezUInt32 Compiler::get_execution_mode_argument(spv::ExecutionMode mode, ezUInt32 index) const
 {
 	auto &execution = get_entry_point();
 	switch (mode)
@@ -1935,31 +1935,31 @@ bool Compiler::get_remapped_variable_state(VariableID id) const
 	return get<SPIRVariable>(id).remapped_variable;
 }
 
-void Compiler::set_subpass_input_remapped_components(VariableID id, uint32_t components)
+void Compiler::set_subpass_input_remapped_components(VariableID id, ezUInt32 components)
 {
 	get<SPIRVariable>(id).remapped_components = components;
 }
 
-uint32_t Compiler::get_subpass_input_remapped_components(VariableID id) const
+ezUInt32 Compiler::get_subpass_input_remapped_components(VariableID id) const
 {
 	return get<SPIRVariable>(id).remapped_components;
 }
 
-void Compiler::add_implied_read_expression(SPIRExpression &e, uint32_t source)
+void Compiler::add_implied_read_expression(SPIRExpression &e, ezUInt32 source)
 {
 	auto itr = find(begin(e.implied_read_expressions), end(e.implied_read_expressions), ID(source));
 	if (itr == end(e.implied_read_expressions))
 		e.implied_read_expressions.push_back(source);
 }
 
-void Compiler::add_implied_read_expression(SPIRAccessChain &e, uint32_t source)
+void Compiler::add_implied_read_expression(SPIRAccessChain &e, ezUInt32 source)
 {
 	auto itr = find(begin(e.implied_read_expressions), end(e.implied_read_expressions), ID(source));
 	if (itr == end(e.implied_read_expressions))
 		e.implied_read_expressions.push_back(source);
 }
 
-void Compiler::inherit_expression_dependencies(uint32_t dst, uint32_t source_expression)
+void Compiler::inherit_expression_dependencies(ezUInt32 dst, ezUInt32 source_expression)
 {
 	// Don't inherit any expression dependencies if the expression in dst
 	// is not a forwarded temporary.
@@ -2019,7 +2019,7 @@ SPIREntryPoint &Compiler::get_first_entry_point(const std::string &name)
 {
 	auto itr = find_if(
 	    begin(ir.entry_points), end(ir.entry_points),
-	    [&](const std::pair<uint32_t, SPIREntryPoint> &entry) -> bool { return entry.second.orig_name == name; });
+	    [&](const std::pair<ezUInt32, SPIREntryPoint> &entry) -> bool { return entry.second.orig_name == name; });
 
 	if (itr == end(ir.entry_points))
 		SPIRV_CROSS_THROW("Entry point does not exist.");
@@ -2031,7 +2031,7 @@ const SPIREntryPoint &Compiler::get_first_entry_point(const std::string &name) c
 {
 	auto itr = find_if(
 	    begin(ir.entry_points), end(ir.entry_points),
-	    [&](const std::pair<uint32_t, SPIREntryPoint> &entry) -> bool { return entry.second.orig_name == name; });
+	    [&](const std::pair<ezUInt32, SPIREntryPoint> &entry) -> bool { return entry.second.orig_name == name; });
 
 	if (itr == end(ir.entry_points))
 		SPIRV_CROSS_THROW("Entry point does not exist.");
@@ -2042,7 +2042,7 @@ const SPIREntryPoint &Compiler::get_first_entry_point(const std::string &name) c
 SPIREntryPoint &Compiler::get_entry_point(const std::string &name, ExecutionModel model)
 {
 	auto itr = find_if(begin(ir.entry_points), end(ir.entry_points),
-	                   [&](const std::pair<uint32_t, SPIREntryPoint> &entry) -> bool {
+	                   [&](const std::pair<ezUInt32, SPIREntryPoint> &entry) -> bool {
 		                   return entry.second.orig_name == name && entry.second.model == model;
 	                   });
 
@@ -2055,7 +2055,7 @@ SPIREntryPoint &Compiler::get_entry_point(const std::string &name, ExecutionMode
 const SPIREntryPoint &Compiler::get_entry_point(const std::string &name, ExecutionModel model) const
 {
 	auto itr = find_if(begin(ir.entry_points), end(ir.entry_points),
-	                   [&](const std::pair<uint32_t, SPIREntryPoint> &entry) -> bool {
+	                   [&](const std::pair<ezUInt32, SPIREntryPoint> &entry) -> bool {
 		                   return entry.second.orig_name == name && entry.second.model == model;
 	                   });
 
@@ -2080,7 +2080,7 @@ SPIREntryPoint &Compiler::get_entry_point()
 	return ir.entry_points.find(ir.default_entry_point)->second;
 }
 
-bool Compiler::interface_variable_exists_in_entry_point(uint32_t id) const
+bool Compiler::interface_variable_exists_in_entry_point(ezUInt32 id) const
 {
 	auto &var = get<SPIRVariable>(id);
 	if (var.storage != StorageClassInput && var.storage != StorageClassOutput &&
@@ -2099,13 +2099,13 @@ bool Compiler::interface_variable_exists_in_entry_point(uint32_t id) const
 	       end(execution.interface_variables);
 }
 
-void Compiler::CombinedImageSamplerHandler::push_remap_parameters(const SPIRFunction &func, const uint32_t *args,
-                                                                  uint32_t length)
+void Compiler::CombinedImageSamplerHandler::push_remap_parameters(const SPIRFunction &func, const ezUInt32 *args,
+                                                                  ezUInt32 length)
 {
 	// If possible, pipe through a remapping table so that parameters know
 	// which variables they actually bind to in this scope.
-	unordered_map<uint32_t, uint32_t> remapping;
-	for (uint32_t i = 0; i < length; i++)
+	unordered_map<ezUInt32, ezUInt32> remapping;
+	for (ezUInt32 i = 0; i < length; i++)
 		remapping[func.arguments[i].id] = remap_parameter(args[i]);
 	parameter_remapping.push(move(remapping));
 }
@@ -2115,7 +2115,7 @@ void Compiler::CombinedImageSamplerHandler::pop_remap_parameters()
 	parameter_remapping.pop();
 }
 
-uint32_t Compiler::CombinedImageSamplerHandler::remap_parameter(uint32_t id)
+ezUInt32 Compiler::CombinedImageSamplerHandler::remap_parameter(ezUInt32 id)
 {
 	auto *var = compiler.maybe_get_backing_variable(id);
 	if (var)
@@ -2132,7 +2132,7 @@ uint32_t Compiler::CombinedImageSamplerHandler::remap_parameter(uint32_t id)
 		return id;
 }
 
-bool Compiler::CombinedImageSamplerHandler::begin_function_scope(const uint32_t *args, uint32_t length)
+bool Compiler::CombinedImageSamplerHandler::begin_function_scope(const ezUInt32 *args, ezUInt32 length)
 {
 	if (length < 3)
 		return false;
@@ -2145,7 +2145,7 @@ bool Compiler::CombinedImageSamplerHandler::begin_function_scope(const uint32_t 
 	return true;
 }
 
-bool Compiler::CombinedImageSamplerHandler::end_function_scope(const uint32_t *args, uint32_t length)
+bool Compiler::CombinedImageSamplerHandler::end_function_scope(const ezUInt32 *args, ezUInt32 length)
 {
 	if (length < 3)
 		return false;
@@ -2212,13 +2212,13 @@ void Compiler::CombinedImageSamplerHandler::register_combined_image_sampler(SPIR
 	if (texture_itr != end(caller.arguments))
 	{
 		param.global_image = false;
-		param.image_id = uint32_t(texture_itr - begin(caller.arguments));
+		param.image_id = ezUInt32(texture_itr - begin(caller.arguments));
 	}
 
 	if (sampler_itr != end(caller.arguments))
 	{
 		param.global_sampler = false;
-		param.sampler_id = uint32_t(sampler_itr - begin(caller.arguments));
+		param.sampler_id = ezUInt32(sampler_itr - begin(caller.arguments));
 	}
 
 	if (param.global_image && param.global_sampler)
@@ -2232,7 +2232,7 @@ void Compiler::CombinedImageSamplerHandler::register_combined_image_sampler(SPIR
 
 	if (itr == end(caller.combined_parameters))
 	{
-		uint32_t id = compiler.ir.increase_bound_by(3);
+		ezUInt32 id = compiler.ir.increase_bound_by(3);
 		auto type_id = id + 0;
 		auto ptr_type_id = id + 1;
 		auto combined_id = id + 2;
@@ -2275,7 +2275,7 @@ void Compiler::CombinedImageSamplerHandler::register_combined_image_sampler(SPIR
 	}
 }
 
-bool Compiler::DummySamplerForCombinedImageHandler::handle(Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::DummySamplerForCombinedImageHandler::handle(Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
 	if (need_dummy_sampler)
 	{
@@ -2290,7 +2290,7 @@ bool Compiler::DummySamplerForCombinedImageHandler::handle(Op opcode, const uint
 		if (length < 3)
 			return false;
 
-		uint32_t result_type = args[0];
+		ezUInt32 result_type = args[0];
 
 		auto &type = compiler.get<SPIRType>(result_type);
 		bool separate_image =
@@ -2300,8 +2300,8 @@ bool Compiler::DummySamplerForCombinedImageHandler::handle(Op opcode, const uint
 		if (!separate_image)
 			return true;
 
-		uint32_t id = args[1];
-		uint32_t ptr = args[2];
+		ezUInt32 id = args[1];
+		ezUInt32 ptr = args[2];
 		compiler.set<SPIRExpression>(id, "", result_type, true);
 		compiler.register_read(id, ptr, true);
 		break;
@@ -2332,15 +2332,15 @@ bool Compiler::DummySamplerForCombinedImageHandler::handle(Op opcode, const uint
 		if (length < 3)
 			return false;
 
-		uint32_t result_type = args[0];
+		ezUInt32 result_type = args[0];
 		auto &type = compiler.get<SPIRType>(result_type);
 		bool separate_image =
 		    type.basetype == SPIRType::Image && type.image.sampled == 1 && type.image.dim != DimBuffer;
 		if (!separate_image)
 			return true;
 
-		uint32_t id = args[1];
-		uint32_t ptr = args[2];
+		ezUInt32 id = args[1];
+		ezUInt32 ptr = args[2];
 		compiler.set<SPIRExpression>(id, "", result_type, true);
 		compiler.register_read(id, ptr, true);
 
@@ -2356,7 +2356,7 @@ bool Compiler::DummySamplerForCombinedImageHandler::handle(Op opcode, const uint
 	return true;
 }
 
-bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
 	// We need to figure out where samplers and images are loaded from, so do only the bare bones compilation we need.
 	bool is_fetch = false;
@@ -2368,7 +2368,7 @@ bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *ar
 		if (length < 3)
 			return false;
 
-		uint32_t result_type = args[0];
+		ezUInt32 result_type = args[0];
 
 		auto &type = compiler.get<SPIRType>(result_type);
 		bool separate_image = type.basetype == SPIRType::Image && type.image.sampled == 1;
@@ -2378,8 +2378,8 @@ bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *ar
 		if (!separate_image && !separate_sampler)
 			return true;
 
-		uint32_t id = args[1];
-		uint32_t ptr = args[2];
+		ezUInt32 id = args[1];
+		ezUInt32 ptr = args[2];
 		compiler.set<SPIRExpression>(id, "", result_type, true);
 		compiler.register_read(id, ptr, true);
 		return true;
@@ -2398,7 +2398,7 @@ bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *ar
 		// but this seems ridiculously complicated for a problem which is easy to work around.
 		// Checking access chains like this assumes we don't have samplers or textures inside uniform structs, but this makes no sense.
 
-		uint32_t result_type = args[0];
+		ezUInt32 result_type = args[0];
 
 		auto &type = compiler.get<SPIRType>(result_type);
 		bool separate_image = type.basetype == SPIRType::Image && type.image.sampled == 1;
@@ -2410,8 +2410,8 @@ bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *ar
 
 		if (separate_image)
 		{
-			uint32_t id = args[1];
-			uint32_t ptr = args[2];
+			ezUInt32 id = args[1];
+			ezUInt32 ptr = args[2];
 			compiler.set<SPIRExpression>(id, "", result_type, true);
 			compiler.register_read(id, ptr, true);
 		}
@@ -2459,18 +2459,18 @@ bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *ar
 		auto &callee = *functions.top();
 		if (callee.do_combined_parameters)
 		{
-			uint32_t image_id = args[2];
+			ezUInt32 image_id = args[2];
 
 			auto *image = compiler.maybe_get_backing_variable(image_id);
 			if (image)
 				image_id = image->self;
 
-			uint32_t sampler_id = is_fetch ? compiler.dummy_sampler_id : args[3];
+			ezUInt32 sampler_id = is_fetch ? compiler.dummy_sampler_id : args[3];
 			auto *sampler = compiler.maybe_get_backing_variable(sampler_id);
 			if (sampler)
 				sampler_id = sampler->self;
 
-			uint32_t combined_id = args[1];
+			ezUInt32 combined_id = args[1];
 
 			auto &combined_type = compiler.get<SPIRType>(args[0]);
 			register_combined_image_sampler(callee, combined_id, image_id, sampler_id, combined_type.image.depth);
@@ -2491,8 +2491,8 @@ bool Compiler::CombinedImageSamplerHandler::handle(Op opcode, const uint32_t *ar
 
 	if (itr == end(compiler.combined_image_samplers))
 	{
-		uint32_t sampled_type;
-		uint32_t combined_module_id;
+		ezUInt32 sampled_type;
+		ezUInt32 combined_module_id;
 		if (is_fetch)
 		{
 			// Have to invent the sampled image type.
@@ -2557,7 +2557,7 @@ VariableID Compiler::build_dummy_sampler_for_combined_images()
 	traverse_all_reachable_opcodes(get<SPIRFunction>(ir.default_entry_point), handler);
 	if (handler.need_dummy_sampler)
 	{
-		uint32_t offset = ir.increase_bound_by(3);
+		ezUInt32 offset = ir.increase_bound_by(3);
 		auto type_id = offset + 0;
 		auto ptr_type_id = offset + 1;
 		auto var_id = offset + 2;
@@ -2584,7 +2584,7 @@ VariableID Compiler::build_dummy_sampler_for_combined_images()
 
 void Compiler::build_combined_image_samplers()
 {
-	ir.for_each_typed_id<SPIRFunction>([&](uint32_t, SPIRFunction &func) {
+	ir.for_each_typed_id<SPIRFunction>([&](ezUInt32, SPIRFunction &func) {
 		func.combined_parameters.clear();
 		func.shadow_arguments.clear();
 		func.do_combined_parameters = true;
@@ -2598,7 +2598,7 @@ void Compiler::build_combined_image_samplers()
 SmallVector<SpecializationConstant> Compiler::get_specialization_constants() const
 {
 	SmallVector<SpecializationConstant> spec_consts;
-	ir.for_each_typed_id<SPIRConstant>([&](uint32_t, const SPIRConstant &c) {
+	ir.for_each_typed_id<SPIRConstant>([&](ezUInt32, const SPIRConstant &c) {
 		if (c.specialization && has_decoration(c.self, DecorationSpecId))
 			spec_consts.push_back({ c.self, get_decoration(c.self, DecorationSpecId) });
 	});
@@ -2615,7 +2615,7 @@ const SPIRConstant &Compiler::get_constant(ConstantID id) const
 	return get<SPIRConstant>(id);
 }
 
-static bool exists_unaccessed_path_to_return(const CFG &cfg, uint32_t block, const unordered_set<uint32_t> &blocks)
+static bool exists_unaccessed_path_to_return(const CFG &cfg, ezUInt32 block, const unordered_set<ezUInt32> &blocks)
 {
 	// This block accesses the variable.
 	if (blocks.find(block) != end(blocks))
@@ -2634,8 +2634,8 @@ static bool exists_unaccessed_path_to_return(const CFG &cfg, uint32_t block, con
 }
 
 void Compiler::analyze_parameter_preservation(
-    SPIRFunction &entry, const CFG &cfg, const unordered_map<uint32_t, unordered_set<uint32_t>> &variable_to_blocks,
-    const unordered_map<uint32_t, unordered_set<uint32_t>> &complete_write_blocks)
+    SPIRFunction &entry, const CFG &cfg, const unordered_map<ezUInt32, unordered_set<ezUInt32>> &variable_to_blocks,
+    const unordered_map<ezUInt32, unordered_set<ezUInt32>> &complete_write_blocks)
 {
 	for (auto &arg : entry.arguments)
 	{
@@ -2711,7 +2711,7 @@ void Compiler::AnalyzeVariableScopeAccessHandler::set_current_block(const SPIRBl
 	// this will be a variable write when we branch,
 	// so we need to track access to these variables as well to
 	// have a complete picture.
-	const auto test_phi = [this, &block](uint32_t to) {
+	const auto test_phi = [this, &block](ezUInt32 to) {
 		auto &next = compiler.get<SPIRBlock>(to);
 		for (auto &phi : next.phi_variables)
 		{
@@ -2752,7 +2752,7 @@ void Compiler::AnalyzeVariableScopeAccessHandler::set_current_block(const SPIRBl
 	}
 }
 
-void Compiler::AnalyzeVariableScopeAccessHandler::notify_variable_access(uint32_t id, uint32_t block)
+void Compiler::AnalyzeVariableScopeAccessHandler::notify_variable_access(ezUInt32 id, ezUInt32 block)
 {
 	if (id == 0)
 		return;
@@ -2769,7 +2769,7 @@ void Compiler::AnalyzeVariableScopeAccessHandler::notify_variable_access(uint32_
 		accessed_temporaries_to_block[id].insert(block);
 }
 
-bool Compiler::AnalyzeVariableScopeAccessHandler::id_is_phi_variable(uint32_t id) const
+bool Compiler::AnalyzeVariableScopeAccessHandler::id_is_phi_variable(ezUInt32 id) const
 {
 	if (id >= compiler.get_current_id_bound())
 		return false;
@@ -2777,7 +2777,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::id_is_phi_variable(uint32_t id
 	return var && var->phi_variable;
 }
 
-bool Compiler::AnalyzeVariableScopeAccessHandler::id_is_potential_temporary(uint32_t id) const
+bool Compiler::AnalyzeVariableScopeAccessHandler::id_is_potential_temporary(ezUInt32 id) const
 {
 	if (id >= compiler.get_current_id_bound())
 		return false;
@@ -2786,10 +2786,10 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::id_is_potential_temporary(uint
 	return compiler.ir.ids[id].empty() || (compiler.ir.ids[id].get_type() == TypeExpression);
 }
 
-bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint32_t *args, uint32_t length)
+bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const ezUInt32 *args, ezUInt32 length)
 {
 	// Keep track of the types of temporaries, so we can hoist them out as necessary.
-	uint32_t result_type, result_id;
+	ezUInt32 result_type, result_id;
 	if (compiler.instruction_to_result_type(result_type, result_id, op, args, length))
 		result_id_to_type[result_id] = result_type;
 
@@ -2828,7 +2828,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 			return false;
 
 		// Access chains used in multiple blocks mean hoisting all the variables used to construct the access chain as not all backends can use pointers.
-		uint32_t ptr = args[2];
+		ezUInt32 ptr = args[2];
 		auto *var = compiler.maybe_get<SPIRVariable>(ptr);
 		if (var)
 		{
@@ -2837,7 +2837,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 		}
 
 		// args[2] might be another access chain we have to track use of.
-		for (uint32_t i = 2; i < length; i++)
+		for (ezUInt32 i = 2; i < length; i++)
 		{
 			notify_variable_access(args[i], current_block->self);
 			access_chain_children[args[1]].insert(args[i]);
@@ -2880,7 +2880,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 		}
 
 		// args[0:1] might be access chains we have to track use of.
-		for (uint32_t i = 0; i < 2; i++)
+		for (ezUInt32 i = 0; i < 2; i++)
 			notify_variable_access(args[i], current_block->self);
 
 		var = compiler.maybe_get_backing_variable(rhs);
@@ -2912,7 +2912,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 	{
 		if (length < 3)
 			return false;
-		uint32_t ptr = args[2];
+		ezUInt32 ptr = args[2];
 		auto *var = compiler.maybe_get_backing_variable(ptr);
 		if (var)
 			accessed_variables_to_block[var->self].insert(current_block->self);
@@ -2937,7 +2937,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 		length -= 3;
 		args += 3;
 
-		for (uint32_t i = 0; i < length; i++)
+		for (ezUInt32 i = 0; i < length; i++)
 		{
 			auto *var = compiler.maybe_get_backing_variable(args[i]);
 			if (var)
@@ -2959,7 +2959,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 
 	case OpExtInst:
 	{
-		for (uint32_t i = 4; i < length; i++)
+		for (ezUInt32 i = 4; i < length; i++)
 			notify_variable_access(args[i], current_block->self);
 		notify_variable_access(args[1], current_block->self);
 		break;
@@ -2977,18 +2977,18 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 	case OpCompositeInsert:
 	case OpVectorShuffle:
 		// Specialize for opcode which contains literals.
-		for (uint32_t i = 1; i < 4; i++)
+		for (ezUInt32 i = 1; i < 4; i++)
 			notify_variable_access(args[i], current_block->self);
 		break;
 
 	case OpCompositeExtract:
 		// Specialize for opcode which contains literals.
-		for (uint32_t i = 1; i < 3; i++)
+		for (ezUInt32 i = 1; i < 3; i++)
 			notify_variable_access(args[i], current_block->self);
 		break;
 
 	case OpImageWrite:
-		for (uint32_t i = 0; i < length; i++)
+		for (ezUInt32 i = 0; i < length; i++)
 		{
 			// Argument 3 is a literal.
 			if (i != 3)
@@ -3008,7 +3008,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 	case OpImageSparseFetch:
 	case OpImageRead:
 	case OpImageSparseRead:
-		for (uint32_t i = 1; i < length; i++)
+		for (ezUInt32 i = 1; i < length; i++)
 		{
 			// Argument 4 is a literal.
 			if (i != 4)
@@ -3028,7 +3028,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 	case OpImageSparseGather:
 	case OpImageDrefGather:
 	case OpImageSparseDrefGather:
-		for (uint32_t i = 1; i < length; i++)
+		for (ezUInt32 i = 1; i < length; i++)
 		{
 			// Argument 5 is a literal.
 			if (i != 5)
@@ -3044,7 +3044,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 		// There are potential false positives here where a literal is used in-place of an ID,
 		// but worst case, it does not affect the correctness of the compile.
 		// Exhaustive analysis would be better here, but it's not worth it for now.
-		for (uint32_t i = 0; i < length; i++)
+		for (ezUInt32 i = 0; i < length; i++)
 			notify_variable_access(args[i], current_block->self);
 		break;
 	}
@@ -3052,7 +3052,7 @@ bool Compiler::AnalyzeVariableScopeAccessHandler::handle(spv::Op op, const uint3
 	return true;
 }
 
-Compiler::StaticExpressionAccessHandler::StaticExpressionAccessHandler(Compiler &compiler_, uint32_t variable_id_)
+Compiler::StaticExpressionAccessHandler::StaticExpressionAccessHandler(Compiler &compiler_, ezUInt32 variable_id_)
     : compiler(compiler_)
     , variable_id(variable_id_)
 {
@@ -3063,7 +3063,7 @@ bool Compiler::StaticExpressionAccessHandler::follow_function_call(const SPIRFun
 	return false;
 }
 
-bool Compiler::StaticExpressionAccessHandler::handle(spv::Op op, const uint32_t *args, uint32_t length)
+bool Compiler::StaticExpressionAccessHandler::handle(spv::Op op, const ezUInt32 *args, ezUInt32 length)
 {
 	switch (op)
 	{
@@ -3128,7 +3128,7 @@ void Compiler::find_function_local_luts(SPIRFunction &entry, const AnalyzeVariab
 			continue;
 
 		// If the variable has an initializer, make sure it is a constant expression.
-		uint32_t static_constant_expression = 0;
+		ezUInt32 static_constant_expression = 0;
 		if (var.initializer)
 		{
 			if (ir.ids[var.initializer].get_type() != TypeConstant)
@@ -3163,7 +3163,7 @@ void Compiler::find_function_local_luts(SPIRFunction &entry, const AnalyzeVariab
 			DominatorBuilder builder(cfg);
 			for (auto &block : blocks)
 				builder.add_block(block);
-			uint32_t dominator = builder.get_dominator();
+			ezUInt32 dominator = builder.get_dominator();
 
 			// The complete write happened in a branch or similar, cannot deduce static expression.
 			if (write_blocks.count(dominator) == 0)
@@ -3204,7 +3204,7 @@ void Compiler::analyze_variable_scope(SPIRFunction &entry, AnalyzeVariableScopeA
 	analyze_parameter_preservation(entry, cfg, handler.accessed_variables_to_block,
 	                               handler.complete_write_variables_to_block);
 
-	unordered_map<uint32_t, uint32_t> potential_loop_variables;
+	unordered_map<ezUInt32, ezUInt32> potential_loop_variables;
 
 	// Find the loop dominator block for each block.
 	for (auto &block_id : entry.blocks)
@@ -3220,7 +3220,7 @@ void Compiler::analyze_variable_scope(SPIRFunction &entry, AnalyzeVariableScopeA
 		}
 		else
 		{
-			uint32_t loop_dominator = cfg.find_loop_dominator(block_id);
+			ezUInt32 loop_dominator = cfg.find_loop_dominator(block_id);
 			if (loop_dominator != block_id)
 				block.loop_dominator = loop_dominator;
 			else
@@ -3352,7 +3352,7 @@ void Compiler::analyze_variable_scope(SPIRFunction &entry, AnalyzeVariableScopeA
 			}
 		}
 
-		uint32_t dominating_block = builder.get_dominator();
+		ezUInt32 dominating_block = builder.get_dominator();
 
 		if (blocks.size() != 1 && is_single_block_loop(dominating_block))
 		{
@@ -3415,7 +3415,7 @@ void Compiler::analyze_variable_scope(SPIRFunction &entry, AnalyzeVariableScopeA
 		}
 	}
 
-	unordered_set<uint32_t> seen_blocks;
+	unordered_set<ezUInt32> seen_blocks;
 
 	// Now, try to analyze whether or not these variables are actually loop variables.
 	for (auto &loop_variable : potential_loop_variables)
@@ -3491,7 +3491,7 @@ void Compiler::analyze_variable_scope(SPIRFunction &entry, AnalyzeVariableScopeA
 		// merge can occur. Walk the CFG to see if we find anything.
 
 		seen_blocks.clear();
-		cfg.walk_from(seen_blocks, header_block.merge_block, [&](uint32_t walk_block) -> bool {
+		cfg.walk_from(seen_blocks, header_block.merge_block, [&](ezUInt32 walk_block) -> bool {
 			// We found a block which accesses the variable outside the loop.
 			if (blocks.find(walk_block) != end(blocks))
 				static_loop_init = false;
@@ -3510,7 +3510,7 @@ void Compiler::analyze_variable_scope(SPIRFunction &entry, AnalyzeVariableScopeA
 	}
 }
 
-bool Compiler::may_read_undefined_variable_in_block(const SPIRBlock &block, uint32_t var)
+bool Compiler::may_read_undefined_variable_in_block(const SPIRBlock &block, ezUInt32 var)
 {
 	for (auto &op : block.ops)
 	{
@@ -3547,8 +3547,8 @@ bool Compiler::may_read_undefined_variable_in_block(const SPIRBlock &block, uint
 			if (op.length < 2)
 				break;
 
-			uint32_t count = op.length - 2;
-			for (uint32_t i = 0; i < count; i += 2)
+			ezUInt32 count = op.length - 2;
+			for (ezUInt32 i = 0; i < count; i += 2)
 				if (ops[i + 2] == var)
 					return true;
 			break;
@@ -3566,8 +3566,8 @@ bool Compiler::may_read_undefined_variable_in_block(const SPIRBlock &block, uint
 				break;
 
 			// May read before writing.
-			uint32_t count = op.length - 3;
-			for (uint32_t i = 0; i < count; i++)
+			ezUInt32 count = op.length - 3;
+			for (ezUInt32 i = 0; i < count; i++)
 				if (ops[i + 3] == var)
 					return true;
 			break;
@@ -3622,7 +3622,7 @@ void Compiler::ActiveBuiltinHandler::handle_builtin(const SPIRType &type, BuiltI
 	{
 		if (!type.array_size_literal[0])
 			SPIRV_CROSS_THROW("Array size for ClipDistance must be a literal.");
-		uint32_t array_size = type.array[0];
+		ezUInt32 array_size = type.array[0];
 		if (array_size == 0)
 			SPIRV_CROSS_THROW("Array size for ClipDistance must not be unsized.");
 		compiler.clip_distance_count = array_size;
@@ -3631,7 +3631,7 @@ void Compiler::ActiveBuiltinHandler::handle_builtin(const SPIRType &type, BuiltI
 	{
 		if (!type.array_size_literal[0])
 			SPIRV_CROSS_THROW("Array size for CullDistance must be a literal.");
-		uint32_t array_size = type.array[0];
+		ezUInt32 array_size = type.array[0];
 		if (array_size == 0)
 			SPIRV_CROSS_THROW("Array size for CullDistance must not be unsized.");
 		compiler.cull_distance_count = array_size;
@@ -3643,9 +3643,9 @@ void Compiler::ActiveBuiltinHandler::handle_builtin(const SPIRType &type, BuiltI
 	}
 }
 
-bool Compiler::ActiveBuiltinHandler::handle(spv::Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::ActiveBuiltinHandler::handle(spv::Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
-	const auto add_if_builtin = [&](uint32_t id) {
+	const auto add_if_builtin = [&](ezUInt32 id) {
 		// Only handles variables here.
 		// Builtins which are part of a block are handled in AccessChain.
 		auto *var = compiler.maybe_get<SPIRVariable>(id);
@@ -3698,9 +3698,9 @@ bool Compiler::ActiveBuiltinHandler::handle(spv::Op opcode, const uint32_t *args
 		if (length < 2)
 			return false;
 
-		uint32_t count = length - 2;
+		ezUInt32 count = length - 2;
 		args += 2;
-		for (uint32_t i = 0; i < count; i += 2)
+		for (ezUInt32 i = 0; i < count; i += 2)
 			add_if_builtin(args[i]);
 		break;
 	}
@@ -3710,9 +3710,9 @@ bool Compiler::ActiveBuiltinHandler::handle(spv::Op opcode, const uint32_t *args
 		if (length < 3)
 			return false;
 
-		uint32_t count = length - 3;
+		ezUInt32 count = length - 3;
 		args += 3;
-		for (uint32_t i = 0; i < count; i++)
+		for (ezUInt32 i = 0; i < count; i++)
 			add_if_builtin(args[i]);
 		break;
 	}
@@ -3739,9 +3739,9 @@ bool Compiler::ActiveBuiltinHandler::handle(spv::Op opcode, const uint32_t *args
 		auto &flags =
 		    var->storage == StorageClassInput ? compiler.active_input_builtins : compiler.active_output_builtins;
 
-		uint32_t count = length - 3;
+		ezUInt32 count = length - 3;
 		args += 3;
-		for (uint32_t i = 0; i < count; i++)
+		for (ezUInt32 i = 0; i < count; i++)
 		{
 			// Pointers
 			if (opcode == OpPtrAccessChain && i == 0)
@@ -3758,9 +3758,9 @@ bool Compiler::ActiveBuiltinHandler::handle(spv::Op opcode, const uint32_t *args
 			// Structs
 			else if (type->basetype == SPIRType::Struct)
 			{
-				uint32_t index = compiler.get<SPIRConstant>(args[i]).scalar();
+				ezUInt32 index = compiler.get<SPIRConstant>(args[i]).scalar();
 
-				if (index < uint32_t(compiler.ir.meta[type->self].members.size()))
+				if (index < ezUInt32(compiler.ir.meta[type->self].members.size()))
 				{
 					auto &decorations = compiler.ir.meta[type->self].members[index];
 					if (decorations.builtin)
@@ -3841,7 +3841,7 @@ void Compiler::analyze_image_and_sampler_usage()
 			comparison_ids.insert(combined.combined_id);
 }
 
-bool Compiler::CombinedImageSamplerDrefHandler::handle(spv::Op opcode, const uint32_t *args, uint32_t)
+bool Compiler::CombinedImageSamplerDrefHandler::handle(spv::Op opcode, const ezUInt32 *args, ezUInt32)
 {
 	// Mark all sampled images which are used with Dref.
 	switch (opcode)
@@ -3872,7 +3872,7 @@ const CFG &Compiler::get_cfg_for_current_function() const
 	return get_cfg_for_function(current_function->self);
 }
 
-const CFG &Compiler::get_cfg_for_function(uint32_t id) const
+const CFG &Compiler::get_cfg_for_function(ezUInt32 id) const
 {
 	auto cfg_itr = function_cfgs.find(id);
 	assert(cfg_itr != end(function_cfgs));
@@ -3904,7 +3904,7 @@ void Compiler::build_function_control_flow_graphs_and_analyze()
 				continue;
 
 			auto &flags = get_decoration_bitset(b.loop_variables.front());
-			uint32_t type = get<SPIRVariable>(b.loop_variables.front()).basetype;
+			ezUInt32 type = get<SPIRVariable>(b.loop_variables.front()).basetype;
 			bool invalid_initializers = false;
 			for (auto loop_variable : b.loop_variables)
 			{
@@ -3931,7 +3931,7 @@ Compiler::CFGBuilder::CFGBuilder(Compiler &compiler_)
 {
 }
 
-bool Compiler::CFGBuilder::handle(spv::Op, const uint32_t *, uint32_t)
+bool Compiler::CFGBuilder::handle(spv::Op, const ezUInt32 *, ezUInt32)
 {
 	return true;
 }
@@ -3947,7 +3947,7 @@ bool Compiler::CFGBuilder::follow_function_call(const SPIRFunction &func)
 		return false;
 }
 
-void Compiler::CombinedImageSamplerUsageHandler::add_dependency(uint32_t dst, uint32_t src)
+void Compiler::CombinedImageSamplerUsageHandler::add_dependency(ezUInt32 dst, ezUInt32 src)
 {
 	dependency_hierarchy[dst].insert(src);
 	// Propagate up any comparison state if we're loading from one such variable.
@@ -3955,7 +3955,7 @@ void Compiler::CombinedImageSamplerUsageHandler::add_dependency(uint32_t dst, ui
 		comparison_ids.insert(dst);
 }
 
-bool Compiler::CombinedImageSamplerUsageHandler::begin_function_scope(const uint32_t *args, uint32_t length)
+bool Compiler::CombinedImageSamplerUsageHandler::begin_function_scope(const ezUInt32 *args, ezUInt32 length)
 {
 	if (length < 3)
 		return false;
@@ -3964,7 +3964,7 @@ bool Compiler::CombinedImageSamplerUsageHandler::begin_function_scope(const uint
 	const auto *arg = &args[3];
 	length -= 3;
 
-	for (uint32_t i = 0; i < length; i++)
+	for (ezUInt32 i = 0; i < length; i++)
 	{
 		auto &argument = func.arguments[i];
 		add_dependency(argument.id, arg[i]);
@@ -3973,7 +3973,7 @@ bool Compiler::CombinedImageSamplerUsageHandler::begin_function_scope(const uint
 	return true;
 }
 
-void Compiler::CombinedImageSamplerUsageHandler::add_hierarchy_to_comparison_ids(uint32_t id)
+void Compiler::CombinedImageSamplerUsageHandler::add_hierarchy_to_comparison_ids(ezUInt32 id)
 {
 	// Traverse the variable dependency hierarchy and tag everything in its path with comparison ids.
 	comparison_ids.insert(id);
@@ -3982,7 +3982,7 @@ void Compiler::CombinedImageSamplerUsageHandler::add_hierarchy_to_comparison_ids
 		add_hierarchy_to_comparison_ids(dep_id);
 }
 
-bool Compiler::CombinedImageSamplerUsageHandler::handle(Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::CombinedImageSamplerUsageHandler::handle(Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
 	switch (opcode)
 	{
@@ -4013,14 +4013,14 @@ bool Compiler::CombinedImageSamplerUsageHandler::handle(Op opcode, const uint32_
 		if (length < 4)
 			return false;
 
-		uint32_t result_type = args[0];
-		uint32_t result_id = args[1];
+		ezUInt32 result_type = args[0];
+		ezUInt32 result_id = args[1];
 		auto &type = compiler.get<SPIRType>(result_type);
 
 		// If the underlying resource has been used for comparison then duplicate loads of that resource must be too.
 		// This image must be a depth image.
-		uint32_t image = args[2];
-		uint32_t sampler = args[3];
+		ezUInt32 image = args[2];
+		ezUInt32 sampler = args[3];
 
 		if (type.image.depth || dref_combined_samplers.count(result_id) != 0)
 		{
@@ -4048,7 +4048,7 @@ bool Compiler::buffer_is_hlsl_counter_buffer(VariableID id) const
 	return m && m->hlsl_is_magic_counter_buffer;
 }
 
-bool Compiler::buffer_get_hlsl_counter_buffer(VariableID id, uint32_t &counter_id) const
+bool Compiler::buffer_get_hlsl_counter_buffer(VariableID id, ezUInt32 &counter_id) const
 {
 	auto *m = ir.find_meta(id);
 
@@ -4062,7 +4062,7 @@ bool Compiler::buffer_get_hlsl_counter_buffer(VariableID id, uint32_t &counter_i
 		return false;
 }
 
-void Compiler::make_constant_null(uint32_t id, uint32_t type)
+void Compiler::make_constant_null(ezUInt32 id, ezUInt32 type)
 {
 	auto &constant_type = get<SPIRType>(type);
 
@@ -4074,27 +4074,27 @@ void Compiler::make_constant_null(uint32_t id, uint32_t type)
 	else if (!constant_type.array.empty())
 	{
 		assert(constant_type.parent_type);
-		uint32_t parent_id = ir.increase_bound_by(1);
+		ezUInt32 parent_id = ir.increase_bound_by(1);
 		make_constant_null(parent_id, constant_type.parent_type);
 
 		if (!constant_type.array_size_literal.back())
 			SPIRV_CROSS_THROW("Array size of OpConstantNull must be a literal.");
 
-		SmallVector<uint32_t> elements(constant_type.array.back());
-		for (uint32_t i = 0; i < constant_type.array.back(); i++)
+		SmallVector<ezUInt32> elements(constant_type.array.back());
+		for (ezUInt32 i = 0; i < constant_type.array.back(); i++)
 			elements[i] = parent_id;
-		set<SPIRConstant>(id, type, elements.data(), uint32_t(elements.size()), false);
+		set<SPIRConstant>(id, type, elements.data(), ezUInt32(elements.size()), false);
 	}
 	else if (!constant_type.member_types.empty())
 	{
-		uint32_t member_ids = ir.increase_bound_by(uint32_t(constant_type.member_types.size()));
-		SmallVector<uint32_t> elements(constant_type.member_types.size());
-		for (uint32_t i = 0; i < constant_type.member_types.size(); i++)
+		ezUInt32 member_ids = ir.increase_bound_by(ezUInt32(constant_type.member_types.size()));
+		SmallVector<ezUInt32> elements(constant_type.member_types.size());
+		for (ezUInt32 i = 0; i < constant_type.member_types.size(); i++)
 		{
 			make_constant_null(member_ids + i, constant_type.member_types[i]);
 			elements[i] = member_ids + i;
 		}
-		set<SPIRConstant>(id, type, elements.data(), uint32_t(elements.size()), false);
+		set<SPIRConstant>(id, type, elements.data(), ezUInt32(elements.size()), false);
 	}
 	else
 	{
@@ -4118,7 +4118,7 @@ std::string Compiler::get_remapped_declared_block_name(VariableID id) const
 	return get_remapped_declared_block_name(id, false);
 }
 
-std::string Compiler::get_remapped_declared_block_name(uint32_t id, bool fallback_prefer_instance_name) const
+std::string Compiler::get_remapped_declared_block_name(ezUInt32 id, bool fallback_prefer_instance_name) const
 {
 	auto itr = declared_block_names.find(id);
 	if (itr != end(declared_block_names))
@@ -4153,11 +4153,11 @@ bool Compiler::reflection_ssbo_instance_name_is_significant() const
 		return ir.source.hlsl;
 	}
 
-	unordered_set<uint32_t> ssbo_type_ids;
+	unordered_set<ezUInt32> ssbo_type_ids;
 	bool aliased_ssbo_types = false;
 
 	// If we don't have any OpSource information, we need to perform some shaky heuristics.
-	ir.for_each_typed_id<SPIRVariable>([&](uint32_t, const SPIRVariable &var) {
+	ir.for_each_typed_id<SPIRVariable>([&](ezUInt32, const SPIRVariable &var) {
 		auto &type = this->get<SPIRType>(var.basetype);
 		if (!type.pointer || var.storage == StorageClassFunction)
 			return;
@@ -4178,8 +4178,8 @@ bool Compiler::reflection_ssbo_instance_name_is_significant() const
 	return aliased_ssbo_types;
 }
 
-bool Compiler::instruction_to_result_type(uint32_t &result_type, uint32_t &result_id, spv::Op op, const uint32_t *args,
-                                          uint32_t length)
+bool Compiler::instruction_to_result_type(ezUInt32 &result_type, ezUInt32 &result_id, spv::Op op, const ezUInt32 *args,
+                                          ezUInt32 length)
 {
 	// Most instructions follow the pattern of <result-type> <result-id> <arguments>.
 	// There are some exceptions.
@@ -4220,7 +4220,7 @@ bool Compiler::instruction_to_result_type(uint32_t &result_type, uint32_t &resul
 	}
 }
 
-Bitset Compiler::combined_decoration_for_member(const SPIRType &type, uint32_t index) const
+Bitset Compiler::combined_decoration_for_member(const SPIRType &type, ezUInt32 index) const
 {
 	Bitset flags;
 	auto *type_meta = ir.find_meta(type.self);
@@ -4238,7 +4238,7 @@ Bitset Compiler::combined_decoration_for_member(const SPIRType &type, uint32_t i
 
 		// If our member type is a struct, traverse all the child members as well recursively.
 		auto &member_childs = member_type.member_types;
-		for (uint32_t i = 0; i < member_childs.size(); i++)
+		for (ezUInt32 i = 0; i < member_childs.size(); i++)
 		{
 			auto &child_member_type = get<SPIRType>(member_childs[i]);
 			if (!child_member_type.pointer)
@@ -4282,7 +4282,7 @@ bool Compiler::is_desktop_only_format(spv::ImageFormat format)
 	return false;
 }
 
-bool Compiler::image_is_comparison(const SPIRType &type, uint32_t id) const
+bool Compiler::image_is_comparison(const SPIRType &type, ezUInt32 id) const
 {
 	return type.image.depth || (comparison_ids.count(id) != 0);
 }
@@ -4314,7 +4314,7 @@ Compiler::PhysicalStorageBufferPointerHandler::PhysicalStorageBufferPointerHandl
 {
 }
 
-bool Compiler::PhysicalStorageBufferPointerHandler::handle(Op op, const uint32_t *args, uint32_t)
+bool Compiler::PhysicalStorageBufferPointerHandler::handle(Op op, const ezUInt32 *args, ezUInt32)
 {
 	if (op == OpConvertUToPtr || op == OpBitcast)
 	{
@@ -4341,7 +4341,7 @@ void Compiler::analyze_non_block_pointer_types()
 	sort(begin(physical_storage_non_block_pointer_types), end(physical_storage_non_block_pointer_types));
 }
 
-bool Compiler::InterlockedResourceAccessPrepassHandler::handle(Op op, const uint32_t *, uint32_t)
+bool Compiler::InterlockedResourceAccessPrepassHandler::handle(Op op, const ezUInt32 *, ezUInt32)
 {
 	if (op == OpBeginInvocationInterlockEXT || op == OpEndInvocationInterlockEXT)
 	{
@@ -4358,7 +4358,7 @@ bool Compiler::InterlockedResourceAccessPrepassHandler::handle(Op op, const uint
 			// If this call is performed inside control flow we have a problem.
 			auto &cfg = compiler.get_cfg_for_function(interlock_function_id);
 
-			uint32_t from_block_id = compiler.get<SPIRFunction>(interlock_function_id).entry_block;
+			ezUInt32 from_block_id = compiler.get<SPIRFunction>(interlock_function_id).entry_block;
 			bool outside_control_flow = cfg.node_terminates_control_flow_in_sub_graph(from_block_id, current_block_id);
 			if (!outside_control_flow)
 				control_flow_interlock = true;
@@ -4372,7 +4372,7 @@ void Compiler::InterlockedResourceAccessPrepassHandler::rearm_current_block(cons
 	current_block_id = block.self;
 }
 
-bool Compiler::InterlockedResourceAccessPrepassHandler::begin_function_scope(const uint32_t *args, uint32_t length)
+bool Compiler::InterlockedResourceAccessPrepassHandler::begin_function_scope(const ezUInt32 *args, ezUInt32 length)
 {
 	if (length < 3)
 		return false;
@@ -4380,13 +4380,13 @@ bool Compiler::InterlockedResourceAccessPrepassHandler::begin_function_scope(con
 	return true;
 }
 
-bool Compiler::InterlockedResourceAccessPrepassHandler::end_function_scope(const uint32_t *, uint32_t)
+bool Compiler::InterlockedResourceAccessPrepassHandler::end_function_scope(const ezUInt32 *, ezUInt32)
 {
 	call_stack.pop_back();
 	return true;
 }
 
-bool Compiler::InterlockedResourceAccessHandler::begin_function_scope(const uint32_t *args, uint32_t length)
+bool Compiler::InterlockedResourceAccessHandler::begin_function_scope(const ezUInt32 *args, ezUInt32 length)
 {
 	if (length < 3)
 		return false;
@@ -4398,7 +4398,7 @@ bool Compiler::InterlockedResourceAccessHandler::begin_function_scope(const uint
 	return true;
 }
 
-bool Compiler::InterlockedResourceAccessHandler::end_function_scope(const uint32_t *, uint32_t)
+bool Compiler::InterlockedResourceAccessHandler::end_function_scope(const ezUInt32 *, ezUInt32)
 {
 	if (call_stack.back() == interlock_function_id)
 		call_stack_is_interlocked = false;
@@ -4407,7 +4407,7 @@ bool Compiler::InterlockedResourceAccessHandler::end_function_scope(const uint32
 	return true;
 }
 
-void Compiler::InterlockedResourceAccessHandler::access_potential_resource(uint32_t id)
+void Compiler::InterlockedResourceAccessHandler::access_potential_resource(ezUInt32 id)
 {
 	if ((use_critical_section && in_crit_sec) || (control_flow_interlock && call_stack_is_interlocked) ||
 	    split_function_case)
@@ -4416,7 +4416,7 @@ void Compiler::InterlockedResourceAccessHandler::access_potential_resource(uint3
 	}
 }
 
-bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_t *args, uint32_t length)
+bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const ezUInt32 *args, ezUInt32 length)
 {
 	// Only care about critical section analysis if we have simple case.
 	if (use_critical_section)
@@ -4442,7 +4442,7 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 3)
 			return false;
 
-		uint32_t ptr = args[2];
+		ezUInt32 ptr = args[2];
 		auto *var = compiler.maybe_get_backing_variable(ptr);
 
 		// We're only concerned with buffer and image memory here.
@@ -4456,8 +4456,8 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 
 		case StorageClassUniformConstant:
 		{
-			uint32_t result_type = args[0];
-			uint32_t id = args[1];
+			ezUInt32 result_type = args[0];
+			ezUInt32 id = args[1];
 			compiler.set<SPIRExpression>(id, "", result_type, true);
 			compiler.register_read(id, ptr, true);
 			break;
@@ -4482,14 +4482,14 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 3)
 			return false;
 
-		uint32_t result_type = args[0];
+		ezUInt32 result_type = args[0];
 
 		auto &type = compiler.get<SPIRType>(result_type);
 		if (type.storage == StorageClassUniform || type.storage == StorageClassUniformConstant ||
 		    type.storage == StorageClassStorageBuffer)
 		{
-			uint32_t id = args[1];
-			uint32_t ptr = args[2];
+			ezUInt32 id = args[1];
+			ezUInt32 ptr = args[2];
 			compiler.set<SPIRExpression>(id, "", result_type, true);
 			compiler.register_read(id, ptr, true);
 			compiler.ir.ids[id].set_allow_type_rewrite();
@@ -4502,9 +4502,9 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 3)
 			return false;
 
-		uint32_t result_type = args[0];
-		uint32_t id = args[1];
-		uint32_t ptr = args[2];
+		ezUInt32 result_type = args[0];
+		ezUInt32 id = args[1];
+		ezUInt32 ptr = args[2];
 		auto &e = compiler.set<SPIRExpression>(id, "", result_type, true);
 		auto *var = compiler.maybe_get_backing_variable(ptr);
 		if (var)
@@ -4519,7 +4519,7 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 1)
 			return false;
 
-		uint32_t ptr = args[0];
+		ezUInt32 ptr = args[0];
 		auto *var = compiler.maybe_get_backing_variable(ptr);
 		if (var && (var->storage == StorageClassUniform || var->storage == StorageClassUniformConstant ||
 		            var->storage == StorageClassStorageBuffer))
@@ -4535,8 +4535,8 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 2)
 			return false;
 
-		uint32_t dst = args[0];
-		uint32_t src = args[1];
+		ezUInt32 dst = args[0];
+		ezUInt32 src = args[1];
 		auto *dst_var = compiler.maybe_get_backing_variable(dst);
 		auto *src_var = compiler.maybe_get_backing_variable(src);
 
@@ -4566,7 +4566,7 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 3)
 			return false;
 
-		uint32_t ptr = args[2];
+		ezUInt32 ptr = args[2];
 		auto *var = compiler.maybe_get_backing_variable(ptr);
 
 		// We're only concerned with buffer and image memory here.
@@ -4608,7 +4608,7 @@ bool Compiler::InterlockedResourceAccessHandler::handle(Op opcode, const uint32_
 		if (length < 3)
 			return false;
 
-		uint32_t ptr = args[2];
+		ezUInt32 ptr = args[2];
 		auto *var = compiler.maybe_get_backing_variable(ptr);
 		if (var && (var->storage == StorageClassUniform || var->storage == StorageClassUniformConstant ||
 		            var->storage == StorageClassStorageBuffer))

@@ -148,7 +148,7 @@ struct spvc_compiler_s : ScratchMemoryAllocation
 struct spvc_compiler_options_s : ScratchMemoryAllocation
 {
 	spvc_context context = nullptr;
-	uint32_t backend_flags = 0;
+	ezUInt32 backend_flags = 0;
 #if SPIRV_CROSS_C_API_GLSL
 	CompilerGLSL::Options glsl;
 #endif
@@ -394,8 +394,8 @@ spvc_result spvc_compiler_options_set_uint(spvc_compiler_options options, spvc_c
 {
 	(void)value;
 	(void)option;
-	uint32_t supported_mask = options->backend_flags;
-	uint32_t required_mask = option & SPVC_COMPILER_OPTION_LANG_BITS;
+	ezUInt32 supported_mask = options->backend_flags;
+	ezUInt32 required_mask = option & SPVC_COMPILER_OPTION_LANG_BITS;
 	if ((required_mask | supported_mask) != supported_mask)
 	{
 		options->context->report_error("Option is not supported by current backend.");
@@ -1374,7 +1374,7 @@ unsigned spvc_compiler_msl_get_automatic_resource_binding(spvc_compiler compiler
 	if (compiler->backend != SPVC_BACKEND_MSL)
 	{
 		compiler->context->report_error("MSL function used on a non-MSL backend.");
-		return uint32_t(-1);
+		return ezUInt32(-1);
 	}
 
 	auto &msl = *static_cast<CompilerMSL *>(compiler->compiler.get());
@@ -1382,7 +1382,7 @@ unsigned spvc_compiler_msl_get_automatic_resource_binding(spvc_compiler compiler
 #else
 	(void)id;
 	compiler->context->report_error("MSL function used on a non-MSL backend.");
-	return uint32_t(-1);
+	return ezUInt32(-1);
 #endif
 }
 
@@ -1392,7 +1392,7 @@ unsigned spvc_compiler_msl_get_automatic_resource_binding_secondary(spvc_compile
 	if (compiler->backend != SPVC_BACKEND_MSL)
 	{
 		compiler->context->report_error("MSL function used on a non-MSL backend.");
-		return uint32_t(-1);
+		return ezUInt32(-1);
 	}
 
 	auto &msl = *static_cast<CompilerMSL *>(compiler->compiler.get());
@@ -1400,7 +1400,7 @@ unsigned spvc_compiler_msl_get_automatic_resource_binding_secondary(spvc_compile
 #else
 	(void)id;
 	compiler->context->report_error("MSL function used on a non-MSL backend.");
-	return uint32_t(-1);
+	return ezUInt32(-1);
 #endif
 }
 
@@ -1805,7 +1805,7 @@ spvc_result spvc_compiler_get_execution_modes(spvc_compiler compiler, const SpvE
 		auto ptr = spvc_allocate<TemporaryBuffer<SpvExecutionMode>>();
 
 		compiler->compiler->get_execution_mode_bitset().for_each_bit(
-		    [&](uint32_t bit) { ptr->buffer.push_back(static_cast<SpvExecutionMode>(bit)); });
+		    [&](ezUInt32 bit) { ptr->buffer.push_back(static_cast<SpvExecutionMode>(bit)); });
 
 		*modes = ptr->buffer.data();
 		*num_modes = ptr->buffer.size();
@@ -2189,7 +2189,7 @@ spvc_bool spvc_compiler_get_binary_offset_for_decoration(spvc_compiler compiler,
                                                          SpvDecoration decoration,
                                                          unsigned *word_offset)
 {
-	uint32_t off = 0;
+	ezUInt32 off = 0;
 	bool ret = compiler->compiler->get_binary_offset_for_decoration(id, static_cast<spv::Decoration>(decoration), off);
 	if (ret)
 	{
@@ -2208,7 +2208,7 @@ spvc_bool spvc_compiler_buffer_is_hlsl_counter_buffer(spvc_compiler compiler, sp
 spvc_bool spvc_compiler_buffer_get_hlsl_counter_buffer(spvc_compiler compiler, spvc_variable_id id,
                                                        spvc_variable_id *counter_id)
 {
-	uint32_t buffer;
+	ezUInt32 buffer;
 	bool ret = compiler->compiler->buffer_get_hlsl_counter_buffer(id, buffer);
 	if (ret)
 	{
@@ -2268,7 +2268,7 @@ spvc_result spvc_compiler_get_buffer_block_decorations(spvc_compiler compiler, s
 		auto flags = compiler->compiler->get_buffer_block_flags(id);
 		auto bitset = spvc_allocate<TemporaryBuffer<SpvDecoration>>();
 
-		flags.for_each_bit([&](uint32_t bit) { bitset->buffer.push_back(static_cast<SpvDecoration>(bit)); });
+		flags.for_each_bit([&](ezUInt32 bit) { bitset->buffer.push_back(static_cast<SpvDecoration>(bit)); });
 
 		*decorations = bitset->buffer.data();
 		*num_decorations = bitset->buffer.size();

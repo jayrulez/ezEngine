@@ -27,8 +27,8 @@ void CompilerCPP::emit_buffer_block(const SPIRVariable &var)
 	auto &type = get<SPIRType>(var.basetype);
 	auto instance_name = to_name(var.self);
 
-	uint32_t descriptor_set = ir.meta[var.self].decoration.set;
-	uint32_t binding = ir.meta[var.self].decoration.binding;
+	ezUInt32 descriptor_set = ir.meta[var.self].decoration.set;
+	ezUInt32 binding = ir.meta[var.self].decoration.binding;
 
 	emit_block_struct(type);
 	auto buffer_name = to_name(type.self);
@@ -49,7 +49,7 @@ void CompilerCPP::emit_interface_block(const SPIRVariable &var)
 	const char *qual = var.storage == StorageClassInput ? "StageInput" : "StageOutput";
 	const char *lowerqual = var.storage == StorageClassInput ? "stage_input" : "stage_output";
 	auto instance_name = to_name(var.self);
-	uint32_t location = ir.meta[var.self].decoration.location;
+	ezUInt32 location = ir.meta[var.self].decoration.location;
 
 	string buffer_name;
 	auto flags = ir.meta[type.self].decoration.decoration_flags;
@@ -83,9 +83,9 @@ void CompilerCPP::emit_uniform(const SPIRVariable &var)
 	auto &type = get<SPIRType>(var.basetype);
 	auto instance_name = to_name(var.self);
 
-	uint32_t descriptor_set = ir.meta[var.self].decoration.set;
-	uint32_t binding = ir.meta[var.self].decoration.binding;
-	uint32_t location = ir.meta[var.self].decoration.location;
+	ezUInt32 descriptor_set = ir.meta[var.self].decoration.set;
+	ezUInt32 binding = ir.meta[var.self].decoration.binding;
+	ezUInt32 location = ir.meta[var.self].decoration.location;
 
 	string type_name = type_to_glsl(type);
 	remap_variable_type_name(type, instance_name, type_name);
@@ -314,7 +314,7 @@ string CompilerCPP::compile()
 	backend.long_long_literal_suffix = true;
 	backend.uint32_t_literal_suffix = true;
 	backend.basic_int_type = "int32_t";
-	backend.basic_uint_type = "uint32_t";
+	backend.basic_uint_type = "ezUInt32";
 	backend.swizzle_is_function = true;
 	backend.shared_is_implied = true;
 	backend.unsized_array_supported = false;
@@ -326,7 +326,7 @@ string CompilerCPP::compile()
 	build_function_control_flow_graphs_and_analyze();
 	update_active_builtins();
 
-	uint32_t pass_count = 0;
+	ezUInt32 pass_count = 0;
 	do
 	{
 		if (pass_count >= 3)
@@ -448,19 +448,19 @@ string CompilerCPP::argument_decl(const SPIRFunction::Parameter &arg)
 	string variable_name = to_name(var.self);
 	remap_variable_type_name(type, variable_name, base);
 
-	for (uint32_t i = 0; i < type.array.size(); i++)
+	for (ezUInt32 i = 0; i < type.array.size(); i++)
 		base = join("std::array<", base, ", ", to_array_size(type, i), ">");
 
 	return join(constref ? "const " : "", base, " &", variable_name);
 }
 
-string CompilerCPP::variable_decl(const SPIRType &type, const string &name, uint32_t /* id */)
+string CompilerCPP::variable_decl(const SPIRType &type, const string &name, ezUInt32 /* id */)
 {
 	string base = type_to_glsl(type);
 	remap_variable_type_name(type, name, base);
 	bool runtime = false;
 
-	for (uint32_t i = 0; i < type.array.size(); i++)
+	for (ezUInt32 i = 0; i < type.array.size(); i++)
 	{
 		auto &array = type.array[i];
 		if (!array && type.array_size_literal[i])

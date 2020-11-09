@@ -113,28 +113,7 @@ inline Float3X4::Float3X4(
 
 
 
-enum SHADERSTAGE
-{
-  MS,
-  AS,
-  VS,
-  HS,
-  DS,
-  GS,
-  PS,
-  CS,
-  SHADERSTAGE_COUNT,
-};
-enum PRIMITIVETOPOLOGY
-{
-  UNDEFINED,
-  TRIANGLELIST,
-  TRIANGLESTRIP,
-  POINTLIST,
-  LINELIST,
-  LINESTRIP,
-  PATCHLIST,
-};
+
 enum COMPARISON_FUNC
 {
   COMPARISON_NEVER,
@@ -356,11 +335,7 @@ enum GPU_QUERY_TYPE
   GPU_QUERY_TYPE_TIMESTAMP,           // retrieve time point of gpu execution
   GPU_QUERY_TYPE_TIMESTAMP_DISJOINT,  // timestamp frequency information
 };
-enum INDEXBUFFER_FORMAT
-{
-  INDEXFORMAT_16BIT,
-  INDEXFORMAT_32BIT,
-};
+
 enum SUBRESOURCE_TYPE
 {
   SRV,
@@ -462,15 +437,15 @@ struct EZ_RHI_DLL Viewport
 };
 struct EZ_RHI_DLL InputLayoutDesc
 {
-  static const uint32_t APPEND_ALIGNED_ELEMENT = 0xffffffff; // automatically figure out AlignedByteOffset depending on Format
+  static const ezUInt32 APPEND_ALIGNED_ELEMENT = 0xffffffff; // automatically figure out AlignedByteOffset depending on Format
 
   std::string SemanticName;
-  uint32_t SemanticIndex = 0;
+  ezUInt32 SemanticIndex = 0;
   FORMAT Format = FORMAT_UNKNOWN;
-  uint32_t InputSlot = 0;
-  uint32_t AlignedByteOffset = APPEND_ALIGNED_ELEMENT;
+  ezUInt32 InputSlot = 0;
+  ezUInt32 AlignedByteOffset = APPEND_ALIGNED_ELEMENT;
   INPUT_CLASSIFICATION InputSlotClass = INPUT_CLASSIFICATION::INPUT_PER_VERTEX_DATA;
-  uint32_t InstanceDataStepRate = 0;
+  ezUInt32 InstanceDataStepRate = 0;
 };
 union EZ_RHI_DLL ClearValue
 {
@@ -478,7 +453,7 @@ union EZ_RHI_DLL ClearValue
   struct ClearDepthStencil
   {
     float depth;
-    uint32_t stencil;
+    ezUInt32 stencil;
   } depthstencil;
 };
 struct EZ_RHI_DLL TextureDesc
@@ -489,17 +464,17 @@ struct EZ_RHI_DLL TextureDesc
     TEXTURE_2D,
     TEXTURE_3D,
   } type = TEXTURE_2D;
-  uint32_t Width = 0;
-  uint32_t Height = 0;
-  uint32_t Depth = 0;
-  uint32_t ArraySize = 1;
-  uint32_t MipLevels = 1;
+  ezUInt32 Width = 0;
+  ezUInt32 Height = 0;
+  ezUInt32 Depth = 0;
+  ezUInt32 ArraySize = 1;
+  ezUInt32 MipLevels = 1;
   FORMAT Format = FORMAT_UNKNOWN;
-  uint32_t SampleCount = 1;
+  ezUInt32 SampleCount = 1;
   USAGE Usage = USAGE_DEFAULT;
-  uint32_t BindFlags = 0;
-  uint32_t CPUAccessFlags = 0;
-  uint32_t MiscFlags = 0;
+  ezUInt32 BindFlags = 0;
+  ezUInt32 CPUAccessFlags = 0;
+  ezUInt32 MiscFlags = 0;
   ClearValue clear = {};
   IMAGE_LAYOUT layout = IMAGE_LAYOUT_GENERAL;
 };
@@ -510,7 +485,7 @@ struct EZ_RHI_DLL SamplerDesc
   TEXTURE_ADDRESS_MODE AddressV = TEXTURE_ADDRESS_CLAMP;
   TEXTURE_ADDRESS_MODE AddressW = TEXTURE_ADDRESS_CLAMP;
   float MipLODBias = 0.0f;
-  uint32_t MaxAnisotropy = 0;
+  ezUInt32 MaxAnisotropy = 0;
   COMPARISON_FUNC ComparisonFunc = COMPARISON_NEVER;
   float BorderColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
   float MinLOD = 0.0f;
@@ -528,7 +503,7 @@ struct EZ_RHI_DLL RasterizerStateDesc
   bool MultisampleEnable = false;
   bool AntialiasedLineEnable = false;
   bool ConservativeRasterizationEnable = false;
-  uint32_t ForcedSampleCount = 0;
+  ezUInt32 ForcedSampleCount = 0;
 };
 struct EZ_RHI_DLL DepthStencilOpDesc
 {
@@ -567,12 +542,12 @@ struct EZ_RHI_DLL BlendStateDesc
 };
 struct EZ_RHI_DLL GPUBufferDesc
 {
-  uint32_t ByteWidth = 0;
+  ezUInt32 ByteWidth = 0;
   USAGE Usage = USAGE_DEFAULT;
-  uint32_t BindFlags = 0;
-  uint32_t CPUAccessFlags = 0;
-  uint32_t MiscFlags = 0;
-  uint32_t StructureByteStride = 0; // needed for typed and structured buffer types!
+  ezUInt32 BindFlags = 0;
+  ezUInt32 CPUAccessFlags = 0;
+  ezUInt32 MiscFlags = 0;
+  ezUInt32 StructureByteStride = 0; // needed for typed and structured buffer types!
   FORMAT Format = FORMAT_UNKNOWN;   // only needed for typed buffer!
 };
 struct EZ_RHI_DLL GPUQueryDesc
@@ -599,8 +574,8 @@ struct EZ_RHI_DLL PipelineStateDesc
   const RasterizerState* rs = nullptr;
   const DepthStencilState* dss = nullptr;
   const InputLayout* il = nullptr;
-  PRIMITIVETOPOLOGY pt = TRIANGLELIST;
-  uint32_t sampleMask = 0xFFFFFFFF;
+  ezRHIPrimitiveTopology::Enum pt = ezRHIPrimitiveTopology::TriangleList;
+  ezUInt32 sampleMask = 0xFFFFFFFF;
 };
 struct EZ_RHI_DLL GPUBarrier
 {
@@ -743,35 +718,35 @@ struct EZ_RHI_DLL RenderPassDesc
     FLAG_EMPTY = 0,
     FLAG_ALLOW_UAV_WRITES = 1 << 0,
   };
-  uint32_t _flags = FLAG_EMPTY;
+  ezUInt32 _flags = FLAG_EMPTY;
   std::vector<RenderPassAttachment> attachments;
 };
 struct EZ_RHI_DLL IndirectDrawArgsInstanced
 {
-  uint32_t VertexCountPerInstance = 0;
-  uint32_t InstanceCount = 0;
-  uint32_t StartVertexLocation = 0;
-  uint32_t StartInstanceLocation = 0;
+  ezUInt32 VertexCountPerInstance = 0;
+  ezUInt32 InstanceCount = 0;
+  ezUInt32 StartVertexLocation = 0;
+  ezUInt32 StartInstanceLocation = 0;
 };
 struct EZ_RHI_DLL IndirectDrawArgsIndexedInstanced
 {
-  uint32_t IndexCountPerInstance = 0;
-  uint32_t InstanceCount = 0;
-  uint32_t StartIndexLocation = 0;
+  ezUInt32 IndexCountPerInstance = 0;
+  ezUInt32 InstanceCount = 0;
+  ezUInt32 StartIndexLocation = 0;
   int32_t BaseVertexLocation = 0;
-  uint32_t StartInstanceLocation = 0;
+  ezUInt32 StartInstanceLocation = 0;
 };
 struct EZ_RHI_DLL IndirectDispatchArgs
 {
-  uint32_t ThreadGroupCountX = 0;
-  uint32_t ThreadGroupCountY = 0;
-  uint32_t ThreadGroupCountZ = 0;
+  ezUInt32 ThreadGroupCountX = 0;
+  ezUInt32 ThreadGroupCountY = 0;
+  ezUInt32 ThreadGroupCountZ = 0;
 };
 struct EZ_RHI_DLL SubresourceData
 {
   const void* pSysMem = nullptr;
-  uint32_t SysMemPitch = 0;
-  uint32_t SysMemSlicePitch = 0;
+  ezUInt32 SysMemPitch = 0;
+  ezUInt32 SysMemSlicePitch = 0;
 };
 struct EZ_RHI_DLL Rect
 {
@@ -788,10 +763,10 @@ struct EZ_RHI_DLL Mapping
     FLAG_READ = 1 << 0,
     FLAG_WRITE = 1 << 1,
   };
-  uint32_t _flags = FLAG_EMPTY;
+  ezUInt32 _flags = FLAG_EMPTY;
   size_t offset = 0;
   size_t size = 0;
-  uint32_t rowpitch = 0; // output
+  ezUInt32 rowpitch = 0; // output
   void* data = nullptr;  // output
 };
 
@@ -806,7 +781,7 @@ struct EZ_RHI_DLL GraphicsDeviceChild
 
 struct EZ_RHI_DLL Shader : public GraphicsDeviceChild
 {
-  SHADERSTAGE stage = SHADERSTAGE_COUNT;
+  ezEnum<ezRHIShaderStage> stage = ezRHIShaderStage::ENUM_COUNT;
   std::vector<uint8_t> code;
   const RootSignature* rootSignature = nullptr;
 };
@@ -907,7 +882,7 @@ struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
     FLAG_PREFER_FAST_BUILD = 1 << 3,
     FLAG_MINIMIZE_MEMORY = 1 << 4,
   };
-  uint32_t _flags = FLAG_EMPTY;
+  ezUInt32 _flags = FLAG_EMPTY;
 
   enum TYPE
   {
@@ -926,7 +901,7 @@ struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
         FLAG_NO_DUPLICATE_ANYHIT_INVOCATION = 1 << 1,
         FLAG_USE_TRANSFORM = 1 << 2,
       };
-      uint32_t _flags = FLAG_EMPTY;
+      ezUInt32 _flags = FLAG_EMPTY;
 
       enum TYPE
       {
@@ -938,22 +913,22 @@ struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
       {
         GPUBuffer vertexBuffer;
         GPUBuffer indexBuffer;
-        uint32_t indexCount = 0;
-        uint32_t indexOffset = 0;
-        uint32_t vertexCount = 0;
-        uint32_t vertexByteOffset = 0;
-        uint32_t vertexStride = 0;
-        INDEXBUFFER_FORMAT indexFormat = INDEXFORMAT_32BIT;
+        ezUInt32 indexCount = 0;
+        ezUInt32 indexOffset = 0;
+        ezUInt32 vertexCount = 0;
+        ezUInt32 vertexByteOffset = 0;
+        ezUInt32 vertexStride = 0;
+        ezRHIIndexBufferFormat::Enum indexFormat = ezRHIIndexBufferFormat::UInt32;
         FORMAT vertexFormat = FORMAT_R32G32B32_FLOAT;
         GPUBuffer transform3x4Buffer;
-        uint32_t transform3x4BufferOffset = 0;
+        ezUInt32 transform3x4BufferOffset = 0;
       } triangles;
       struct Procedural_AABBs
       {
         GPUBuffer aabbBuffer;
-        uint32_t offset = 0;
-        uint32_t count = 0;
-        uint32_t stride = 0;
+        ezUInt32 offset = 0;
+        ezUInt32 count = 0;
+        ezUInt32 stride = 0;
       } aabbs;
     };
     std::vector<Geometry> geometries;
@@ -964,15 +939,15 @@ struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
     struct Instance
     {
       Float3X4 transform;
-      uint32_t InstanceID : 24;
-      uint32_t InstanceMask : 8;
-      uint32_t InstanceContributionToHitGroupIndex : 24;
-      uint32_t Flags : 8;
+      ezUInt32 InstanceID : 24;
+      ezUInt32 InstanceMask : 8;
+      ezUInt32 InstanceContributionToHitGroupIndex : 24;
+      ezUInt32 Flags : 8;
       GPUResource bottomlevel;
     };
     GPUBuffer instanceBuffer;
-    uint32_t offset = 0;
-    uint32_t count = 0;
+    ezUInt32 offset = 0;
+    ezUInt32 count = 0;
   } toplevel;
 };
 struct EZ_RHI_DLL RaytracingAccelerationStructure : public GPUResource
@@ -1004,19 +979,19 @@ struct EZ_RHI_DLL ShaderHitGroup
     PROCEDURAL,
   } type = TRIANGLES;
   std::string name;
-  uint32_t general_shader = ~0;
-  uint32_t closesthit_shader = ~0;
-  uint32_t anyhit_shader = ~0;
-  uint32_t intersection_shader = ~0;
+  ezUInt32 general_shader = ~0;
+  ezUInt32 closesthit_shader = ~0;
+  ezUInt32 anyhit_shader = ~0;
+  ezUInt32 intersection_shader = ~0;
 };
 struct EZ_RHI_DLL RaytracingPipelineStateDesc
 {
   const RootSignature* rootSignature = nullptr;
   std::vector<ShaderLibrary> shaderlibraries;
   std::vector<ShaderHitGroup> hitgroups;
-  uint32_t max_trace_recursion_depth = 1;
-  uint32_t max_attribute_size_in_bytes = 0;
-  uint32_t max_payload_size_in_bytes = 0;
+  ezUInt32 max_trace_recursion_depth = 1;
+  ezUInt32 max_attribute_size_in_bytes = 0;
+  ezUInt32 max_payload_size_in_bytes = 0;
 };
 struct EZ_RHI_DLL RaytracingPipelineState : public GraphicsDeviceChild
 {
@@ -1038,9 +1013,9 @@ struct EZ_RHI_DLL DispatchRaysDesc
   ShaderTable miss;
   ShaderTable hitgroup;
   ShaderTable callable;
-  uint32_t Width = 1;
-  uint32_t Height = 1;
-  uint32_t Depth = 1;
+  ezUInt32 Width = 1;
+  ezUInt32 Height = 1;
+  ezUInt32 Depth = 1;
 };
 
 enum BINDPOINT
@@ -1083,32 +1058,32 @@ enum RESOURCEBINDING
 struct EZ_RHI_DLL ResourceRange
 {
   RESOURCEBINDING binding = CONSTANTBUFFER;
-  uint32_t slot = 0;
-  uint32_t count = 1;
+  ezUInt32 slot = 0;
+  ezUInt32 count = 1;
 };
 struct EZ_RHI_DLL SamplerRange
 {
-  uint32_t slot = 0;
-  uint32_t count = 1;
+  ezUInt32 slot = 0;
+  ezUInt32 count = 1;
 };
 struct EZ_RHI_DLL StaticSampler
 {
   Sampler sampler;
-  uint32_t slot = 0;
+  ezUInt32 slot = 0;
 };
 struct EZ_RHI_DLL DescriptorTable : public GraphicsDeviceChild
 {
-  SHADERSTAGE stage = SHADERSTAGE_COUNT;
+  ezEnum<ezRHIShaderStage> stage = ezRHIShaderStage::ENUM_COUNT;
   std::vector<ResourceRange> resources;
   std::vector<SamplerRange> samplers;
   std::vector<StaticSampler> staticsamplers;
 };
 struct EZ_RHI_DLL RootConstantRange
 {
-  SHADERSTAGE stage = SHADERSTAGE_COUNT;
-  uint32_t slot = 0;
-  uint32_t size = 0;
-  uint32_t offset = 0;
+  ezEnum<ezRHIShaderStage> stage = ezRHIShaderStage::ENUM_COUNT;
+  ezUInt32 slot = 0;
+  ezUInt32 size = 0;
+  ezUInt32 offset = 0;
 };
 struct EZ_RHI_DLL RootSignature : public GraphicsDeviceChild
 {
@@ -1117,7 +1092,7 @@ struct EZ_RHI_DLL RootSignature : public GraphicsDeviceChild
     FLAG_EMPTY = 0,
     FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT = 1 << 0,
   };
-  uint32_t _flags = FLAG_EMPTY;
+  ezUInt32 _flags = FLAG_EMPTY;
   std::vector<DescriptorTable> tables;
   std::vector<RootConstantRange> rootconstants;
 };

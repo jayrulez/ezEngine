@@ -165,7 +165,7 @@ public:
         dataBuffer.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
 
         ezUInt64 psDataSize = fReader.ReadBytes(dataBuffer.GetData(), fReader.GetFileSize());
-        m_pDevice->CreateShader(SHADERSTAGE::PS, dataBuffer.GetData(), psDataSize, pixelShader);
+        m_pDevice->CreateShader(ezRHIShaderStage::PixelShader, dataBuffer.GetData(), psDataSize, pixelShader);
 
         dataBuffer.Clear();
         fReader.Close();
@@ -180,7 +180,7 @@ public:
         dataBuffer.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
 
         ezUInt64 vsDataSize = fReader.ReadBytes(dataBuffer.GetData(), fReader.GetFileSize());
-        m_pDevice->CreateShader(SHADERSTAGE::VS, dataBuffer.GetData(), vsDataSize, vertexShader);
+        m_pDevice->CreateShader(ezRHIShaderStage::VertexShader, dataBuffer.GetData(), vsDataSize, vertexShader);
 
         dataBuffer.Clear();
         fReader.Close();
@@ -198,7 +198,7 @@ public:
       PipelineStateDesc pipelineDesc = {};
       pipelineDesc.vs = vertexShader;
       pipelineDesc.ps = pixelShader;
-      pipelineDesc.pt = TRIANGLELIST;
+      pipelineDesc.pt = ezRHIPrimitiveTopology::TriangleList;
       pipelineDesc.il = &inputLayout;
 
       //BlendStateDesc bsDesc;
@@ -385,9 +385,9 @@ public:
 
     uint32_t stride = sizeof(Vertex);
     m_pDevice->BindVertexBuffers(vbs, 0, 1, &stride, nullptr, commandList);
-    m_pDevice->BindIndexBuffer(&indexBuffer, INDEXFORMAT_16BIT, 0, commandList);
+    m_pDevice->BindIndexBuffer(&indexBuffer, ezRHIIndexBufferFormat::UInt16, 0, commandList);
     m_pDevice->BindPipelineState(&pipeline, commandList);
-    m_pDevice->BindConstantBuffer(SHADERSTAGE::VS, &constantBuffer, 0, commandList);
+    m_pDevice->BindConstantBuffer(ezRHIShaderStage::VertexShader, &constantBuffer, 0, commandList);
     //m_pDevice->Draw(36,0, commandList);
     m_pDevice->DrawIndexed(36, 0, 0, commandList);
 

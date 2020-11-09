@@ -65,7 +65,7 @@ public:
 	{
 	}
 
-	inline bool get(uint32_t bit) const
+	inline bool get(ezUInt32 bit) const
 	{
 		if (bit < 64)
 			return (lower & (1ull << bit)) != 0;
@@ -73,7 +73,7 @@ public:
 			return higher.count(bit) != 0;
 	}
 
-	inline void set(uint32_t bit)
+	inline void set(ezUInt32 bit)
 	{
 		if (bit < 64)
 			lower |= 1ull << bit;
@@ -81,7 +81,7 @@ public:
 			higher.insert(bit);
 	}
 
-	inline void clear(uint32_t bit)
+	inline void clear(ezUInt32 bit)
 	{
 		if (bit < 64)
 			lower &= ~(1ull << bit);
@@ -103,7 +103,7 @@ public:
 	inline void merge_and(const Bitset &other)
 	{
 		lower &= other.lower;
-		std::unordered_set<uint32_t> tmp_set;
+		std::unordered_set<ezUInt32> tmp_set;
 		for (auto &v : higher)
 			if (other.higher.count(v) != 0)
 				tmp_set.insert(v);
@@ -141,7 +141,7 @@ public:
 	void for_each_bit(const Op &op) const
 	{
 		// TODO: Add ctz-based iteration.
-		for (uint32_t i = 0; i < 64; i++)
+		for (ezUInt32 i = 0; i < 64; i++)
 		{
 			if (lower & (1ull << i))
 				op(i);
@@ -152,7 +152,7 @@ public:
 
 		// Need to enforce an order here for reproducible results,
 		// but hitting this path should happen extremely rarely, so having this slow path is fine.
-		SmallVector<uint32_t> bits;
+		SmallVector<ezUInt32> bits;
 		bits.reserve(higher.size());
 		for (auto &v : higher)
 			bits.push_back(v);
@@ -172,7 +172,7 @@ private:
 	// so optimize for this case. Bits spilling outside 64 go into a slower data structure.
 	// In almost all cases, higher data structure will not be used.
 	uint64_t lower = 0;
-	std::unordered_set<uint32_t> higher;
+	std::unordered_set<ezUInt32> higher;
 };
 
 // Helper template to avoid lots of nasty string temporary munging.
@@ -270,10 +270,10 @@ inline std::string convert_to_string(double t, char locale_radix_point)
 
 struct Instruction
 {
-	uint16_t op = 0;
-	uint16_t count = 0;
-	uint32_t offset = 0;
-	uint32_t length = 0;
+	ezUInt16 op = 0;
+	ezUInt16 count = 0;
+	ezUInt32 offset = 0;
+	ezUInt32 length = 0;
 };
 
 enum Types
@@ -303,7 +303,7 @@ class TypedID<TypeNone>
 {
 public:
 	TypedID() = default;
-	TypedID(uint32_t id_)
+	TypedID(ezUInt32 id_)
 	    : id(id_)
 	{
 	}
@@ -317,13 +317,13 @@ public:
 	template <Types U>
 	TypedID &operator=(const TypedID<U> &other)
 	{
-		id = uint32_t(other);
+		id = ezUInt32(other);
 		return *this;
 	}
 
 	// Implicit conversion to u32 is desired here.
 	// As long as we block implicit conversion between TypedID<A> and TypedID<B> we're good.
-	operator uint32_t() const
+	operator ezUInt32() const
 	{
 		return id;
 	}
@@ -347,17 +347,17 @@ public:
 	template <Types type>
 	bool operator==(const TypedID<type> &other) const
 	{
-		return id == uint32_t(other);
+		return id == ezUInt32(other);
 	}
 
 	template <Types type>
 	bool operator!=(const TypedID<type> &other) const
 	{
-		return id != uint32_t(other);
+		return id != ezUInt32(other);
 	}
 
 private:
-	uint32_t id = 0;
+	ezUInt32 id = 0;
 };
 
 template <Types type>
@@ -365,17 +365,17 @@ class TypedID
 {
 public:
 	TypedID() = default;
-	TypedID(uint32_t id_)
+	TypedID(ezUInt32 id_)
 	    : id(id_)
 	{
 	}
 
 	explicit TypedID(const TypedID<TypeNone> &other)
-	    : id(uint32_t(other))
+	    : id(ezUInt32(other))
 	{
 	}
 
-	operator uint32_t() const
+	operator ezUInt32() const
 	{
 		return id;
 	}
@@ -392,16 +392,16 @@ public:
 
 	bool operator==(const TypedID<TypeNone> &other) const
 	{
-		return id == uint32_t(other);
+		return id == ezUInt32(other);
 	}
 
 	bool operator!=(const TypedID<TypeNone> &other) const
 	{
-		return id != uint32_t(other);
+		return id != ezUInt32(other);
 	}
 
 private:
-	uint32_t id = 0;
+	ezUInt32 id = 0;
 };
 
 using VariableID = TypedID<TypeVariable>;
@@ -486,17 +486,17 @@ struct SPIRConstantOp : IVariant
 		type = TypeConstantOp
 	};
 
-	SPIRConstantOp(TypeID result_type, spv::Op op, const uint32_t *args, uint32_t length)
+	SPIRConstantOp(TypeID result_type, spv::Op op, const ezUInt32 *args, ezUInt32 length)
 	    : opcode(op)
 	    , basetype(result_type)
 	{
 		arguments.reserve(length);
-		for (uint32_t i = 0; i < length; i++)
+		for (ezUInt32 i = 0; i < length; i++)
 			arguments.push_back(args[i]);
 	}
 
 	spv::Op opcode;
-	SmallVector<uint32_t> arguments;
+	SmallVector<ezUInt32> arguments;
 	TypeID basetype;
 
 	SPIRV_CROSS_DECLARE_CLONE(SPIRConstantOp)
@@ -540,12 +540,12 @@ struct SPIRType : IVariant
 
 	// Scalar/vector/matrix support.
 	BaseType basetype = Unknown;
-	uint32_t width = 0;
-	uint32_t vecsize = 1;
-	uint32_t columns = 1;
+	ezUInt32 width = 0;
+	ezUInt32 vecsize = 1;
+	ezUInt32 columns = 1;
 
 	// Arrays, support array of arrays by having a vector of array sizes.
-	SmallVector<uint32_t> array;
+	SmallVector<ezUInt32> array;
 
 	// Array elements can be either specialization constants or specialization ops.
 	// This array determines how to interpret the array size.
@@ -556,7 +556,7 @@ struct SPIRType : IVariant
 
 	// Pointers
 	// Keep track of how many pointer layers we have.
-	uint32_t pointer_depth = 0;
+	ezUInt32 pointer_depth = 0;
 	bool pointer = false;
 	bool forward_pointer = false;
 
@@ -566,7 +566,7 @@ struct SPIRType : IVariant
 
 	// If member order has been rewritten to handle certain scenarios with Offset,
 	// allow codegen to rewrite the index.
-	SmallVector<uint32_t> member_type_index_redirection;
+	SmallVector<ezUInt32> member_type_index_redirection;
 
 	struct ImageType
 	{
@@ -575,7 +575,7 @@ struct SPIRType : IVariant
 		bool depth;
 		bool arrayed;
 		bool ms;
-		uint32_t sampled;
+		ezUInt32 sampled;
 		spv::ImageFormat format;
 		spv::AccessQualifier access;
 	} image;
@@ -643,11 +643,11 @@ struct SPIREntryPoint
 	Bitset flags;
 	struct
 	{
-		uint32_t x = 0, y = 0, z = 0;
-		uint32_t constant = 0; // Workgroup size can be expressed as a constant/spec-constant instead.
+		ezUInt32 x = 0, y = 0, z = 0;
+		ezUInt32 constant = 0; // Workgroup size can be expressed as a constant/spec-constant instead.
 	} workgroup_size;
-	uint32_t invocations = 0;
-	uint32_t output_vertices = 0;
+	ezUInt32 invocations = 0;
+	ezUInt32 output_vertices = 0;
 	spv::ExecutionModel model = spv::ExecutionModelMax;
 	bool geometry_passthrough = false;
 };
@@ -715,7 +715,7 @@ struct SPIRFunctionPrototype : IVariant
 	}
 
 	TypeID return_type;
-	SmallVector<uint32_t> parameter_types;
+	SmallVector<ezUInt32> parameter_types;
 
 	SPIRV_CROSS_DECLARE_CLONE(SPIRFunctionPrototype)
 };
@@ -781,7 +781,7 @@ struct SPIRBlock : IVariant
 		ComplexLoop
 	};
 
-	enum : uint32_t
+	enum : ezUInt32
 	{
 		NoDominator = 0xffffffffu
 	};
@@ -821,7 +821,7 @@ struct SPIRBlock : IVariant
 
 	struct Case
 	{
-		uint32_t value;
+		ezUInt32 value;
 		BlockID block;
 	};
 	SmallVector<Case> cases;
@@ -878,8 +878,8 @@ struct SPIRFunction : IVariant
 	{
 		TypeID type;
 		ID id;
-		uint32_t read_count;
-		uint32_t write_count;
+		ezUInt32 read_count;
+		ezUInt32 write_count;
 
 		// Set to true if this parameter aliases a global variable,
 		// used mostly in Metal where global variables
@@ -922,8 +922,8 @@ struct SPIRFunction : IVariant
 
 	struct EntryLine
 	{
-		uint32_t file_id = 0;
-		uint32_t line_literal = 0;
+		ezUInt32 file_id = 0;
+		ezUInt32 line_literal = 0;
 	};
 	EntryLine entry_line;
 
@@ -991,8 +991,8 @@ struct SPIRAccessChain : IVariant
 	int32_t static_index;
 
 	VariableID loaded_from = 0;
-	uint32_t matrix_stride = 0;
-	uint32_t array_stride = 0;
+	ezUInt32 matrix_stride = 0;
+	ezUInt32 array_stride = 0;
 	bool row_major_matrix = false;
 	bool immutable = false;
 
@@ -1021,11 +1021,11 @@ struct SPIRVariable : IVariant
 
 	TypeID basetype = 0;
 	spv::StorageClass storage = spv::StorageClassGeneric;
-	uint32_t decoration = 0;
+	ezUInt32 decoration = 0;
 	ID initializer = 0;
 	VariableID basevariable = 0;
 
-	SmallVector<uint32_t> dereference_chain;
+	SmallVector<ezUInt32> dereference_chain;
 	bool compat_builtin = false;
 
 	// If a variable is shadowed, we only statically assign to it
@@ -1046,7 +1046,7 @@ struct SPIRVariable : IVariant
 	bool allocate_temporary_copy = false;
 
 	bool remapped_variable = false;
-	uint32_t remapped_components = 0;
+	ezUInt32 remapped_components = 0;
 
 	// The block which dominates all access to this variable.
 	BlockID dominator = 0;
@@ -1070,7 +1070,7 @@ struct SPIRConstant : IVariant
 	};
 
 	union Constant {
-		uint32_t u32;
+		ezUInt32 u32;
 		int32_t i32;
 		float f32;
 
@@ -1084,7 +1084,7 @@ struct SPIRConstant : IVariant
 		Constant r[4];
 		// If != 0, this element is a specialization constant, and we should keep track of it as such.
 		ID id[4];
-		uint32_t vecsize = 1;
+		ezUInt32 vecsize = 1;
 
 		ConstantVector()
 		{
@@ -1097,10 +1097,10 @@ struct SPIRConstant : IVariant
 		ConstantVector c[4];
 		// If != 0, this column is a specialization constant, and we should keep track of it as such.
 		ID id[4];
-		uint32_t columns = 1;
+		ezUInt32 columns = 1;
 	};
 
-	static inline float f16_to_f32(uint16_t u16_value)
+	static inline float f16_to_f32(ezUInt16 u16_value)
 	{
 		// Based on the GLM implementation.
 		int s = (u16_value >> 15) & 0x1;
@@ -1109,14 +1109,14 @@ struct SPIRConstant : IVariant
 
 		union {
 			float f32;
-			uint32_t u32;
+			ezUInt32 u32;
 		} u;
 
 		if (e == 0)
 		{
 			if (m == 0)
 			{
-				u.u32 = uint32_t(s) << 31;
+				u.u32 = ezUInt32(s) << 31;
 				return u.f32;
 			}
 			else
@@ -1135,83 +1135,83 @@ struct SPIRConstant : IVariant
 		{
 			if (m == 0)
 			{
-				u.u32 = (uint32_t(s) << 31) | 0x7f800000u;
+				u.u32 = (ezUInt32(s) << 31) | 0x7f800000u;
 				return u.f32;
 			}
 			else
 			{
-				u.u32 = (uint32_t(s) << 31) | 0x7f800000u | (m << 13);
+				u.u32 = (ezUInt32(s) << 31) | 0x7f800000u | (m << 13);
 				return u.f32;
 			}
 		}
 
 		e += 127 - 15;
 		m <<= 13;
-		u.u32 = (uint32_t(s) << 31) | (e << 23) | m;
+		u.u32 = (ezUInt32(s) << 31) | (e << 23) | m;
 		return u.f32;
 	}
 
-	inline uint32_t specialization_constant_id(uint32_t col, uint32_t row) const
+	inline ezUInt32 specialization_constant_id(ezUInt32 col, ezUInt32 row) const
 	{
 		return m.c[col].id[row];
 	}
 
-	inline uint32_t specialization_constant_id(uint32_t col) const
+	inline ezUInt32 specialization_constant_id(ezUInt32 col) const
 	{
 		return m.id[col];
 	}
 
-	inline uint32_t scalar(uint32_t col = 0, uint32_t row = 0) const
+	inline ezUInt32 scalar(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].u32;
 	}
 
-	inline int16_t scalar_i16(uint32_t col = 0, uint32_t row = 0) const
+	inline int16_t scalar_i16(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return int16_t(m.c[col].r[row].u32 & 0xffffu);
 	}
 
-	inline uint16_t scalar_u16(uint32_t col = 0, uint32_t row = 0) const
+	inline ezUInt16 scalar_u16(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
-		return uint16_t(m.c[col].r[row].u32 & 0xffffu);
+		return ezUInt16(m.c[col].r[row].u32 & 0xffffu);
 	}
 
-	inline int8_t scalar_i8(uint32_t col = 0, uint32_t row = 0) const
+	inline int8_t scalar_i8(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return int8_t(m.c[col].r[row].u32 & 0xffu);
 	}
 
-	inline uint8_t scalar_u8(uint32_t col = 0, uint32_t row = 0) const
+	inline uint8_t scalar_u8(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return uint8_t(m.c[col].r[row].u32 & 0xffu);
 	}
 
-	inline float scalar_f16(uint32_t col = 0, uint32_t row = 0) const
+	inline float scalar_f16(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return f16_to_f32(scalar_u16(col, row));
 	}
 
-	inline float scalar_f32(uint32_t col = 0, uint32_t row = 0) const
+	inline float scalar_f32(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].f32;
 	}
 
-	inline int32_t scalar_i32(uint32_t col = 0, uint32_t row = 0) const
+	inline int32_t scalar_i32(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].i32;
 	}
 
-	inline double scalar_f64(uint32_t col = 0, uint32_t row = 0) const
+	inline double scalar_f64(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].f64;
 	}
 
-	inline int64_t scalar_i64(uint32_t col = 0, uint32_t row = 0) const
+	inline int64_t scalar_i64(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].i64;
 	}
 
-	inline uint64_t scalar_u64(uint32_t col = 0, uint32_t row = 0) const
+	inline uint64_t scalar_u64(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].u64;
 	}
@@ -1221,12 +1221,12 @@ struct SPIRConstant : IVariant
 		return m.c[0];
 	}
 
-	inline uint32_t vector_size() const
+	inline ezUInt32 vector_size() const
 	{
 		return m.c[0].vecsize;
 	}
 
-	inline uint32_t columns() const
+	inline ezUInt32 columns() const
 	{
 		return m.columns;
 	}
@@ -1246,33 +1246,33 @@ struct SPIRConstant : IVariant
 		if (!subconstants.empty())
 			return false;
 
-		for (uint32_t col = 0; col < columns(); col++)
-			for (uint32_t row = 0; row < vector_size(); row++)
+		for (ezUInt32 col = 0; col < columns(); col++)
+			for (ezUInt32 row = 0; row < vector_size(); row++)
 				if (scalar_u64(col, row) != 0)
 					return false;
 
 		return true;
 	}
 
-	explicit SPIRConstant(uint32_t constant_type_)
+	explicit SPIRConstant(ezUInt32 constant_type_)
 	    : constant_type(constant_type_)
 	{
 	}
 
 	SPIRConstant() = default;
 
-	SPIRConstant(TypeID constant_type_, const uint32_t *elements, uint32_t num_elements, bool specialized)
+	SPIRConstant(TypeID constant_type_, const ezUInt32 *elements, ezUInt32 num_elements, bool specialized)
 	    : constant_type(constant_type_)
 	    , specialization(specialized)
 	{
 		subconstants.reserve(num_elements);
-		for (uint32_t i = 0; i < num_elements; i++)
+		for (ezUInt32 i = 0; i < num_elements; i++)
 			subconstants.push_back(elements[i]);
 		specialization = specialized;
 	}
 
 	// Construct scalar (32-bit).
-	SPIRConstant(TypeID constant_type_, uint32_t v0, bool specialized)
+	SPIRConstant(TypeID constant_type_, ezUInt32 v0, bool specialized)
 	    : constant_type(constant_type_)
 	    , specialization(specialized)
 	{
@@ -1292,7 +1292,7 @@ struct SPIRConstant : IVariant
 	}
 
 	// Construct vectors and matrices.
-	SPIRConstant(TypeID constant_type_, const SPIRConstant *const *vector_elements, uint32_t num_elements,
+	SPIRConstant(TypeID constant_type_, const SPIRConstant *const *vector_elements, ezUInt32 num_elements,
 	             bool specialized)
 	    : constant_type(constant_type_)
 	    , specialization(specialized)
@@ -1303,7 +1303,7 @@ struct SPIRConstant : IVariant
 		{
 			m.columns = num_elements;
 
-			for (uint32_t i = 0; i < num_elements; i++)
+			for (ezUInt32 i = 0; i < num_elements; i++)
 			{
 				m.c[i] = vector_elements[i]->m.c[0];
 				if (vector_elements[i]->specialization)
@@ -1315,7 +1315,7 @@ struct SPIRConstant : IVariant
 			m.c[0].vecsize = num_elements;
 			m.columns = 1;
 
-			for (uint32_t i = 0; i < num_elements; i++)
+			for (ezUInt32 i = 0; i < num_elements; i++)
 			{
 				m.c[0].r[i] = vector_elements[i]->m.c[0].r[0];
 				if (vector_elements[i]->specialization)
@@ -1522,7 +1522,7 @@ T &variant_set(Variant &var, P &&... args)
 
 struct AccessChainMeta
 {
-	uint32_t storage_physical_type = 0;
+	ezUInt32 storage_physical_type = 0;
 	bool need_transpose = false;
 	bool storage_is_packed = false;
 	bool storage_is_invariant = false;
@@ -1582,18 +1582,18 @@ struct Meta
 		std::string hlsl_semantic;
 		Bitset decoration_flags;
 		spv::BuiltIn builtin_type = spv::BuiltInMax;
-		uint32_t location = 0;
-		uint32_t component = 0;
-		uint32_t set = 0;
-		uint32_t binding = 0;
-		uint32_t offset = 0;
-		uint32_t xfb_buffer = 0;
-		uint32_t xfb_stride = 0;
-		uint32_t array_stride = 0;
-		uint32_t matrix_stride = 0;
-		uint32_t input_attachment = 0;
-		uint32_t spec_id = 0;
-		uint32_t index = 0;
+		ezUInt32 location = 0;
+		ezUInt32 component = 0;
+		ezUInt32 set = 0;
+		ezUInt32 binding = 0;
+		ezUInt32 offset = 0;
+		ezUInt32 xfb_buffer = 0;
+		ezUInt32 xfb_stride = 0;
+		ezUInt32 array_stride = 0;
+		ezUInt32 matrix_stride = 0;
+		ezUInt32 input_attachment = 0;
+		ezUInt32 spec_id = 0;
+		ezUInt32 index = 0;
 		spv::FPRoundingMode fp_rounding_mode = spv::FPRoundingModeMax;
 		bool builtin = false;
 
@@ -1607,7 +1607,7 @@ struct Meta
 			}
 
 			Bitset flags;
-			uint32_t values[SPIRVCrossDecorationCount];
+			ezUInt32 values[SPIRVCrossDecorationCount];
 		} extended;
 	};
 
@@ -1616,12 +1616,12 @@ struct Meta
 	// Intentionally not a SmallVector. Decoration is large and somewhat rare.
 	Vector<Decoration> members;
 
-	std::unordered_map<uint32_t, uint32_t> decoration_word_offset;
+	std::unordered_map<ezUInt32, ezUInt32> decoration_word_offset;
 
 	// For SPV_GOOGLE_hlsl_functionality1.
 	bool hlsl_is_magic_counter_buffer = false;
 	// ID for the sibling counter buffer.
-	uint32_t hlsl_magic_counter_buffer = 0;
+	ezUInt32 hlsl_magic_counter_buffer = 0;
 };
 
 // A user callback that remaps the type of any variable.
@@ -1633,7 +1633,7 @@ using VariableTypeRemapCallback =
 class Hasher
 {
 public:
-	inline void u32(uint32_t value)
+	inline void u32(ezUInt32 value)
 	{
 		h = (h * 0x100000001b3ull) ^ value;
 	}
@@ -1659,7 +1659,7 @@ static inline bool type_is_integral(const SPIRType &type)
 	       type.basetype == SPIRType::Int64 || type.basetype == SPIRType::UInt64;
 }
 
-static inline SPIRType::BaseType to_signed_basetype(uint32_t width)
+static inline SPIRType::BaseType to_signed_basetype(ezUInt32 width)
 {
 	switch (width)
 	{
@@ -1676,7 +1676,7 @@ static inline SPIRType::BaseType to_signed_basetype(uint32_t width)
 	}
 }
 
-static inline SPIRType::BaseType to_unsigned_basetype(uint32_t width)
+static inline SPIRType::BaseType to_unsigned_basetype(ezUInt32 width)
 {
 	switch (width)
 	{
@@ -1716,8 +1716,8 @@ static inline bool opcode_is_sign_invariant(spv::Op opcode)
 
 struct SetBindingPair
 {
-	uint32_t desc_set;
-	uint32_t binding;
+	ezUInt32 desc_set;
+	ezUInt32 binding;
 
 	inline bool operator==(const SetBindingPair &other) const
 	{
@@ -1733,8 +1733,8 @@ struct SetBindingPair
 struct StageSetBinding
 {
 	spv::ExecutionModel model;
-	uint32_t desc_set;
-	uint32_t binding;
+	ezUInt32 desc_set;
+	ezUInt32 binding;
 
 	inline bool operator==(const StageSetBinding &other) const
 	{
@@ -1747,16 +1747,16 @@ struct InternalHasher
 	inline size_t operator()(const SetBindingPair &value) const
 	{
 		// Quality of hash doesn't really matter here.
-		auto hash_set = std::hash<uint32_t>()(value.desc_set);
-		auto hash_binding = std::hash<uint32_t>()(value.binding);
+		auto hash_set = std::hash<ezUInt32>()(value.desc_set);
+		auto hash_binding = std::hash<ezUInt32>()(value.binding);
 		return (hash_set * 0x10001b31) ^ hash_binding;
 	}
 
 	inline size_t operator()(const StageSetBinding &value) const
 	{
 		// Quality of hash doesn't really matter here.
-		auto hash_model = std::hash<uint32_t>()(value.model);
-		auto hash_set = std::hash<uint32_t>()(value.desc_set);
+		auto hash_model = std::hash<ezUInt32>()(value.model);
+		auto hash_set = std::hash<ezUInt32>()(value.desc_set);
 		auto tmp_hash = (hash_model * 0x10001b31) ^ hash_set;
 		return (tmp_hash * 0x10001b31) ^ value.binding;
 	}
@@ -1764,11 +1764,11 @@ struct InternalHasher
 
 // Special constant used in a {MSL,HLSL}ResourceBinding desc_set
 // element to indicate the bindings for the push constants.
-static const uint32_t ResourceBindingPushConstantDescriptorSet = ~(0u);
+static const ezUInt32 ResourceBindingPushConstantDescriptorSet = ~(0u);
 
 // Special constant used in a {MSL,HLSL}ResourceBinding binding
 // element to indicate the bindings for the push constants.
-static const uint32_t ResourceBindingPushConstantBinding = 0;
+static const ezUInt32 ResourceBindingPushConstantBinding = 0;
 } // namespace SPIRV_CROSS_NAMESPACE
 
 namespace std
@@ -1778,7 +1778,7 @@ struct hash<SPIRV_CROSS_NAMESPACE::TypedID<type>>
 {
 	size_t operator()(const SPIRV_CROSS_NAMESPACE::TypedID<type> &value) const
 	{
-		return std::hash<uint32_t>()(value);
+		return std::hash<ezUInt32>()(value);
 	}
 };
 } // namespace std

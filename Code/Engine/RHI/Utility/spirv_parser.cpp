@@ -22,14 +22,14 @@ using namespace spv;
 
 namespace SPIRV_CROSS_NAMESPACE
 {
-Parser::Parser(vector<uint32_t> spirv)
+Parser::Parser(vector<ezUInt32> spirv)
 {
 	ir.spirv = move(spirv);
 }
 
-Parser::Parser(const uint32_t *spirv_data, size_t word_count)
+Parser::Parser(const ezUInt32 *spirv_data, size_t word_count)
 {
-	ir.spirv = vector<uint32_t>(spirv_data, spirv_data + word_count);
+	ir.spirv = vector<ezUInt32>(spirv_data, spirv_data + word_count);
 }
 
 static bool decoration_is_string(Decoration decoration)
@@ -44,12 +44,12 @@ static bool decoration_is_string(Decoration decoration)
 	}
 }
 
-static inline uint32_t swap_endian(uint32_t v)
+static inline ezUInt32 swap_endian(ezUInt32 v)
 {
 	return ((v >> 24) & 0x000000ffu) | ((v >> 8) & 0x0000ff00u) | ((v << 8) & 0x00ff0000u) | ((v << 24) & 0xff000000u);
 }
 
-static bool is_valid_spirv_version(uint32_t version)
+static bool is_valid_spirv_version(ezUInt32 version)
 {
 	switch (version)
 	{
@@ -80,20 +80,20 @@ void Parser::parse()
 
 	// Endian-swap if we need to.
 	if (s[0] == swap_endian(MagicNumber))
-		transform(begin(spirv), end(spirv), begin(spirv), [](uint32_t c) { return swap_endian(c); });
+		transform(begin(spirv), end(spirv), begin(spirv), [](ezUInt32 c) { return swap_endian(c); });
 
 	if (s[0] != MagicNumber || !is_valid_spirv_version(s[1]))
 		SPIRV_CROSS_THROW("Invalid SPIRV format.");
 
-	uint32_t bound = s[3];
+	ezUInt32 bound = s[3];
 
-	const uint32_t MaximumNumberOfIDs = 0x3fffff;
+	const ezUInt32 MaximumNumberOfIDs = 0x3fffff;
 	if (bound > MaximumNumberOfIDs)
 		SPIRV_CROSS_THROW("ID bound exceeds limit of 0x3fffff.\n");
 
 	ir.set_id_bounds(bound);
 
-	uint32_t offset = 5;
+	ezUInt32 offset = 5;
 
 	SmallVector<Instruction> instructions;
 	while (offset < len)
@@ -135,7 +135,7 @@ void Parser::parse()
 		SPIRV_CROSS_THROW("Block was not terminated.");
 }
 
-const uint32_t *Parser::stream(const Instruction &instr) const
+const ezUInt32 *Parser::stream(const Instruction &instr) const
 {
 	// If we're not going to use any arguments, just return nullptr.
 	// We want to avoid case where we return an out of range pointer
@@ -148,14 +148,14 @@ const uint32_t *Parser::stream(const Instruction &instr) const
 	return &ir.spirv[instr.offset];
 }
 
-static string extract_string(const vector<uint32_t> &spirv, uint32_t offset)
+static string extract_string(const vector<ezUInt32> &spirv, ezUInt32 offset)
 {
 	string ret;
-	for (uint32_t i = offset; i < spirv.size(); i++)
+	for (ezUInt32 i = offset; i < spirv.size(); i++)
 	{
-		uint32_t w = spirv[i];
+		ezUInt32 w = spirv[i];
 
-		for (uint32_t j = 0; j < 4; j++, w >>= 8)
+		for (ezUInt32 j = 0; j < 4; j++, w >>= 8)
 		{
 			char c = w & 0xff;
 			if (c == '\0')
@@ -171,7 +171,7 @@ void Parser::parse(const Instruction &instruction)
 {
 	auto *ops = stream(instruction);
 	auto op = static_cast<Op>(instruction.op);
-	uint32_t length = instruction.length;
+	ezUInt32 length = instruction.length;
 
 	switch (op)
 	{
@@ -228,8 +228,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpUndef:
 	{
-		uint32_t result_type = ops[0];
-		uint32_t id = ops[1];
+		ezUInt32 result_type = ops[0];
+		ezUInt32 id = ops[1];
 		set<SPIRUndef>(id, result_type);
 		if (current_block)
 			current_block->ops.push_back(instruction);
@@ -238,7 +238,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpCapability:
 	{
-		uint32_t cap = ops[0];
+		ezUInt32 cap = ops[0];
 		if (cap == CapabilityKernel)
 			SPIRV_CROSS_THROW("Kernel capability not supported.");
 
@@ -255,7 +255,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpExtInstImport:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto ext = extract_string(ir.spirv, instruction.offset + 1);
 		if (ext == "GLSL.std.450")
 			set<SPIRExtension>(id, SPIRExtension::GLSL);
@@ -293,9 +293,9 @@ void Parser::parse(const Instruction &instruction)
 		auto &e = itr.first->second;
 
 		// Strings need nul-terminator and consume the whole word.
-		uint32_t strlen_words = uint32_t((e.name.size() + 1 + 3) >> 2);
+		ezUInt32 strlen_words = ezUInt32((e.name.size() + 1 + 3) >> 2);
 
-		for (uint32_t i = strlen_words + 2; i < instruction.length; i++)
+		for (ezUInt32 i = strlen_words + 2; i < instruction.length; i++)
 			e.interface_variables.push_back(ops[i]);
 
 		// Set the name of the entry point in case OpName is not provided later.
@@ -337,15 +337,15 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpName:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		ir.set_name(id, extract_string(ir.spirv, instruction.offset + 1));
 		break;
 	}
 
 	case OpMemberName:
 	{
-		uint32_t id = ops[0];
-		uint32_t member = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 member = ops[1];
 		ir.set_member_name(id, member, extract_string(ir.spirv, instruction.offset + 2));
 		break;
 	}
@@ -359,16 +359,16 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpGroupDecorate:
 	{
-		uint32_t group_id = ops[0];
+		ezUInt32 group_id = ops[0];
 		auto &decorations = ir.meta[group_id].decoration;
 		auto &flags = decorations.decoration_flags;
 
 		// Copies decorations from one ID to another. Only copy decorations which are set in the group,
 		// i.e., we cannot just copy the meta structure directly.
-		for (uint32_t i = 1; i < length; i++)
+		for (ezUInt32 i = 1; i < length; i++)
 		{
-			uint32_t target = ops[i];
-			flags.for_each_bit([&](uint32_t bit) {
+			ezUInt32 target = ops[i];
+			flags.for_each_bit([&](ezUInt32 bit) {
 				auto decoration = static_cast<Decoration>(bit);
 
 				if (decoration_is_string(decoration))
@@ -388,16 +388,16 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpGroupMemberDecorate:
 	{
-		uint32_t group_id = ops[0];
+		ezUInt32 group_id = ops[0];
 		auto &flags = ir.meta[group_id].decoration.decoration_flags;
 
 		// Copies decorations from one ID to another. Only copy decorations which are set in the group,
 		// i.e., we cannot just copy the meta structure directly.
-		for (uint32_t i = 1; i + 1 < length; i += 2)
+		for (ezUInt32 i = 1; i + 1 < length; i += 2)
 		{
-			uint32_t target = ops[i + 0];
-			uint32_t index = ops[i + 1];
-			flags.for_each_bit([&](uint32_t bit) {
+			ezUInt32 target = ops[i + 0];
+			ezUInt32 index = ops[i + 1];
+			flags.for_each_bit([&](ezUInt32 bit) {
 				auto decoration = static_cast<Decoration>(bit);
 
 				if (decoration_is_string(decoration))
@@ -415,12 +415,12 @@ void Parser::parse(const Instruction &instruction)
 	{
 		// OpDecorateId technically supports an array of arguments, but our only supported decorations are single uint,
 		// so merge decorate and decorate-id here.
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 
 		auto decoration = static_cast<Decoration>(ops[1]);
 		if (length >= 3)
 		{
-			ir.meta[id].decoration_word_offset[decoration] = uint32_t(&ops[2] - ir.spirv.data());
+			ir.meta[id].decoration_word_offset[decoration] = ezUInt32(&ops[2] - ir.spirv.data());
 			ir.set_decoration(id, decoration, ops[2]);
 		}
 		else
@@ -431,7 +431,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpDecorateStringGOOGLE:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto decoration = static_cast<Decoration>(ops[1]);
 		ir.set_decoration_string(id, decoration, extract_string(ir.spirv, instruction.offset + 2));
 		break;
@@ -439,8 +439,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpMemberDecorate:
 	{
-		uint32_t id = ops[0];
-		uint32_t member = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 member = ops[1];
 		auto decoration = static_cast<Decoration>(ops[2]);
 		if (length >= 4)
 			ir.set_member_decoration(id, member, decoration, ops[3]);
@@ -451,8 +451,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpMemberDecorateStringGOOGLE:
 	{
-		uint32_t id = ops[0];
-		uint32_t member = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 member = ops[1];
 		auto decoration = static_cast<Decoration>(ops[2]);
 		ir.set_member_decoration_string(id, member, decoration, extract_string(ir.spirv, instruction.offset + 3));
 		break;
@@ -461,7 +461,7 @@ void Parser::parse(const Instruction &instruction)
 	// Build up basic types.
 	case OpTypeVoid:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::Void;
 		break;
@@ -469,7 +469,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeBool:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::Boolean;
 		type.width = 1;
@@ -478,8 +478,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeFloat:
 	{
-		uint32_t id = ops[0];
-		uint32_t width = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 width = ops[1];
 		auto &type = set<SPIRType>(id);
 		if (width == 64)
 			type.basetype = SPIRType::Double;
@@ -495,8 +495,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeInt:
 	{
-		uint32_t id = ops[0];
-		uint32_t width = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 width = ops[1];
 		bool signedness = ops[2] != 0;
 		auto &type = set<SPIRType>(id);
 		type.basetype = signedness ? to_signed_basetype(width) : to_unsigned_basetype(width);
@@ -509,8 +509,8 @@ void Parser::parse(const Instruction &instruction)
 	// since we can refer to decorations on pointee classes which is needed for UBO/SSBO, I/O blocks in geometry/tess etc.
 	case OpTypeVector:
 	{
-		uint32_t id = ops[0];
-		uint32_t vecsize = ops[2];
+		ezUInt32 id = ops[0];
+		ezUInt32 vecsize = ops[2];
 
 		auto &base = get<SPIRType>(ops[1]);
 		auto &vecbase = set<SPIRType>(id);
@@ -524,8 +524,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeMatrix:
 	{
-		uint32_t id = ops[0];
-		uint32_t colcount = ops[2];
+		ezUInt32 id = ops[0];
+		ezUInt32 colcount = ops[2];
 
 		auto &base = get<SPIRType>(ops[1]);
 		auto &matrixbase = set<SPIRType>(id);
@@ -539,16 +539,16 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeArray:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &arraybase = set<SPIRType>(id);
 
-		uint32_t tid = ops[1];
+		ezUInt32 tid = ops[1];
 		auto &base = get<SPIRType>(tid);
 
 		arraybase = base;
 		arraybase.parent_type = tid;
 
-		uint32_t cid = ops[2];
+		ezUInt32 cid = ops[2];
 		ir.mark_used_as_array_length(cid);
 		auto *c = maybe_get<SPIRConstant>(cid);
 		bool literal = c && !c->specialization;
@@ -566,7 +566,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeRuntimeArray:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 
 		auto &base = get<SPIRType>(ops[1]);
 		auto &arraybase = set<SPIRType>(id);
@@ -586,7 +586,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeImage:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::Image;
 		type.image.type = ops[1];
@@ -602,8 +602,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeSampledImage:
 	{
-		uint32_t id = ops[0];
-		uint32_t imagetype = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 imagetype = ops[1];
 		auto &type = set<SPIRType>(id);
 		type = get<SPIRType>(imagetype);
 		type.basetype = SPIRType::SampledImage;
@@ -613,7 +613,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeSampler:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::Sampler;
 		break;
@@ -621,7 +621,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypePointer:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 
 		auto &base = get<SPIRType>(ops[2]);
 		auto &ptrbase = set<SPIRType>(id);
@@ -645,7 +645,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeForwardPointer:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &ptrbase = set<SPIRType>(id);
 		ptrbase.pointer = true;
 		ptrbase.pointer_depth++;
@@ -660,10 +660,10 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeStruct:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::Struct;
-		for (uint32_t i = 1; i < length; i++)
+		for (ezUInt32 i = 1; i < length; i++)
 			type.member_types.push_back(ops[i]);
 
 		// Check if we have seen this struct type before, with just different
@@ -698,18 +698,18 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeFunction:
 	{
-		uint32_t id = ops[0];
-		uint32_t ret = ops[1];
+		ezUInt32 id = ops[0];
+		ezUInt32 ret = ops[1];
 
 		auto &func = set<SPIRFunctionPrototype>(id, ret);
-		for (uint32_t i = 2; i < length; i++)
+		for (ezUInt32 i = 2; i < length; i++)
 			func.parameter_types.push_back(ops[i]);
 		break;
 	}
 
 	case OpTypeAccelerationStructureKHR:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::AccelerationStructure;
 		break;
@@ -717,7 +717,7 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpTypeRayQueryProvisionalKHR:
 	{
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 		auto &type = set<SPIRType>(id);
 		type.basetype = SPIRType::RayQuery;
 		break;
@@ -727,10 +727,10 @@ void Parser::parse(const Instruction &instruction)
 	// All variables are essentially pointers with a storage qualifier.
 	case OpVariable:
 	{
-		uint32_t type = ops[0];
-		uint32_t id = ops[1];
+		ezUInt32 type = ops[0];
+		ezUInt32 id = ops[1];
 		auto storage = static_cast<StorageClass>(ops[2]);
-		uint32_t initializer = length == 4 ? ops[3] : 0;
+		ezUInt32 initializer = length == 4 ? ops[3] : 0;
 
 		if (storage == StorageClassFunction)
 		{
@@ -755,8 +755,8 @@ void Parser::parse(const Instruction &instruction)
 		if (!current_block)
 			SPIRV_CROSS_THROW("No block currently in scope");
 
-		uint32_t result_type = ops[0];
-		uint32_t id = ops[1];
+		ezUInt32 result_type = ops[0];
+		ezUInt32 id = ops[1];
 
 		// Instead of a temporary, create a new function-wide temporary with this ID instead.
 		auto &var = set<SPIRVariable>(id, result_type, spv::StorageClassFunction);
@@ -764,7 +764,7 @@ void Parser::parse(const Instruction &instruction)
 
 		current_function->add_local_variable(id);
 
-		for (uint32_t i = 2; i + 2 <= length; i += 2)
+		for (ezUInt32 i = 2; i + 2 <= length; i += 2)
 			current_block->phi_variables.push_back({ ops[i], ops[i + 1], id });
 		break;
 	}
@@ -773,7 +773,7 @@ void Parser::parse(const Instruction &instruction)
 	case OpSpecConstant:
 	case OpConstant:
 	{
-		uint32_t id = ops[1];
+		ezUInt32 id = ops[1];
 		auto &type = get<SPIRType>(ops[0]);
 
 		if (type.width > 32)
@@ -786,23 +786,23 @@ void Parser::parse(const Instruction &instruction)
 	case OpSpecConstantFalse:
 	case OpConstantFalse:
 	{
-		uint32_t id = ops[1];
-		set<SPIRConstant>(id, ops[0], uint32_t(0), op == OpSpecConstantFalse);
+		ezUInt32 id = ops[1];
+		set<SPIRConstant>(id, ops[0], ezUInt32(0), op == OpSpecConstantFalse);
 		break;
 	}
 
 	case OpSpecConstantTrue:
 	case OpConstantTrue:
 	{
-		uint32_t id = ops[1];
-		set<SPIRConstant>(id, ops[0], uint32_t(1), op == OpSpecConstantTrue);
+		ezUInt32 id = ops[1];
+		set<SPIRConstant>(id, ops[0], ezUInt32(1), op == OpSpecConstantTrue);
 		break;
 	}
 
 	case OpConstantNull:
 	{
-		uint32_t id = ops[1];
-		uint32_t type = ops[0];
+		ezUInt32 id = ops[1];
+		ezUInt32 type = ops[0];
 		ir.make_constant_null(id, type, true);
 		break;
 	}
@@ -810,8 +810,8 @@ void Parser::parse(const Instruction &instruction)
 	case OpSpecConstantComposite:
 	case OpConstantComposite:
 	{
-		uint32_t id = ops[1];
-		uint32_t type = ops[0];
+		ezUInt32 id = ops[1];
+		ezUInt32 type = ops[0];
 
 		auto &ctype = get<SPIRType>(type);
 
@@ -824,13 +824,13 @@ void Parser::parse(const Instruction &instruction)
 		}
 		else
 		{
-			uint32_t elements = length - 2;
+			ezUInt32 elements = length - 2;
 			if (elements > 4)
 				SPIRV_CROSS_THROW("OpConstantComposite only supports 1, 2, 3 and 4 elements.");
 
 			SPIRConstant remapped_constant_ops[4];
 			const SPIRConstant *c[4];
-			for (uint32_t i = 0; i < elements; i++)
+			for (ezUInt32 i = 0; i < elements; i++)
 			{
 				// Specialization constants operations can also be part of this.
 				// We do not know their value, so any attempt to query SPIRConstant later
@@ -866,10 +866,10 @@ void Parser::parse(const Instruction &instruction)
 	// Functions
 	case OpFunction:
 	{
-		uint32_t res = ops[0];
-		uint32_t id = ops[1];
+		ezUInt32 res = ops[0];
+		ezUInt32 id = ops[1];
 		// Control
-		uint32_t type = ops[3];
+		ezUInt32 type = ops[3];
 
 		if (current_function)
 			SPIRV_CROSS_THROW("Must end a function before starting a new one!");
@@ -880,8 +880,8 @@ void Parser::parse(const Instruction &instruction)
 
 	case OpFunctionParameter:
 	{
-		uint32_t type = ops[0];
-		uint32_t id = ops[1];
+		ezUInt32 type = ops[0];
+		ezUInt32 id = ops[1];
 
 		if (!current_function)
 			SPIRV_CROSS_THROW("Must be in a function!");
@@ -911,7 +911,7 @@ void Parser::parse(const Instruction &instruction)
 		if (!current_function)
 			SPIRV_CROSS_THROW("Blocks cannot exist outside functions!");
 
-		uint32_t id = ops[0];
+		ezUInt32 id = ops[0];
 
 		current_function->blocks.push_back(id);
 		if (!current_function->entry_block)
@@ -930,7 +930,7 @@ void Parser::parse(const Instruction &instruction)
 		if (!current_block)
 			SPIRV_CROSS_THROW("Trying to end a non-existing block.");
 
-		uint32_t target = ops[0];
+		ezUInt32 target = ops[0];
 		current_block->terminator = SPIRBlock::Direct;
 		current_block->next_block = target;
 		current_block = nullptr;
@@ -961,7 +961,7 @@ void Parser::parse(const Instruction &instruction)
 		current_block->condition = ops[0];
 		current_block->default_block = ops[1];
 
-		for (uint32_t i = 2; i + 2 <= length; i += 2)
+		for (ezUInt32 i = 2; i + 2 <= length; i += 2)
 			current_block->cases.push_back({ ops[i], ops[i + 1] });
 
 		// If we jump to next block, make it break instead since we're inside a switch case block at that point.
@@ -1062,8 +1062,8 @@ void Parser::parse(const Instruction &instruction)
 		if (length < 3)
 			SPIRV_CROSS_THROW("OpSpecConstantOp not enough arguments.");
 
-		uint32_t result_type = ops[0];
-		uint32_t id = ops[1];
+		ezUInt32 result_type = ops[0];
+		ezUInt32 id = ops[1];
 		auto spec_op = static_cast<Op>(ops[2]);
 
 		set<SPIRConstantOp>(id, result_type, spec_op, ops + 3, length - 3);
@@ -1127,7 +1127,7 @@ bool Parser::types_are_logically_equivalent(const SPIRType &a, const SPIRType &b
 		return false;
 
 	size_t array_count = a.array.size();
-	if (array_count && memcmp(a.array.data(), b.array.data(), array_count * sizeof(uint32_t)) != 0)
+	if (array_count && memcmp(a.array.data(), b.array.data(), array_count * sizeof(ezUInt32)) != 0)
 		return false;
 
 	if (a.basetype == SPIRType::Image || a.basetype == SPIRType::SampledImage)

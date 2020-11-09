@@ -17,9 +17,9 @@ namespace DX11_Internal
 {
   // Engine -> Native converters
 
-  constexpr uint32_t _ParseBindFlags(uint32_t value)
+  constexpr ezUInt32 _ParseBindFlags(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value & BIND_VERTEX_BUFFER)
       _flag |= D3D11_BIND_VERTEX_BUFFER;
@@ -40,9 +40,9 @@ namespace DX11_Internal
 
     return _flag;
   }
-  constexpr uint32_t _ParseCPUAccessFlags(uint32_t value)
+  constexpr ezUInt32 _ParseCPUAccessFlags(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value & CPU_ACCESS_WRITE)
       _flag |= D3D11_CPU_ACCESS_WRITE;
@@ -51,9 +51,9 @@ namespace DX11_Internal
 
     return _flag;
   }
-  constexpr uint32_t _ParseResourceMiscFlags(uint32_t value)
+  constexpr ezUInt32 _ParseResourceMiscFlags(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value & RESOURCE_MISC_SHARED)
       _flag |= D3D11_RESOURCE_MISC_SHARED;
@@ -70,9 +70,9 @@ namespace DX11_Internal
 
     return _flag;
   }
-  constexpr uint32_t _ParseColorWriteMask(uint32_t value)
+  constexpr ezUInt32 _ParseColorWriteMask(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value == D3D11_COLOR_WRITE_ENABLE_ALL)
     {
@@ -736,9 +736,9 @@ namespace DX11_Internal
 
   // Native -> Engine converters
 
-  constexpr uint32_t _ParseBindFlags_Inv(uint32_t value)
+  constexpr ezUInt32 _ParseBindFlags_Inv(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value & D3D11_BIND_VERTEX_BUFFER)
       _flag |= BIND_VERTEX_BUFFER;
@@ -759,9 +759,9 @@ namespace DX11_Internal
 
     return _flag;
   }
-  constexpr uint32_t _ParseCPUAccessFlags_Inv(uint32_t value)
+  constexpr ezUInt32 _ParseCPUAccessFlags_Inv(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value & D3D11_CPU_ACCESS_WRITE)
       _flag |= CPU_ACCESS_WRITE;
@@ -770,9 +770,9 @@ namespace DX11_Internal
 
     return _flag;
   }
-  constexpr uint32_t _ParseResourceMiscFlags_Inv(uint32_t value)
+  constexpr ezUInt32 _ParseResourceMiscFlags_Inv(ezUInt32 value)
   {
-    uint32_t _flag = 0;
+    ezUInt32 _flag = 0;
 
     if (value & D3D11_RESOURCE_MISC_SHARED)
       _flag |= RESOURCE_MISC_SHARED;
@@ -1257,22 +1257,22 @@ void GraphicsDevice_DX11::pso_validate(CommandList cmd)
     D3D11_PRIMITIVE_TOPOLOGY d3dType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     switch (desc.pt)
     {
-      case TRIANGLELIST:
+      case ezRHIPrimitiveTopology::TriangleList:
         d3dType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         break;
-      case TRIANGLESTRIP:
+      case ezRHIPrimitiveTopology::TriangleStrip:
         d3dType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
         break;
-      case POINTLIST:
+      case ezRHIPrimitiveTopology::PointList:
         d3dType = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
         break;
-      case LINELIST:
+      case ezRHIPrimitiveTopology::LineList:
         d3dType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
         break;
-      case LINESTRIP:
+      case ezRHIPrimitiveTopology::LineStrip:
         d3dType = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
         break;
-      case PATCHLIST:
+      case ezRHIPrimitiveTopology::PatchList:
         d3dType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
         break;
       default:
@@ -1304,7 +1304,7 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
 
   HRESULT hr = E_FAIL;
 
-  uint32_t createDeviceFlags = 0;
+  ezUInt32 createDeviceFlags = 0;
 
   if (debuglayer)
   {
@@ -1317,16 +1317,16 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
       D3D_DRIVER_TYPE_WARP,
       D3D_DRIVER_TYPE_REFERENCE,
     };
-  uint32_t numDriverTypes = arraysize(driverTypes);
+  ezUInt32 numDriverTypes = arraysize(driverTypes);
 
   D3D_FEATURE_LEVEL featureLevels[] =
     {
       D3D_FEATURE_LEVEL_11_1,
       D3D_FEATURE_LEVEL_11_0,
     };
-  uint32_t numFeatureLevels = arraysize(featureLevels);
+  ezUInt32 numFeatureLevels = arraysize(featureLevels);
 
-  for (uint32_t driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
+  for (ezUInt32 driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
   {
     driverType = driverTypes[driverTypeIndex];
     hr = D3D11CreateDevice(nullptr, driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels, D3D11_SDK_VERSION, &device, &featureLevel, &immediateContext);
@@ -1528,9 +1528,9 @@ bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const Subresou
   std::vector<D3D11_SUBRESOURCE_DATA> data;
   if (pInitialData != nullptr)
   {
-    uint32_t dataCount = pDesc->ArraySize * ezMath::Max(1u, pDesc->MipLevels);
+    ezUInt32 dataCount = pDesc->ArraySize * ezMath::Max(1u, pDesc->MipLevels);
     data.resize(dataCount);
-    for (uint32_t slice = 0; slice < dataCount; ++slice)
+    for (ezUInt32 slice = 0; slice < dataCount; ++slice)
     {
       data[slice] = _ConvertSubresourceData(pInitialData[slice]);
     }
@@ -1569,7 +1569,7 @@ bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const Subresou
 
   if (pTexture->desc.MipLevels == 0)
   {
-    pTexture->desc.MipLevels = (uint32_t)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
+    pTexture->desc.MipLevels = (ezUInt32)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
   }
 
   if (pTexture->desc.BindFlags & BIND_RENDER_TARGET)
@@ -1591,7 +1591,7 @@ bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const Subresou
 
   return SUCCEEDED(hr);
 }
-bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElementDescs, uint32_t NumElements, const Shader* shader, InputLayout* pInputLayout)
+bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElementDescs, ezUInt32 NumElements, const Shader* shader, InputLayout* pInputLayout)
 {
   auto internal_state = std::make_shared<InputLayout_DX11>();
   pInputLayout->internal_state = internal_state;
@@ -1599,7 +1599,7 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
   pInputLayout->desc.reserve((size_t)NumElements);
 
   std::vector<D3D11_INPUT_ELEMENT_DESC> desc(NumElements);
-  for (uint32_t i = 0; i < NumElements; ++i)
+  for (ezUInt32 i = 0; i < NumElements; ++i)
   {
     desc[i].SemanticName = pInputElementDescs[i].SemanticName.c_str();
     desc[i].SemanticIndex = pInputElementDescs[i].SemanticIndex;
@@ -1618,7 +1618,7 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
 
   return SUCCEEDED(hr);
 }
-bool GraphicsDevice_DX11::CreateShader(SHADERSTAGE stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
+bool GraphicsDevice_DX11::CreateShader(ezEnum<ezRHIShaderStage> stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
 {
   pShader->code.resize(BytecodeLength);
   std::memcpy(pShader->code.data(), pShaderBytecode, BytecodeLength);
@@ -1628,42 +1628,42 @@ bool GraphicsDevice_DX11::CreateShader(SHADERSTAGE stage, const void* pShaderByt
 
   switch (stage)
   {
-    case VS:
+    case ezRHIShaderStage::VertexShader:
     {
       auto internal_state = std::make_shared<VertexShader_DX11>();
       pShader->internal_state = internal_state;
       hr = device->CreateVertexShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
-    case HS:
+    case ezRHIShaderStage::HullShader:
     {
       auto internal_state = std::make_shared<HullShader_DX11>();
       pShader->internal_state = internal_state;
       hr = device->CreateHullShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
-    case DS:
+    case ezRHIShaderStage::DomainShader:
     {
       auto internal_state = std::make_shared<DomainShader_DX11>();
       pShader->internal_state = internal_state;
       hr = device->CreateDomainShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
-    case GS:
+    case ezRHIShaderStage::GeometryShader:
     {
       auto internal_state = std::make_shared<GeometryShader_DX11>();
       pShader->internal_state = internal_state;
       hr = device->CreateGeometryShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
-    case PS:
+    case ezRHIShaderStage::PixelShader:
     {
       auto internal_state = std::make_shared<PixelShader_DX11>();
       pShader->internal_state = internal_state;
       hr = device->CreatePixelShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
-    case CS:
+    case ezRHIShaderStage::ComputeShader:
     {
       auto internal_state = std::make_shared<ComputeShader_DX11>();
       pShader->internal_state = internal_state;
@@ -1893,7 +1893,7 @@ bool GraphicsDevice_DX11::CreateRenderPass(const RenderPassDesc* pDesc, RenderPa
   return true;
 }
 
-int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, uint32_t firstSlice, uint32_t sliceCount, uint32_t firstMip, uint32_t mipCount)
+int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, ezUInt32 firstSlice, ezUInt32 sliceCount, ezUInt32 firstMip, ezUInt32 mipCount)
 {
   auto internal_state = to_internal(texture);
 
@@ -2306,8 +2306,8 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
         srv_desc.Format = DXGI_FORMAT_R32_TYPELESS;
         srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
         srv_desc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
-        srv_desc.BufferEx.FirstElement = (UINT)offset / sizeof(uint32_t);
-        srv_desc.BufferEx.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
+        srv_desc.BufferEx.FirstElement = (UINT)offset / sizeof(ezUInt32);
+        srv_desc.BufferEx.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(ezUInt32);
       }
       else if (desc.MiscFlags & RESOURCE_MISC_BUFFER_STRUCTURED)
       {
@@ -2320,7 +2320,7 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        uint32_t stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = GetFormatStride(desc.Format);
         srv_desc.Format = _ConvertFormat(desc.Format);
         srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
         srv_desc.Buffer.FirstElement = (UINT)offset / stride;
@@ -2359,8 +2359,8 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
         // This is a Raw Buffer
         uav_desc.Format = DXGI_FORMAT_R32_TYPELESS; // Format must be DXGI_FORMAT_R32_TYPELESS, when creating Raw Unordered Access View
         uav_desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-        uav_desc.Buffer.FirstElement = (UINT)offset / sizeof(uint32_t);
-        uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(uint32_t);
+        uav_desc.Buffer.FirstElement = (UINT)offset / sizeof(ezUInt32);
+        uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / sizeof(ezUInt32);
       }
       else if (desc.MiscFlags & RESOURCE_MISC_BUFFER_STRUCTURED)
       {
@@ -2372,7 +2372,7 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        uint32_t stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = GetFormatStride(desc.Format);
         uav_desc.Format = _ConvertFormat(desc.Format);
         uav_desc.Buffer.FirstElement = (UINT)offset / stride;
         uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
@@ -2448,7 +2448,7 @@ void GraphicsDevice_DX11::Unmap(const GPUResource* resource)
 }
 bool GraphicsDevice_DX11::QueryRead(const GPUQuery* query, GPUQueryResult* result)
 {
-  const uint32_t _flags = D3D11_ASYNC_GETDATA_DONOTFLUSH;
+  const ezUInt32 _flags = D3D11_ASYNC_GETDATA_DONOTFLUSH;
 
   auto internal_state = to_internal(query);
   ID3D11Query* QUERY = internal_state->resource.Get();
@@ -2542,7 +2542,7 @@ CommandList GraphicsDevice_DX11::BeginCommandList()
   deviceContexts[cmd]->RSSetViewports(1, &vp);
 
   D3D11_RECT pRects[8];
-  for (uint32_t i = 0; i < 8; ++i)
+  for (ezUInt32 i = 0; i < 8; ++i)
   {
     pRects[i].bottom = INT32_MAX;
     pRects[i].left = INT32_MIN;
@@ -2633,7 +2633,7 @@ void GraphicsDevice_DX11::RenderPassBegin(const RenderPass* renderpass, CommandL
   active_renderpass[cmd] = renderpass;
   const RenderPassDesc& desc = renderpass->GetDesc();
 
-  uint32_t rt_count = 0;
+  ezUInt32 rt_count = 0;
   ID3D11RenderTargetView* RTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
   ID3D11DepthStencilView* DSV = nullptr;
   for (auto& attachment : desc.attachments)
@@ -2675,7 +2675,7 @@ void GraphicsDevice_DX11::RenderPassBegin(const RenderPass* renderpass, CommandL
 
       if (attachment.loadop == RenderPassAttachment::LOADOP_CLEAR)
       {
-        uint32_t _flags = D3D11_CLEAR_DEPTH;
+        ezUInt32 _flags = D3D11_CLEAR_DEPTH;
         if (IsFormatStencilSupport(texture->desc.Format))
           _flags |= D3D11_CLEAR_STENCIL;
         deviceContexts[cmd]->ClearDepthStencilView(DSV, _flags, texture->desc.clear.depthstencil.depth, texture->desc.clear.depthstencil.stencil);
@@ -2686,8 +2686,8 @@ void GraphicsDevice_DX11::RenderPassBegin(const RenderPass* renderpass, CommandL
   if (raster_uavs_count[cmd] > 0)
   {
     // UAVs:
-    const uint32_t count = raster_uavs_count[cmd];
-    const uint32_t slot = raster_uavs_slot[cmd];
+    const ezUInt32 count = raster_uavs_count[cmd];
+    const ezUInt32 slot = raster_uavs_slot[cmd];
 
     deviceContexts[cmd]->OMSetRenderTargetsAndUnorderedAccessViews(rt_count, RTVs, DSV, slot, count, &raster_uavs[cmd][slot], nullptr);
 
@@ -2734,12 +2734,12 @@ void GraphicsDevice_DX11::RenderPassEnd(CommandList cmd)
   }
   active_renderpass[cmd] = nullptr;
 }
-void GraphicsDevice_DX11::BindScissorRects(uint32_t numRects, const Rect* rects, CommandList cmd)
+void GraphicsDevice_DX11::BindScissorRects(ezUInt32 numRects, const Rect* rects, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(rects != nullptr, "rects should not be null.");
   EZ_ASSERT_ALWAYS(numRects <= 8, "numRects must be less then or equal to 8.");
   D3D11_RECT pRects[8];
-  for (uint32_t i = 0; i < numRects; ++i)
+  for (ezUInt32 i = 0; i < numRects; ++i)
   {
     pRects[i].bottom = (LONG)rects[i].bottom;
     pRects[i].left = (LONG)rects[i].left;
@@ -2748,11 +2748,11 @@ void GraphicsDevice_DX11::BindScissorRects(uint32_t numRects, const Rect* rects,
   }
   deviceContexts[cmd]->RSSetScissorRects(numRects, pRects);
 }
-void GraphicsDevice_DX11::BindViewports(uint32_t NumViewports, const Viewport* pViewports, CommandList cmd)
+void GraphicsDevice_DX11::BindViewports(ezUInt32 NumViewports, const Viewport* pViewports, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(NumViewports <= 6, "NumViewports must be less then or equal to 6.");
   D3D11_VIEWPORT d3dViewPorts[6];
-  for (uint32_t i = 0; i < NumViewports; ++i)
+  for (ezUInt32 i = 0; i < NumViewports; ++i)
   {
     d3dViewPorts[i].TopLeftX = pViewports[i].TopLeftX;
     d3dViewPorts[i].TopLeftY = pViewports[i].TopLeftY;
@@ -2763,7 +2763,7 @@ void GraphicsDevice_DX11::BindViewports(uint32_t NumViewports, const Viewport* p
   }
   deviceContexts[cmd]->RSSetViewports(NumViewports, d3dViewPorts);
 }
-void GraphicsDevice_DX11::BindResource(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource)
+void GraphicsDevice_DX11::BindResource(ezEnum<ezRHIShaderStage> stage, const GPUResource* resource, ezUInt32 slot, CommandList cmd, int subresource)
 {
   if (resource != nullptr && resource->IsValid())
   {
@@ -2782,22 +2782,22 @@ void GraphicsDevice_DX11::BindResource(SHADERSTAGE stage, const GPUResource* res
 
     switch (stage)
     {
-      case VS:
+      case ezRHIShaderStage::VertexShader:
         deviceContexts[cmd]->VSSetShaderResources(slot, 1, &SRV);
         break;
-      case HS:
+      case ezRHIShaderStage::HullShader:
         deviceContexts[cmd]->HSSetShaderResources(slot, 1, &SRV);
         break;
-      case DS:
+      case ezRHIShaderStage::DomainShader:
         deviceContexts[cmd]->DSSetShaderResources(slot, 1, &SRV);
         break;
-      case GS:
+      case ezRHIShaderStage::GeometryShader:
         deviceContexts[cmd]->GSSetShaderResources(slot, 1, &SRV);
         break;
-      case PS:
+      case ezRHIShaderStage::PixelShader:
         deviceContexts[cmd]->PSSetShaderResources(slot, 1, &SRV);
         break;
-      case CS:
+      case ezRHIShaderStage::ComputeShader:
         deviceContexts[cmd]->CSSetShaderResources(slot, 1, &SRV);
         break;
       default:
@@ -2806,33 +2806,33 @@ void GraphicsDevice_DX11::BindResource(SHADERSTAGE stage, const GPUResource* res
     }
   }
 }
-void GraphicsDevice_DX11::BindResources(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd)
+void GraphicsDevice_DX11::BindResources(ezEnum<ezRHIShaderStage> stage, const GPUResource* const* resources, ezUInt32 slot, ezUInt32 count, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(count <= 16, "count must be less than or equal to 16.");
   ID3D11ShaderResourceView* srvs[16];
-  for (uint32_t i = 0; i < count; ++i)
+  for (ezUInt32 i = 0; i < count; ++i)
   {
     srvs[i] = resources[i] != nullptr && resources[i]->IsValid() ? to_internal(resources[i])->srv.Get() : nullptr;
   }
 
   switch (stage)
   {
-    case VS:
+    case ezRHIShaderStage::VertexShader:
       deviceContexts[cmd]->VSSetShaderResources(slot, count, srvs);
       break;
-    case HS:
+    case ezRHIShaderStage::HullShader:
       deviceContexts[cmd]->HSSetShaderResources(slot, count, srvs);
       break;
-    case DS:
+    case ezRHIShaderStage::DomainShader:
       deviceContexts[cmd]->DSSetShaderResources(slot, count, srvs);
       break;
-    case GS:
+    case ezRHIShaderStage::GeometryShader:
       deviceContexts[cmd]->GSSetShaderResources(slot, count, srvs);
       break;
-    case PS:
+    case ezRHIShaderStage::PixelShader:
       deviceContexts[cmd]->PSSetShaderResources(slot, count, srvs);
       break;
-    case CS:
+    case ezRHIShaderStage::ComputeShader:
       deviceContexts[cmd]->CSSetShaderResources(slot, count, srvs);
       break;
     default:
@@ -2840,7 +2840,7 @@ void GraphicsDevice_DX11::BindResources(SHADERSTAGE stage, const GPUResource* co
       break;
   }
 }
-void GraphicsDevice_DX11::BindUAV(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource)
+void GraphicsDevice_DX11::BindUAV(ezEnum<ezRHIShaderStage> stage, const GPUResource* resource, ezUInt32 slot, CommandList cmd, int subresource)
 {
   if (resource != nullptr && resource->IsValid())
   {
@@ -2857,7 +2857,7 @@ void GraphicsDevice_DX11::BindUAV(SHADERSTAGE stage, const GPUResource* resource
       UAV = internal_state->subresources_uav[subresource].Get();
     }
 
-    if (stage == CS)
+    if (stage == ezRHIShaderStage::ComputeShader)
     {
       deviceContexts[cmd]->CSSetUnorderedAccessViews(slot, 1, &UAV, nullptr);
     }
@@ -2869,23 +2869,23 @@ void GraphicsDevice_DX11::BindUAV(SHADERSTAGE stage, const GPUResource* resource
     }
   }
 }
-void GraphicsDevice_DX11::BindUAVs(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd)
+void GraphicsDevice_DX11::BindUAVs(ezEnum<ezRHIShaderStage> stage, const GPUResource* const* resources, ezUInt32 slot, ezUInt32 count, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(slot + count <= 8, "slot + count must be less then or equal to 8.");
   ID3D11UnorderedAccessView* uavs[8];
-  for (uint32_t i = 0; i < count; ++i)
+  for (ezUInt32 i = 0; i < count; ++i)
   {
     uavs[i] = resources[i] != nullptr && resources[i]->IsValid() ? to_internal(resources[i])->uav.Get() : nullptr;
 
-    if (stage != CS)
+    if (stage != ezRHIShaderStage::ComputeShader)
     {
       raster_uavs[cmd][slot + i] = uavs[i];
     }
   }
 
-  if (stage == CS)
+  if (stage == ezRHIShaderStage::ComputeShader)
   {
-    deviceContexts[cmd]->CSSetUnorderedAccessViews(static_cast<uint32_t>(slot), static_cast<uint32_t>(count), uavs, nullptr);
+    deviceContexts[cmd]->CSSetUnorderedAccessViews(static_cast<ezUInt32>(slot), static_cast<ezUInt32>(count), uavs, nullptr);
   }
   else
   {
@@ -2893,7 +2893,7 @@ void GraphicsDevice_DX11::BindUAVs(SHADERSTAGE stage, const GPUResource* const* 
     raster_uavs_count[cmd] = ezMath::Max(raster_uavs_count[cmd], uint8_t(count));
   }
 }
-void GraphicsDevice_DX11::UnbindResources(uint32_t slot, uint32_t num, CommandList cmd)
+void GraphicsDevice_DX11::UnbindResources(ezUInt32 slot, ezUInt32 num, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(num <= arraysize(__nullBlob), "Extend nullBlob to support more resource unbinding!");
   deviceContexts[cmd]->PSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
@@ -2903,7 +2903,7 @@ void GraphicsDevice_DX11::UnbindResources(uint32_t slot, uint32_t num, CommandLi
   deviceContexts[cmd]->DSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
   deviceContexts[cmd]->CSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
 }
-void GraphicsDevice_DX11::UnbindUAVs(uint32_t slot, uint32_t num, CommandList cmd)
+void GraphicsDevice_DX11::UnbindUAVs(ezUInt32 slot, ezUInt32 num, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(num <= arraysize(__nullBlob), "Extend nullBlob to support more resource unbinding!");
   deviceContexts[cmd]->CSSetUnorderedAccessViews(slot, num, (ID3D11UnorderedAccessView**)__nullBlob, 0);
@@ -2911,7 +2911,7 @@ void GraphicsDevice_DX11::UnbindUAVs(uint32_t slot, uint32_t num, CommandList cm
   raster_uavs_count[cmd] = 0;
   raster_uavs_slot[cmd] = 8;
 }
-void GraphicsDevice_DX11::BindSampler(SHADERSTAGE stage, const Sampler* sampler, uint32_t slot, CommandList cmd)
+void GraphicsDevice_DX11::BindSampler(ezEnum<ezRHIShaderStage> stage, const Sampler* sampler, ezUInt32 slot, CommandList cmd)
 {
   if (sampler != nullptr && sampler->IsValid())
   {
@@ -2920,26 +2920,26 @@ void GraphicsDevice_DX11::BindSampler(SHADERSTAGE stage, const Sampler* sampler,
 
     switch (stage)
     {
-      case VS:
+      case ezRHIShaderStage::VertexShader:
         deviceContexts[cmd]->VSSetSamplers(slot, 1, &SAM);
         break;
-      case HS:
+      case ezRHIShaderStage::HullShader:
         deviceContexts[cmd]->HSSetSamplers(slot, 1, &SAM);
         break;
-      case DS:
+      case ezRHIShaderStage::DomainShader:
         deviceContexts[cmd]->DSSetSamplers(slot, 1, &SAM);
         break;
-      case GS:
+      case ezRHIShaderStage::GeometryShader:
         deviceContexts[cmd]->GSSetSamplers(slot, 1, &SAM);
         break;
-      case PS:
+      case ezRHIShaderStage::PixelShader:
         deviceContexts[cmd]->PSSetSamplers(slot, 1, &SAM);
         break;
-      case CS:
+      case ezRHIShaderStage::ComputeShader:
         deviceContexts[cmd]->CSSetSamplers(slot, 1, &SAM);
         break;
-      case MS:
-      case AS:
+      case ezRHIShaderStage::MeshShader:
+      case ezRHIShaderStage::AmplificationShader:
         break;
       default:
         EZ_ASSERT_NOT_IMPLEMENTED;
@@ -2947,53 +2947,53 @@ void GraphicsDevice_DX11::BindSampler(SHADERSTAGE stage, const Sampler* sampler,
     }
   }
 }
-void GraphicsDevice_DX11::BindConstantBuffer(SHADERSTAGE stage, const GPUBuffer* buffer, uint32_t slot, CommandList cmd)
+void GraphicsDevice_DX11::BindConstantBuffer(ezEnum<ezRHIShaderStage> stage, const GPUBuffer* buffer, ezUInt32 slot, CommandList cmd)
 {
   ID3D11Buffer* res = buffer != nullptr && buffer->IsValid() ? (ID3D11Buffer*)to_internal(buffer)->resource.Get() : nullptr;
   switch (stage)
   {
-    case VS:
+    case ezRHIShaderStage::VertexShader:
       deviceContexts[cmd]->VSSetConstantBuffers(slot, 1, &res);
       break;
-    case HS:
+    case ezRHIShaderStage::HullShader:
       deviceContexts[cmd]->HSSetConstantBuffers(slot, 1, &res);
       break;
-    case DS:
+    case ezRHIShaderStage::DomainShader:
       deviceContexts[cmd]->DSSetConstantBuffers(slot, 1, &res);
       break;
-    case GS:
+    case ezRHIShaderStage::GeometryShader:
       deviceContexts[cmd]->GSSetConstantBuffers(slot, 1, &res);
       break;
-    case PS:
+    case ezRHIShaderStage::PixelShader:
       deviceContexts[cmd]->PSSetConstantBuffers(slot, 1, &res);
       break;
-    case CS:
+    case ezRHIShaderStage::ComputeShader:
       deviceContexts[cmd]->CSSetConstantBuffers(slot, 1, &res);
       break;
-    case MS:
-    case AS:
+    case ezRHIShaderStage::MeshShader:
+    case ezRHIShaderStage::AmplificationShader:
       break;
     default:
       EZ_ASSERT_NOT_IMPLEMENTED;
       break;
   }
 }
-void GraphicsDevice_DX11::BindVertexBuffers(const GPUBuffer* const* vertexBuffers, uint32_t slot, uint32_t count, const uint32_t* strides, const uint32_t* offsets, CommandList cmd)
+void GraphicsDevice_DX11::BindVertexBuffers(const GPUBuffer* const* vertexBuffers, ezUInt32 slot, ezUInt32 count, const ezUInt32* strides, const ezUInt32* offsets, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(count <= 8, "count must be less then or equal to 8.");
   ID3D11Buffer* res[8] = {0};
-  for (uint32_t i = 0; i < count; ++i)
+  for (ezUInt32 i = 0; i < count; ++i)
   {
     res[i] = vertexBuffers[i] != nullptr && vertexBuffers[i]->IsValid() ? (ID3D11Buffer*)to_internal(vertexBuffers[i])->resource.Get() : nullptr;
   }
-  deviceContexts[cmd]->IASetVertexBuffers(slot, count, res, strides, (offsets != nullptr ? offsets : reinterpret_cast<const uint32_t*>(__nullBlob)));
+  deviceContexts[cmd]->IASetVertexBuffers(slot, count, res, strides, (offsets != nullptr ? offsets : reinterpret_cast<const ezUInt32*>(__nullBlob)));
 }
-void GraphicsDevice_DX11::BindIndexBuffer(const GPUBuffer* indexBuffer, const INDEXBUFFER_FORMAT format, uint32_t offset, CommandList cmd)
+void GraphicsDevice_DX11::BindIndexBuffer(const GPUBuffer* indexBuffer, const ezEnum<ezRHIIndexBufferFormat> format, ezUInt32 offset, CommandList cmd)
 {
   ID3D11Buffer* res = indexBuffer != nullptr && indexBuffer->IsValid() ? (ID3D11Buffer*)to_internal(indexBuffer)->resource.Get() : nullptr;
-  deviceContexts[cmd]->IASetIndexBuffer(res, (format == INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT), offset);
+  deviceContexts[cmd]->IASetIndexBuffer(res, (format == ezRHIIndexBufferFormat::UInt16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT), offset);
 }
-void GraphicsDevice_DX11::BindStencilRef(uint32_t value, CommandList cmd)
+void GraphicsDevice_DX11::BindStencilRef(ezUInt32 value, CommandList cmd)
 {
   stencilRef[cmd] = value;
 }
@@ -3021,55 +3021,55 @@ void GraphicsDevice_DX11::BindComputeShader(const Shader* cs, CommandList cmd)
     prev_cs[cmd] = _cs;
   }
 }
-void GraphicsDevice_DX11::Draw(uint32_t vertexCount, uint32_t startVertexLocation, CommandList cmd)
+void GraphicsDevice_DX11::Draw(ezUInt32 vertexCount, ezUInt32 startVertexLocation, CommandList cmd)
 {
   pso_validate(cmd);
   commit_allocations(cmd);
 
   deviceContexts[cmd]->Draw(vertexCount, startVertexLocation);
 }
-void GraphicsDevice_DX11::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, CommandList cmd)
+void GraphicsDevice_DX11::DrawIndexed(ezUInt32 indexCount, ezUInt32 startIndexLocation, ezUInt32 baseVertexLocation, CommandList cmd)
 {
   pso_validate(cmd);
   commit_allocations(cmd);
 
   deviceContexts[cmd]->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
 }
-void GraphicsDevice_DX11::DrawInstanced(uint32_t vertexCount, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation, CommandList cmd)
+void GraphicsDevice_DX11::DrawInstanced(ezUInt32 vertexCount, ezUInt32 instanceCount, ezUInt32 startVertexLocation, ezUInt32 startInstanceLocation, CommandList cmd)
 {
   pso_validate(cmd);
   commit_allocations(cmd);
 
   deviceContexts[cmd]->DrawInstanced(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 }
-void GraphicsDevice_DX11::DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation, CommandList cmd)
+void GraphicsDevice_DX11::DrawIndexedInstanced(ezUInt32 indexCount, ezUInt32 instanceCount, ezUInt32 startIndexLocation, ezUInt32 baseVertexLocation, ezUInt32 startInstanceLocation, CommandList cmd)
 {
   pso_validate(cmd);
   commit_allocations(cmd);
 
   deviceContexts[cmd]->DrawIndexedInstanced(indexCount, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
-void GraphicsDevice_DX11::DrawInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX11::DrawInstancedIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   pso_validate(cmd);
   commit_allocations(cmd);
 
   deviceContexts[cmd]->DrawInstancedIndirect((ID3D11Buffer*)to_internal(args)->resource.Get(), args_offset);
 }
-void GraphicsDevice_DX11::DrawIndexedInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX11::DrawIndexedInstancedIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   pso_validate(cmd);
   commit_allocations(cmd);
 
   deviceContexts[cmd]->DrawIndexedInstancedIndirect((ID3D11Buffer*)to_internal(args)->resource.Get(), args_offset);
 }
-void GraphicsDevice_DX11::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ, CommandList cmd)
+void GraphicsDevice_DX11::Dispatch(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ, CommandList cmd)
 {
   commit_allocations(cmd);
 
   deviceContexts[cmd]->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
-void GraphicsDevice_DX11::DispatchIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd)
+void GraphicsDevice_DX11::DispatchIndirect(const GPUBuffer* args, ezUInt32 args_offset, CommandList cmd)
 {
   commit_allocations(cmd);
 
@@ -3112,7 +3112,7 @@ void GraphicsDevice_DX11::UpdateBuffer(const GPUBuffer* buffer, const void* data
   {
     D3D11_BOX box = {};
     box.left = 0;
-    box.right = static_cast<uint32_t>(dataSize);
+    box.right = static_cast<ezUInt32>(dataSize);
     box.top = 0;
     box.bottom = 1;
     box.front = 0;
@@ -3143,7 +3143,7 @@ GraphicsDevice::GPUAllocation GraphicsDevice_DX11::AllocateGPU(size_t dataSize, 
   if (allocator.buffer.desc.ByteWidth <= dataSize)
   {
     // If allocation too large, grow the allocator:
-    allocator.buffer.desc.ByteWidth = uint32_t((dataSize + 1) * 2);
+    allocator.buffer.desc.ByteWidth = ezUInt32((dataSize + 1) * 2);
     bool success = CreateBuffer(&allocator.buffer.desc, nullptr, &allocator.buffer);
     EZ_ASSERT_ALWAYS(success, "Failed to create buffer.");
     SetName(&allocator.buffer, "frame_allocator");
@@ -3168,7 +3168,7 @@ GraphicsDevice::GPUAllocation GraphicsDevice_DX11::AllocateGPU(size_t dataSize, 
   allocator.residentFrame = FRAMECOUNT;
 
   result.buffer = &allocator.buffer;
-  result.offset = (uint32_t)position;
+  result.offset = (ezUInt32)position;
   result.data = (void*)((size_t)mappedResource.pData + position);
   return result;
 }
