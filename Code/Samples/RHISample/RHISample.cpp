@@ -94,6 +94,7 @@ void RHISample::AfterCoreSystemsStartup()
     ezWindowCreationDesc WindowCreationDesc;
     WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
     WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
+    WindowCreationDesc.m_WindowMode = ezWindowMode::WindowResizable;
     m_pWindow = EZ_DEFAULT_NEW(RHISampleWindow);
     m_pWindow->Initialize(WindowCreationDesc);
   }
@@ -101,8 +102,9 @@ void RHISample::AfterCoreSystemsStartup()
   // Create device and resource factory
   {
     RHIGraphicsDeviceOptions options(true);
-    RHISwapchainDescription swapchainDesc(new RHIWin32SwapchainSource(m_pWindow->GetNativeWindowHandle(), nullptr), g_uiWindowWidth, g_uiWindowHeight, std::nullopt, true);
+    RHISwapchainDescription swapchainDesc(new RHIWin32SwapchainSource(m_pWindow->GetNativeWindowHandle(), nullptr), g_uiWindowWidth, g_uiWindowHeight, RHIPixelFormat::D32_Float_S8_UInt, true);
     m_pDevice = GraphicsUtils::CreateD3D11(options, swapchainDesc);
+    m_pWindow->SetGraphicsDevice(m_pDevice);
     ResourceFactory = m_pDevice->GetResourceFactory();
   }
 
@@ -260,9 +262,9 @@ void RHISample::CreatePipelineState()
     }
 
     RHIGraphicsPipelineDescription pipelineDesc;
-    pipelineDesc.BlendState = RHIBlendStateDescription::Empty();
-    pipelineDesc.DepthStencilState = RHIDepthStencilStateDescription(true, true, RHIComparisonKind::LessEqual);
-    pipelineDesc.RasterizerState = RHIRasterizerStateDescription(RHIFaceCullMode::Back, RHIPolygonFillMode::Solid, RHIFrontFace::Clockwise, true, false);
+    pipelineDesc.BlendState = RHIBlendStateDescription::SingleOverrideBlend();
+    pipelineDesc.DepthStencilState = RHIDepthStencilStateDescription::DepthOnlyLessEqual; // RHIDepthStencilStateDescription(true, true, RHIComparisonKind::LessEqual);
+    pipelineDesc.RasterizerState = RHIRasterizerStateDescription::Default; //RHIRasterizerStateDescription(RHIFaceCullMode::Back, RHIPolygonFillMode::Solid, RHIFrontFace::Clockwise, true, false);
     pipelineDesc.PrimitiveTopology = RHIPrimitiveTopology::TriangleStrip;
 
 
@@ -302,17 +304,20 @@ void RHISample::CreatePipelineState()
     pipelineDesc.Outputs = m_pDevice->GetSwapchainFramebuffer()->GetOutputDescription();
     Pipeline = ResourceFactory->CreateGraphicsPipeline(pipelineDesc);
     CommandList = ResourceFactory->CreateCommandList();
+
+
   }
 }
 
 void RHISample::OnDraw()
 {
   CommandList->Begin();
+  CommandList->UpdateBuffer(ConstantBuffer, 0, reinterpret_cast<ezUInt8*>(&WorldViewProjectionMatrix), sizeof(ezMat4));
   CommandList->SetFramebuffer(m_pDevice->GetSwapchainFramebuffer());
   CommandList->ClearColorTarget(0, ezColor::Black);
+  CommandList->ClearDepthStencil(1.f);
   CommandList->SetVertexBuffer(0, VertexBuffer);
   CommandList->SetIndexBuffer(IndexBuffer, RHIIndexFormat::UInt16);
-  CommandList->UpdateBuffer(ConstantBuffer, 0, reinterpret_cast<ezUInt8*>(&WorldViewProjectionMatrix), sizeof(ezMat4));
   CommandList->SetPipeline(Pipeline);
   CommandList->SetGraphicsResourceSet(0, ResourceSet);
   CommandList->DrawIndexed(36, 1, 0, 0, 0);
@@ -320,6 +325,7 @@ void RHISample::OnDraw()
 
   m_pDevice->SubmitCommands(CommandList);
   m_pDevice->SwapBuffers();
+  m_pDevice->WaitForIdle();
 }
 
 void RHISample::Update()
@@ -337,7 +343,7 @@ void RHISample::Update()
   rotZ.SetRotationMatrixZ(ezAngle::Radian(ezMath::Pi<float>() * 0.4f));
 
 
-  ezMat4 transform = rotY * rotZ/* * rotX*/;
+  ezMat4 transform = rotY * rotZ * rotX;
 
   ezMat4 view;
   view.SetIdentity();
@@ -371,4 +377,17 @@ void RHISample::BeforeCoreSystemsShutdown()
   // finally destroy the window
   m_pWindow->Destroy();
   EZ_DEFAULT_DELETE(m_pWindow);
+}
+
+void RHISampleWindow::SetGraphicsDevice(RHIGraphicsDevice* pDevice)
+{
+  m_pDevice = pDevice;
+}
+
+void RHISampleWindow::OnResize(const ezSizeU32& newWindowSize)
+{
+  if (m_pDevice != nullptr)
+  {
+    //m_pDevice->ResizeMainWindow(newWindowSize.width, newWindowSize.height);
+  }
 }

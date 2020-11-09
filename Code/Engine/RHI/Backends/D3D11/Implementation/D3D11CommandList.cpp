@@ -280,7 +280,8 @@ void D3D11CommandList::ClearColorTargetCore(ezUInt32 index, ezColor clearColor)
 
 void D3D11CommandList::ClearDepthStencilCore(float depth, ezUInt8 stencil)
 {
-  Context->ClearDepthStencilView(GetD3D11Framebuffer()->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
+  ID3D11DepthStencilView* dsv = GetD3D11Framebuffer()->GetDepthStencilView();
+  Context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
 }
 
 void D3D11CommandList::SetViewportCore(ezUInt32 index, const RHIViewport& viewport)

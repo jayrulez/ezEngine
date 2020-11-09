@@ -291,6 +291,7 @@ private:
   ezHybridArray<RHIBoundResourceSetInfo, 1> ComputeResourceSets;
   // Resource sets are invalidated when a new resource set is bound with an incompatible SRV or UAV.
   ezHybridArray<bool, 1> InvalidatedComputeResourceSets;
+
   bool VertexBindingsChanged = false;
   ezHybridArray<ID3D11Buffer*, 1> CBOut;
   ezHybridArray<ezUInt32, 1> FirstConstRef;

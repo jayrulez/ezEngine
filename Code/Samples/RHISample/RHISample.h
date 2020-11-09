@@ -15,6 +15,12 @@ public:
   virtual void OnClickClose() override { m_bCloseRequested = true; }
 
   bool m_bCloseRequested;
+
+  void SetGraphicsDevice(RHIGraphicsDevice* pDevice);
+  virtual void OnResize(const ezSizeU32& newWindowSize) override;
+
+private:
+  RHIGraphicsDevice* m_pDevice = nullptr;
 };
 
 class RHISample : public ezApplication

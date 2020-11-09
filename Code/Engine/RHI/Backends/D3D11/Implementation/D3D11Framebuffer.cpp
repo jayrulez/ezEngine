@@ -83,6 +83,8 @@ D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDes
       }
     }
 
+    dsvDesc.Flags = 0;
+
     HRESULT hr = device->CreateDepthStencilView(d3dDepthTarget->GetDeviceTexture(), &dsvDesc, &DepthStencilView);
   }
 
