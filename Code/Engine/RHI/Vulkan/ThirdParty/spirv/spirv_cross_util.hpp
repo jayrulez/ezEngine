@@ -17,7 +17,7 @@
 #ifndef SPIRV_CROSS_UTIL_HPP
 #define SPIRV_CROSS_UTIL_HPP
 
-#include <RHI/Utility/spirv_cross.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross.hpp>
 
 namespace spirv_cross_util
 {

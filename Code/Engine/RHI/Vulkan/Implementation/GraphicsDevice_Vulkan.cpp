@@ -4,7 +4,7 @@
 
 #  pragma comment(lib, "vulkan-1.lib")
 
-#  include <RHI/Utility/spirv_reflect.hpp>
+#  include <RHI/Vulkan/ThirdParty/spirv/spirv_reflect.hpp>
 
 #  include <Foundation/Logging/Log.h>
 

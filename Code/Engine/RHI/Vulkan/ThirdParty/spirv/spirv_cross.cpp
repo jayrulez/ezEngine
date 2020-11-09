@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_cross.hpp>
-#include <RHI/Utility/GLSL.std.450.h>
-#include <RHI/Utility/spirv_cfg.hpp>
-#include <RHI/Utility/spirv_common.hpp>
-#include <RHI/Utility/spirv_parser.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/GLSL.std.450.h>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cfg.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_common.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_parser.hpp>
 #include <algorithm>
 #include <cstring>
 #include <utility>

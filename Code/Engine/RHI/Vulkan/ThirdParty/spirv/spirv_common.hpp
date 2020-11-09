@@ -17,9 +17,9 @@
 #ifndef SPIRV_CROSS_COMMON_HPP
 #define SPIRV_CROSS_COMMON_HPP
 
-#include <RHI/Utility/spirv.hpp>
-#include <RHI/Utility/spirv_cross_containers.hpp>
-#include <RHI/Utility/spirv_cross_error_handling.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_containers.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_error_handling.hpp>
 #include <functional>
 
 // A bit crude, but allows projects which embed SPIRV-Cross statically to

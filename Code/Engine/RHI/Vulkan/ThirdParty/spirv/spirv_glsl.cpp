@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_glsl.hpp>
-#include <RHI/Utility/GLSL.std.450.h>
-#include <RHI/Utility/spirv_common.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_glsl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/GLSL.std.450.h>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_common.hpp>
 #include <algorithm>
 #include <assert.h>
 #include <cmath>

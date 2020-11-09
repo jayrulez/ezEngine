@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_reflect.hpp>
-#include <RHI/Utility/spirv_glsl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_reflect.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_glsl.hpp>
 #include <iomanip>
 
 using namespace spv;

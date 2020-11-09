@@ -17,7 +17,7 @@
 #ifndef SPIRV_CROSS_PARSER_HPP
 #define SPIRV_CROSS_PARSER_HPP
 
-#include <RHI/Utility/spirv_cross_parsed_ir.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_parsed_ir.hpp>
 #include <stdint.h>
 
 namespace SPIRV_CROSS_NAMESPACE

@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_cross_c.h>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_c.h>
 
 #if SPIRV_CROSS_C_API_CPP
-#include <RHI/Utility/spirv_cpp.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cpp.hpp>
 #endif
 #if SPIRV_CROSS_C_API_GLSL
-#include <RHI/Utility/spirv_glsl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_glsl.hpp>
 #else
-#include <RHI/Utility/spirv_cross.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross.hpp>
 #endif
 #if SPIRV_CROSS_C_API_HLSL
-#include <RHI/Utility/spirv_hlsl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_hlsl.hpp>
 #endif
 #if SPIRV_CROSS_C_API_MSL
-#include <RHI/Utility/spirv_msl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_msl.hpp>
 #endif
 #if SPIRV_CROSS_C_API_REFLECT
-#include <RHI/Utility/spirv_reflect.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_reflect.hpp>
 #endif
 
 #ifdef HAVE_SPIRV_CROSS_GIT_VERSION
 #include "gitversion.h"
 #endif
 
-#include <RHI/Utility/spirv_parser.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_parser.hpp>
 #include <memory>
 #include <new>
 #include <string.h>

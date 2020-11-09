@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_parser.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_parser.hpp>
 #include <assert.h>
 
 using namespace std;

@@ -17,7 +17,7 @@
 #ifndef SPIRV_CROSS_PARSED_IR_HPP
 #define SPIRV_CROSS_PARSED_IR_HPP
 
-#include <RHI/Utility/spirv_common.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_common.hpp>
 #include <stdint.h>
 #include <unordered_map>
 

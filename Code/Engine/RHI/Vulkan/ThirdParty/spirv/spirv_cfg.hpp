@@ -17,7 +17,7 @@
 #ifndef SPIRV_CROSS_CFG_HPP
 #define SPIRV_CROSS_CFG_HPP
 
-#include <RHI/Utility/spirv_common.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_common.hpp>
 #include <assert.h>
 
 namespace SPIRV_CROSS_NAMESPACE

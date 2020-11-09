@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_cross_parsed_ir.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_parsed_ir.hpp>
 #include <algorithm>
 #include <assert.h>
 

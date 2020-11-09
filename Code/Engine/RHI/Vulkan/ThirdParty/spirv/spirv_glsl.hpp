@@ -17,8 +17,8 @@
 #ifndef SPIRV_CROSS_GLSL_HPP
 #define SPIRV_CROSS_GLSL_HPP
 
-#include <RHI/Utility/GLSL.std.450.h>
-#include <RHI/Utility/spirv_cross.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/GLSL.std.450.h>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>

@@ -18,7 +18,7 @@
 #define SPIRV_CROSS_C_API_H
 
 #include <stddef.h>
-#include <RHI/Utility/spirv.h>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv.h>
 
 /*
  * C89-compatible wrapper for SPIRV-Cross' API.

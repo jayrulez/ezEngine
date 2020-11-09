@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_cross_util.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_util.hpp>
 #include "spirv_common.hpp"
 
 using namespace spv;

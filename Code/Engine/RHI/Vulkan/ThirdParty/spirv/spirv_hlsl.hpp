@@ -17,7 +17,7 @@
 #ifndef SPIRV_HLSL_HPP
 #define SPIRV_HLSL_HPP
 
-#include <RHI/Utility/spirv_glsl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_glsl.hpp>
 #include <utility>
 
 namespace SPIRV_CROSS_NAMESPACE

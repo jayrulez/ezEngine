@@ -17,7 +17,7 @@
 #ifndef SPIRV_CROSS_MSL_HPP
 #define SPIRV_CROSS_MSL_HPP
 
-#include <RHI/Utility/spirv_glsl.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_glsl.hpp>
 #include <map>
 #include <set>
 #include <stddef.h>

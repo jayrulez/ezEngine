@@ -17,7 +17,7 @@
 #ifndef SPIRV_CROSS_CONTAINERS_HPP
 #define SPIRV_CROSS_CONTAINERS_HPP
 
-#include <RHI/Utility/spirv_cross_error_handling.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross_error_handling.hpp>
 #include <algorithm>
 #include <functional>
 #include <iterator>

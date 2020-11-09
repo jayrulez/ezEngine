@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <RHI/Utility/spirv_cfg.hpp>
-#include <RHI/Utility/spirv_cross.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cfg.hpp>
+#include <RHI/Vulkan/ThirdParty/spirv/spirv_cross.hpp>
 #include <algorithm>
 #include <assert.h>
 
