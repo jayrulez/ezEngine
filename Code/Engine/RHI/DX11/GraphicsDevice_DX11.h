@@ -33,7 +33,7 @@ namespace wiGraphics
 		Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation> userDefinedAnnotations[COMMANDLIST_COUNT];
 
 		uint32_t	stencilRef[COMMANDLIST_COUNT];
-		XMFLOAT4	blendFactor[COMMANDLIST_COUNT];
+		ezVec4	blendFactor[COMMANDLIST_COUNT];
 
 		ID3D11VertexShader* prev_vs[COMMANDLIST_COUNT] = {};
 		ID3D11PixelShader* prev_ps[COMMANDLIST_COUNT] = {};
@@ -41,7 +41,7 @@ namespace wiGraphics
 		ID3D11DomainShader* prev_ds[COMMANDLIST_COUNT] = {};
 		ID3D11GeometryShader* prev_gs[COMMANDLIST_COUNT] = {};
 		ID3D11ComputeShader* prev_cs[COMMANDLIST_COUNT] = {};
-		XMFLOAT4 prev_blendfactor[COMMANDLIST_COUNT] = {};
+		ezVec4 prev_blendfactor[COMMANDLIST_COUNT] = {};
 		uint32_t prev_samplemask[COMMANDLIST_COUNT] = {};
 		ID3D11BlendState* prev_bs[COMMANDLIST_COUNT] = {};
 		ID3D11RasterizerState* prev_rs[COMMANDLIST_COUNT] = {};

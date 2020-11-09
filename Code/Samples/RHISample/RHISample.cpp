@@ -20,35 +20,19 @@
 #include <Foundation/Time/Clock.h>
 #include <Foundation/Utilities/GraphicsUtils.h>
 
+#include <Foundation/Containers/Blob.h>
 #include <RHI/DX11/GraphicsDevice_DX11.h>
 #include <RHI/DX12/GraphicsDevice_DX12.h>
-#include <RHI/Vulkan/GraphicsDevice_Vulkan.h>
 #include <RHI/Graphics.h>
 #include <RHI/GraphicsDevice.h>
-#include <Foundation/Containers/Blob.h>
+#include <RHI/Vulkan/GraphicsDevice_Vulkan.h>
 
 using namespace wiGraphics;
 
-struct EZ_ALIGN_16(float4)
-{
-  float x;
-  float y;
-  float z;
-  float w;
-};
-
-struct EZ_ALIGN_16(Color4)
-{
-  float r;
-  float g;
-  float b;
-  float a;
-};
-
 struct Vertex
 {
-  float4 position;
-  Color4 color;
+  ezVec3 position;
+  ezColor color;
 };
 
 class RHISampleWindow : public ezWindow
@@ -86,7 +70,7 @@ public:
   {
     ezStringBuilder sProjectDir = ">sdk/Data/Samples/RHISample";
     ezStringBuilder sProjectDirResolved;
-    ezFileSystem::ResolveSpecialDirectory(sProjectDir, sProjectDirResolved);
+    ezFileSystem::ResolveSpecialDirectory(sProjectDir, sProjectDirResolved).IgnoreResult();
 
     ezFileSystem::SetSpecialDirectory("project", sProjectDirResolved);
 
@@ -98,21 +82,22 @@ public:
       ezDataDirectory::FolderType::s_sRedirectionPrefix = "AssetCache/PC/";
     }
 
-    ezFileSystem::AddDataDirectory("", "", ":", ezFileSystem::AllowWrites);
-    ezFileSystem::AddDataDirectory(">appdir/", "AppBin", "bin", ezFileSystem::AllowWrites);              // writing to the binary directory
-    ezFileSystem::AddDataDirectory(">appdir/", "ShaderCache", "shadercache", ezFileSystem::AllowWrites); // for shader files
+    ezFileSystem::AddDataDirectory("", "", ":", ezFileSystem::AllowWrites).IgnoreResult();
+    ezFileSystem::AddDataDirectory(">appdir/", "AppBin", "bin", ezFileSystem::AllowWrites).IgnoreResult();              // writing to the binary directory
+    ezFileSystem::AddDataDirectory(">appdir/", "ShaderCache", "shadercache", ezFileSystem::AllowWrites).IgnoreResult(); // for shader files
     ezFileSystem::AddDataDirectory(">user/ezEngine Project/TextureSample", "AppData", "appdata",
-      ezFileSystem::AllowWrites); // app user data
+      ezFileSystem::AllowWrites)
+      .IgnoreResult(); // app user data
 
-    ezFileSystem::AddDataDirectory(">sdk/Data/Base", "Base", "base");
-    ezFileSystem::AddDataDirectory(">sdk/Data/FreeContent", "Shared", "shared");
-    ezFileSystem::AddDataDirectory(">project/", "Project", "project", ezFileSystem::AllowWrites);
+    ezFileSystem::AddDataDirectory(">sdk/Data/Base", "Base", "base").IgnoreResult();
+    ezFileSystem::AddDataDirectory(">sdk/Data/FreeContent", "Shared", "shared").IgnoreResult();
+    ezFileSystem::AddDataDirectory(">project/", "Project", "project", ezFileSystem::AllowWrites).IgnoreResult();
 
     ezGlobalLog::AddLogWriter(ezLogWriter::Console::LogMessageHandler);
     ezGlobalLog::AddLogWriter(ezLogWriter::VisualStudio::LogMessageHandler);
 
     ezTelemetry::CreateServer();
-    ezPlugin::LoadPlugin("ezInspectorPlugin");
+    ezPlugin::LoadPlugin("ezInspectorPlugin").IgnoreResult();
 
     // Register Input
     {
@@ -154,12 +139,12 @@ public:
       WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
       WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
       m_pWindow = EZ_DEFAULT_NEW(RHISampleWindow);
-      m_pWindow->Initialize(WindowCreationDesc);
+      m_pWindow->Initialize(WindowCreationDesc).IgnoreResult();
     }
 
     // Create a device
     {
-      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX12, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
+      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX11, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -170,41 +155,38 @@ public:
       vertexShader = EZ_DEFAULT_NEW(Shader);
       pixelShader = EZ_DEFAULT_NEW(Shader);
 
-      ezBlob blob;
       ezFileReader fReader;
+      ezDynamicArray<ezUInt8> dataBuffer;
 
-      ezDynamicArray<ezUInt8> fileBuffer;
+      fReader.Open("ps5_0.o").IgnoreResult();
+      //fReader.Open("ps_sv11.o").IgnoreResult();
+      //fReader.Open("ps6_2.o").IgnoreResult();
 
-      ezUInt8* psData = new ezUInt8[10000];
-      ezUInt64 psDataSize = 0;
-
-      //fReader.Open("ps5_0.o");
-      //fReader.Open("ps_sv11.o");
-      fReader.Open("ps6_2.o");
       if (fReader.IsOpen())
       {
-        psDataSize = fReader.ReadBytes(psData, fReader.GetFileSize());
-        m_pDevice->CreateShader(SHADERSTAGE::PS, psData, psDataSize, pixelShader);
-        delete[] psData;
+        dataBuffer.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+
+        ezUInt64 psDataSize = fReader.ReadBytes(dataBuffer.GetData(), fReader.GetFileSize());
+        m_pDevice->CreateShader(SHADERSTAGE::PS, dataBuffer.GetData(), psDataSize, pixelShader);
+
+        dataBuffer.Clear();
+        fReader.Close();
       }
-      fReader.Close();
-      blob.Clear();
 
-      ezUInt8* vsData = new ezUInt8[10000];
-      ezUInt64 vsDataSize = 0;
+      fReader.Open("vs5_0.o").IgnoreResult();
+      //fReader.Open("vs_sv11.o").IgnoreResult();
+      //fReader.Open("vs6_2.o").IgnoreResult();
 
-      //fReader.Open("vs5_0.o");
-      //fReader.Open("vs_sv11.o");
-      fReader.Open("vs6_2.o");
       if (fReader.IsOpen())
       {
-        vsDataSize = fReader.ReadBytes(vsData, fReader.GetFileSize());
-        m_pDevice->CreateShader(SHADERSTAGE::VS, vsData, vsDataSize, vertexShader);
-        delete[] vsData;
+        dataBuffer.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+
+        ezUInt64 vsDataSize = fReader.ReadBytes(dataBuffer.GetData(), fReader.GetFileSize());
+        m_pDevice->CreateShader(SHADERSTAGE::VS, dataBuffer.GetData(), vsDataSize, vertexShader);
+
+        dataBuffer.Clear();
+        fReader.Close();
       }
-      fReader.Close();
-      blob.Clear();
-      
     }
 
     {
@@ -247,10 +229,15 @@ public:
 
     {
       Vertex quadVertices[] = {
-        {{-0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        {{0.5f, -0.5, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-        {{-0.5f, -0.5, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+        {ezVec3(-.5f, -.5f, -.5f), ezColor::Red},
+        {ezVec3(-.5f, +.5f, -.5f), ezColor::Green},
+        {ezVec3(+.5f, +.5f, -.5f), ezColor::Blue},
+        {ezVec3(+.5f, -.5f, -.5f), ezColor::Violet},
+
+        {ezVec3(-.5f, -.5f, +.5f), ezColor::Yellow},
+        {ezVec3(-.5f, +.5f, +.5f), ezColor::Aqua},
+        {ezVec3(+.5f, +.5f, +.5f), ezColor::Fuchsia},
+        {ezVec3(+.5f, -.5f, +.5f), ezColor::Brown},
       };
 
       GPUBufferDesc bufferDesc{};
@@ -264,12 +251,42 @@ public:
 
       // Index buffer
       const ezUInt16 indices[] = {
-        0, 1, 2, 0, 2, 3,
-        6, 5, 4, 7, 6, 4,
-        8, 9, 10, 8, 10, 11,
-        14, 13, 12, 15, 14, 12,
-        16, 17, 18, 16, 18, 19,
-        22, 21, 20, 23, 22, 20
+        2,
+        0,
+        1,
+        2,
+        3,
+        0,
+        4,
+        6,
+        5,
+        4,
+        7,
+        6,
+        0,
+        7,
+        4,
+        0,
+        3,
+        7,
+        1,
+        0,
+        4,
+        1,
+        4,
+        5,
+        1,
+        5,
+        2,
+        5,
+        6,
+        2,
+        3,
+        6,
+        7,
+        3,
+        2,
+        6,
       };
 
       bufferDesc.Usage = USAGE_IMMUTABLE;
@@ -281,7 +298,7 @@ public:
 
       GPUBufferDesc bd;
       bd.Usage = USAGE_DYNAMIC;
-      bd.ByteWidth = sizeof(XMFLOAT4X4);
+      bd.ByteWidth = sizeof(ezMat4);
       bd.BindFlags = BIND_CONSTANT_BUFFER;
       bd.CPUAccessFlags = CPU_ACCESS_WRITE;
 
@@ -337,20 +354,31 @@ public:
   void OnDraw(CommandList commandList)
   {
     static float time = 0.0f;
-    XMMATRIX world = XMMatrixRotationX(time) * XMMatrixRotationY(time * 2) * XMMatrixRotationZ(time * .7f);
 
-    
+    ezMat4 rotX;
+    rotX.SetRotationMatrixX(ezAngle::Radian(time));
+
+    ezMat4 rotY;
+    rotY.SetRotationMatrixX(ezAngle::Radian(time * 2));
+
+    ezMat4 rotZ;
+    rotZ.SetRotationMatrixX(ezAngle::Radian(time * .7f));
+
+    ezMat4 world = rotZ * rotY * rotX;
 
     float aspect = (float)(m_pWindow->GetClientAreaSize().width / m_pWindow->GetClientAreaSize().height);
-    XMMATRIX view = XMMatrixLookAtRH(XMVectorSet(0, 0, 5, 1), XMVectorZero(), XMVectorSet(0, 1, 0, 1));
-    XMMATRIX proj = XMMatrixPerspectiveFovRH(ezMath::Pi<float>() / 4.0f, aspect, 0.1f, 100);
-    XMMATRIX viewProj = XMMatrixMultiply(world, XMMatrixMultiply(view, proj));
 
-    //Matrix4x4 projectionMatrix;
-    //Matrix4x4::CreatePerspectiveFieldOfView(Pi / 4.0f, aspect, 0.1f, 100, &projectionMatrix);
+    ezMat4 view = ezGraphicsUtils::CreateLookAtViewMatrix(ezVec3(0, 0, 5), ezVec3::ZeroVector(), ezVec3::UnitYAxis());
+    ezMat4 proj = ezGraphicsUtils::CreatePerspectiveProjectionMatrixFromFovX(ezAngle::Radian(ezMath::Pi<float>() / 4.0f), aspect, .1f, 100.f);
 
-    XMFLOAT4X4 worldViewProjection;
-    XMStoreFloat4x4(&worldViewProjection, viewProj);
+    ezMat4 viewProj = proj * view * world;
+
+
+    ezMat4 worldViewProjection = viewProj;
+
+    //worldViewProjection.SetZero();
+    //worldViewProjection.SetIdentity();
+
     m_pDevice->UpdateBuffer(&constantBuffer, &worldViewProjection, commandList);
 
     const GPUBuffer* vbs[] = {
@@ -359,7 +387,7 @@ public:
 
     uint32_t stride = sizeof(Vertex);
     m_pDevice->BindVertexBuffers(vbs, 0, 1, &stride, nullptr, commandList);
-    m_pDevice ->BindIndexBuffer(&indexBuffer, INDEXFORMAT_16BIT, 0, commandList);
+    m_pDevice->BindIndexBuffer(&indexBuffer, INDEXFORMAT_16BIT, 0, commandList);
     m_pDevice->BindPipelineState(&pipeline, commandList);
     m_pDevice->BindConstantBuffer(SHADERSTAGE::VS, &constantBuffer, 0, commandList);
     //m_pDevice->Draw(36,0, commandList);
@@ -382,7 +410,7 @@ public:
     EZ_DEFAULT_DELETE(m_pDevice);
 
     // finally destroy the window
-    m_pWindow->Destroy();
+    m_pWindow->Destroy().IgnoreResult();
     EZ_DEFAULT_DELETE(m_pWindow);
   }
 

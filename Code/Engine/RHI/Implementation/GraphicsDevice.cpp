@@ -131,7 +131,7 @@ uint32_t GraphicsDevice::GetFormatStride(FORMAT value) const
 
 
     default:
-      assert(0); // didn't catch format!
+      EZ_REPORT_FAILURE("Unsupported format."); // didn't catch format!
       break;
   }
 

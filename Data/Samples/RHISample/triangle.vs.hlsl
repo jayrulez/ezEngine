@@ -1,4 +1,14 @@
+//#define DXIL 1
+
+#if !defined(DXIL)
+#define DXIL 0
+#endif
+
+#if DXIL || VULKAN
+#define VERTEX_ATTRIBUTE(type, name, index) [[vk::location(index)]] type name : ATTRIBUTE##index
+#else
 #define VERTEX_ATTRIBUTE(type, name, index) type name : ATTRIBUTE##index
+#endif
 
 struct VS_INPUT
 {
@@ -20,8 +30,7 @@ cbuffer ProjectionMatrixBuffer : register(b0)
 PS_INPUT VSMain(VS_INPUT input)
 {
     PS_INPUT output;
-    //output.Position = float4(input.Position.xyz, 1.0f);
-    output.Position = mul(ProjectionMatrix, float4(input.Position.xyz, 1.0f));
+    output.Position = mul(ProjectionMatrix, float4(input.Position, 1.0f));
     output.Color = input.Color;
     return output;
 }

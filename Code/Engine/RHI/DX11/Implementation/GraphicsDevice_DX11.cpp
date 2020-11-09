@@ -1,8 +1,8 @@
 #include <RHI/DX11/GraphicsDevice_DX11.h>
 
 #ifdef WICKEDENGINE_BUILD_DX11
-#include <Foundation/Basics/Platform/Win/HResultUtils.h>
-#include <Foundation/Logging/Log.h>
+#  include <Foundation/Basics/Platform/Win/HResultUtils.h>
+#  include <Foundation/Logging/Log.h>
 
 #  pragma comment(lib, "d3d11.lib")
 #  pragma comment(lib, "Dxgi.lib")
@@ -1459,7 +1459,7 @@ namespace wiGraphics
       renderTargetView.Reset();
 
       HRESULT hr = swapChain->ResizeBuffers(GetBackBufferCount(), width, height, _ConvertFormat(GetBackBufferFormat()), 0);
-      assert(SUCCEEDED(hr));
+      EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to resize swapchain.");
 
       CreateBackBufferResources();
     }
@@ -1503,7 +1503,7 @@ namespace wiGraphics
 
     pBuffer->desc = *pDesc;
     HRESULT hr = device->CreateBuffer(&desc, pInitialData == nullptr ? nullptr : &data, (ID3D11Buffer**)internal_state->resource.ReleaseAndGetAddressOf());
-    assert(SUCCEEDED(hr) && "GPUBuffer creation failed!");
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "GPUBuffer creation failed!");
 
     if (SUCCEEDED(hr))
     {
@@ -1562,12 +1562,12 @@ namespace wiGraphics
       }
       break;
       default:
-        assert(0);
+        EZ_ASSERT_NOT_IMPLEMENTED;
         break;
     }
 
-    assert(SUCCEEDED(hr));
-    if (FAILED(hr))
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create texture.");
+    if (FAILED(hr)) //wtf?
       return SUCCEEDED(hr);
 
     if (pTexture->desc.MipLevels == 0)
@@ -1675,7 +1675,7 @@ namespace wiGraphics
       break;
     }
 
-    assert(SUCCEEDED(hr));
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create shader.");
 
     return SUCCEEDED(hr);
   }
@@ -1701,7 +1701,7 @@ namespace wiGraphics
 
     pBlendState->desc = *pBlendStateDesc;
     HRESULT hr = device->CreateBlendState(&desc, &internal_state->resource);
-    assert(SUCCEEDED(hr));
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to crate blend state.");
 
     return SUCCEEDED(hr);
   }
@@ -1728,7 +1728,7 @@ namespace wiGraphics
 
     pDepthStencilState->desc = *pDepthStencilStateDesc;
     HRESULT hr = device->CreateDepthStencilState(&desc, &internal_state->resource);
-    assert(SUCCEEDED(hr));
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create depth stencil state.");
 
     return SUCCEEDED(hr);
   }
@@ -1775,7 +1775,7 @@ namespace wiGraphics
 
         ComPtr<ID3D11RasterizerState2> rasterizer2;
         HRESULT hr = device3->CreateRasterizerState2(&desc2, &rasterizer2);
-        assert(SUCCEEDED(hr));
+        EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create rasterizer state.");
 
         internal_state->resource = rasterizer2;
 
@@ -1804,7 +1804,7 @@ namespace wiGraphics
 
         ComPtr<ID3D11RasterizerState1> rasterizer1;
         HRESULT hr = device1->CreateRasterizerState1(&desc1, &rasterizer1);
-        assert(SUCCEEDED(hr));
+        EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create rasterizer state.");
 
         internal_state->resource = rasterizer1;
 
@@ -1813,7 +1813,7 @@ namespace wiGraphics
     }
 
     HRESULT hr = device->CreateRasterizerState(&desc, &internal_state->resource);
-    assert(SUCCEEDED(hr));
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create rasterizer state.");
 
     return SUCCEEDED(hr);
   }
@@ -1839,7 +1839,7 @@ namespace wiGraphics
 
     pSamplerState->desc = *pSamplerDesc;
     HRESULT hr = device->CreateSamplerState(&desc, &internal_state->resource);
-    assert(SUCCEEDED(hr));
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create sampler state.");
 
     return SUCCEEDED(hr);
   }
@@ -1875,7 +1875,7 @@ namespace wiGraphics
     }
 
     HRESULT hr = device->CreateQuery(&desc, &internal_state->resource);
-    assert(SUCCEEDED(hr));
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create query.");
 
     return SUCCEEDED(hr);
   }
@@ -2017,7 +2017,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(0);
+          EZ_REPORT_FAILURE("Failed to create shader resource view.");
         }
       }
       break;
@@ -2097,7 +2097,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(0);
+          EZ_REPORT_FAILURE("Failed to create unordered access view.");
         }
       }
       break;
@@ -2193,7 +2193,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(0);
+          EZ_REPORT_FAILURE("Failed to create render target view.");
         }
       }
       break;
@@ -2282,7 +2282,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(0);
+          EZ_REPORT_FAILURE("Failed to create depth stencil view.");
         }
       }
       break;
@@ -2348,7 +2348,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(0);
+          EZ_REPORT_FAILURE("Failed to create shader resource view.");
         }
       }
       break;
@@ -2399,12 +2399,12 @@ namespace wiGraphics
         }
         else
         {
-          assert(0);
+          EZ_REPORT_FAILURE("Failed to create unordered access view.");
         }
       }
       break;
       default:
-        assert(0);
+        EZ_ASSERT_NOT_IMPLEMENTED;
         break;
     }
     return -1;
@@ -2439,7 +2439,7 @@ namespace wiGraphics
     }
     else
     {
-      assert(0);
+      EZ_REPORT_FAILURE("Failed to map resource.");
       mapping->data = nullptr;
       mapping->rowpitch = 0;
     }
@@ -2512,13 +2512,13 @@ namespace wiGraphics
     if (deviceContexts[cmd] == nullptr)
     {
       // need to create one more command list:
-      assert(cmd < COMMANDLIST_COUNT);
+      EZ_ASSERT_ALWAYS(cmd < COMMANDLIST_COUNT, "Need to create one more command list.");
 
       HRESULT hr = device->CreateDeferredContext(0, &deviceContexts[cmd]);
-      assert(SUCCEEDED(hr));
+      EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to create deferred context.");
 
       hr = deviceContexts[cmd].As(&userDefinedAnnotations[cmd]);
-      assert(SUCCEEDED(hr));
+      EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "Failed to get ID3DUserDefinedAnnotation.");
 
       // Temporary allocations will use the following buffer type:
       GPUBufferDesc frameAllocatorDesc;
@@ -2528,7 +2528,7 @@ namespace wiGraphics
       frameAllocatorDesc.CPUAccessFlags = CPU_ACCESS_WRITE;
       frameAllocatorDesc.MiscFlags = RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
       bool success = CreateBuffer(&frameAllocatorDesc, nullptr, &frame_allocators[cmd].buffer);
-      assert(success);
+      EZ_ASSERT_ALWAYS(success, "Failed to create buffer.");
       SetName(&frame_allocators[cmd].buffer, "frame_allocator");
     }
 
@@ -2555,7 +2555,7 @@ namespace wiGraphics
     deviceContexts[cmd]->RSSetScissorRects(8, pRects);
 
     stencilRef[cmd] = 0;
-    blendFactor[cmd] = XMFLOAT4(1, 1, 1, 1);
+    blendFactor[cmd] = ezVec4(1, 1, 1, 1);
 
     prev_vs[cmd] = {};
     prev_ps[cmd] = {};
@@ -2608,13 +2608,13 @@ namespace wiGraphics
     GPUQueryDesc desc;
     desc.Type = GPU_QUERY_TYPE_EVENT;
     bool success = CreateQuery(&desc, &query);
-    assert(success);
+    EZ_ASSERT_ALWAYS(success, "Failed to create query.");
     auto internal_state = to_internal(&query);
     immediateContext->End(internal_state->resource.Get());
     BOOL result;
     while (immediateContext->GetData(internal_state->resource.Get(), &result, sizeof(result), 0) == S_FALSE)
       ;
-    assert(result == TRUE);
+    EZ_ASSERT_ALWAYS(result == TRUE, "result must be true at this point.");
   }
 
 
@@ -2653,7 +2653,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(internal_state->subresources_rtv.size() > size_t(subresource) && "Invalid RTV subresource!");
+          EZ_ASSERT_ALWAYS(internal_state->subresources_rtv.size() > size_t(subresource), "Invalid RTV subresource!");
           RTVs[rt_count] = internal_state->subresources_rtv[subresource].Get();
         }
 
@@ -2672,7 +2672,7 @@ namespace wiGraphics
         }
         else
         {
-          assert(internal_state->subresources_dsv.size() > size_t(subresource) && "Invalid DSV subresource!");
+          EZ_ASSERT_ALWAYS(internal_state->subresources_dsv.size() > size_t(subresource), "Invalid DSV subresource!");
           DSV = internal_state->subresources_dsv[subresource].Get();
         }
 
@@ -2739,8 +2739,8 @@ namespace wiGraphics
   }
   void GraphicsDevice_DX11::BindScissorRects(uint32_t numRects, const Rect* rects, CommandList cmd)
   {
-    assert(rects != nullptr);
-    assert(numRects <= 8);
+    EZ_ASSERT_ALWAYS(rects != nullptr, "rects should not be null.");
+    EZ_ASSERT_ALWAYS(numRects <= 8, "numRects must be less then or equal to 8.");
     D3D11_RECT pRects[8];
     for (uint32_t i = 0; i < numRects; ++i)
     {
@@ -2753,7 +2753,7 @@ namespace wiGraphics
   }
   void GraphicsDevice_DX11::BindViewports(uint32_t NumViewports, const Viewport* pViewports, CommandList cmd)
   {
-    assert(NumViewports <= 6);
+    EZ_ASSERT_ALWAYS(NumViewports <= 6, "NumViewports must be less then or equal to 6.");
     D3D11_VIEWPORT d3dViewPorts[6];
     for (uint32_t i = 0; i < NumViewports; ++i)
     {
@@ -2779,7 +2779,7 @@ namespace wiGraphics
       }
       else
       {
-        assert(internal_state->subresources_srv.size() > static_cast<size_t>(subresource) && "Invalid subresource!");
+        EZ_ASSERT_ALWAYS(internal_state->subresources_srv.size() > static_cast<size_t>(subresource), "Invalid subresource!");
         SRV = internal_state->subresources_srv[subresource].Get();
       }
 
@@ -2804,14 +2804,14 @@ namespace wiGraphics
           deviceContexts[cmd]->CSSetShaderResources(slot, 1, &SRV);
           break;
         default:
-          assert(0);
+          EZ_ASSERT_NOT_IMPLEMENTED;
           break;
       }
     }
   }
   void GraphicsDevice_DX11::BindResources(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd)
   {
-    assert(count <= 16);
+    EZ_ASSERT_ALWAYS(count <= 16, "count must be less than or equal to 16.");
     ID3D11ShaderResourceView* srvs[16];
     for (uint32_t i = 0; i < count; ++i)
     {
@@ -2839,7 +2839,7 @@ namespace wiGraphics
         deviceContexts[cmd]->CSSetShaderResources(slot, count, srvs);
         break;
       default:
-        assert(0);
+        EZ_ASSERT_NOT_IMPLEMENTED;
         break;
     }
   }
@@ -2856,7 +2856,7 @@ namespace wiGraphics
       }
       else
       {
-        assert(internal_state->subresources_uav.size() > static_cast<size_t>(subresource) && "Invalid subresource!");
+        EZ_ASSERT_ALWAYS(internal_state->subresources_uav.size() > static_cast<size_t>(subresource), "Invalid subresource!");
         UAV = internal_state->subresources_uav[subresource].Get();
       }
 
@@ -2874,7 +2874,7 @@ namespace wiGraphics
   }
   void GraphicsDevice_DX11::BindUAVs(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd)
   {
-    assert(slot + count <= 8);
+    EZ_ASSERT_ALWAYS(slot + count <= 8, "slot + count must be less then or equal to 8.");
     ID3D11UnorderedAccessView* uavs[8];
     for (uint32_t i = 0; i < count; ++i)
     {
@@ -2898,7 +2898,7 @@ namespace wiGraphics
   }
   void GraphicsDevice_DX11::UnbindResources(uint32_t slot, uint32_t num, CommandList cmd)
   {
-    assert(num <= arraysize(__nullBlob) && "Extend nullBlob to support more resource unbinding!");
+    EZ_ASSERT_ALWAYS(num <= arraysize(__nullBlob), "Extend nullBlob to support more resource unbinding!");
     deviceContexts[cmd]->PSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
     deviceContexts[cmd]->VSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
     deviceContexts[cmd]->GSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
@@ -2908,7 +2908,7 @@ namespace wiGraphics
   }
   void GraphicsDevice_DX11::UnbindUAVs(uint32_t slot, uint32_t num, CommandList cmd)
   {
-    assert(num <= arraysize(__nullBlob) && "Extend nullBlob to support more resource unbinding!");
+    EZ_ASSERT_ALWAYS(num <= arraysize(__nullBlob), "Extend nullBlob to support more resource unbinding!");
     deviceContexts[cmd]->CSSetUnorderedAccessViews(slot, num, (ID3D11UnorderedAccessView**)__nullBlob, 0);
 
     raster_uavs_count[cmd] = 0;
@@ -2945,7 +2945,7 @@ namespace wiGraphics
         case AS:
           break;
         default:
-          assert(0);
+          EZ_ASSERT_NOT_IMPLEMENTED;
           break;
       }
     }
@@ -2977,13 +2977,13 @@ namespace wiGraphics
       case AS:
         break;
       default:
-        assert(0);
+        EZ_ASSERT_NOT_IMPLEMENTED;
         break;
     }
   }
   void GraphicsDevice_DX11::BindVertexBuffers(const GPUBuffer* const* vertexBuffers, uint32_t slot, uint32_t count, const uint32_t* strides, const uint32_t* offsets, CommandList cmd)
   {
-    assert(count <= 8);
+    EZ_ASSERT_ALWAYS(count <= 8, "count must be less then or equal to 8.");
     ID3D11Buffer* res[8] = {0};
     for (uint32_t i = 0; i < count; ++i)
     {
@@ -3080,15 +3080,15 @@ namespace wiGraphics
   }
   void GraphicsDevice_DX11::CopyResource(const GPUResource* pDst, const GPUResource* pSrc, CommandList cmd)
   {
-    assert(pDst != nullptr && pSrc != nullptr);
+    EZ_ASSERT_ALWAYS(pDst != nullptr && pSrc != nullptr, "pDst and pSrc cannot be null.");
     auto internal_state_src = to_internal(pSrc);
     auto internal_state_dst = to_internal(pDst);
     deviceContexts[cmd]->CopyResource(internal_state_dst->resource.Get(), internal_state_src->resource.Get());
   }
   void GraphicsDevice_DX11::UpdateBuffer(const GPUBuffer* buffer, const void* data, CommandList cmd, int dataSize)
   {
-    assert(buffer->desc.Usage != USAGE_IMMUTABLE && "Cannot update IMMUTABLE GPUBuffer!");
-    assert((int)buffer->desc.ByteWidth >= dataSize || dataSize < 0 && "Data size is too big!");
+    EZ_ASSERT_ALWAYS(buffer->desc.Usage != USAGE_IMMUTABLE, "Cannot update IMMUTABLE GPUBuffer!");
+    EZ_ASSERT_ALWAYS((int)buffer->desc.ByteWidth >= dataSize || dataSize < 0, "Data size is too big!");
 
     if (dataSize == 0)
     {
@@ -3103,7 +3103,7 @@ namespace wiGraphics
     {
       D3D11_MAPPED_SUBRESOURCE mappedResource;
       HRESULT hr = deviceContexts[cmd]->Map(internal_state->resource.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-      assert(SUCCEEDED(hr) && "GPUBuffer mapping failed!");
+      EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "GPUBuffer mapping failed!");
       memcpy(mappedResource.pData, data, (dataSize >= 0 ? dataSize : buffer->desc.ByteWidth));
       deviceContexts[cmd]->Unmap(internal_state->resource.Get(), 0);
     }
@@ -3148,7 +3148,7 @@ namespace wiGraphics
       // If allocation too large, grow the allocator:
       allocator.buffer.desc.ByteWidth = uint32_t((dataSize + 1) * 2);
       bool success = CreateBuffer(&allocator.buffer.desc, nullptr, &allocator.buffer);
-      assert(success);
+      EZ_ASSERT_ALWAYS(success, "Failed to create buffer.");
       SetName(&allocator.buffer, "frame_allocator");
       allocator.byteOffset = 0;
     }
@@ -3165,7 +3165,7 @@ namespace wiGraphics
     D3D11_MAP mapping = wrap ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr = deviceContexts[cmd]->Map(internal_state->resource.Get(), 0, mapping, 0, &mappedResource);
-    assert(SUCCEEDED(hr) && "GPUBuffer mapping failed!");
+    EZ_ASSERT_ALWAYS(SUCCEEDED(hr), "GPUBuffer mapping failed!");
 
     allocator.byteOffset = position + dataSize;
     allocator.residentFrame = FRAMECOUNT;

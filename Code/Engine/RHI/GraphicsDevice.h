@@ -3,6 +3,7 @@
 #include <RHI/RHIPCH.h>
 
 #include <RHI/Graphics.h>
+#include <Foundation/Utilities/GraphicsUtils.h>
 #include <memory>
 
 namespace wiGraphics
@@ -81,6 +82,7 @@ namespace wiGraphics
 		inline bool GetVSyncEnabled() const { return VSYNC; }
 		virtual void SetVSyncEnabled(bool value) { VSYNC = value; }
 		inline uint64_t GetFrameCount() const { return FRAMECOUNT; }
+    inline uint64_t GetFrameIndex() const { return FRAMECOUNT % BACKBUFFER_COUNT; }
 
 		// Returns native resolution width of back buffer in pixels:
 		inline int GetResolutionWidth() const { return RESOLUTIONWIDTH; }
@@ -104,9 +106,10 @@ namespace wiGraphics
 		bool IsFormatBlockCompressed(FORMAT value) const;
 		bool IsFormatStencilSupport(FORMAT value) const;
 
-		inline XMMATRIX GetScreenProjection() const
+		inline ezMat4 GetScreenProjection() const
 		{
-			return XMMatrixOrthographicOffCenterLH(0, (float)GetScreenWidth(), (float)GetScreenHeight(), 0, -1, 1);
+      return ezGraphicsUtils::CreateOrthographicProjectionMatrix(0, (float)GetScreenWidth(), (float)GetScreenHeight(), 0, -1, 1);
+			//return XMMatrixOrthographicOffCenterLH(0, (float)GetScreenWidth(), (float)GetScreenHeight(), 0, -1, 1);
 		}
 		inline FORMAT GetBackBufferFormat() const { return BACKBUFFER_FORMAT; }
 		static constexpr uint32_t GetBackBufferCount() { return BACKBUFFER_COUNT; }

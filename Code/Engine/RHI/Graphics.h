@@ -2,32 +2,12 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
 
-#include <memory>
-#include <string>
-#include <vector>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-
-#if __has_include("DirectXMath.h")
-// In this case, DirectXMath is coming from Windows SDK.
-//	It is better to use this on Windows as some Windows libraries could depend on the same
-//	DirectXMath headers
-#  include <DirectXCollision.h>
-#  include <DirectXMath.h>
-#  include <DirectXPackedVector.h>
-#else
-// In this case, DirectXMath is coming from supplied source code
-//	On platforms that don't have Windows SDK, the source code for DirectXMath is provided
-//	as part of the engine utilities
-#  include <RHI/Utility/DirectXCollision.h>
-#  include <RHI/Utility/DirectXMath.h>
-#  include <RHI/Utility/DirectXPackedVector.h>
-#endif
-
-using namespace DirectX;
-using namespace DirectX::PackedVector;
-static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+#include <memory>
+#include <string>
+#include <vector>
 
 #define arraysize(a) (sizeof(a) / sizeof(a[0]))
 #define NOMINMAX
@@ -61,6 +41,76 @@ namespace wiGraphics
 #else
   using RHIWindowType = int;
 #endif // _WIN32
+
+  ///////////////////////////////////////////TODO//////////////////////////////////////
+  //                PR an ezMat3x4 implementation to ez upstream                     //
+  /////////////////////////////////////////////////////////////////////////////////////
+  struct Float3X4
+  {
+    union
+    {
+      struct
+      {
+        float _11, _12, _13, _14;
+        float _21, _22, _23, _24;
+        float _31, _32, _33, _34;
+      };
+      float m[3][4];
+      float f[12];
+    };
+
+    Float3X4() = default;
+
+    Float3X4(const Float3X4&) = default;
+    Float3X4& operator=(const Float3X4&) = default;
+
+    Float3X4(Float3X4&&) = default;
+    Float3X4& operator=(Float3X4&&) = default;
+
+    constexpr Float3X4(float m00, float m01, float m02, float m03,
+      float m10, float m11, float m12, float m13,
+      float m20, float m21, float m22, float m23)
+      : _11(m00)
+      , _12(m01)
+      , _13(m02)
+      , _14(m03)
+      , _21(m10)
+      , _22(m11)
+      , _23(m12)
+      , _24(m13)
+      , _31(m20)
+      , _32(m21)
+      , _33(m22)
+      , _34(m23)
+    {
+    }
+    explicit Float3X4(const float* pArray);
+
+    float operator()(size_t Row, size_t Column) const { return m[Row][Column]; }
+    float& operator()(size_t Row, size_t Column) { return m[Row][Column]; }
+  };
+
+  inline Float3X4::Float3X4(
+    const float* pArray)
+  {
+    EZ_ASSERT_ALWAYS(pArray != nullptr, "The float pointer passed should not be null.");
+
+    m[0][0] = pArray[0];
+    m[0][1] = pArray[1];
+    m[0][2] = pArray[2];
+    m[0][3] = pArray[3];
+
+    m[1][0] = pArray[4];
+    m[1][1] = pArray[5];
+    m[1][2] = pArray[6];
+    m[1][3] = pArray[7];
+
+    m[2][0] = pArray[8];
+    m[2][1] = pArray[9];
+    m[2][2] = pArray[10];
+    m[2][3] = pArray[11];
+  }
+  /////////////////////////////////////////////////////////////////////////////////////
 
   struct Shader;
   struct BlendState;
@@ -405,7 +455,7 @@ namespace wiGraphics
     RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS = 1 << 3,
     RESOURCE_MISC_BUFFER_STRUCTURED = 1 << 4,
     RESOURCE_MISC_TILED = 1 << 5,
-    RESOURCE_MISC_RAY_TRACING = 1 << 0,
+    RESOURCE_MISC_RAY_TRACING = 1 << 6,
   };
 
   // Descriptor structs:
@@ -922,7 +972,7 @@ namespace wiGraphics
     {
       struct Instance
       {
-        XMFLOAT3X4 transform;
+        Float3X4 transform;
         uint32_t InstanceID : 24;
         uint32_t InstanceMask : 8;
         uint32_t InstanceContributionToHitGroupIndex : 24;
