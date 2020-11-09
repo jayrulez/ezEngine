@@ -4009,7 +4009,7 @@ std::string CompilerGLSL::convert_double_to_string(const SPIRConstant &c, ezUInt
 			out_type.width = 64;
 			in_type.width = 64;
 
-			uint64_t u64_value = c.scalar_u64(col, row);
+			ezUInt64 u64_value = c.scalar_u64(col, row);
 
 			if (options.es)
 				SPIRV_CROSS_THROW("64-bit integers/float not supported in ES profile.");
@@ -4102,7 +4102,7 @@ string CompilerGLSL::constant_expression_vector(const SPIRConstant &c, ezUInt32 
 	{
 		if (type.width == 64)
 		{
-			uint64_t ident = c.scalar_u64(vector, 0);
+			ezUInt64 ident = c.scalar_u64(vector, 0);
 			for (ezUInt32 i = 1; i < c.vector_size(); i++)
 			{
 				if (ident != c.scalar_u64(vector, i))
@@ -11908,7 +11908,7 @@ string CompilerGLSL::type_to_glsl(const SPIRType &type, ezUInt32 id)
 		case SPIRType::Int64:
 			return "int64_t";
 		case SPIRType::UInt64:
-			return "uint64_t";
+			return "ezUInt64";
 		default:
 			return "???";
 		}
@@ -12119,7 +12119,7 @@ void CompilerGLSL::add_function_overload(const SPIRFunction &func)
 
 		hasher.u32(type_id);
 	}
-	uint64_t types_hash = hasher.get();
+	ezUInt64 types_hash = hasher.get();
 
 	auto function_name = to_name(func.self);
 	auto itr = function_overloads.find(function_name);

@@ -59,6 +59,106 @@ struct EZ_RHI_DLL ezRHIIndexBufferFormat
   };
 };
 
+struct EZ_RHI_DLL ezRHIDepthWriteMask
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    Zero,
+    All,
+  };
+};
+
+struct EZ_RHI_DLL ezRHIColorWriteMask
+{
+  typedef ezUInt8 StorageType;
+  enum Enum
+  {
+    None = 0,
+    Red = 1,
+    Green = 2,
+    Blue = 4,
+    Alpha = 8,
+    All = (((Red | Green) | Blue) | Alpha)
+  };
+  struct Bits
+  {
+  };
+};
+EZ_DECLARE_FLAGS_OPERATORS(ezRHIColorWriteMask);
+
+struct EZ_RHI_DLL ezRHIBlendFactor
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    Zero,
+    One,
+    SourceColor,
+    InverseSourceColor,
+    SourceAlpha,
+    InverseSourceAlpha,
+    DestinationAlpha,
+    InverseDestinationAlpha,
+    DestinationColor,
+    InverseDestinationColor,
+    SourceAlphaSaturated,
+    BlendFactor,
+    InverseBlendFactor,
+    Source1Color,
+    InverseSource1Color,
+    Source1Alpha,
+    InverseSource1Alpha,
+  };
+};
+
+struct EZ_RHI_DLL ezRHIBlendOp
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    Add,
+    Subtract,
+    ReverseSubtract,
+    Min,
+    Max,
+  };
+};
+
+
+
+struct EZ_RHI_DLL ezRHIStencilOp
+{
+  typedef ezUInt8 StorageType;
+  enum Enum
+  {
+    Keep,
+    Zero,
+    Replace,
+    IncrementSaturated,
+    DecrementSaturated,
+    Invert,
+    Increment,
+    Decrement,
+  };
+};
+
+struct EZ_RHI_DLL ezRHIComparisonFunc
+{
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    Never,
+    Less,
+    Equal,
+    LessEqual,
+    Greater,
+    NotEqual,
+    GreaterEqual,
+    Always,
+  };
+};
+
 struct EZ_RHI_DLL ezRHIShaderStage
 {
   typedef ezUInt32 StorageType;
@@ -87,4 +187,12 @@ struct EZ_RHI_DLL ezRHIStruct
   struct Bits { };
 };
 EZ_DECLARE_FLAGS_OPERATORS(_bitFlagName);
+*/
+
+/////////////////////// Not used ////////////////////////////
+/*
+
+
+
+
 */

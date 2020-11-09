@@ -70,7 +70,7 @@ namespace DX11_Internal
 
     return _flag;
   }
-  constexpr ezUInt32 _ParseColorWriteMask(ezUInt32 value)
+  inline ezUInt32 _ParseColorWriteMask(ezBitflags<ezRHIColorWriteMask> value)
   {
     ezUInt32 _flag = 0;
 
@@ -80,13 +80,13 @@ namespace DX11_Internal
     }
     else
     {
-      if (value & COLOR_WRITE_ENABLE_RED)
+      if (value.IsSet(ezRHIColorWriteMask::Red))
         _flag |= D3D11_COLOR_WRITE_ENABLE_RED;
-      if (value & COLOR_WRITE_ENABLE_GREEN)
+      if (value.IsSet(ezRHIColorWriteMask::Green))
         _flag |= D3D11_COLOR_WRITE_ENABLE_GREEN;
-      if (value & COLOR_WRITE_ENABLE_BLUE)
+      if (value.IsSet(ezRHIColorWriteMask::Blue))
         _flag |= D3D11_COLOR_WRITE_ENABLE_BLUE;
-      if (value & COLOR_WRITE_ENABLE_ALPHA)
+      if (value.IsSet(ezRHIColorWriteMask::Alpha))
         _flag |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
     }
 
@@ -231,32 +231,32 @@ namespace DX11_Internal
     }
     return D3D11_TEXTURE_ADDRESS_WRAP;
   }
-  constexpr D3D11_COMPARISON_FUNC _ConvertComparisonFunc(COMPARISON_FUNC value)
+  inline D3D11_COMPARISON_FUNC _ConvertComparisonFunc(ezEnum<ezRHIComparisonFunc> value)
   {
     switch (value)
     {
-      case COMPARISON_NEVER:
+      case ezRHIComparisonFunc::Never:
         return D3D11_COMPARISON_NEVER;
         break;
-      case COMPARISON_LESS:
+      case ezRHIComparisonFunc::Less:
         return D3D11_COMPARISON_LESS;
         break;
-      case COMPARISON_EQUAL:
+      case ezRHIComparisonFunc::Equal:
         return D3D11_COMPARISON_EQUAL;
         break;
-      case COMPARISON_LESS_EQUAL:
+      case ezRHIComparisonFunc::LessEqual:
         return D3D11_COMPARISON_LESS_EQUAL;
         break;
-      case COMPARISON_GREATER:
+      case ezRHIComparisonFunc::Greater:
         return D3D11_COMPARISON_GREATER;
         break;
-      case COMPARISON_NOT_EQUAL:
+      case ezRHIComparisonFunc::NotEqual:
         return D3D11_COMPARISON_NOT_EQUAL;
         break;
-      case COMPARISON_GREATER_EQUAL:
+      case ezRHIComparisonFunc::GreaterEqual:
         return D3D11_COMPARISON_GREATER_EQUAL;
         break;
-      case COMPARISON_ALWAYS:
+      case ezRHIComparisonFunc::Always:
         return D3D11_COMPARISON_ALWAYS;
         break;
       default:
@@ -297,14 +297,14 @@ namespace DX11_Internal
     }
     return D3D11_CULL_NONE;
   }
-  constexpr D3D11_DEPTH_WRITE_MASK _ConvertDepthWriteMask(DEPTH_WRITE_MASK value)
+  inline D3D11_DEPTH_WRITE_MASK _ConvertDepthWriteMask(ezEnum<ezRHIDepthWriteMask> value)
   {
     switch (value)
     {
-      case DEPTH_WRITE_MASK_ZERO:
+      case ezRHIDepthWriteMask::Zero:
         return D3D11_DEPTH_WRITE_MASK_ZERO;
         break;
-      case DEPTH_WRITE_MASK_ALL:
+      case ezRHIDepthWriteMask::All:
         return D3D11_DEPTH_WRITE_MASK_ALL;
         break;
       default:
@@ -312,32 +312,32 @@ namespace DX11_Internal
     }
     return D3D11_DEPTH_WRITE_MASK_ZERO;
   }
-  constexpr D3D11_STENCIL_OP _ConvertStencilOp(STENCIL_OP value)
+  inline D3D11_STENCIL_OP _ConvertStencilOp(ezEnum<ezRHIStencilOp> value)
   {
     switch (value)
     {
-      case STENCIL_OP_KEEP:
+      case ezRHIStencilOp::Keep:
         return D3D11_STENCIL_OP_KEEP;
         break;
-      case STENCIL_OP_ZERO:
+      case ezRHIStencilOp::Zero:
         return D3D11_STENCIL_OP_ZERO;
         break;
-      case STENCIL_OP_REPLACE:
+      case ezRHIStencilOp::Replace:
         return D3D11_STENCIL_OP_REPLACE;
         break;
-      case STENCIL_OP_INCR_SAT:
+      case ezRHIStencilOp::IncrementSaturated:
         return D3D11_STENCIL_OP_INCR_SAT;
         break;
-      case STENCIL_OP_DECR_SAT:
+      case ezRHIStencilOp::DecrementSaturated:
         return D3D11_STENCIL_OP_DECR_SAT;
         break;
-      case STENCIL_OP_INVERT:
+      case ezRHIStencilOp::Invert:
         return D3D11_STENCIL_OP_INVERT;
         break;
-      case STENCIL_OP_INCR:
+      case ezRHIStencilOp::Increment:
         return D3D11_STENCIL_OP_INCR;
         break;
-      case STENCIL_OP_DECR:
+      case ezRHIStencilOp::Decrement:
         return D3D11_STENCIL_OP_DECR;
         break;
       default:
@@ -345,59 +345,59 @@ namespace DX11_Internal
     }
     return D3D11_STENCIL_OP_KEEP;
   }
-  constexpr D3D11_BLEND _ConvertBlend(BLEND value)
+  inline D3D11_BLEND _ConvertBlend(ezEnum<ezRHIBlendFactor> value)
   {
     switch (value)
     {
-      case BLEND_ZERO:
+      case ezRHIBlendFactor::Zero:
         return D3D11_BLEND_ZERO;
         break;
-      case BLEND_ONE:
+      case ezRHIBlendFactor::One:
         return D3D11_BLEND_ONE;
         break;
-      case BLEND_SRC_COLOR:
+      case ezRHIBlendFactor::SourceColor:
         return D3D11_BLEND_SRC_COLOR;
         break;
-      case BLEND_INV_SRC_COLOR:
+      case ezRHIBlendFactor::InverseSourceColor:
         return D3D11_BLEND_INV_SRC_COLOR;
         break;
-      case BLEND_SRC_ALPHA:
+      case ezRHIBlendFactor::SourceAlpha:
         return D3D11_BLEND_SRC_ALPHA;
         break;
-      case BLEND_INV_SRC_ALPHA:
+      case ezRHIBlendFactor::InverseSourceAlpha:
         return D3D11_BLEND_INV_SRC_ALPHA;
         break;
-      case BLEND_DEST_ALPHA:
+      case ezRHIBlendFactor::DestinationAlpha:
         return D3D11_BLEND_DEST_ALPHA;
         break;
-      case BLEND_INV_DEST_ALPHA:
+      case ezRHIBlendFactor::InverseDestinationAlpha:
         return D3D11_BLEND_INV_DEST_ALPHA;
         break;
-      case BLEND_DEST_COLOR:
+      case ezRHIBlendFactor::DestinationColor:
         return D3D11_BLEND_DEST_COLOR;
         break;
-      case BLEND_INV_DEST_COLOR:
+      case ezRHIBlendFactor::InverseDestinationColor:
         return D3D11_BLEND_INV_DEST_COLOR;
         break;
-      case BLEND_SRC_ALPHA_SAT:
+      case ezRHIBlendFactor::SourceAlphaSaturated:
         return D3D11_BLEND_SRC_ALPHA_SAT;
         break;
-      case BLEND_BLEND_FACTOR:
+      case ezRHIBlendFactor::BlendFactor:
         return D3D11_BLEND_BLEND_FACTOR;
         break;
-      case BLEND_INV_BLEND_FACTOR:
+      case ezRHIBlendFactor::InverseBlendFactor:
         return D3D11_BLEND_INV_BLEND_FACTOR;
         break;
-      case BLEND_SRC1_COLOR:
+      case ezRHIBlendFactor::Source1Color:
         return D3D11_BLEND_SRC1_COLOR;
         break;
-      case BLEND_INV_SRC1_COLOR:
+      case ezRHIBlendFactor::InverseSource1Color:
         return D3D11_BLEND_INV_SRC1_COLOR;
         break;
-      case BLEND_SRC1_ALPHA:
+      case ezRHIBlendFactor::Source1Alpha:
         return D3D11_BLEND_SRC1_ALPHA;
         break;
-      case BLEND_INV_SRC1_ALPHA:
+      case ezRHIBlendFactor::InverseSource1Alpha:
         return D3D11_BLEND_INV_SRC1_ALPHA;
         break;
       default:
@@ -405,23 +405,23 @@ namespace DX11_Internal
     }
     return D3D11_BLEND_ZERO;
   }
-  constexpr D3D11_BLEND_OP _ConvertBlendOp(BLEND_OP value)
+  inline D3D11_BLEND_OP _ConvertBlendOp(ezEnum<ezRHIBlendOp> value)
   {
     switch (value)
     {
-      case BLEND_OP_ADD:
+      case ezRHIBlendOp::Add:
         return D3D11_BLEND_OP_ADD;
         break;
-      case BLEND_OP_SUBTRACT:
+      case ezRHIBlendOp::Subtract:
         return D3D11_BLEND_OP_SUBTRACT;
         break;
-      case BLEND_OP_REV_SUBTRACT:
+      case ezRHIBlendOp::ReverseSubtract:
         return D3D11_BLEND_OP_REV_SUBTRACT;
         break;
-      case BLEND_OP_MIN:
+      case ezRHIBlendOp::Min:
         return D3D11_BLEND_OP_MIN;
         break;
-      case BLEND_OP_MAX:
+      case ezRHIBlendOp::Max:
         return D3D11_BLEND_OP_MAX;
         break;
       default:
@@ -2288,7 +2288,7 @@ int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
   }
   return -1;
 }
-int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size)
+int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, ezUInt64 offset, ezUInt64 size)
 {
   auto internal_state = to_internal(buffer);
   const GPUBufferDesc& desc = buffer->GetDesc();
@@ -2457,7 +2457,7 @@ bool GraphicsDevice_DX11::QueryRead(const GPUQuery* query, GPUQueryResult* resul
   switch (query->desc.Type)
   {
     case GPU_QUERY_TYPE_TIMESTAMP:
-      hr = immediateContext->GetData(QUERY, &result->result_timestamp, sizeof(uint64_t), _flags);
+      hr = immediateContext->GetData(QUERY, &result->result_timestamp, sizeof(ezUInt64), _flags);
       break;
     case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
     {
@@ -2468,13 +2468,13 @@ bool GraphicsDevice_DX11::QueryRead(const GPUQuery* query, GPUQueryResult* resul
     break;
     case GPU_QUERY_TYPE_EVENT:
     case GPU_QUERY_TYPE_OCCLUSION:
-      hr = immediateContext->GetData(QUERY, &result->result_passed_sample_count, sizeof(uint64_t), _flags);
+      hr = immediateContext->GetData(QUERY, &result->result_passed_sample_count, sizeof(ezUInt64), _flags);
       break;
     case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
     {
       BOOL passed = FALSE;
       hr = immediateContext->GetData(QUERY, &passed, sizeof(BOOL), _flags);
-      result->result_passed_sample_count = (uint64_t)passed;
+      result->result_passed_sample_count = (ezUInt64)passed;
       break;
     }
   }
@@ -2864,8 +2864,8 @@ void GraphicsDevice_DX11::BindUAV(ezEnum<ezRHIShaderStage> stage, const GPUResou
     else
     {
       raster_uavs[cmd][slot] = UAV;
-      raster_uavs_slot[cmd] = ezMath::Min(raster_uavs_slot[cmd], uint8_t(slot));
-      raster_uavs_count[cmd] = ezMath::Max(raster_uavs_count[cmd], uint8_t(1));
+      raster_uavs_slot[cmd] = ezMath::Min(raster_uavs_slot[cmd], ezUInt8(slot));
+      raster_uavs_count[cmd] = ezMath::Max(raster_uavs_count[cmd], ezUInt8(1));
     }
   }
 }
@@ -2889,8 +2889,8 @@ void GraphicsDevice_DX11::BindUAVs(ezEnum<ezRHIShaderStage> stage, const GPUReso
   }
   else
   {
-    raster_uavs_slot[cmd] = ezMath::Min(raster_uavs_slot[cmd], uint8_t(slot));
-    raster_uavs_count[cmd] = ezMath::Max(raster_uavs_count[cmd], uint8_t(count));
+    raster_uavs_slot[cmd] = ezMath::Min(raster_uavs_slot[cmd], ezUInt8(slot));
+    raster_uavs_count[cmd] = ezMath::Max(raster_uavs_count[cmd], ezUInt8(count));
   }
 }
 void GraphicsDevice_DX11::UnbindResources(ezUInt32 slot, ezUInt32 num, CommandList cmd)

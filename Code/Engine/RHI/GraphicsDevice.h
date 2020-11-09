@@ -7,13 +7,13 @@
 #include <memory>
 
 
-typedef uint8_t CommandList;
+typedef ezUInt8 CommandList;
 static const CommandList COMMANDLIST_COUNT = 32;
 
 class EZ_RHI_DLL GraphicsDevice
 {
 protected:
-  uint64_t FRAMECOUNT = 0;
+  ezUInt64 FRAMECOUNT = 0;
   bool VSYNC = true;
   int RESOLUTIONWIDTH = 0;
   int RESOLUTIONHEIGHT = 0;
@@ -55,12 +55,12 @@ public:
   virtual bool CreateRootSignature(RootSignature* rootsig) { return false; }
 
   virtual int CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, ezUInt32 firstSlice, ezUInt32 sliceCount, ezUInt32 firstMip, ezUInt32 mipCount) = 0;
-  virtual int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size = ~0) = 0;
+  virtual int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, ezUInt64 offset, ezUInt64 size = ~0) = 0;
 
   virtual void WriteShadingRateValue(SHADING_RATE rate, void* dest){};
   virtual void WriteTopLevelAccelerationStructureInstance(const RaytracingAccelerationStructureDesc::TopLevel::Instance* instance, void* dest) {}
   virtual void WriteShaderIdentifier(const RaytracingPipelineState* rtpso, ezUInt32 group_index, void* dest) {}
-  virtual void WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource = -1, uint64_t offset = 0) {}
+  virtual void WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource = -1, ezUInt64 offset = 0) {}
   virtual void WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const Sampler* sampler) {}
 
   virtual void Map(const GPUResource* resource, Mapping* mapping) = 0;
@@ -80,8 +80,8 @@ public:
 
   inline bool GetVSyncEnabled() const { return VSYNC; }
   virtual void SetVSyncEnabled(bool value) { VSYNC = value; }
-  inline uint64_t GetFrameCount() const { return FRAMECOUNT; }
-  inline uint64_t GetFrameIndex() const { return FRAMECOUNT % BACKBUFFER_COUNT; }
+  inline ezUInt64 GetFrameCount() const { return FRAMECOUNT; }
+  inline ezUInt64 GetFrameIndex() const { return FRAMECOUNT % BACKBUFFER_COUNT; }
 
   // Returns native resolution width of back buffer in pixels:
   inline int GetResolutionWidth() const { return RESOLUTIONWIDTH; }

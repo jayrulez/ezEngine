@@ -114,70 +114,9 @@ inline Float3X4::Float3X4(
 
 
 
-enum COMPARISON_FUNC
-{
-  COMPARISON_NEVER,
-  COMPARISON_LESS,
-  COMPARISON_EQUAL,
-  COMPARISON_LESS_EQUAL,
-  COMPARISON_GREATER,
-  COMPARISON_NOT_EQUAL,
-  COMPARISON_GREATER_EQUAL,
-  COMPARISON_ALWAYS,
-};
-enum DEPTH_WRITE_MASK
-{
-  DEPTH_WRITE_MASK_ZERO,
-  DEPTH_WRITE_MASK_ALL,
-};
-enum STENCIL_OP
-{
-  STENCIL_OP_KEEP,
-  STENCIL_OP_ZERO,
-  STENCIL_OP_REPLACE,
-  STENCIL_OP_INCR_SAT,
-  STENCIL_OP_DECR_SAT,
-  STENCIL_OP_INVERT,
-  STENCIL_OP_INCR,
-  STENCIL_OP_DECR,
-};
-enum BLEND
-{
-  BLEND_ZERO,
-  BLEND_ONE,
-  BLEND_SRC_COLOR,
-  BLEND_INV_SRC_COLOR,
-  BLEND_SRC_ALPHA,
-  BLEND_INV_SRC_ALPHA,
-  BLEND_DEST_ALPHA,
-  BLEND_INV_DEST_ALPHA,
-  BLEND_DEST_COLOR,
-  BLEND_INV_DEST_COLOR,
-  BLEND_SRC_ALPHA_SAT,
-  BLEND_BLEND_FACTOR,
-  BLEND_INV_BLEND_FACTOR,
-  BLEND_SRC1_COLOR,
-  BLEND_INV_SRC1_COLOR,
-  BLEND_SRC1_ALPHA,
-  BLEND_INV_SRC1_ALPHA,
-};
-enum COLOR_WRITE_ENABLE
-{
-  COLOR_WRITE_DISABLE = 0,
-  COLOR_WRITE_ENABLE_RED = 1,
-  COLOR_WRITE_ENABLE_GREEN = 2,
-  COLOR_WRITE_ENABLE_BLUE = 4,
-  COLOR_WRITE_ENABLE_ALPHA = 8,
-  COLOR_WRITE_ENABLE_ALL = (((COLOR_WRITE_ENABLE_RED | COLOR_WRITE_ENABLE_GREEN) | COLOR_WRITE_ENABLE_BLUE) | COLOR_WRITE_ENABLE_ALPHA)
-};
-enum BLEND_OP
-{
-  BLEND_OP_ADD,
-  BLEND_OP_SUBTRACT,
-  BLEND_OP_REV_SUBTRACT,
-  BLEND_OP_MIN,
-  BLEND_OP_MAX,
-};
+
+
+
 enum FILL_MODE
 {
   FILL_WIREFRAME,
@@ -486,7 +425,7 @@ struct EZ_RHI_DLL SamplerDesc
   TEXTURE_ADDRESS_MODE AddressW = TEXTURE_ADDRESS_CLAMP;
   float MipLODBias = 0.0f;
   ezUInt32 MaxAnisotropy = 0;
-  COMPARISON_FUNC ComparisonFunc = COMPARISON_NEVER;
+  ezRHIComparisonFunc::Enum ComparisonFunc = ezRHIComparisonFunc::Never;
   float BorderColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
   float MinLOD = 0.0f;
   float MaxLOD = FLT_MAX;
@@ -507,32 +446,32 @@ struct EZ_RHI_DLL RasterizerStateDesc
 };
 struct EZ_RHI_DLL DepthStencilOpDesc
 {
-  STENCIL_OP StencilFailOp = STENCIL_OP_KEEP;
-  STENCIL_OP StencilDepthFailOp = STENCIL_OP_KEEP;
-  STENCIL_OP StencilPassOp = STENCIL_OP_KEEP;
-  COMPARISON_FUNC StencilFunc = COMPARISON_NEVER;
+  ezRHIStencilOp::Enum StencilFailOp = ezRHIStencilOp::Keep;
+  ezRHIStencilOp::Enum StencilDepthFailOp = ezRHIStencilOp::Keep;
+  ezRHIStencilOp::Enum StencilPassOp = ezRHIStencilOp::Keep;
+  ezRHIComparisonFunc::Enum StencilFunc = ezRHIComparisonFunc::Never;
 };
 struct EZ_RHI_DLL DepthStencilStateDesc
 {
   bool DepthEnable = false;
-  DEPTH_WRITE_MASK DepthWriteMask = DEPTH_WRITE_MASK_ZERO;
-  COMPARISON_FUNC DepthFunc = COMPARISON_NEVER;
+  ezRHIDepthWriteMask::Enum DepthWriteMask = ezRHIDepthWriteMask::Zero;
+  ezRHIComparisonFunc::Enum DepthFunc = ezRHIComparisonFunc::Never;
   bool StencilEnable = false;
-  uint8_t StencilReadMask = 0xff;
-  uint8_t StencilWriteMask = 0xff;
+  ezUInt8 StencilReadMask = 0xff;
+  ezUInt8 StencilWriteMask = 0xff;
   DepthStencilOpDesc FrontFace;
   DepthStencilOpDesc BackFace;
 };
 struct EZ_RHI_DLL RenderTargetBlendStateDesc
 {
   bool BlendEnable = false;
-  BLEND SrcBlend = BLEND_SRC_ALPHA;
-  BLEND DestBlend = BLEND_INV_SRC_ALPHA;
-  BLEND_OP BlendOp = BLEND_OP_ADD;
-  BLEND SrcBlendAlpha = BLEND_ONE;
-  BLEND DestBlendAlpha = BLEND_ONE;
-  BLEND_OP BlendOpAlpha = BLEND_OP_ADD;
-  uint8_t RenderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
+  ezRHIBlendFactor::Enum SrcBlend = ezRHIBlendFactor::SourceAlpha;
+  ezRHIBlendFactor::Enum DestBlend = ezRHIBlendFactor::InverseSourceAlpha;
+  ezRHIBlendOp::Enum BlendOp = ezRHIBlendOp::Add;
+  ezRHIBlendFactor::Enum SrcBlendAlpha = ezRHIBlendFactor::One;
+  ezRHIBlendFactor::Enum DestBlendAlpha = ezRHIBlendFactor::One;
+  ezRHIBlendOp::Enum BlendOpAlpha = ezRHIBlendOp::Add;
+  ezBitflags<ezRHIColorWriteMask> RenderTargetWriteMask = ezRHIColorWriteMask::All;
 };
 struct EZ_RHI_DLL BlendStateDesc
 {
@@ -556,9 +495,9 @@ struct EZ_RHI_DLL GPUQueryDesc
 };
 struct EZ_RHI_DLL GPUQueryResult
 {
-  uint64_t result_passed_sample_count = 0;
-  uint64_t result_timestamp = 0;
-  uint64_t result_timestamp_frequency = 0;
+  ezUInt64 result_passed_sample_count = 0;
+  ezUInt64 result_timestamp = 0;
+  ezUInt64 result_timestamp_frequency = 0;
 };
 struct EZ_RHI_DLL PipelineStateDesc
 {
@@ -782,7 +721,7 @@ struct EZ_RHI_DLL GraphicsDeviceChild
 struct EZ_RHI_DLL Shader : public GraphicsDeviceChild
 {
   ezEnum<ezRHIShaderStage> stage = ezRHIShaderStage::ENUM_COUNT;
-  std::vector<uint8_t> code;
+  std::vector<ezUInt8> code;
   const RootSignature* rootSignature = nullptr;
 };
 
@@ -1003,9 +942,9 @@ struct EZ_RHI_DLL RaytracingPipelineState : public GraphicsDeviceChild
 struct EZ_RHI_DLL ShaderTable
 {
   const GPUBuffer* buffer = nullptr;
-  uint64_t offset = 0;
-  uint64_t size = 0;
-  uint64_t stride = 0;
+  ezUInt64 offset = 0;
+  ezUInt64 size = 0;
+  ezUInt64 stride = 0;
 };
 struct EZ_RHI_DLL DispatchRaysDesc
 {

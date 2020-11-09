@@ -36,7 +36,7 @@ namespace DX12_Internal
 {
   // Engine -> Native converters
 
-  inline ezUInt32 _ParseColorWriteMask(ezUInt32 value)
+  inline ezUInt32 _ParseColorWriteMask(ezBitflags<ezRHIColorWriteMask> value)
   {
     ezUInt32 _flag = 0;
 
@@ -46,13 +46,13 @@ namespace DX12_Internal
     }
     else
     {
-      if (value & COLOR_WRITE_ENABLE_RED)
+      if (value.IsSet(ezRHIColorWriteMask::Red))
         _flag |= D3D12_COLOR_WRITE_ENABLE_RED;
-      if (value & COLOR_WRITE_ENABLE_GREEN)
+      if (value.IsSet(ezRHIColorWriteMask::Green))
         _flag |= D3D12_COLOR_WRITE_ENABLE_GREEN;
-      if (value & COLOR_WRITE_ENABLE_BLUE)
+      if (value.IsSet(ezRHIColorWriteMask::Blue))
         _flag |= D3D12_COLOR_WRITE_ENABLE_BLUE;
-      if (value & COLOR_WRITE_ENABLE_ALPHA)
+      if (value.IsSet(ezRHIColorWriteMask::Alpha))
         _flag |= D3D12_COLOR_WRITE_ENABLE_ALPHA;
     }
 
@@ -197,32 +197,32 @@ namespace DX12_Internal
     }
     return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
   }
-  constexpr D3D12_COMPARISON_FUNC _ConvertComparisonFunc(COMPARISON_FUNC value)
+  inline D3D12_COMPARISON_FUNC _ConvertComparisonFunc(ezEnum<ezRHIComparisonFunc> value)
   {
     switch (value)
     {
-      case COMPARISON_NEVER:
+      case ezRHIComparisonFunc::Never:
         return D3D12_COMPARISON_FUNC_NEVER;
         break;
-      case COMPARISON_LESS:
+      case ezRHIComparisonFunc::Less:
         return D3D12_COMPARISON_FUNC_LESS;
         break;
-      case COMPARISON_EQUAL:
+      case ezRHIComparisonFunc::Equal:
         return D3D12_COMPARISON_FUNC_EQUAL;
         break;
-      case COMPARISON_LESS_EQUAL:
+      case ezRHIComparisonFunc::LessEqual:
         return D3D12_COMPARISON_FUNC_LESS_EQUAL;
         break;
-      case COMPARISON_GREATER:
+      case ezRHIComparisonFunc::Greater:
         return D3D12_COMPARISON_FUNC_GREATER;
         break;
-      case COMPARISON_NOT_EQUAL:
+      case ezRHIComparisonFunc::NotEqual:
         return D3D12_COMPARISON_FUNC_NOT_EQUAL;
         break;
-      case COMPARISON_GREATER_EQUAL:
+      case ezRHIComparisonFunc::GreaterEqual:
         return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
         break;
-      case COMPARISON_ALWAYS:
+      case ezRHIComparisonFunc::Always:
         return D3D12_COMPARISON_FUNC_ALWAYS;
         break;
       default:
@@ -263,14 +263,14 @@ namespace DX12_Internal
     }
     return D3D12_CULL_MODE_NONE;
   }
-  constexpr D3D12_DEPTH_WRITE_MASK _ConvertDepthWriteMask(DEPTH_WRITE_MASK value)
+  inline D3D12_DEPTH_WRITE_MASK _ConvertDepthWriteMask(ezEnum<ezRHIDepthWriteMask> value)
   {
     switch (value)
     {
-      case DEPTH_WRITE_MASK_ZERO:
+      case ezRHIDepthWriteMask::Zero:
         return D3D12_DEPTH_WRITE_MASK_ZERO;
         break;
-      case DEPTH_WRITE_MASK_ALL:
+      case ezRHIDepthWriteMask::All:
         return D3D12_DEPTH_WRITE_MASK_ALL;
         break;
       default:
@@ -278,32 +278,32 @@ namespace DX12_Internal
     }
     return D3D12_DEPTH_WRITE_MASK_ZERO;
   }
-  constexpr D3D12_STENCIL_OP _ConvertStencilOp(STENCIL_OP value)
+  inline D3D12_STENCIL_OP _ConvertStencilOp(ezEnum<ezRHIStencilOp> value)
   {
     switch (value)
     {
-      case STENCIL_OP_KEEP:
+      case ezRHIStencilOp::Keep:
         return D3D12_STENCIL_OP_KEEP;
         break;
-      case STENCIL_OP_ZERO:
+      case ezRHIStencilOp::Zero:
         return D3D12_STENCIL_OP_ZERO;
         break;
-      case STENCIL_OP_REPLACE:
+      case ezRHIStencilOp::Replace:
         return D3D12_STENCIL_OP_REPLACE;
         break;
-      case STENCIL_OP_INCR_SAT:
+      case ezRHIStencilOp::IncrementSaturated:
         return D3D12_STENCIL_OP_INCR_SAT;
         break;
-      case STENCIL_OP_DECR_SAT:
+      case ezRHIStencilOp::DecrementSaturated:
         return D3D12_STENCIL_OP_DECR_SAT;
         break;
-      case STENCIL_OP_INVERT:
+      case ezRHIStencilOp::Invert:
         return D3D12_STENCIL_OP_INVERT;
         break;
-      case STENCIL_OP_INCR:
+      case ezRHIStencilOp::Increment:
         return D3D12_STENCIL_OP_INCR;
         break;
-      case STENCIL_OP_DECR:
+      case ezRHIStencilOp::Decrement:
         return D3D12_STENCIL_OP_DECR;
         break;
       default:
@@ -311,59 +311,59 @@ namespace DX12_Internal
     }
     return D3D12_STENCIL_OP_KEEP;
   }
-  constexpr D3D12_BLEND _ConvertBlend(BLEND value)
+  inline D3D12_BLEND _ConvertBlend(ezEnum<ezRHIBlendFactor> value)
   {
     switch (value)
     {
-      case BLEND_ZERO:
+      case ezRHIBlendFactor::Zero:
         return D3D12_BLEND_ZERO;
         break;
-      case BLEND_ONE:
+      case ezRHIBlendFactor::One:
         return D3D12_BLEND_ONE;
         break;
-      case BLEND_SRC_COLOR:
+      case ezRHIBlendFactor::SourceColor:
         return D3D12_BLEND_SRC_COLOR;
         break;
-      case BLEND_INV_SRC_COLOR:
+      case ezRHIBlendFactor::InverseSourceColor:
         return D3D12_BLEND_INV_SRC_COLOR;
         break;
-      case BLEND_SRC_ALPHA:
+      case ezRHIBlendFactor::SourceAlpha:
         return D3D12_BLEND_SRC_ALPHA;
         break;
-      case BLEND_INV_SRC_ALPHA:
+      case ezRHIBlendFactor::InverseSourceAlpha:
         return D3D12_BLEND_INV_SRC_ALPHA;
         break;
-      case BLEND_DEST_ALPHA:
+      case ezRHIBlendFactor::DestinationAlpha:
         return D3D12_BLEND_DEST_ALPHA;
         break;
-      case BLEND_INV_DEST_ALPHA:
+      case ezRHIBlendFactor::InverseDestinationAlpha:
         return D3D12_BLEND_INV_DEST_ALPHA;
         break;
-      case BLEND_DEST_COLOR:
+      case ezRHIBlendFactor::DestinationColor:
         return D3D12_BLEND_DEST_COLOR;
         break;
-      case BLEND_INV_DEST_COLOR:
+      case ezRHIBlendFactor::InverseDestinationColor:
         return D3D12_BLEND_INV_DEST_COLOR;
         break;
-      case BLEND_SRC_ALPHA_SAT:
+      case ezRHIBlendFactor::SourceAlphaSaturated:
         return D3D12_BLEND_SRC_ALPHA_SAT;
         break;
-      case BLEND_BLEND_FACTOR:
+      case ezRHIBlendFactor::BlendFactor:
         return D3D12_BLEND_BLEND_FACTOR;
         break;
-      case BLEND_INV_BLEND_FACTOR:
+      case ezRHIBlendFactor::InverseBlendFactor:
         return D3D12_BLEND_INV_BLEND_FACTOR;
         break;
-      case BLEND_SRC1_COLOR:
+      case ezRHIBlendFactor::Source1Color:
         return D3D12_BLEND_SRC1_COLOR;
         break;
-      case BLEND_INV_SRC1_COLOR:
+      case ezRHIBlendFactor::InverseSource1Color:
         return D3D12_BLEND_INV_SRC1_COLOR;
         break;
-      case BLEND_SRC1_ALPHA:
+      case ezRHIBlendFactor::Source1Alpha:
         return D3D12_BLEND_SRC1_ALPHA;
         break;
-      case BLEND_INV_SRC1_ALPHA:
+      case ezRHIBlendFactor::InverseSource1Alpha:
         return D3D12_BLEND_INV_SRC1_ALPHA;
         break;
       default:
@@ -371,23 +371,23 @@ namespace DX12_Internal
     }
     return D3D12_BLEND_ZERO;
   }
-  constexpr D3D12_BLEND_OP _ConvertBlendOp(BLEND_OP value)
+  inline D3D12_BLEND_OP _ConvertBlendOp(ezEnum<ezRHIBlendOp> value)
   {
     switch (value)
     {
-      case BLEND_OP_ADD:
+      case ezRHIBlendOp::Add:
         return D3D12_BLEND_OP_ADD;
         break;
-      case BLEND_OP_SUBTRACT:
+      case ezRHIBlendOp::Subtract:
         return D3D12_BLEND_OP_SUBTRACT;
         break;
-      case BLEND_OP_REV_SUBTRACT:
+      case ezRHIBlendOp::ReverseSubtract:
         return D3D12_BLEND_OP_REV_SUBTRACT;
         break;
-      case BLEND_OP_MIN:
+      case ezRHIBlendOp::Min:
         return D3D12_BLEND_OP_MIN;
         break;
-      case BLEND_OP_MAX:
+      case ezRHIBlendOp::Max:
         return D3D12_BLEND_OP_MAX;
         break;
       default:
@@ -995,7 +995,7 @@ namespace DX12_Internal
     virtual ~Resource_DX12()
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (allocation)
         allocationhandler->destroyer_allocations.push_back(std::make_pair(allocation, framecount));
       if (resource)
@@ -1013,7 +1013,7 @@ namespace DX12_Internal
     ~Texture_DX12() override
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -1025,7 +1025,7 @@ namespace DX12_Internal
     ~Sampler_DX12()
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -1040,7 +1040,7 @@ namespace DX12_Internal
       if (query_index != ~0)
       {
         allocationhandler->destroylocker.lock();
-        uint64_t framecount = allocationhandler->framecount;
+        ezUInt64 framecount = allocationhandler->framecount;
         switch (query_type)
         {
           case GPU_QUERY_TYPE_OCCLUSION:
@@ -1067,7 +1067,7 @@ namespace DX12_Internal
     ~PipelineState_DX12()
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_pipelines.push_back(std::make_pair(resource, framecount));
       if (rootSignature)
@@ -1096,7 +1096,7 @@ namespace DX12_Internal
     ~RTPipelineState_DX12()
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_stateobjects.push_back(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
@@ -1128,7 +1128,7 @@ namespace DX12_Internal
     ~DescriptorTable_DX12()
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (sampler_heap.heap)
         allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(sampler_heap.heap, framecount));
       if (resource_heap.heap)
@@ -1155,7 +1155,7 @@ namespace DX12_Internal
     ~RootSignature_DX12()
     {
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_rootSignatures.push_back(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
@@ -1241,7 +1241,7 @@ void GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::init(GraphicsD
   void* pData;
   CD3DX12_RANGE readRange(0, 0);
   internal_state->resource->Map(0, &readRange, &pData);
-  dataCur = dataBegin = reinterpret_cast<uint8_t*>(pData);
+  dataCur = dataBegin = reinterpret_cast<ezUInt8*>(pData);
   dataEnd = dataBegin + size;
 
   // Because the "buffer" is created by hand in this, fill the desc to indicate how it can be used:
@@ -1256,16 +1256,16 @@ void GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::init(GraphicsD
   internal_state->srv.Buffer.NumElements = buffer.desc.ByteWidth / sizeof(ezUInt32);
   internal_state->srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 }
-uint8_t* GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::allocate(size_t dataSize, size_t alignment)
+ezUInt8* GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::allocate(size_t dataSize, size_t alignment)
 {
-  dataCur = reinterpret_cast<uint8_t*>(Align(reinterpret_cast<size_t>(dataCur), alignment));
+  dataCur = reinterpret_cast<ezUInt8*>(Align(reinterpret_cast<size_t>(dataCur), alignment));
 
   if (dataCur + dataSize > dataEnd)
   {
     init(device, ((size_t)dataEnd + dataSize - (size_t)dataBegin) * 2);
   }
 
-  uint8_t* retVal = dataCur;
+  ezUInt8* retVal = dataCur;
 
   dataCur += dataSize;
 
@@ -1275,10 +1275,10 @@ void GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::clear()
 {
   dataCur = dataBegin;
 }
-uint64_t GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::calculateOffset(uint8_t* address)
+ezUInt64 GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::calculateOffset(ezUInt8* address)
 {
   assert(address >= dataBegin && address < dataEnd);
-  return static_cast<uint64_t>(address - dataBegin);
+  return static_cast<ezUInt64>(address - dataBegin);
 }
 
 void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::init(GraphicsDevice_DX12* device)
@@ -1348,7 +1348,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
 
       // Issue destruction of the old heap:
       device->allocationhandler->destroylocker.lock();
-      uint64_t framecount = device->allocationhandler->framecount;
+      ezUInt64 framecount = device->allocationhandler->framecount;
       device->allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(heap.heap_GPU, framecount));
       device->allocationhandler->destroylocker.unlock();
 
@@ -1393,7 +1393,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
 
       // Issue destruction of the old heap:
       device->allocationhandler->destroylocker.lock();
-      uint64_t framecount = device->allocationhandler->framecount;
+      ezUInt64 framecount = device->allocationhandler->framecount;
       device->allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(heap.heap_GPU, framecount));
       device->allocationhandler->destroylocker.unlock();
 
@@ -2282,7 +2282,7 @@ GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, 
     D3D12MA::ALLOCATION_DESC allocationDesc = {};
     allocationDesc.HeapType = D3D12_HEAP_TYPE_READBACK;
 
-    CD3DX12_RESOURCE_DESC resdesc = CD3DX12_RESOURCE_DESC::Buffer(timestamp_query_count * sizeof(uint64_t));
+    CD3DX12_RESOURCE_DESC resdesc = CD3DX12_RESOURCE_DESC::Buffer(timestamp_query_count * sizeof(ezUInt64));
 
     hr = allocationhandler->allocator->CreateResource(
       &allocationDesc,
@@ -2293,7 +2293,7 @@ GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, 
       IID_PPV_ARGS(&querypool_timestamp_readback));
     assert(SUCCEEDED(hr));
 
-    resdesc = CD3DX12_RESOURCE_DESC::Buffer(occlusion_query_count * sizeof(uint64_t));
+    resdesc = CD3DX12_RESOURCE_DESC::Buffer(occlusion_query_count * sizeof(ezUInt64));
 
     hr = allocationhandler->allocator->CreateResource(
       &allocationDesc,
@@ -2640,7 +2640,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
     assert(upload_success);
     ID3D12Resource* upload_resource = to_internal(&uploadbuffer)->resource.Get();
 
-    uint8_t* pData;
+    ezUInt8* pData;
     CD3DX12_RANGE readRange(0, 0);
     hr = upload_resource->Map(0, &readRange, (void**)&pData);
     assert(SUCCEEDED(hr));
@@ -4151,7 +4151,7 @@ int GraphicsDevice_DX12::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
   }
   return -1;
 }
-int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size)
+int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, ezUInt64 offset, ezUInt64 size)
 {
   auto internal_state = to_internal(buffer);
   const GPUBufferDesc& desc = buffer->GetDesc();
@@ -4256,7 +4256,7 @@ void GraphicsDevice_DX12::WriteShadingRateValue(SHADING_RATE rate, void* dest)
   {
     _rate = ezMath::Min(_rate, D3D12_SHADING_RATE_2X2);
   }
-  *(uint8_t*)dest = _rate;
+  *(ezUInt8*)dest = _rate;
 }
 void GraphicsDevice_DX12::WriteTopLevelAccelerationStructureInstance(const RaytracingAccelerationStructureDesc::TopLevel::Instance* instance, void* dest)
 {
@@ -4279,7 +4279,7 @@ void GraphicsDevice_DX12::WriteShaderIdentifier(const RaytracingPipelineState* r
   void* identifier = stateObjectProperties->GetShaderIdentifier(internal_state->group_strings[group_index].c_str());
   memcpy(dest, identifier, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
 }
-void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource, uint64_t offset)
+void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource, ezUInt64 offset)
 {
   auto table_internal = to_internal(table);
   D3D12_CPU_DESCRIPTOR_HANDLE dst = table_internal->resource_heap.address;
@@ -4533,7 +4533,7 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
 
   D3D12_RANGE range;
   range.Begin = (size_t)internal_state->query_index * sizeof(size_t);
-  range.End = range.Begin + sizeof(uint64_t);
+  range.End = range.Begin + sizeof(ezUInt64);
   D3D12_RANGE nullrange = {};
   void* data = nullptr;
 
@@ -4544,7 +4544,7 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
       break;
     case GPU_QUERY_TYPE_TIMESTAMP:
       querypool_timestamp_readback->Map(0, &range, &data);
-      result->result_timestamp = *(uint64_t*)((size_t)data + range.Begin);
+      result->result_timestamp = *(ezUInt64*)((size_t)data + range.Begin);
       querypool_timestamp_readback->Unmap(0, &nullrange);
       break;
     case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
@@ -4556,12 +4556,12 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
       querypool_occlusion_readback->Map(0, &range, &data);
       passed = *(BOOL*)((size_t)data + range.Begin);
       querypool_occlusion_readback->Unmap(0, &nullrange);
-      result->result_passed_sample_count = (uint64_t)passed;
+      result->result_passed_sample_count = (ezUInt64)passed;
       break;
     }
     case GPU_QUERY_TYPE_OCCLUSION:
       querypool_occlusion_readback->Map(0, &range, &data);
-      result->result_passed_sample_count = *(uint64_t*)((size_t)data + range.Begin);
+      result->result_passed_sample_count = *(ezUInt64*)((size_t)data + range.Begin);
       querypool_occlusion_readback->Unmap(0, &nullrange);
       break;
   }
@@ -4740,13 +4740,13 @@ void GraphicsDevice_DX12::SubmitCommandLists()
         switch (x.type)
         {
           case GPU_QUERY_TYPE_TIMESTAMP:
-            GetDirectCommandList(cmd)->ResolveQueryData(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, x.index, 1, querypool_timestamp_readback.Get(), (uint64_t)x.index * sizeof(uint64_t));
+            GetDirectCommandList(cmd)->ResolveQueryData(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, x.index, 1, querypool_timestamp_readback.Get(), (ezUInt64)x.index * sizeof(ezUInt64));
             break;
           case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
-            GetDirectCommandList(cmd)->ResolveQueryData(querypool_occlusion.Get(), D3D12_QUERY_TYPE_BINARY_OCCLUSION, x.index, 1, querypool_occlusion_readback.Get(), (uint64_t)x.index * sizeof(uint64_t));
+            GetDirectCommandList(cmd)->ResolveQueryData(querypool_occlusion.Get(), D3D12_QUERY_TYPE_BINARY_OCCLUSION, x.index, 1, querypool_occlusion_readback.Get(), (ezUInt64)x.index * sizeof(ezUInt64));
             break;
           case GPU_QUERY_TYPE_OCCLUSION:
-            GetDirectCommandList(cmd)->ResolveQueryData(querypool_occlusion.Get(), D3D12_QUERY_TYPE_OCCLUSION, x.index, 1, querypool_occlusion_readback.Get(), (uint64_t)x.index * sizeof(uint64_t));
+            GetDirectCommandList(cmd)->ResolveQueryData(querypool_occlusion.Get(), D3D12_QUERY_TYPE_OCCLUSION, x.index, 1, querypool_occlusion_readback.Get(), (ezUInt64)x.index * sizeof(ezUInt64));
             break;
         }
       }
@@ -4783,7 +4783,7 @@ void GraphicsDevice_DX12::SubmitCommandLists()
   HRESULT hr = directQueue->Signal(frameFence.Get(), FRAMECOUNT);
 
   // Determine the last frame that we should not wait on:
-  const uint64_t lastFrameToAllowLatency = ezMath::Max(uint64_t(BACKBUFFER_COUNT - 1u), FRAMECOUNT) - (BACKBUFFER_COUNT - 1);
+  const ezUInt64 lastFrameToAllowLatency = ezMath::Max(ezUInt64(BACKBUFFER_COUNT - 1u), FRAMECOUNT) - (BACKBUFFER_COUNT - 1);
 
   // Wait if too many frames are being incomplete:
   if (frameFence->GetCompletedValue() < lastFrameToAllowLatency)
@@ -5356,7 +5356,7 @@ void GraphicsDevice_DX12::UpdateBuffer(const GPUBuffer* buffer, const void* data
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     GetDirectCommandList(cmd)->ResourceBarrier(1, &barrier);
 
-    uint8_t* dest = GetFrameResources().resourceBuffer[cmd].allocate(dataSize, 1);
+    ezUInt8* dest = GetFrameResources().resourceBuffer[cmd].allocate(dataSize, 1);
     memcpy(dest, data, dataSize);
     GetDirectCommandList(cmd)->CopyBufferRegion(
       internal_state_dst->resource.Get(), 0,
@@ -5769,7 +5769,7 @@ GraphicsDevice::GPUAllocation GraphicsDevice_DX12::AllocateGPU(size_t dataSize, 
   }
 
   FrameResources::ResourceFrameAllocator& allocator = GetFrameResources().resourceBuffer[cmd];
-  uint8_t* dest = allocator.allocate(dataSize, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
+  ezUInt8* dest = allocator.allocate(dataSize, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
   assert(dest != nullptr);
 
   result.buffer = &allocator.buffer;

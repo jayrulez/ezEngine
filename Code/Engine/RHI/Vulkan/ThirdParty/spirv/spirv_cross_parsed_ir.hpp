@@ -86,7 +86,7 @@ public:
 		BLOCK_META_SELECTION_MERGE_BIT = 1 << 3,
 		BLOCK_META_MULTISELECT_MERGE_BIT = 1 << 4
 	};
-	using BlockMetaFlags = uint8_t;
+	using BlockMetaFlags = ezUInt8;
 	SmallVector<BlockMetaFlags> block_meta;
 	std::unordered_map<BlockID, BlockID> continue_block_to_loop_header;
 

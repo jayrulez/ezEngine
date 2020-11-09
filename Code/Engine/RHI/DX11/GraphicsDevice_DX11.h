@@ -54,15 +54,15 @@ private:
   const RenderPass* active_renderpass[COMMANDLIST_COUNT] = {};
 
   ID3D11UnorderedAccessView* raster_uavs[COMMANDLIST_COUNT][8] = {};
-  uint8_t raster_uavs_slot[COMMANDLIST_COUNT] = {};
-  uint8_t raster_uavs_count[COMMANDLIST_COUNT] = {};
+  ezUInt8 raster_uavs_slot[COMMANDLIST_COUNT] = {};
+  ezUInt8 raster_uavs_count[COMMANDLIST_COUNT] = {};
   void validate_raster_uavs(CommandList cmd);
 
   struct GPUAllocator
   {
     GPUBuffer buffer;
     size_t byteOffset = 0;
-    uint64_t residentFrame = 0;
+    ezUInt64 residentFrame = 0;
     bool dirty = false;
   } frame_allocators[COMMANDLIST_COUNT];
   void commit_allocations(CommandList cmd);
@@ -92,7 +92,7 @@ public:
   bool CreateRenderPass(const RenderPassDesc* pDesc, RenderPass* renderpass) override;
 
   int CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, ezUInt32 firstSlice, ezUInt32 sliceCount, ezUInt32 firstMip, ezUInt32 mipCount) override;
-  int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size = ~0) override;
+  int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, ezUInt64 offset, ezUInt64 size = ~0) override;
 
   void Map(const GPUResource* resource, Mapping* mapping) override;
   void Unmap(const GPUResource* resource) override;

@@ -400,7 +400,9 @@ public:
     ezResourceManager::EngineAboutToShutdown();
 
     EZ_DEFAULT_DELETE(vertexShader);
+
     EZ_DEFAULT_DELETE(pixelShader);
+
     EZ_DEFAULT_DELETE(texture);
 
     // now we can destroy the graphics device

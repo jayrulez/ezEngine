@@ -99,7 +99,7 @@ private:
   VkImageView nullImageViewCubeArray = VK_NULL_HANDLE;
   VkImageView nullImageView3D = VK_NULL_HANDLE;
 
-  uint64_t timestamp_frequency = 0;
+  ezUInt64 timestamp_frequency = 0;
   VkQueryPool querypool_timestamp = VK_NULL_HANDLE;
   VkQueryPool querypool_occlusion = VK_NULL_HANDLE;
   static const size_t timestamp_query_count = 1024;
@@ -165,15 +165,15 @@ private:
     {
       GraphicsDevice_Vulkan* device = nullptr;
       GPUBuffer buffer;
-      uint8_t* dataBegin = nullptr;
-      uint8_t* dataCur = nullptr;
-      uint8_t* dataEnd = nullptr;
+      ezUInt8* dataBegin = nullptr;
+      ezUInt8* dataCur = nullptr;
+      ezUInt8* dataEnd = nullptr;
 
       void init(GraphicsDevice_Vulkan* device, size_t size);
 
-      uint8_t* allocate(size_t dataSize, size_t alignment);
+      ezUInt8* allocate(size_t dataSize, size_t alignment);
       void clear();
-      uint64_t calculateOffset(uint8_t* address);
+      ezUInt64 calculateOffset(ezUInt8* address);
     };
     ResourceFrameAllocator resourceBuffer[COMMANDLIST_COUNT];
   };
@@ -232,11 +232,11 @@ public:
   bool CreateRootSignature(RootSignature* rootsig) override;
 
   int CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, ezUInt32 firstSlice, ezUInt32 sliceCount, ezUInt32 firstMip, ezUInt32 mipCount) override;
-  int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size = ~0) override;
+  int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, ezUInt64 offset, ezUInt64 size = ~0) override;
 
   void WriteTopLevelAccelerationStructureInstance(const RaytracingAccelerationStructureDesc::TopLevel::Instance* instance, void* dest) override;
   void WriteShaderIdentifier(const RaytracingPipelineState* rtpso, ezUInt32 group_index, void* dest) override;
-  void WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource = -1, uint64_t offset = 0) override;
+  void WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource = -1, ezUInt64 offset = 0) override;
   void WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const Sampler* sampler) override;
 
   void Map(const GPUResource* resource, Mapping* mapping) override;
@@ -319,24 +319,24 @@ public:
     VmaAllocator allocator = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkInstance instance;
-    uint64_t framecount = 0;
+    ezUInt64 framecount = 0;
     std::mutex destroylocker;
-    std::deque<std::pair<std::pair<VkImage, VmaAllocation>, uint64_t>> destroyer_images;
-    std::deque<std::pair<VkImageView, uint64_t>> destroyer_imageviews;
-    std::deque<std::pair<std::pair<VkBuffer, VmaAllocation>, uint64_t>> destroyer_buffers;
-    std::deque<std::pair<VkBufferView, uint64_t>> destroyer_bufferviews;
-    std::deque<std::pair<VkAccelerationStructureKHR, uint64_t>> destroyer_bvhs;
-    std::deque<std::pair<VkSampler, uint64_t>> destroyer_samplers;
-    std::deque<std::pair<VkDescriptorPool, uint64_t>> destroyer_descriptorPools;
-    std::deque<std::pair<VkDescriptorSetLayout, uint64_t>> destroyer_descriptorSetLayouts;
-    std::deque<std::pair<VkDescriptorUpdateTemplate, uint64_t>> destroyer_descriptorUpdateTemplates;
-    std::deque<std::pair<VkShaderModule, uint64_t>> destroyer_shadermodules;
-    std::deque<std::pair<VkPipelineLayout, uint64_t>> destroyer_pipelineLayouts;
-    std::deque<std::pair<VkPipeline, uint64_t>> destroyer_pipelines;
-    std::deque<std::pair<VkRenderPass, uint64_t>> destroyer_renderpasses;
-    std::deque<std::pair<VkFramebuffer, uint64_t>> destroyer_framebuffers;
-    std::deque<std::pair<ezUInt32, uint64_t>> destroyer_queries_occlusion;
-    std::deque<std::pair<ezUInt32, uint64_t>> destroyer_queries_timestamp;
+    std::deque<std::pair<std::pair<VkImage, VmaAllocation>, ezUInt64>> destroyer_images;
+    std::deque<std::pair<VkImageView, ezUInt64>> destroyer_imageviews;
+    std::deque<std::pair<std::pair<VkBuffer, VmaAllocation>, ezUInt64>> destroyer_buffers;
+    std::deque<std::pair<VkBufferView, ezUInt64>> destroyer_bufferviews;
+    std::deque<std::pair<VkAccelerationStructureKHR, ezUInt64>> destroyer_bvhs;
+    std::deque<std::pair<VkSampler, ezUInt64>> destroyer_samplers;
+    std::deque<std::pair<VkDescriptorPool, ezUInt64>> destroyer_descriptorPools;
+    std::deque<std::pair<VkDescriptorSetLayout, ezUInt64>> destroyer_descriptorSetLayouts;
+    std::deque<std::pair<VkDescriptorUpdateTemplate, ezUInt64>> destroyer_descriptorUpdateTemplates;
+    std::deque<std::pair<VkShaderModule, ezUInt64>> destroyer_shadermodules;
+    std::deque<std::pair<VkPipelineLayout, ezUInt64>> destroyer_pipelineLayouts;
+    std::deque<std::pair<VkPipeline, ezUInt64>> destroyer_pipelines;
+    std::deque<std::pair<VkRenderPass, ezUInt64>> destroyer_renderpasses;
+    std::deque<std::pair<VkFramebuffer, ezUInt64>> destroyer_framebuffers;
+    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
+    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
 
     ThreadSafeRingBuffer<ezUInt32, timestamp_query_count> free_timestampqueries;
     ThreadSafeRingBuffer<ezUInt32, occlusion_query_count> free_occlusionqueries;
@@ -350,7 +350,7 @@ public:
     }
 
     // Deferred destroy of resources that the GPU is already finished with:
-    void Update(uint64_t FRAMECOUNT, ezUInt32 BACKBUFFER_COUNT)
+    void Update(ezUInt64 FRAMECOUNT, ezUInt32 BACKBUFFER_COUNT)
     {
       destroylocker.lock();
       framecount = FRAMECOUNT;

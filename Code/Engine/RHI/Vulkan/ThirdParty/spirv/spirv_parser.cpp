@@ -777,7 +777,7 @@ void Parser::parse(const Instruction &instruction)
 		auto &type = get<SPIRType>(ops[0]);
 
 		if (type.width > 32)
-			set<SPIRConstant>(id, ops[0], ops[2] | (uint64_t(ops[3]) << 32), op == OpSpecConstant);
+			set<SPIRConstant>(id, ops[0], ops[2] | (ezUInt64(ops[3]) << 32), op == OpSpecConstant);
 		else
 			set<SPIRConstant>(id, ops[0], ops[2], op == OpSpecConstant);
 		break;

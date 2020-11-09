@@ -4210,7 +4210,7 @@ static inline void VmaUint32ToStr(char* outStr, size_t strLen, ezUInt32 num)
 {
   snprintf(outStr, strLen, "%u", static_cast<unsigned int>(num));
 }
-static inline void VmaUint64ToStr(char* outStr, size_t strLen, uint64_t num)
+static inline void VmaUint64ToStr(char* outStr, size_t strLen, ezUInt64 num)
 {
   snprintf(outStr, strLen, "%llu", static_cast<unsigned long long>(num));
 }
@@ -4300,7 +4300,7 @@ If providing your own implementation, you need to implement a subset of std::ato
 
 #ifndef VMA_ATOMIC_UINT64
 #  include <atomic>
-#  define VMA_ATOMIC_UINT64 std::atomic<uint64_t>
+#  define VMA_ATOMIC_UINT64 std::atomic<ezUInt64>
 #endif
 
 #ifndef VMA_DEBUG_ALWAYS_DEDICATED_MEMORY
@@ -4382,8 +4382,8 @@ static const ezUInt32 VMA_FRAME_INDEX_LOST = UINT32_MAX;
 // Decimal 2139416166, float NaN, little-endian binary 66 E6 84 7F.
 static const ezUInt32 VMA_CORRUPTION_DETECTION_MAGIC_VALUE = 0x7F84E666;
 
-static const uint8_t VMA_ALLOCATION_FILL_PATTERN_CREATED = 0xDC;
-static const uint8_t VMA_ALLOCATION_FILL_PATTERN_DESTROYED = 0xEF;
+static const ezUInt8 VMA_ALLOCATION_FILL_PATTERN_CREATED = 0xDC;
+static const ezUInt8 VMA_ALLOCATION_FILL_PATTERN_DESTROYED = 0xEF;
 
 /*******************************************************************************
 END OF CONFIGURATION
@@ -4423,7 +4423,7 @@ inline bool VmaIsPow2(T x)
 }
 
 // Aligns given value up to nearest multiply of align value. For example: VmaAlignUp(11, 8) = 16.
-// Use types like ezUInt32, uint64_t as T.
+// Use types like ezUInt32, ezUInt64 as T.
 template <typename T>
 static inline T VmaAlignUp(T val, T alignment)
 {
@@ -4431,7 +4431,7 @@ static inline T VmaAlignUp(T val, T alignment)
   return (val + alignment - 1) & ~(alignment - 1);
 }
 // Aligns given value down to nearest multiply of align value. For example: VmaAlignUp(11, 8) = 8.
-// Use types like ezUInt32, uint64_t as T.
+// Use types like ezUInt32, ezUInt64 as T.
 template <typename T>
 static inline T VmaAlignDown(T val, T alignment)
 {
@@ -4458,7 +4458,7 @@ static inline ezUInt32 VmaNextPow2(ezUInt32 v)
   v++;
   return v;
 }
-static inline uint64_t VmaNextPow2(uint64_t v)
+static inline ezUInt64 VmaNextPow2(ezUInt64 v)
 {
   v--;
   v |= v >> 1;
@@ -4482,7 +4482,7 @@ static inline ezUInt32 VmaPrevPow2(ezUInt32 v)
   v = v ^ (v >> 1);
   return v;
 }
-static inline uint64_t VmaPrevPow2(uint64_t v)
+static inline ezUInt64 VmaPrevPow2(ezUInt64 v)
 {
   v |= v >> 1;
   v |= v >> 2;
@@ -6125,7 +6125,7 @@ enum VMA_CACHE_OPERATION
 struct VmaAllocation_T
 {
 private:
-  static const uint8_t MAP_COUNT_FLAG_PERSISTENT_MAP = 0x80;
+  static const ezUInt8 MAP_COUNT_FLAG_PERSISTENT_MAP = 0x80;
 
   enum FLAGS
   {
@@ -6150,10 +6150,10 @@ public:
     , m_pUserData{VMA_NULL}
     , m_LastUseFrameIndex{currentFrameIndex}
     , m_MemoryTypeIndex{0}
-    , m_Type{(uint8_t)ALLOCATION_TYPE_NONE}
-    , m_SuballocationType{(uint8_t)VMA_SUBALLOCATION_TYPE_UNKNOWN}
+    , m_Type{(ezUInt8)ALLOCATION_TYPE_NONE}
+    , m_SuballocationType{(ezUInt8)VMA_SUBALLOCATION_TYPE_UNKNOWN}
     , m_MapCount{0}
-    , m_Flags{userDataString ? (uint8_t)FLAG_USER_DATA_STRING : (uint8_t)0}
+    , m_Flags{userDataString ? (ezUInt8)FLAG_USER_DATA_STRING : (ezUInt8)0}
   {
 #if VMA_STATS_STRING_ENABLED
     m_CreationFrameIndex = currentFrameIndex;
@@ -6181,12 +6181,12 @@ public:
   {
     VMA_ASSERT(m_Type == ALLOCATION_TYPE_NONE);
     VMA_ASSERT(block != VMA_NULL);
-    m_Type = (uint8_t)ALLOCATION_TYPE_BLOCK;
+    m_Type = (ezUInt8)ALLOCATION_TYPE_BLOCK;
     m_Alignment = alignment;
     m_Size = size;
     m_MemoryTypeIndex = memoryTypeIndex;
     m_MapCount = mapped ? MAP_COUNT_FLAG_PERSISTENT_MAP : 0;
-    m_SuballocationType = (uint8_t)suballocationType;
+    m_SuballocationType = (ezUInt8)suballocationType;
     m_BlockAllocation.m_Block = block;
     m_BlockAllocation.m_Offset = offset;
     m_BlockAllocation.m_CanBecomeLost = canBecomeLost;
@@ -6196,7 +6196,7 @@ public:
   {
     VMA_ASSERT(m_Type == ALLOCATION_TYPE_NONE);
     VMA_ASSERT(m_LastUseFrameIndex.load() == VMA_FRAME_INDEX_LOST);
-    m_Type = (uint8_t)ALLOCATION_TYPE_BLOCK;
+    m_Type = (ezUInt8)ALLOCATION_TYPE_BLOCK;
     m_MemoryTypeIndex = 0;
     m_BlockAllocation.m_Block = VMA_NULL;
     m_BlockAllocation.m_Offset = 0;
@@ -6220,11 +6220,11 @@ public:
   {
     VMA_ASSERT(m_Type == ALLOCATION_TYPE_NONE);
     VMA_ASSERT(hMemory != VK_NULL_HANDLE);
-    m_Type = (uint8_t)ALLOCATION_TYPE_DEDICATED;
+    m_Type = (ezUInt8)ALLOCATION_TYPE_DEDICATED;
     m_Alignment = 0;
     m_Size = size;
     m_MemoryTypeIndex = memoryTypeIndex;
-    m_SuballocationType = (uint8_t)suballocationType;
+    m_SuballocationType = (ezUInt8)suballocationType;
     m_MapCount = (pMappedData != VMA_NULL) ? MAP_COUNT_FLAG_PERSISTENT_MAP : 0;
     m_DedicatedAllocation.m_hMemory = hMemory;
     m_DedicatedAllocation.m_pMappedData = pMappedData;
@@ -6308,12 +6308,12 @@ private:
   void* m_pUserData;
   VMA_ATOMIC_UINT32 m_LastUseFrameIndex;
   ezUInt32 m_MemoryTypeIndex;
-  uint8_t m_Type;              // ALLOCATION_TYPE
-  uint8_t m_SuballocationType; // VmaSuballocationType
+  ezUInt8 m_Type;              // ALLOCATION_TYPE
+  ezUInt8 m_SuballocationType; // VmaSuballocationType
   // Bit 0x80 is set when allocation was created with VMA_ALLOCATION_CREATE_MAPPED_BIT.
   // Bits with mask 0x7F are reference counter for vmaMapMemory()/vmaUnmapMemory().
-  uint8_t m_MapCount;
-  uint8_t m_Flags; // enum FLAGS
+  ezUInt8 m_MapCount;
+  ezUInt8 m_Flags; // enum FLAGS
 
   // Allocation out of VmaDeviceMemoryBlock.
   struct BlockAllocation
@@ -7728,7 +7728,7 @@ public:
   void RecordAllocateMemoryPages(ezUInt32 frameIndex,
     const VkMemoryRequirements& vkMemReq,
     const VmaAllocationCreateInfo& createInfo,
-    uint64_t allocationCount,
+    ezUInt64 allocationCount,
     const VmaAllocation* pAllocations);
   void RecordAllocateMemoryForBuffer(ezUInt32 frameIndex,
     const VkMemoryRequirements& vkMemReq,
@@ -7745,7 +7745,7 @@ public:
   void RecordFreeMemory(ezUInt32 frameIndex,
     VmaAllocation allocation);
   void RecordFreeMemoryPages(ezUInt32 frameIndex,
-    uint64_t allocationCount,
+    ezUInt64 allocationCount,
     const VmaAllocation* pAllocations);
   void RecordSetAllocationUserData(ezUInt32 frameIndex,
     VmaAllocation allocation,
@@ -7815,19 +7815,19 @@ private:
 
   // T must be a pointer type, e.g. VmaAllocation, VmaPool.
   template <typename T>
-  void PrintPointerList(uint64_t count, const T* pItems)
+  void PrintPointerList(ezUInt64 count, const T* pItems)
   {
     if (count)
     {
       fprintf(m_File, "%p", pItems[0]);
-      for (uint64_t i = 1; i < count; ++i)
+      for (ezUInt64 i = 1; i < count; ++i)
       {
         fprintf(m_File, " %p", pItems[i]);
       }
     }
   }
 
-  void PrintPointerList(uint64_t count, const VmaAllocation* pItems);
+  void PrintPointerList(ezUInt64 count, const VmaAllocation* pItems);
   void Flush();
 };
 
@@ -7859,9 +7859,9 @@ struct VmaCurrentBudgetData
 #if VMA_MEMORY_BUDGET
   VMA_ATOMIC_UINT32 m_OperationsSinceBudgetFetch;
   VMA_RW_MUTEX m_BudgetMutex;
-  uint64_t m_VulkanUsage[VK_MAX_MEMORY_HEAPS];
-  uint64_t m_VulkanBudget[VK_MAX_MEMORY_HEAPS];
-  uint64_t m_BlockBytesAtBudgetFetch[VK_MAX_MEMORY_HEAPS];
+  ezUInt64 m_VulkanUsage[VK_MAX_MEMORY_HEAPS];
+  ezUInt64 m_VulkanBudget[VK_MAX_MEMORY_HEAPS];
+  ezUInt64 m_BlockBytesAtBudgetFetch[VK_MAX_MEMORY_HEAPS];
 #endif // #if VMA_MEMORY_BUDGET
 
   VmaCurrentBudgetData()
@@ -8105,7 +8105,7 @@ public:
     const VkDeviceSize* offsets, const VkDeviceSize* sizes,
     VMA_CACHE_OPERATION op);
 
-  void FillAllocation(const VmaAllocation hAllocation, uint8_t pattern);
+  void FillAllocation(const VmaAllocation hAllocation, ezUInt8 pattern);
 
   /*
     Returns bit mask of memory types that can support defragmentation on GPU as
@@ -8274,7 +8274,7 @@ public:
   void Add(const char* pStr);
   void AddNewLine() { Add('\n'); }
   void AddNumber(ezUInt32 num);
-  void AddNumber(uint64_t num);
+  void AddNumber(ezUInt64 num);
   void AddPointer(const void* ptr);
 
 private:
@@ -8305,7 +8305,7 @@ void VmaStringBuilder::AddNumber(ezUInt32 num)
   Add(p);
 }
 
-void VmaStringBuilder::AddNumber(uint64_t num)
+void VmaStringBuilder::AddNumber(ezUInt64 num)
 {
   char buf[21];
   buf[20] = '\0';
@@ -8349,12 +8349,12 @@ public:
   void BeginString(const char* pStr = VMA_NULL);
   void ContinueString(const char* pStr);
   void ContinueString(ezUInt32 n);
-  void ContinueString(uint64_t n);
+  void ContinueString(ezUInt64 n);
   void ContinueString_Pointer(const void* ptr);
   void EndString(const char* pStr = VMA_NULL);
 
   void WriteNumber(ezUInt32 n);
-  void WriteNumber(uint64_t n);
+  void WriteNumber(ezUInt64 n);
   void WriteBool(bool b);
   void WriteNull();
 
@@ -8516,7 +8516,7 @@ void VmaJsonWriter::ContinueString(ezUInt32 n)
   m_SB.AddNumber(n);
 }
 
-void VmaJsonWriter::ContinueString(uint64_t n)
+void VmaJsonWriter::ContinueString(ezUInt64 n)
 {
   VMA_ASSERT(m_InsideString);
   m_SB.AddNumber(n);
@@ -8546,7 +8546,7 @@ void VmaJsonWriter::WriteNumber(ezUInt32 n)
   m_SB.AddNumber(n);
 }
 
-void VmaJsonWriter::WriteNumber(uint64_t n)
+void VmaJsonWriter::WriteNumber(ezUInt64 n)
 {
   VMA_ASSERT(!m_InsideString);
   BeginValue(false);
@@ -9001,10 +9001,10 @@ void VmaBlockMetadata::PrintDetailedMap_Begin(class VmaJsonWriter& json,
   json.WriteNumber(unusedBytes);
 
   json.WriteString("Allocations");
-  json.WriteNumber((uint64_t)allocationCount);
+  json.WriteNumber((ezUInt64)allocationCount);
 
   json.WriteString("UnusedRanges");
-  json.WriteNumber((uint64_t)unusedRangeCount);
+  json.WriteNumber((ezUInt64)unusedRangeCount);
 
   json.WriteString("Suballocations");
   json.BeginArray();
@@ -13635,15 +13635,15 @@ void VmaBlockVector::PrintDetailedMap(class VmaJsonWriter& json)
     if (m_MinBlockCount > 0)
     {
       json.WriteString("Min");
-      json.WriteNumber((uint64_t)m_MinBlockCount);
+      json.WriteNumber((ezUInt64)m_MinBlockCount);
     }
     if (m_MaxBlockCount < SIZE_MAX)
     {
       json.WriteString("Max");
-      json.WriteNumber((uint64_t)m_MaxBlockCount);
+      json.WriteNumber((ezUInt64)m_MaxBlockCount);
     }
     json.WriteString("Cur");
-    json.WriteNumber((uint64_t)m_Blocks.size());
+    json.WriteNumber((ezUInt64)m_Blocks.size());
     json.EndObject();
 
     if (m_FrameInUseCount > 0)
@@ -15144,8 +15144,8 @@ void VmaRecorder::RecordCreatePool(ezUInt32 frameIndex, const VmaPoolCreateInfo&
     createInfo.memoryTypeIndex,
     createInfo.flags,
     createInfo.blockSize,
-    (uint64_t)createInfo.minBlockCount,
-    (uint64_t)createInfo.maxBlockCount,
+    (ezUInt64)createInfo.minBlockCount,
+    (ezUInt64)createInfo.maxBlockCount,
     createInfo.frameInUseCount,
     pool);
   Flush();
@@ -15190,7 +15190,7 @@ void VmaRecorder::RecordAllocateMemory(ezUInt32 frameIndex,
 void VmaRecorder::RecordAllocateMemoryPages(ezUInt32 frameIndex,
   const VkMemoryRequirements& vkMemReq,
   const VmaAllocationCreateInfo& createInfo,
-  uint64_t allocationCount,
+  ezUInt64 allocationCount,
   const VmaAllocation* pAllocations)
 {
   CallParams callParams;
@@ -15284,7 +15284,7 @@ void VmaRecorder::RecordFreeMemory(ezUInt32 frameIndex,
 }
 
 void VmaRecorder::RecordFreeMemoryPages(ezUInt32 frameIndex,
-  uint64_t allocationCount,
+  ezUInt64 allocationCount,
   const VmaAllocation* pAllocations)
 {
   CallParams callParams;
@@ -15643,12 +15643,12 @@ void VmaRecorder::GetBasicParams(CallParams& outParams)
   outParams.time = std::chrono::duration<double, std::chrono::seconds::period>(current_time - m_RecordingStartTime).count();
 }
 
-void VmaRecorder::PrintPointerList(uint64_t count, const VmaAllocation* pItems)
+void VmaRecorder::PrintPointerList(ezUInt64 count, const VmaAllocation* pItems)
 {
   if (count)
   {
     fprintf(m_File, "%p", pItems[0]);
-    for (uint64_t i = 1; i < count; ++i)
+    for (ezUInt64 i = 1; i < count; ++i)
     {
       fprintf(m_File, " %p", pItems[i]);
     }
@@ -17603,7 +17603,7 @@ void VmaAllocator_T::UpdateVulkanBudget()
 
 #endif // #if VMA_MEMORY_BUDGET
 
-void VmaAllocator_T::FillAllocation(const VmaAllocation hAllocation, uint8_t pattern)
+void VmaAllocator_T::FillAllocation(const VmaAllocation hAllocation, ezUInt8 pattern)
 {
   if (VMA_DEBUG_INITIALIZE_ALLOCATIONS &&
       !hAllocation->CanBecomeLost() &&
@@ -18341,7 +18341,7 @@ VMA_CALL_PRE VkResult VMA_CALL_POST vmaAllocateMemoryPages(
       allocator->GetCurrentFrameIndex(),
       *pVkMemoryRequirements,
       *pCreateInfo,
-      (uint64_t)allocationCount,
+      (ezUInt64)allocationCount,
       pAllocations);
   }
 #endif
@@ -18512,7 +18512,7 @@ VMA_CALL_PRE void VMA_CALL_POST vmaFreeMemoryPages(
   {
     allocator->GetRecorder()->RecordFreeMemoryPages(
       allocator->GetCurrentFrameIndex(),
-      (uint64_t)allocationCount,
+      (ezUInt64)allocationCount,
       pAllocations);
   }
 #endif

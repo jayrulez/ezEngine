@@ -455,7 +455,7 @@ string CompilerHLSL::type_to_glsl(const SPIRType &type, ezUInt32 id)
 		case SPIRType::UInt64:
 			if (hlsl_options.shader_model < 60)
 				SPIRV_CROSS_THROW("64-bit integers only supported in SM 6.0.");
-			return "uint64_t";
+			return "ezUInt64";
 		default:
 			return "???";
 		}
@@ -1509,13 +1509,13 @@ void CompilerHLSL::emit_resources()
 
 	if (requires_uint2_packing)
 	{
-		statement("uint64_t SPIRV_Cross_packUint2x32(uint2 value)");
+		statement("ezUInt64 SPIRV_Cross_packUint2x32(uint2 value)");
 		begin_scope();
-		statement("return (uint64_t(value.y) << 32) | uint64_t(value.x);");
+		statement("return (ezUInt64(value.y) << 32) | ezUInt64(value.x);");
 		end_scope();
 		statement("");
 
-		statement("uint2 SPIRV_Cross_unpackUint2x32(uint64_t value)");
+		statement("uint2 SPIRV_Cross_unpackUint2x32(ezUInt64 value)");
 		begin_scope();
 		statement("uint2 Unpacked;");
 		statement("Unpacked.x = uint(value & 0xffffffff);");
@@ -1849,7 +1849,7 @@ void CompilerHLSL::emit_resources()
 	}
 }
 
-void CompilerHLSL::emit_texture_size_variants(uint64_t variant_mask, const char *vecsize_qualifier, bool uav, const char *type_qualifier)
+void CompilerHLSL::emit_texture_size_variants(ezUInt64 variant_mask, const char *vecsize_qualifier, bool uav, const char *type_qualifier)
 {
 	if (variant_mask == 0)
 		return;
@@ -1874,7 +1874,7 @@ void CompilerHLSL::emit_texture_size_variants(uint64_t variant_mask, const char 
 		for (ezUInt32 type_index = 0; type_index < QueryTypeCount; type_index++)
 		{
 			ezUInt32 bit = 16 * type_index + index;
-			uint64_t mask = 1ull << bit;
+			ezUInt64 mask = 1ull << bit;
 
 			if ((variant_mask & mask) == 0)
 				continue;
@@ -5459,7 +5459,7 @@ void CompilerHLSL::require_texture_query_variant(ezUInt32 var_id)
 	auto &variant = uav ? required_texture_size_variants.uav[ezUInt32(norm_state)][image_format_to_components(type.image.format) - 1] :
 	                required_texture_size_variants.srv;
 
-	uint64_t mask = 1ull << bit;
+	ezUInt64 mask = 1ull << bit;
 	if ((variant & mask) == 0)
 	{
 		force_recompile();

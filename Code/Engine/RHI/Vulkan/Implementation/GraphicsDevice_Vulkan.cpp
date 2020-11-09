@@ -255,32 +255,32 @@ namespace Vulkan_Internal
     }
     return VK_FORMAT_UNDEFINED;
   }
-  constexpr VkCompareOp _ConvertComparisonFunc(COMPARISON_FUNC value)
+  inline VkCompareOp _ConvertComparisonFunc(ezEnum<ezRHIComparisonFunc> value)
   {
     switch (value)
     {
-      case COMPARISON_NEVER:
+      case ezRHIComparisonFunc::Never:
         return VK_COMPARE_OP_NEVER;
         break;
-      case COMPARISON_LESS:
+      case ezRHIComparisonFunc::Less:
         return VK_COMPARE_OP_LESS;
         break;
-      case COMPARISON_EQUAL:
+      case ezRHIComparisonFunc::Equal:
         return VK_COMPARE_OP_EQUAL;
         break;
-      case COMPARISON_LESS_EQUAL:
+      case ezRHIComparisonFunc::LessEqual:
         return VK_COMPARE_OP_LESS_OR_EQUAL;
         break;
-      case COMPARISON_GREATER:
+      case ezRHIComparisonFunc::Greater:
         return VK_COMPARE_OP_GREATER;
         break;
-      case COMPARISON_NOT_EQUAL:
+      case ezRHIComparisonFunc::NotEqual:
         return VK_COMPARE_OP_NOT_EQUAL;
         break;
-      case COMPARISON_GREATER_EQUAL:
+      case ezRHIComparisonFunc::GreaterEqual:
         return VK_COMPARE_OP_GREATER_OR_EQUAL;
         break;
-      case COMPARISON_ALWAYS:
+      case ezRHIComparisonFunc::Always:
         return VK_COMPARE_OP_ALWAYS;
         break;
       default:
@@ -288,59 +288,59 @@ namespace Vulkan_Internal
     }
     return VK_COMPARE_OP_NEVER;
   }
-  constexpr VkBlendFactor _ConvertBlend(BLEND value)
+  inline VkBlendFactor _ConvertBlend(ezEnum<ezRHIBlendFactor> value)
   {
     switch (value)
     {
-      case BLEND_ZERO:
+      case ezRHIBlendFactor::Zero:
         return VK_BLEND_FACTOR_ZERO;
         break;
-      case BLEND_ONE:
+      case ezRHIBlendFactor::One:
         return VK_BLEND_FACTOR_ONE;
         break;
-      case BLEND_SRC_COLOR:
+      case ezRHIBlendFactor::SourceColor:
         return VK_BLEND_FACTOR_SRC_COLOR;
         break;
-      case BLEND_INV_SRC_COLOR:
+      case ezRHIBlendFactor::InverseSourceColor:
         return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
         break;
-      case BLEND_SRC_ALPHA:
+      case ezRHIBlendFactor::SourceAlpha:
         return VK_BLEND_FACTOR_SRC_ALPHA;
         break;
-      case BLEND_INV_SRC_ALPHA:
+      case ezRHIBlendFactor::InverseSourceAlpha:
         return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         break;
-      case BLEND_DEST_ALPHA:
+      case ezRHIBlendFactor::DestinationAlpha:
         return VK_BLEND_FACTOR_DST_ALPHA;
         break;
-      case BLEND_INV_DEST_ALPHA:
+      case ezRHIBlendFactor::InverseDestinationAlpha:
         return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
         break;
-      case BLEND_DEST_COLOR:
+      case ezRHIBlendFactor::DestinationColor:
         return VK_BLEND_FACTOR_DST_COLOR;
         break;
-      case BLEND_INV_DEST_COLOR:
+      case ezRHIBlendFactor::InverseDestinationColor:
         return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
         break;
-      case BLEND_SRC_ALPHA_SAT:
+      case ezRHIBlendFactor::SourceAlphaSaturated:
         return VK_BLEND_FACTOR_SRC_ALPHA_SATURATE;
         break;
-      case BLEND_BLEND_FACTOR:
+      case ezRHIBlendFactor::BlendFactor:
         return VK_BLEND_FACTOR_CONSTANT_COLOR;
         break;
-      case BLEND_INV_BLEND_FACTOR:
+      case ezRHIBlendFactor::InverseBlendFactor:
         return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR;
         break;
-      case BLEND_SRC1_COLOR:
+      case ezRHIBlendFactor::Source1Color:
         return VK_BLEND_FACTOR_SRC1_COLOR;
         break;
-      case BLEND_INV_SRC1_COLOR:
+      case ezRHIBlendFactor::InverseSource1Color:
         return VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR;
         break;
-      case BLEND_SRC1_ALPHA:
+      case ezRHIBlendFactor::Source1Alpha:
         return VK_BLEND_FACTOR_SRC1_ALPHA;
         break;
-      case BLEND_INV_SRC1_ALPHA:
+      case ezRHIBlendFactor::InverseSource1Alpha:
         return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
         break;
       default:
@@ -348,23 +348,23 @@ namespace Vulkan_Internal
     }
     return VK_BLEND_FACTOR_ZERO;
   }
-  constexpr VkBlendOp _ConvertBlendOp(BLEND_OP value)
+  inline VkBlendOp _ConvertBlendOp(ezEnum<ezRHIBlendOp> value)
   {
     switch (value)
     {
-      case BLEND_OP_ADD:
+      case ezRHIBlendOp::Add:
         return VK_BLEND_OP_ADD;
         break;
-      case BLEND_OP_SUBTRACT:
+      case ezRHIBlendOp::Subtract:
         return VK_BLEND_OP_SUBTRACT;
         break;
-      case BLEND_OP_REV_SUBTRACT:
+      case ezRHIBlendOp::ReverseSubtract:
         return VK_BLEND_OP_REVERSE_SUBTRACT;
         break;
-      case BLEND_OP_MIN:
+      case ezRHIBlendOp::Min:
         return VK_BLEND_OP_MIN;
         break;
-      case BLEND_OP_MAX:
+      case ezRHIBlendOp::Max:
         return VK_BLEND_OP_MAX;
         break;
       default:
@@ -393,32 +393,32 @@ namespace Vulkan_Internal
     }
     return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
   }
-  constexpr VkStencilOp _ConvertStencilOp(STENCIL_OP value)
+  inline VkStencilOp _ConvertStencilOp(ezEnum<ezRHIStencilOp> value)
   {
     switch (value)
     {
-      case STENCIL_OP_KEEP:
+      case ezRHIStencilOp::Keep:
         return VK_STENCIL_OP_KEEP;
         break;
-      case STENCIL_OP_ZERO:
+      case ezRHIStencilOp::Zero:
         return VK_STENCIL_OP_ZERO;
         break;
-      case STENCIL_OP_REPLACE:
+      case ezRHIStencilOp::Replace:
         return VK_STENCIL_OP_REPLACE;
         break;
-      case STENCIL_OP_INCR_SAT:
+      case ezRHIStencilOp::IncrementSaturated:
         return VK_STENCIL_OP_INCREMENT_AND_CLAMP;
         break;
-      case STENCIL_OP_DECR_SAT:
+      case ezRHIStencilOp::DecrementSaturated:
         return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
         break;
-      case STENCIL_OP_INVERT:
+      case ezRHIStencilOp::Invert:
         return VK_STENCIL_OP_INVERT;
         break;
-      case STENCIL_OP_INCR:
+      case ezRHIStencilOp::Increment:
         return VK_STENCIL_OP_INCREMENT_AND_WRAP;
         break;
-      case STENCIL_OP_DECR:
+      case ezRHIStencilOp::Decrement:
         return VK_STENCIL_OP_DECREMENT_AND_WRAP;
         break;
       default:
@@ -658,7 +658,7 @@ namespace Vulkan_Internal
   static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugReportFlagsEXT flags,
     VkDebugReportObjectTypeEXT objType,
-    uint64_t obj,
+    ezUInt64 obj,
     size_t location,
     int32_t code,
     const char* layerPrefix,
@@ -878,7 +878,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_buffers.push_back(std::make_pair(std::make_pair(resource, allocation), framecount));
       if (cbv)
@@ -920,7 +920,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_images.push_back(std::make_pair(std::make_pair(resource, allocation), framecount));
       if (staging_resource)
@@ -962,7 +962,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_samplers.push_back(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
@@ -981,7 +981,7 @@ namespace Vulkan_Internal
       if (query_index != ~0)
       {
         allocationhandler->destroylocker.lock();
-        uint64_t framecount = allocationhandler->framecount;
+        ezUInt64 framecount = allocationhandler->framecount;
         switch (query_type)
         {
           case GPU_QUERY_TYPE_OCCLUSION:
@@ -1014,7 +1014,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (shaderModule)
         allocationhandler->destroyer_shadermodules.push_back(std::make_pair(shaderModule, framecount));
       if (pipeline_cs)
@@ -1039,7 +1039,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (pipelineLayout)
         allocationhandler->destroyer_pipelineLayouts.push_back(std::make_pair(pipelineLayout, framecount));
       if (descriptorSetLayout)
@@ -1060,7 +1060,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (renderpass)
         allocationhandler->destroyer_renderpasses.push_back(std::make_pair(renderpass, framecount));
       if (framebuffer)
@@ -1085,7 +1085,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (buffer)
         allocationhandler->destroyer_buffers.push_back(std::make_pair(std::make_pair(buffer, allocation), framecount));
       if (resource)
@@ -1103,7 +1103,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (pipeline)
         allocationhandler->destroyer_pipelines.push_back(std::make_pair(pipeline, framecount));
       allocationhandler->destroylocker.unlock();
@@ -1135,7 +1135,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (layout)
         allocationhandler->destroyer_descriptorSetLayouts.push_back(std::make_pair(layout, framecount));
       if (updatetemplate)
@@ -1167,7 +1167,7 @@ namespace Vulkan_Internal
       if (allocationhandler == nullptr)
         return;
       allocationhandler->destroylocker.lock();
-      uint64_t framecount = allocationhandler->framecount;
+      ezUInt64 framecount = allocationhandler->framecount;
       if (pipelineLayout)
         allocationhandler->destroyer_pipelineLayouts.push_back(std::make_pair(pipelineLayout, framecount));
       allocationhandler->destroylocker.unlock();
@@ -1250,7 +1250,7 @@ void GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::init(Graphic
   assert(res == VK_SUCCESS);
 
   void* pData = internal_state->allocation->GetMappedData();
-  dataCur = dataBegin = reinterpret_cast<uint8_t*>(pData);
+  dataCur = dataBegin = reinterpret_cast<ezUInt8*>(pData);
   dataEnd = dataBegin + size;
 
   // Because the "buffer" is created by hand in this, fill the desc to indicate how it can be used:
@@ -1260,16 +1260,16 @@ void GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::init(Graphic
   this->buffer.desc.BindFlags = BIND_VERTEX_BUFFER | BIND_INDEX_BUFFER | BIND_SHADER_RESOURCE;
   this->buffer.desc.MiscFlags = RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
 }
-uint8_t* GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::allocate(size_t dataSize, size_t alignment)
+ezUInt8* GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::allocate(size_t dataSize, size_t alignment)
 {
-  dataCur = reinterpret_cast<uint8_t*>(Align(reinterpret_cast<size_t>(dataCur), alignment));
+  dataCur = reinterpret_cast<ezUInt8*>(Align(reinterpret_cast<size_t>(dataCur), alignment));
 
   if (dataCur + dataSize > dataEnd)
   {
     init(device, ((size_t)dataEnd + dataSize - (size_t)dataBegin) * 2);
   }
 
-  uint8_t* retVal = dataCur;
+  ezUInt8* retVal = dataCur;
 
   dataCur += dataSize;
 
@@ -1279,10 +1279,10 @@ void GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::clear()
 {
   dataCur = dataBegin;
 }
-uint64_t GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::calculateOffset(uint8_t* address)
+ezUInt64 GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::calculateOffset(ezUInt8* address)
 {
   assert(address >= dataBegin && address < dataEnd);
-  return static_cast<uint64_t>(address - dataBegin);
+  return static_cast<ezUInt64>(address - dataBegin);
 }
 
 void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::init(GraphicsDevice_Vulkan* device)
@@ -2029,7 +2029,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
       if (pso->desc.dss != nullptr)
       {
         depthstencil.depthTestEnable = pso->desc.dss->desc.DepthEnable ? VK_TRUE : VK_FALSE;
-        depthstencil.depthWriteEnable = pso->desc.dss->desc.DepthWriteMask == DEPTH_WRITE_MASK_ZERO ? VK_FALSE : VK_TRUE;
+        depthstencil.depthWriteEnable = pso->desc.dss->desc.DepthWriteMask == ezRHIDepthWriteMask::Zero ? VK_FALSE : VK_TRUE;
         depthstencil.depthCompareOp = _ConvertComparisonFunc(pso->desc.dss->desc.DepthFunc);
 
         depthstencil.stencilTestEnable = pso->desc.dss->desc.StencilEnable ? VK_TRUE : VK_FALSE;
@@ -2092,19 +2092,19 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
         attachment.blendEnable = desc.BlendEnable ? VK_TRUE : VK_FALSE;
 
         attachment.colorWriteMask = 0;
-        if (desc.RenderTargetWriteMask & COLOR_WRITE_ENABLE_RED)
+        if (desc.RenderTargetWriteMask.IsSet(ezRHIColorWriteMask::Red))
         {
           attachment.colorWriteMask |= VK_COLOR_COMPONENT_R_BIT;
         }
-        if (desc.RenderTargetWriteMask & COLOR_WRITE_ENABLE_GREEN)
+        if (desc.RenderTargetWriteMask.IsSet(ezRHIColorWriteMask::Green))
         {
           attachment.colorWriteMask |= VK_COLOR_COMPONENT_G_BIT;
         }
-        if (desc.RenderTargetWriteMask & COLOR_WRITE_ENABLE_BLUE)
+        if (desc.RenderTargetWriteMask.IsSet(ezRHIColorWriteMask::Blue))
         {
           attachment.colorWriteMask |= VK_COLOR_COMPONENT_B_BIT;
         }
-        if (desc.RenderTargetWriteMask & COLOR_WRITE_ENABLE_ALPHA)
+        if (desc.RenderTargetWriteMask.IsSet(ezRHIColorWriteMask::Alpha))
         {
           attachment.colorWriteMask |= VK_COLOR_COMPONENT_A_BIT;
         }
@@ -2863,7 +2863,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
 
   // GPU Queries:
   {
-    timestamp_frequency = uint64_t(1.0 / double(device_properties.properties.limits.timestampPeriod) * 1000 * 1000 * 1000);
+    timestamp_frequency = ezUInt64(1.0 / double(device_properties.properties.limits.timestampPeriod) * 1000 * 1000 * 1000);
 
     VkQueryPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
@@ -3064,7 +3064,7 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
   info.objectType = VK_OBJECT_TYPE_IMAGE;
   for (auto& x : swapChainImages)
   {
-    info.objectHandle = (uint64_t)x;
+    info.objectHandle = (ezUInt64)x;
 
     res = setDebugUtilsObjectNameEXT(device, &info);
     assert(res == VK_SUCCESS);
@@ -3559,7 +3559,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
         {
           cpysize /= 4;
         }
-        uint8_t* cpyaddr = (uint8_t*)pData + cpyoffset;
+        ezUInt8* cpyaddr = (ezUInt8*)pData + cpyoffset;
         memcpy(cpyaddr, subresourceData.pSysMem, cpysize);
 
         VkBufferImageCopy copyRegion = {};
@@ -5290,7 +5290,7 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
   }
   return -1;
 }
-int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size)
+int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, ezUInt64 offset, ezUInt64 size)
 {
   auto internal_state = to_internal(buffer);
   const GPUBufferDesc& desc = buffer->GetDesc();
@@ -5312,7 +5312,7 @@ int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE
       srv_desc.flags = 0;
       srv_desc.format = _ConvertFormat(desc.Format);
       srv_desc.offset = Align(offset, device_properties.properties.limits.minTexelBufferOffsetAlignment); // damn, if this needs alignment, that could break a lot of things! (index buffer, index offset?)
-      srv_desc.range = std::min(size, (uint64_t)desc.ByteWidth - srv_desc.offset);
+      srv_desc.range = std::min(size, (ezUInt64)desc.ByteWidth - srv_desc.offset);
 
       VkBufferView view;
       res = vkCreateBufferView(device, &srv_desc, nullptr, &view);
@@ -5371,7 +5371,7 @@ void GraphicsDevice_Vulkan::WriteShaderIdentifier(const RaytracingPipelineState*
   VkResult res = getRayTracingShaderGroupHandlesKHR(device, to_internal(rtpso)->pipeline, group_index, 1, SHADER_IDENTIFIER_SIZE, dest);
   assert(res == VK_SUCCESS);
 }
-void GraphicsDevice_Vulkan::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource, uint64_t offset)
+void GraphicsDevice_Vulkan::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource, ezUInt64 offset)
 {
   auto table_internal = to_internal(table);
   size_t remap = table_internal->resource_write_remap[rangeIndex];
@@ -5673,8 +5673,8 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
       assert(0); // not implemented yet
       break;
     case GPU_QUERY_TYPE_TIMESTAMP:
-      res = vkGetQueryPoolResults(device, querypool_timestamp, (ezUInt32)internal_state->query_index, 1, sizeof(uint64_t),
-        &result->result_timestamp, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT);
+      res = vkGetQueryPoolResults(device, querypool_timestamp, (ezUInt32)internal_state->query_index, 1, sizeof(ezUInt64),
+        &result->result_timestamp, sizeof(ezUInt64), VK_QUERY_RESULT_64_BIT);
       if (timestamps_to_reset.empty() || timestamps_to_reset.back() != (ezUInt32)internal_state->query_index)
       {
         timestamps_to_reset.push_back((ezUInt32)internal_state->query_index);
@@ -5685,8 +5685,8 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
       break;
     case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
     case GPU_QUERY_TYPE_OCCLUSION:
-      res = vkGetQueryPoolResults(device, querypool_occlusion, (ezUInt32)internal_state->query_index, 1, sizeof(uint64_t),
-        &result->result_passed_sample_count, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_PARTIAL_BIT);
+      res = vkGetQueryPoolResults(device, querypool_occlusion, (ezUInt32)internal_state->query_index, 1, sizeof(ezUInt64),
+        &result->result_passed_sample_count, sizeof(ezUInt64), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_PARTIAL_BIT);
       if (occlusions_to_reset.empty() || occlusions_to_reset.back() != (ezUInt32)internal_state->query_index)
       {
         occlusions_to_reset.push_back((ezUInt32)internal_state->query_index);
@@ -5705,17 +5705,17 @@ void GraphicsDevice_Vulkan::SetName(GPUResource* pResource, const char* name)
   if (pResource->IsTexture())
   {
     info.objectType = VK_OBJECT_TYPE_IMAGE;
-    info.objectHandle = (uint64_t)to_internal((const Texture*)pResource)->resource;
+    info.objectHandle = (ezUInt64)to_internal((const Texture*)pResource)->resource;
   }
   else if (pResource->IsBuffer())
   {
     info.objectType = VK_OBJECT_TYPE_BUFFER;
-    info.objectHandle = (uint64_t)to_internal((const GPUBuffer*)pResource)->resource;
+    info.objectHandle = (ezUInt64)to_internal((const GPUBuffer*)pResource)->resource;
   }
   else if (pResource->IsAccelerationStructure())
   {
     info.objectType = VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR;
-    info.objectHandle = (uint64_t)to_internal((const RaytracingAccelerationStructure*)pResource)->resource;
+    info.objectHandle = (ezUInt64)to_internal((const RaytracingAccelerationStructure*)pResource)->resource;
   }
 
   if (info.objectHandle == VK_NULL_HANDLE)
@@ -6489,7 +6489,7 @@ void GraphicsDevice_Vulkan::UpdateBuffer(const GPUBuffer* buffer, const void* da
 
 
     // issue data copy:
-    uint8_t* dest = GetFrameResources().resourceBuffer[cmd].allocate(dataSize, 1);
+    ezUInt8* dest = GetFrameResources().resourceBuffer[cmd].allocate(dataSize, 1);
     memcpy(dest, data, dataSize);
 
     VkBufferCopy copyRegion = {};
@@ -6960,7 +6960,7 @@ GraphicsDevice::GPUAllocation GraphicsDevice_Vulkan::AllocateGPU(size_t dataSize
   }
 
   FrameResources::ResourceFrameAllocator& allocator = GetFrameResources().resourceBuffer[cmd];
-  uint8_t* dest = allocator.allocate(dataSize, 256);
+  ezUInt8* dest = allocator.allocate(dataSize, 256);
   assert(dest != nullptr);
 
   result.buffer = &allocator.buffer;

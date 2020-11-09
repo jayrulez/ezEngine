@@ -228,14 +228,14 @@ If providing your own implementation, you need to implement a subset of std::ato
 #endif
 
 // Aligns given value up to nearest multiply of align value. For example: AlignUp(11, 8) = 16.
-// Use types like UINT, uint64_t as T.
+// Use types like UINT, ezUInt64 as T.
 template <typename T>
 static inline T AlignUp(T val, T align)
 {
 	return (val + align - 1) / align * align;
 }
 // Aligns given value down to nearest multiply of align value. For example: AlignUp(11, 8) = 8.
-// Use types like UINT, uint64_t as T.
+// Use types like UINT, ezUInt64 as T.
 template <typename T>
 static inline T AlignDown(T val, T align)
 {
@@ -272,7 +272,7 @@ static inline UINT NextPow2(UINT v)
     v++;
     return v;
 }
-static inline uint64_t NextPow2(uint64_t v)
+static inline ezUInt64 NextPow2(ezUInt64 v)
 {
 	v--;
     v |= v >> 1;
@@ -296,7 +296,7 @@ static inline UINT PrevPow2(UINT v)
     v = v ^ (v >> 1);
     return v;
 }
-static inline uint64_t PrevPow2(uint64_t v)
+static inline ezUInt64 PrevPow2(ezUInt64 v)
 {
     v |= v >> 1;
     v |= v >> 2;
@@ -3595,7 +3595,7 @@ UINT AllocatorPimpl::CalcDefaultPoolIndex(const ALLOCATION_DESC& allocDesc, cons
         const bool allowRtDsTextures = (heapFlags & D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES) == 0;
         const bool allowNonRtDsTextures = (heapFlags & D3D12_HEAP_FLAG_DENY_NON_RT_DS_TEXTURES) == 0;
 
-        const uint8_t allowedGroupCount = (allowBuffers ? 1 : 0) + (allowRtDsTextures ? 1 : 0) + (allowNonRtDsTextures ? 1 : 0);
+        const ezUInt8 allowedGroupCount = (allowBuffers ? 1 : 0) + (allowRtDsTextures ? 1 : 0) + (allowNonRtDsTextures ? 1 : 0);
         if(allowedGroupCount != 1)
         {
             return UINT32_MAX;

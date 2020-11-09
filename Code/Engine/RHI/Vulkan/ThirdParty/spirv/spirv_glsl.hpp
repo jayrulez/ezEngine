@@ -421,7 +421,7 @@ protected:
 	std::unordered_set<std::string> block_ubo_names;
 	std::unordered_set<std::string> block_ssbo_names;
 	std::unordered_set<std::string> block_names; // A union of all block_*_names.
-	std::unordered_map<std::string, std::unordered_set<uint64_t>> function_overloads;
+	std::unordered_map<std::string, std::unordered_set<ezUInt64>> function_overloads;
 	std::unordered_map<ezUInt32, std::string> preserved_aliases;
 	void preserve_alias_on_reset(ezUInt32 id);
 	void reset_name_caches();
@@ -442,7 +442,7 @@ protected:
 		const char *basic_int_type = "int";
 		const char *basic_uint_type = "uint";
 		const char *basic_int8_type = "int8_t";
-		const char *basic_uint8_type = "uint8_t";
+		const char *basic_uint8_type = "ezUInt8";
 		const char *basic_int16_type = "int16_t";
 		const char *basic_uint16_type = "ezUInt16";
 		const char *int16_t_literal_suffix = "s";

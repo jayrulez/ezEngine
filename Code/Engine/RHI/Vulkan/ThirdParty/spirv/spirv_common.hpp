@@ -60,7 +60,7 @@ class Bitset
 {
 public:
 	Bitset() = default;
-	explicit inline Bitset(uint64_t lower_)
+	explicit inline Bitset(ezUInt64 lower_)
 	    : lower(lower_)
 	{
 	}
@@ -89,7 +89,7 @@ public:
 			higher.erase(bit);
 	}
 
-	inline uint64_t get_lower() const
+	inline ezUInt64 get_lower() const
 	{
 		return lower;
 	}
@@ -171,7 +171,7 @@ private:
 	// The most common bits to set are all lower than 64,
 	// so optimize for this case. Bits spilling outside 64 go into a slower data structure.
 	// In almost all cases, higher data structure will not be used.
-	uint64_t lower = 0;
+	ezUInt64 lower = 0;
 	std::unordered_set<ezUInt32> higher;
 };
 
@@ -1074,7 +1074,7 @@ struct SPIRConstant : IVariant
 		int32_t i32;
 		float f32;
 
-		uint64_t u64;
+		ezUInt64 u64;
 		int64_t i64;
 		double f64;
 	};
@@ -1181,9 +1181,9 @@ struct SPIRConstant : IVariant
 		return int8_t(m.c[col].r[row].u32 & 0xffu);
 	}
 
-	inline uint8_t scalar_u8(ezUInt32 col = 0, ezUInt32 row = 0) const
+	inline ezUInt8 scalar_u8(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
-		return uint8_t(m.c[col].r[row].u32 & 0xffu);
+		return ezUInt8(m.c[col].r[row].u32 & 0xffu);
 	}
 
 	inline float scalar_f16(ezUInt32 col = 0, ezUInt32 row = 0) const
@@ -1211,7 +1211,7 @@ struct SPIRConstant : IVariant
 		return m.c[col].r[row].i64;
 	}
 
-	inline uint64_t scalar_u64(ezUInt32 col = 0, ezUInt32 row = 0) const
+	inline ezUInt64 scalar_u64(ezUInt32 col = 0, ezUInt32 row = 0) const
 	{
 		return m.c[col].r[row].u64;
 	}
@@ -1282,7 +1282,7 @@ struct SPIRConstant : IVariant
 	}
 
 	// Construct scalar (64-bit).
-	SPIRConstant(TypeID constant_type_, uint64_t v0, bool specialized)
+	SPIRConstant(TypeID constant_type_, ezUInt64 v0, bool specialized)
 	    : constant_type(constant_type_)
 	    , specialization(specialized)
 	{
@@ -1638,13 +1638,13 @@ public:
 		h = (h * 0x100000001b3ull) ^ value;
 	}
 
-	inline uint64_t get() const
+	inline ezUInt64 get() const
 	{
 		return h;
 	}
 
 private:
-	uint64_t h = 0xcbf29ce484222325ull;
+	ezUInt64 h = 0xcbf29ce484222325ull;
 };
 
 static inline bool type_is_floating_point(const SPIRType &type)

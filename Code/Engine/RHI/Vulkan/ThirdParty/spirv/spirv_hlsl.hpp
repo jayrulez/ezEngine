@@ -286,12 +286,12 @@ private:
 				for (auto &u : unorm)
 					u = 0;
 		}
-		uint64_t srv;
-		uint64_t uav[3][4];
+		ezUInt64 srv;
+		ezUInt64 uav[3][4];
 	} required_texture_size_variants;
 
 	void require_texture_query_variant(ezUInt32 var_id);
-	void emit_texture_size_variants(uint64_t variant_mask, const char *vecsize_qualifier, bool uav, const char *type_qualifier);
+	void emit_texture_size_variants(ezUInt64 variant_mask, const char *vecsize_qualifier, bool uav, const char *type_qualifier);
 
 	enum TextureQueryVariantDim
 	{

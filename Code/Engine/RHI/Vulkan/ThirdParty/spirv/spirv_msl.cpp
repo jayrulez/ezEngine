@@ -3826,7 +3826,7 @@ void CompilerMSL::emit_custom_functions()
 			{
 				ezUInt32 dimensions = spv_func - SPVFuncImplArrayCopyMultidimBase;
 				string tmp = "template<typename T";
-				for (uint8_t i = 0; i < dimensions; i++)
+				for (ezUInt8 i = 0; i < dimensions; i++)
 				{
 					tmp += ", uint ";
 					tmp += 'A' + i;
@@ -3835,7 +3835,7 @@ void CompilerMSL::emit_custom_functions()
 				statement(tmp);
 
 				string array_arg;
-				for (uint8_t i = 0; i < dimensions; i++)
+				for (ezUInt8 i = 0; i < dimensions; i++)
 				{
 					array_arg += "[";
 					array_arg += 'A' + i;
