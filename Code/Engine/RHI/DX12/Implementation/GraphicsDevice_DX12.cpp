@@ -1087,10 +1087,10 @@ namespace DX12_Internal
     std::shared_ptr<GraphicsDevice_DX12::AllocationHandler> allocationhandler;
     ComPtr<ID3D12StateObject> resource;
 
-    std::vector<std::wstring> export_strings;
+    ezDynamicArray<ezString> export_strings;
     std::vector<D3D12_EXPORT_DESC> exports;
     std::vector<D3D12_DXIL_LIBRARY_DESC> library_descs;
-    std::vector<std::wstring> group_strings;
+    ezDynamicArray<ezString> group_strings;
     std::vector<D3D12_HIT_GROUP_DESC> hitgroup_descs;
 
     ~RTPipelineState_DX12()
@@ -1802,7 +1802,7 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
         elements.resize(il.NumElements);
         for (ezUInt32 i = 0; i < il.NumElements; ++i)
         {
-          elements[i].SemanticName = pso->desc.il->desc[i].SemanticName.c_str();
+          elements[i].SemanticName = pso->desc.il->desc[i].SemanticName.GetData();
           elements[i].SemanticIndex = pso->desc.il->desc[i].SemanticIndex;
           elements[i].Format = _ConvertFormat(pso->desc.il->desc[i].Format);
           elements[i].InputSlot = pso->desc.il->desc[i].InputSlot;
@@ -3421,11 +3421,9 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
 
     internal_state->exports.emplace_back();
     D3D12_EXPORT_DESC& export_desc = internal_state->exports.back();
-    internal_state->export_strings.emplace_back();
+    internal_state->export_strings.PushBack(x.function_name);
 
-    RHIHelper::StringConvert(x.function_name, internal_state->export_strings.back());
-
-    export_desc.Name = internal_state->export_strings.back().c_str();
+    export_desc.Name = ezStringWChar(internal_state->export_strings.PeekBack()).GetData();
     library_desc.pExports = &export_desc;
 
     subobject.pDesc = &library_desc;
@@ -3434,9 +3432,7 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
   internal_state->hitgroup_descs.reserve(pDesc->hitgroups.size());
   for (auto& x : pDesc->hitgroups)
   {
-    internal_state->group_strings.emplace_back();
-
-    RHIHelper::StringConvert(x.name, internal_state->group_strings.back());
+    internal_state->group_strings.PushBack(x.name);
 
     if (x.type == ShaderHitGroup::GENERAL)
       continue;
@@ -3457,9 +3453,9 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
         hitgroup_desc.Type = D3D12_HIT_GROUP_TYPE_PROCEDURAL_PRIMITIVE;
         break;
     }
-    if (!x.name.empty())
+    if (!x.name.IsEmpty())
     {
-      hitgroup_desc.HitGroupExport = internal_state->group_strings.back().c_str();
+      hitgroup_desc.HitGroupExport = ezStringWChar(internal_state->group_strings.PeekBack()).GetData();
     }
     if (x.closesthit_shader != ~0)
     {
@@ -4276,7 +4272,7 @@ void GraphicsDevice_DX12::WriteShaderIdentifier(const RaytracingPipelineState* r
   HRESULT hr = internal_state->resource.As(&stateObjectProperties);
   assert(SUCCEEDED(hr));
 
-  void* identifier = stateObjectProperties->GetShaderIdentifier(internal_state->group_strings[group_index].c_str());
+  void* identifier = stateObjectProperties->GetShaderIdentifier(ezStringWChar(internal_state->group_strings[group_index]).GetData());
   memcpy(dest, identifier, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
 }
 void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const GPUResource* resource, int subresource, ezUInt64 offset)
@@ -4645,9 +4641,11 @@ CommandList GraphicsDevice_DX12::BeginCommandList()
       frames[fr].descriptors[cmd].init(this);
       frames[fr].resourceBuffer[cmd].init(this, 1024 * 1024); // 1 MB starting size
 
-      std::wstringstream wss;
-      wss << "cmd" << cmd;
-      frames[fr].commandLists[cmd].Get()->SetName(wss.str().c_str());
+      ezStringBuilder sb("");
+      sb.AppendFormat("cmd{}", cmd);
+      ezStringWChar name(sb.GetData());
+      
+      frames[fr].commandLists[cmd].Get()->SetName(name.GetData());
     }
   }
 

@@ -636,21 +636,18 @@ namespace Vulkan_Internal
     void* user_data)
   {
     // Log debug messge
-    std::stringstream ss("");
+    ezStringBuilder sb("");
 
     if (message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
     {
-      ss << "[Vulkan Warning]: " << callback_data->pMessage << std::endl;
+      sb.AppendFormat("[Vulkan Warning]: {}\n", callback_data->pMessage);
     }
     else if (message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
     {
-      ss << "[Vulkan Error]: " << callback_data->pMessage << std::endl;
+      sb.AppendFormat("[Vulkan Error]: {}\n", callback_data->pMessage);
     }
 
-    std::clog << ss.str();
-#  ifdef _WIN32
-    OutputDebugStringA(ss.str().c_str());
-#  endif
+    ezLog::Debug(sb);
 
     return VK_FALSE;
   }
@@ -666,13 +663,9 @@ namespace Vulkan_Internal
     void* userData)
   {
 
-    std::stringstream ss("");
-    ss << "[VULKAN validation layer]: " << msg << std::endl;
-
-    std::clog << ss.str();
-#  ifdef _WIN32
-    OutputDebugStringA(ss.str().c_str());
-#  endif
+    ezStringBuilder sb("");
+    sb.AppendFormat("[VULKAN validation layer]: {}\n", msg);
+    ezLog::Debug(sb);
 
     return VK_FALSE;
   }
@@ -4776,7 +4769,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
         stage.stage = VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
         break;
     }
-    stage.pName = x.function_name.c_str();
+    stage.pName = x.function_name.GetData();
   }
   info.stageCount = (ezUInt32)stages.size();
   info.pStages = stages.data();

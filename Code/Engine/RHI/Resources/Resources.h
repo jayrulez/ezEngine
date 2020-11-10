@@ -199,7 +199,7 @@ struct EZ_RHI_DLL ShaderLibrary
     INTERSECTION,
   } type = RAYGENERATION;
   const Shader* shader = nullptr;
-  std::string function_name;
+  ezString function_name;
 };
 struct EZ_RHI_DLL ShaderHitGroup
 {
@@ -209,7 +209,7 @@ struct EZ_RHI_DLL ShaderHitGroup
     TRIANGLES,
     PROCEDURAL,
   } type = TRIANGLES;
-  std::string name;
+  ezString name;
   ezUInt32 general_shader = ~0;
   ezUInt32 closesthit_shader = ~0;
   ezUInt32 anyhit_shader = ~0;

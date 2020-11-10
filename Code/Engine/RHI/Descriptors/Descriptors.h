@@ -17,7 +17,7 @@ struct EZ_RHI_DLL InputLayoutDesc
 {
   static const ezUInt32 APPEND_ALIGNED_ELEMENT = 0xffffffff; // automatically figure out AlignedByteOffset depending on Format
 
-  std::string SemanticName;
+  ezString SemanticName;
   ezUInt32 SemanticIndex = 0;
   ezRHIFormat::Enum Format = ezRHIFormat::Unknown;
   ezUInt32 InputSlot = 0;
