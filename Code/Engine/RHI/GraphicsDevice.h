@@ -3,7 +3,8 @@
 #include <RHI/RHIPCH.h>
 
 #include <Foundation/Utilities/GraphicsUtils.h>
-#include <RHI/Graphics.h>
+#include <RHI/Descriptors/Descriptors.h>
+#include <RHI/Resources/Resources.h>
 #include <memory>
 
 

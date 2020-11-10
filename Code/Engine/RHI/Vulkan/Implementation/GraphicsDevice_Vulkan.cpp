@@ -372,20 +372,20 @@ namespace Vulkan_Internal
     }
     return VK_BLEND_OP_ADD;
   }
-  constexpr VkSamplerAddressMode _ConvertTextureAddressMode(TEXTURE_ADDRESS_MODE value)
+  inline VkSamplerAddressMode _ConvertTextureAddressMode(ezEnum<ezRHITextureAddressMode> value)
   {
     switch (value)
     {
-      case TEXTURE_ADDRESS_WRAP:
+      case ezRHITextureAddressMode::Wrap:
         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
         break;
-      case TEXTURE_ADDRESS_MIRROR:
+      case ezRHITextureAddressMode::Mirror:
         return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
         break;
-      case TEXTURE_ADDRESS_CLAMP:
+      case ezRHITextureAddressMode::Clamp:
         return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         break;
-      case TEXTURE_ADDRESS_BORDER:
+      case ezRHITextureAddressMode::Border:
         return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
         break;
       default:
@@ -1854,7 +1854,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
         {
           VkVertexInputBindingDescription bind = {};
           bind.binding = x.InputSlot;
-          bind.inputRate = x.InputSlotClass == INPUT_PER_VERTEX_DATA ? VK_VERTEX_INPUT_RATE_VERTEX : VK_VERTEX_INPUT_RATE_INSTANCE;
+          bind.inputRate = x.InputSlotClass == ezRHIInputClassification::PerVertexData ? VK_VERTEX_INPUT_RATE_VERTEX : VK_VERTEX_INPUT_RATE_INSTANCE;
           bind.stride = x.AlignedByteOffset;
           if (bind.stride == InputLayoutDesc::APPEND_ALIGNED_ELEMENT)
           {
@@ -1964,10 +1964,10 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
         switch (desc.FillMode)
         {
-          case ezRHIFillMode::FILL_WIREFRAME:
+          case ezRHIFillMode::Wireframe:
             rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
             break;
-          case ezRHIFillMode::FILL_SOLID:
+          case ezRHIFillMode::Solid:
           default:
             rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
             break;
@@ -1975,13 +1975,13 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
         switch (desc.CullMode)
         {
-          case ezRHICullMode::CULL_BACK:
+          case ezRHICullMode::Back:
             rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
             break;
-          case ezRHICullMode::CULL_FRONT:
+          case ezRHICullMode::Front:
             rasterizer.cullMode = VK_CULL_MODE_FRONT_BIT;
             break;
-          case ezRHICullMode::CULL_NONE:
+          case ezRHICullMode::None:
           default:
             rasterizer.cullMode = VK_CULL_MODE_NONE;
             break;
@@ -4032,150 +4032,150 @@ bool GraphicsDevice_Vulkan::CreateSampler(const SamplerDesc* pSamplerDesc, Sampl
 
   switch (pSamplerDesc->Filter)
   {
-    case FILTER_MIN_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_MIN_MAG_MIP_POINT:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MIN_MAG_POINT_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_POINT_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MIN_POINT_MAG_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_LINEAR_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_MIN_LINEAR_MAG_MIP_POINT:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_MIN_MAG_LINEAR_MIP_POINT:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_MIN_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MIN_MAG_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = false;
       break;
-    case FILTER_ANISOTROPIC:
+    case ezRHIFilter::FILTER_ANISOTROPIC:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = true;
       createInfo.compareEnable = false;
       break;
-    case FILTER_COMPARISON_MIN_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_MIP_POINT:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_NEAREST;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_MIN_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_MIP_LINEAR:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = false;
       createInfo.compareEnable = true;
       break;
-    case FILTER_COMPARISON_ANISOTROPIC:
+    case ezRHIFilter::FILTER_COMPARISON_ANISOTROPIC:
       createInfo.minFilter = VK_FILTER_LINEAR;
       createInfo.magFilter = VK_FILTER_LINEAR;
       createInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
       createInfo.anisotropyEnable = true;
       createInfo.compareEnable = true;
       break;
-    case FILTER_MINIMUM_MIN_MAG_MIP_POINT:
-    case FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR:
-    case FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
-    case FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR:
-    case FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT:
-    case FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
-    case FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT:
-    case FILTER_MINIMUM_MIN_MAG_MIP_LINEAR:
-    case FILTER_MINIMUM_ANISOTROPIC:
-    case FILTER_MAXIMUM_MIN_MAG_MIP_POINT:
-    case FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR:
-    case FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
-    case FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR:
-    case FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT:
-    case FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
-    case FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT:
-    case FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR:
-    case FILTER_MAXIMUM_ANISOTROPIC:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MINIMUM_ANISOTROPIC:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT:
+    case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR:
+    case ezRHIFilter::FILTER_MAXIMUM_ANISOTROPIC:
     default:
       createInfo.minFilter = VK_FILTER_NEAREST;
       createInfo.magFilter = VK_FILTER_NEAREST;

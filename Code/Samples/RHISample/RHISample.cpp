@@ -23,7 +23,6 @@
 #include <Foundation/Containers/Blob.h>
 #include <RHI/DX11/GraphicsDevice_DX11.h>
 #include <RHI/DX12/GraphicsDevice_DX12.h>
-#include <RHI/Graphics.h>
 #include <RHI/GraphicsDevice.h>
 #include <RHI/Vulkan/GraphicsDevice_Vulkan.h>
 
@@ -189,8 +188,8 @@ public:
 
     {
       InputLayoutDesc layout[] = {
-        {"ATTRIBUTE", 0, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, INPUT_PER_VERTEX_DATA, 0},
-        {"ATTRIBUTE", 1, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, INPUT_PER_VERTEX_DATA, 0},
+        {"ATTRIBUTE", 0, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, ezRHIInputClassification::PerVertexData, 0},
+        {"ATTRIBUTE", 1, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, ezRHIInputClassification::PerVertexData, 0},
       };
 
       m_pDevice->CreateInputLayout(layout, EZ_ARRAY_SIZE(layout), vertexShader, &inputLayout);

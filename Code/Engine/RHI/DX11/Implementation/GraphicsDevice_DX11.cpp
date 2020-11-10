@@ -93,116 +93,116 @@ namespace DX11_Internal
     return _flag;
   }
 
-  constexpr D3D11_FILTER _ConvertFilter(FILTER value)
+  inline D3D11_FILTER _ConvertFilter(ezEnum<ezRHIFilter> value)
   {
     switch (value)
     {
-      case FILTER_MIN_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_MIN_MAG_MIP_POINT:
         return D3D11_FILTER_MIN_MAG_MIP_POINT;
         break;
-      case FILTER_MIN_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MIN_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_MIN_POINT_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MIN_POINT_MAG_MIP_LINEAR:
         return D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
         break;
-      case FILTER_MIN_LINEAR_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_MIN_LINEAR_MAG_MIP_POINT:
         return D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
         break;
-      case FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_MIN_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_MIN_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_MIN_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MIN_MAG_MIP_LINEAR:
         return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
         break;
-      case FILTER_ANISOTROPIC:
+      case ezRHIFilter::FILTER_ANISOTROPIC:
         return D3D11_FILTER_ANISOTROPIC;
         break;
-      case FILTER_COMPARISON_MIN_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_MIP_POINT:
         return D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
         break;
-      case FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR:
         return D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
         break;
-      case FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT:
         return D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
         break;
-      case FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_COMPARISON_MIN_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_COMPARISON_MIN_MAG_MIP_LINEAR:
         return D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
         break;
-      case FILTER_COMPARISON_ANISOTROPIC:
+      case ezRHIFilter::FILTER_COMPARISON_ANISOTROPIC:
         return D3D11_FILTER_COMPARISON_ANISOTROPIC;
         break;
-      case FILTER_MINIMUM_MIN_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_MIP_POINT:
         return D3D11_FILTER_MINIMUM_MIN_MAG_MIP_POINT;
         break;
-      case FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR:
         return D3D11_FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR;
         break;
-      case FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT:
         return D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT;
         break;
-      case FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_MINIMUM_MIN_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MINIMUM_MIN_MAG_MIP_LINEAR:
         return D3D11_FILTER_MINIMUM_MIN_MAG_MIP_LINEAR;
         break;
-      case FILTER_MINIMUM_ANISOTROPIC:
+      case ezRHIFilter::FILTER_MINIMUM_ANISOTROPIC:
         return D3D11_FILTER_MINIMUM_ANISOTROPIC;
         break;
-      case FILTER_MAXIMUM_MIN_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_MIP_POINT:
         return D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_POINT;
         break;
-      case FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR:
         return D3D11_FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR;
         break;
-      case FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT:
         return D3D11_FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT;
         break;
-      case FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR:
         return D3D11_FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
         break;
-      case FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT:
         return D3D11_FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT;
         break;
-      case FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR:
+      case ezRHIFilter::FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR:
         return D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR;
         break;
-      case FILTER_MAXIMUM_ANISOTROPIC:
+      case ezRHIFilter::FILTER_MAXIMUM_ANISOTROPIC:
         return D3D11_FILTER_MAXIMUM_ANISOTROPIC;
         break;
       default:
@@ -210,20 +210,20 @@ namespace DX11_Internal
     }
     return D3D11_FILTER_MIN_MAG_MIP_POINT;
   }
-  constexpr D3D11_TEXTURE_ADDRESS_MODE _ConvertTextureAddressMode(TEXTURE_ADDRESS_MODE value)
+  inline D3D11_TEXTURE_ADDRESS_MODE _ConvertTextureAddressMode(ezEnum<ezRHITextureAddressMode> value)
   {
     switch (value)
     {
-      case TEXTURE_ADDRESS_WRAP:
+      case ezRHITextureAddressMode::Wrap:
         return D3D11_TEXTURE_ADDRESS_WRAP;
         break;
-      case TEXTURE_ADDRESS_MIRROR:
+      case ezRHITextureAddressMode::Mirror:
         return D3D11_TEXTURE_ADDRESS_MIRROR;
         break;
-      case TEXTURE_ADDRESS_CLAMP:
+      case ezRHITextureAddressMode::Clamp:
         return D3D11_TEXTURE_ADDRESS_CLAMP;
         break;
-      case TEXTURE_ADDRESS_BORDER:
+      case ezRHITextureAddressMode::Border:
         return D3D11_TEXTURE_ADDRESS_BORDER;
         break;
       default:
@@ -268,10 +268,10 @@ namespace DX11_Internal
   {
     switch (value)
     {
-      case ezRHIFillMode::FILL_WIREFRAME:
+      case ezRHIFillMode::Wireframe:
         return D3D11_FILL_WIREFRAME;
         break;
-      case ezRHIFillMode::FILL_SOLID:
+      case ezRHIFillMode::Solid:
         return D3D11_FILL_SOLID;
         break;
       default:
@@ -283,13 +283,13 @@ namespace DX11_Internal
   {
     switch (value)
     {
-      case ezRHICullMode::CULL_NONE:
+      case ezRHICullMode::None:
         return D3D11_CULL_NONE;
         break;
-      case ezRHICullMode::CULL_FRONT:
+      case ezRHICullMode::Front:
         return D3D11_CULL_FRONT;
         break;
-      case ezRHICullMode::CULL_BACK:
+      case ezRHICullMode::Back:
         return D3D11_CULL_BACK;
         break;
       default:
@@ -450,14 +450,14 @@ namespace DX11_Internal
     }
     return D3D11_USAGE_DEFAULT;
   }
-  constexpr D3D11_INPUT_CLASSIFICATION _ConvertInputClassification(INPUT_CLASSIFICATION value)
+  inline D3D11_INPUT_CLASSIFICATION _ConvertInputClassification(ezEnum<ezRHIInputClassification> value)
   {
     switch (value)
     {
-      case INPUT_PER_VERTEX_DATA:
+      case ezRHIInputClassification::PerVertexData:
         return D3D11_INPUT_PER_VERTEX_DATA;
         break;
-      case INPUT_PER_INSTANCE_DATA:
+      case ezRHIInputClassification::PerInstanceData:
         return D3D11_INPUT_PER_INSTANCE_DATA;
         break;
       default:
