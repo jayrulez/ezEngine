@@ -21,6 +21,22 @@
 
 #  include <RHI/RHIInternal.h>
 
+EZ_DEFINE_AS_POD_TYPE(D3D12_STATIC_SAMPLER_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_SHADER_RESOURCE_VIEW_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_UNORDERED_ACCESS_VIEW_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_RENDER_TARGET_VIEW_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_DEPTH_STENCIL_VIEW_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_DESCRIPTOR_RANGE);
+EZ_DEFINE_AS_POD_TYPE(D3D12_INPUT_ELEMENT_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_SUBRESOURCE_DATA);
+EZ_DEFINE_AS_POD_TYPE(D3D12_PLACED_SUBRESOURCE_FOOTPRINT);
+EZ_DEFINE_AS_POD_TYPE(D3D12_RAYTRACING_GEOMETRY_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_EXPORT_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_DXIL_LIBRARY_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_HIT_GROUP_DESC);
+EZ_DEFINE_AS_POD_TYPE(D3D12_ROOT_PARAMETER);
+EZ_DEFINE_AS_POD_TYPE(D3D12_STATE_SUBOBJECT);
+
 class EZ_RHI_DLL GraphicsDevice_DX12 : public GraphicsDevice
 {
 private:
@@ -86,8 +102,8 @@ private:
         D3D12_GPU_DESCRIPTOR_HANDLE start_gpu = {};
         ezUInt32 ringOffset = 0;
       };
-      std::vector<DescriptorHeap> heaps_resource;
-      std::vector<DescriptorHeap> heaps_sampler;
+      ezDynamicArray<DescriptorHeap> heaps_resource;
+      ezDynamicArray<DescriptorHeap> heaps_sampler;
       ezUInt32 current_resource_heap = 0;
       ezUInt32 current_sampler_heap = 0;
       bool heaps_bound = false;
@@ -140,7 +156,7 @@ private:
   ezRHIPrimitiveTopology::Enum prev_pt[COMMANDLIST_COUNT] = {};
 
   std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>> pipelines_global;
-  std::vector<std::pair<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>>> pipelines_worker[COMMANDLIST_COUNT];
+  ezDynamicArray<std::pair<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>>> pipelines_worker[COMMANDLIST_COUNT];
   size_t prev_pipeline_hash[COMMANDLIST_COUNT] = {};
   const PipelineState* active_pso[COMMANDLIST_COUNT] = {};
   const Shader* active_cs[COMMANDLIST_COUNT] = {};
@@ -160,10 +176,11 @@ private:
 
   struct Query_Resolve
   {
+    EZ_DECLARE_POD_TYPE();
     GPU_QUERY_TYPE type;
     UINT index;
   };
-  std::vector<Query_Resolve> query_resolves[COMMANDLIST_COUNT] = {};
+  ezDynamicArray<Query_Resolve> query_resolves[COMMANDLIST_COUNT] = {};
 
   std::atomic<CommandList> cmd_count{0};
 
