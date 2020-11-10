@@ -41,6 +41,25 @@ PFN_vkCmdTraceRaysKHR GraphicsDevice_Vulkan::cmdTraceRaysKHR = nullptr;
 PFN_vkCmdDrawMeshTasksNV GraphicsDevice_Vulkan::cmdDrawMeshTasksNV = nullptr;
 PFN_vkCmdDrawMeshTasksIndirectNV GraphicsDevice_Vulkan::cmdDrawMeshTasksIndirectNV = nullptr;
 
+EZ_DEFINE_AS_POD_TYPE(VkExtensionProperties);
+EZ_DEFINE_AS_POD_TYPE(VkLayerProperties);
+EZ_DEFINE_AS_POD_TYPE(VkQueueFamilyProperties);
+EZ_DEFINE_AS_POD_TYPE(VkSurfaceFormatKHR);
+EZ_DEFINE_AS_POD_TYPE(VkPresentModeKHR);
+EZ_DEFINE_AS_POD_TYPE(VkDescriptorSetLayoutBinding);
+EZ_DEFINE_AS_POD_TYPE(VkAccelerationStructureCreateGeometryTypeInfoKHR);
+EZ_DEFINE_AS_POD_TYPE(VkPipelineShaderStageCreateInfo);
+EZ_DEFINE_AS_POD_TYPE(VkRayTracingShaderGroupCreateInfoKHR);
+EZ_DEFINE_AS_POD_TYPE(VkDescriptorUpdateTemplateEntry);
+EZ_DEFINE_AS_POD_TYPE(VkPushConstantRange);
+EZ_DEFINE_AS_POD_TYPE(VkAccelerationStructureGeometryKHR);
+EZ_DEFINE_AS_POD_TYPE(VkAccelerationStructureBuildOffsetInfoKHR);
+EZ_DEFINE_AS_POD_TYPE(VkImageViewType);
+EZ_DEFINE_AS_POD_TYPE(VkVertexInputBindingDescription);
+EZ_DEFINE_AS_POD_TYPE(VkVertexInputAttributeDescription);
+EZ_DEFINE_AS_POD_TYPE(VkDeviceQueueCreateInfo);
+EZ_DEFINE_AS_POD_TYPE(VkBufferImageCopy);
+
 namespace Vulkan_Internal
 {
   // Converters:
@@ -580,7 +599,7 @@ namespace Vulkan_Internal
   PFN_vkCmdInsertDebugUtilsLabelEXT cmdInsertDebugUtilsLabelEXT = nullptr;
 
   bool checkDeviceExtensionSupport(const char* checkExtension,
-    const std::vector<VkExtensionProperties>& available_deviceExtensions)
+    const ezDynamicArray<VkExtensionProperties>& available_deviceExtensions)
   {
 
     for (const auto& x : available_deviceExtensions)
@@ -595,18 +614,25 @@ namespace Vulkan_Internal
   }
 
   // Validation layer helpers:
-  const std::vector<const char*> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
+  const ezDynamicArray<const char*> getValidationLayers()
+  {
+    ezDynamicArray<const char*> validationLayers;
+    validationLayers.PushBack("VK_LAYER_KHRONOS_validation");
+    return validationLayers;
+  }
+
   bool checkValidationLayerSupport()
   {
     ezUInt32 layerCount;
     VkResult res = vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
     assert(res == VK_SUCCESS);
 
-    std::vector<VkLayerProperties> availableLayers(layerCount);
-    res = vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+    ezDynamicArray<VkLayerProperties> availableLayers;
+    availableLayers.SetCount(layerCount);
+    res = vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.GetData());
     assert(res == VK_SUCCESS);
 
+    const ezDynamicArray<const char*> validationLayers = getValidationLayers();
     for (const char* layerName : validationLayers)
     {
       bool layerFound = false;
@@ -717,8 +743,9 @@ namespace Vulkan_Internal
     ezUInt32 queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+    ezDynamicArray<VkQueueFamilyProperties> queueFamilies;
+    queueFamilies.SetCount(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.GetData());
 
     int i = 0;
     for (const auto& queueFamily : queueFamilies)
@@ -752,8 +779,8 @@ namespace Vulkan_Internal
   struct SwapChainSupportDetails
   {
     VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
+    ezDynamicArray<VkSurfaceFormatKHR> formats;
+    ezDynamicArray<VkPresentModeKHR> presentModes;
   };
   SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
   {
@@ -768,8 +795,8 @@ namespace Vulkan_Internal
 
     if (formatCount != 0)
     {
-      details.formats.resize(formatCount);
-      res = vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+      details.formats.SetCount(formatCount);
+      res = vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.GetData());
       assert(res == VK_SUCCESS);
     }
 
@@ -779,8 +806,8 @@ namespace Vulkan_Internal
 
     if (presentModeCount != 0)
     {
-      details.presentModes.resize(presentModeCount);
-      res = vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+      details.presentModes.SetCount(presentModeCount);
+      res = vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.GetData());
       assert(res == VK_SUCCESS);
     }
 
@@ -805,10 +832,15 @@ namespace Vulkan_Internal
   }
 
   // Device selection helpers:
-  const std::vector<const char*> required_deviceExtensions = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-    VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME,
-  };
+  const ezDynamicArray<const char*> getRequiredDeviceExtensions()
+  {
+    ezDynamicArray<const char*> required_deviceExtensions;
+    required_deviceExtensions.PushBack(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    required_deviceExtensions.PushBack(VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME);
+
+    return required_deviceExtensions;
+  }
+
   bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
   {
     QueueFamilyIndices indices = findQueueFamilies(device, surface);
@@ -820,10 +852,12 @@ namespace Vulkan_Internal
     ezUInt32 extensionCount;
     VkResult res = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
     assert(res == VK_SUCCESS);
-    std::vector<VkExtensionProperties> available(extensionCount);
-    res = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, available.data());
+    ezDynamicArray<VkExtensionProperties> available;
+    available.SetCount(extensionCount);
+    res = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, available.GetData());
     assert(res == VK_SUCCESS);
 
+    const ezDynamicArray<const char*> required_deviceExtensions = getRequiredDeviceExtensions();
     for (auto& x : required_deviceExtensions)
     {
       if (!checkDeviceExtensionSupport(x, available))
@@ -834,7 +868,7 @@ namespace Vulkan_Internal
 
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface);
 
-    return !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    return !swapChainSupport.formats.IsEmpty() && !swapChainSupport.presentModes.IsEmpty();
   }
 
 
@@ -861,8 +895,8 @@ namespace Vulkan_Internal
     VkBufferView cbv = VK_NULL_HANDLE;
     VkBufferView srv = VK_NULL_HANDLE;
     VkBufferView uav = VK_NULL_HANDLE;
-    std::vector<VkBufferView> subresources_srv;
-    std::vector<VkBufferView> subresources_uav;
+    ezDynamicArray<VkBufferView> subresources_srv;
+    ezDynamicArray<VkBufferView> subresources_uav;
 
     GraphicsDevice::GPUAllocation dynamic[COMMANDLIST_COUNT];
 
@@ -901,10 +935,10 @@ namespace Vulkan_Internal
     VkImageView uav = VK_NULL_HANDLE;
     VkImageView rtv = VK_NULL_HANDLE;
     VkImageView dsv = VK_NULL_HANDLE;
-    std::vector<VkImageView> subresources_srv;
-    std::vector<VkImageView> subresources_uav;
-    std::vector<VkImageView> subresources_rtv;
-    std::vector<VkImageView> subresources_dsv;
+    ezDynamicArray<VkImageView> subresources_srv;
+    ezDynamicArray<VkImageView> subresources_uav;
+    ezDynamicArray<VkImageView> subresources_rtv;
+    ezDynamicArray<VkImageView> subresources_dsv;
 
     VkSubresourceLayout subresourcelayout = {};
 
@@ -997,10 +1031,10 @@ namespace Vulkan_Internal
     VkPipelineLayout pipelineLayout_cs = VK_NULL_HANDLE;
     VkPipelineShaderStageCreateInfo stageInfo = {};
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-    std::vector<VkDescriptorSetLayoutBinding> layoutBindings;
-    std::vector<VkImageViewType> imageViewTypes;
+    ezDynamicArray<VkDescriptorSetLayoutBinding> layoutBindings;
+    ezDynamicArray<VkImageViewType> imageViewTypes;
 
-    std::vector<spirv_cross::EntryPoint> entrypoints;
+    ezDynamicArray<spirv_cross::EntryPoint> entrypoints;
 
     ~Shader_Vulkan()
     {
@@ -1024,8 +1058,8 @@ namespace Vulkan_Internal
     std::shared_ptr<GraphicsDevice_Vulkan::AllocationHandler> allocationhandler;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-    std::vector<VkDescriptorSetLayoutBinding> layoutBindings;
-    std::vector<VkImageViewType> imageViewTypes;
+    ezDynamicArray<VkDescriptorSetLayoutBinding> layoutBindings;
+    ezDynamicArray<VkImageViewType> imageViewTypes;
 
     ~PipelineState_Vulkan()
     {
@@ -1069,7 +1103,7 @@ namespace Vulkan_Internal
     VkAccelerationStructureKHR resource = VK_NULL_HANDLE;
 
     VkAccelerationStructureCreateInfoKHR info = {};
-    std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR> geometries;
+    ezDynamicArray<VkAccelerationStructureCreateGeometryTypeInfoKHR> geometries;
     VkDeviceSize scratch_offset = 0;
     VkDeviceAddress as_address = 0;
 
@@ -1108,11 +1142,12 @@ namespace Vulkan_Internal
     VkDescriptorSetLayout layout = VK_NULL_HANDLE;
     VkDescriptorUpdateTemplate updatetemplate = VK_NULL_HANDLE;
 
-    std::vector<size_t> resource_write_remap;
-    std::vector<size_t> sampler_write_remap;
+    ezDynamicArray<size_t> resource_write_remap;
+    ezDynamicArray<size_t> sampler_write_remap;
 
     struct Descriptor
     {
+      EZ_DECLARE_POD_TYPE();
       union
       {
         VkDescriptorImageInfo imageinfo;
@@ -1121,7 +1156,7 @@ namespace Vulkan_Internal
         VkAccelerationStructureKHR accelerationStructure;
       };
     };
-    std::vector<Descriptor> descriptors;
+    ezDynamicArray<Descriptor> descriptors;
 
     ~DescriptorTable_Vulkan()
     {
@@ -1142,10 +1177,10 @@ namespace Vulkan_Internal
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
 
     bool dirty[COMMANDLIST_COUNT] = {};
-    std::vector<const DescriptorTable*> last_tables[COMMANDLIST_COUNT];
-    std::vector<VkDescriptorSet> last_descriptorsets[COMMANDLIST_COUNT];
-    std::vector<const GPUBuffer*> root_descriptors[COMMANDLIST_COUNT];
-    std::vector<ezUInt32> root_offsets[COMMANDLIST_COUNT];
+    ezDynamicArray<const DescriptorTable*> last_tables[COMMANDLIST_COUNT];
+    ezDynamicArray<VkDescriptorSet> last_descriptorsets[COMMANDLIST_COUNT];
+    ezDynamicArray<const GPUBuffer*> root_descriptors[COMMANDLIST_COUNT];
+    ezDynamicArray<ezUInt32> root_offsets[COMMANDLIST_COUNT];
 
     struct RootRemap
     {
@@ -1153,7 +1188,7 @@ namespace Vulkan_Internal
       ezUInt32 binding = 0;
       ezUInt32 rangeIndex = 0;
     };
-    std::vector<RootRemap> root_remap;
+    ezDynamicArray<RootRemap> root_remap;
 
     ~RootSignature_Vulkan()
     {
@@ -1745,7 +1780,7 @@ VkDescriptorSet GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAlloc
     device->device,
     descriptorSet,
     internal_state->updatetemplate,
-    internal_state->descriptors.data());
+    internal_state->descriptors.GetData());
 
   return descriptorSet;
 }
@@ -1829,8 +1864,8 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
       // Input layout:
       VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
       vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-      std::vector<VkVertexInputBindingDescription> bindings;
-      std::vector<VkVertexInputAttributeDescription> attributes;
+      ezDynamicArray<VkVertexInputBindingDescription> bindings;
+      ezDynamicArray<VkVertexInputAttributeDescription> attributes;
       if (pso->desc.il != nullptr)
       {
         ezUInt32 lastBinding = 0xFFFFFFFF;
@@ -1848,12 +1883,12 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
           if (lastBinding != bind.binding)
           {
-            bindings.push_back(bind);
+            bindings.PushBack(bind);
             lastBinding = bind.binding;
           }
           else
           {
-            bindings.back().stride += bind.stride;
+            bindings.PeekBack().stride += bind.stride;
           }
         }
 
@@ -1879,15 +1914,15 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
             offset += GetFormatStride(x.Format);
           }
 
-          attributes.push_back(attr);
+          attributes.PushBack(attr);
 
           i++;
         }
 
-        vertexInputInfo.vertexBindingDescriptionCount = static_cast<ezUInt32>(bindings.size());
-        vertexInputInfo.pVertexBindingDescriptions = bindings.data();
-        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<ezUInt32>(attributes.size());
-        vertexInputInfo.pVertexAttributeDescriptions = attributes.data();
+        vertexInputInfo.vertexBindingDescriptionCount = static_cast<ezUInt32>(bindings.GetCount());
+        vertexInputInfo.pVertexBindingDescriptions = bindings.GetData();
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<ezUInt32>(attributes.GetCount());
+        vertexInputInfo.pVertexAttributeDescriptions = attributes.GetData();
       }
       pipelineInfo.pVertexInputState = &vertexInputInfo;
 
@@ -2178,10 +2213,10 @@ void GraphicsDevice_Vulkan::predraw(CommandList cmd)
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         rootsig_internal->pipelineLayout,
         0,
-        (ezUInt32)rootsig_internal->last_descriptorsets[cmd].size(),
-        rootsig_internal->last_descriptorsets[cmd].data(),
-        (ezUInt32)rootsig_internal->root_offsets[cmd].size(),
-        rootsig_internal->root_offsets[cmd].data());
+        (ezUInt32)rootsig_internal->last_descriptorsets[cmd].GetCount(),
+        rootsig_internal->last_descriptorsets[cmd].GetData(),
+        (ezUInt32)rootsig_internal->root_offsets[cmd].GetCount(),
+        rootsig_internal->root_offsets[cmd].GetData());
     }
   }
 }
@@ -2202,10 +2237,10 @@ void GraphicsDevice_Vulkan::predispatch(CommandList cmd)
         VK_PIPELINE_BIND_POINT_COMPUTE,
         rootsig_internal->pipelineLayout,
         0,
-        (ezUInt32)rootsig_internal->last_descriptorsets[cmd].size(),
-        rootsig_internal->last_descriptorsets[cmd].data(),
-        (ezUInt32)rootsig_internal->root_offsets[cmd].size(),
-        rootsig_internal->root_offsets[cmd].data());
+        (ezUInt32)rootsig_internal->last_descriptorsets[cmd].GetCount(),
+        rootsig_internal->last_descriptorsets[cmd].GetData(),
+        (ezUInt32)rootsig_internal->root_offsets[cmd].GetCount(),
+        rootsig_internal->root_offsets[cmd].GetData());
     }
   }
 }
@@ -2226,10 +2261,10 @@ void GraphicsDevice_Vulkan::preraytrace(CommandList cmd)
         VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
         rootsig_internal->pipelineLayout,
         0,
-        (ezUInt32)rootsig_internal->last_descriptorsets[cmd].size(),
-        rootsig_internal->last_descriptorsets[cmd].data(),
-        (ezUInt32)rootsig_internal->root_offsets[cmd].size(),
-        rootsig_internal->root_offsets[cmd].data());
+        (ezUInt32)rootsig_internal->last_descriptorsets[cmd].GetCount(),
+        rootsig_internal->last_descriptorsets[cmd].GetData(),
+        (ezUInt32)rootsig_internal->root_offsets[cmd].GetCount(),
+        rootsig_internal->root_offsets[cmd].GetData());
     }
   }
 }
@@ -2272,11 +2307,12 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
   ezUInt32 extensionCount = 0;
   res = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
   assert(res == VK_SUCCESS);
-  std::vector<VkExtensionProperties> availableInstanceExtensions(extensionCount);
-  res = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableInstanceExtensions.data());
+  ezDynamicArray<VkExtensionProperties> availableInstanceExtensions;
+  availableInstanceExtensions.SetCount(extensionCount);
+  res = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableInstanceExtensions.GetData());
   assert(res == VK_SUCCESS);
 
-  std::vector<const char*> extensionNames;
+  ezDynamicArray<const char*> extensionNames;
 
   // Check if VK_EXT_debug_utils is supported, which supersedes VK_EXT_Debug_Report
   bool debugUtils = false;
@@ -2285,29 +2321,29 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     if (strcmp(available_extension.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0)
     {
       debugUtils = true;
-      extensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+      extensionNames.PushBack(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
       break;
     }
   }
 
   if (!debugUtils)
   {
-    extensionNames.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+    extensionNames.PushBack(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
   }
 
 
-  extensionNames.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+  extensionNames.PushBack(VK_KHR_SURFACE_EXTENSION_NAME);
 #  ifdef _WIN32
-  extensionNames.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+  extensionNames.PushBack(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #  elif SDL2
   {
     ezUInt32 extensionCount;
     SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, nullptr);
-    std::vector<const char*> extensionNames_sdl(extensionCount);
-    SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensionNames_sdl.data());
-    extensionNames.reserve(extensionNames.size() + extensionNames_sdl.size());
-    extensionNames.insert(extensionNames.begin(),
-      extensionNames_sdl.cbegin(), extensionNames_sdl.cend());
+    ezDynamicArray<const char*> extensionNames_sdl;
+    extensionNames_sdl.SetCount(extensionCount);
+    SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensionNames_sdl.GetData());
+    extensionNames.Reserve(extensionNames.GetCount() + extensionNames_sdl.GetCount());
+    extensionNames.PushBackRange(extensionNames_sdl);
   }
 #  endif // _WIN32
 
@@ -2324,13 +2360,14 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     VkInstanceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledExtensionCount = static_cast<ezUInt32>(extensionNames.size());
-    createInfo.ppEnabledExtensionNames = extensionNames.data();
+    createInfo.enabledExtensionCount = extensionNames.GetCount();
+    createInfo.ppEnabledExtensionNames = extensionNames.GetData();
     createInfo.enabledLayerCount = 0;
+    const ezDynamicArray<const char*> validationLayers = getValidationLayers();
     if (enableValidationLayers)
     {
-      createInfo.enabledLayerCount = static_cast<ezUInt32>(validationLayers.size());
-      createInfo.ppEnabledLayerNames = validationLayers.data();
+      createInfo.enabledLayerCount = validationLayers.GetCount();
+      createInfo.ppEnabledLayerNames = validationLayers.GetData();
     }
     res = vkCreateInstance(&createInfo, nullptr, &instance);
     assert(res == VK_SUCCESS);
@@ -2397,8 +2434,9 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
       assert(0);
     }
 
-    std::vector<VkPhysicalDevice> devices(deviceCount);
-    res = vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+    ezDynamicArray<VkPhysicalDevice> devices;
+    devices.SetCount(deviceCount);
+    res = vkEnumeratePhysicalDevices(instance, &deviceCount, devices.GetData());
     assert(res == VK_SUCCESS);
 
     device_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
@@ -2437,7 +2475,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
 
     queueIndices = findQueueFamilies(physicalDevice, surface);
 
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    ezDynamicArray<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<int> uniqueQueueFamilies = {queueIndices.graphicsFamily, queueIndices.presentFamily, queueIndices.copyFamily};
 
     float queuePriority = 1.0f;
@@ -2448,22 +2486,23 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
       queueCreateInfo.queueFamilyIndex = queueFamily;
       queueCreateInfo.queueCount = 1;
       queueCreateInfo.pQueuePriorities = &queuePriority;
-      queueCreateInfos.push_back(queueCreateInfo);
+      queueCreateInfos.PushBack(queueCreateInfo);
     }
 
     assert(device_properties.properties.limits.timestampComputeAndGraphics == VK_TRUE);
 
 
-    std::vector<const char*> enabled_deviceExtensions = required_deviceExtensions;
+    ezDynamicArray<const char*> enabled_deviceExtensions = getRequiredDeviceExtensions();
     res = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
     assert(res == VK_SUCCESS);
-    std::vector<VkExtensionProperties> available_deviceExtensions(extensionCount);
-    res = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, available_deviceExtensions.data());
+    ezDynamicArray<VkExtensionProperties> available_deviceExtensions;
+    available_deviceExtensions.SetCount(extensionCount);
+    res = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, available_deviceExtensions.GetData());
     assert(res == VK_SUCCESS);
 
     if (checkDeviceExtensionSupport(VK_KHR_SPIRV_1_4_EXTENSION_NAME, available_deviceExtensions))
     {
-      enabled_deviceExtensions.push_back(VK_KHR_SPIRV_1_4_EXTENSION_NAME);
+      enabled_deviceExtensions.PushBack(VK_KHR_SPIRV_1_4_EXTENSION_NAME);
     }
 
     device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -2479,10 +2518,10 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     {
       SHADER_IDENTIFIER_SIZE = raytracing_properties.shaderGroupHandleSize;
       RAYTRACING = true;
-      enabled_deviceExtensions.push_back(VK_KHR_RAY_TRACING_EXTENSION_NAME);
-      enabled_deviceExtensions.push_back(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
-      enabled_deviceExtensions.push_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
-      enabled_deviceExtensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+      enabled_deviceExtensions.PushBack(VK_KHR_RAY_TRACING_EXTENSION_NAME);
+      enabled_deviceExtensions.PushBack(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
+      enabled_deviceExtensions.PushBack(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
+      enabled_deviceExtensions.PushBack(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
       features_1_2.pNext = &raytracing_features;
     }
 #  endif // ENABLE_RAYTRACING_EXTENSION
@@ -2490,7 +2529,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     mesh_shader_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV;
     if (checkDeviceExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME, available_deviceExtensions))
     {
-      enabled_deviceExtensions.push_back(VK_NV_MESH_SHADER_EXTENSION_NAME);
+      enabled_deviceExtensions.PushBack(VK_NV_MESH_SHADER_EXTENSION_NAME);
       if (RAYTRACING)
       {
         raytracing_features.pNext = &mesh_shader_features;
@@ -2532,19 +2571,20 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     VkDeviceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-    createInfo.queueCreateInfoCount = static_cast<ezUInt32>(queueCreateInfos.size());
-    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+    createInfo.queueCreateInfoCount = queueCreateInfos.GetCount();
+    createInfo.pQueueCreateInfos = queueCreateInfos.GetData();
 
     createInfo.pEnabledFeatures = nullptr;
     createInfo.pNext = &device_features2;
 
-    createInfo.enabledExtensionCount = static_cast<ezUInt32>(enabled_deviceExtensions.size());
-    createInfo.ppEnabledExtensionNames = enabled_deviceExtensions.data();
+    createInfo.enabledExtensionCount = enabled_deviceExtensions.GetCount();
+    createInfo.ppEnabledExtensionNames = enabled_deviceExtensions.GetData();
 
+    const ezDynamicArray<const char*> validationLayers = getValidationLayers();
     if (enableValidationLayers)
     {
-      createInfo.enabledLayerCount = static_cast<ezUInt32>(validationLayers.size());
-      createInfo.ppEnabledLayerNames = validationLayers.data();
+      createInfo.enabledLayerCount = validationLayers.GetCount();
+      createInfo.ppEnabledLayerNames = validationLayers.GetData();
     }
     else
     {
@@ -3533,7 +3573,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
     void* pData = upload_allocation->GetMappedData();
     assert(pData != nullptr);
 
-    std::vector<VkBufferImageCopy> copyRegions;
+    ezDynamicArray<VkBufferImageCopy> copyRegions;
 
     size_t cpyoffset = 0;
     ezUInt32 initDataIdx = 0;
@@ -3571,7 +3611,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
         width = std::max(1u, width / 2);
         height = std::max(1u, height / 2);
 
-        copyRegions.push_back(copyRegion);
+        copyRegions.PushBack(copyRegion);
 
         cpyoffset += Align(cpysize, GetFormatStride(pDesc->Format));
       }
@@ -3620,7 +3660,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
         0, nullptr,
         1, &barrier);
 
-      vkCmdCopyBufferToImage(frame.copyCommandBuffer, upload_resource, internal_state->resource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, (ezUInt32)copyRegions.size(), copyRegions.data());
+      vkCmdCopyBufferToImage(frame.copyCommandBuffer, upload_resource, internal_state->resource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, copyRegions.GetCount(), copyRegions.GetData());
 
       barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
       barrier.newLayout = _ConvertImageLayout(pTexture->desc.layout);
@@ -3777,14 +3817,14 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
     spirv_cross::ShaderResources resources = comp.get_shader_resources(active);
     comp.set_enabled_interface_variables(move(active));
 
-    internal_state->entrypoints.reserve(entrypoints.size());
+    internal_state->entrypoints.Reserve(entrypoints.size());
     for (auto& x : entrypoints)
     {
-      internal_state->entrypoints.push_back(x);
+      internal_state->entrypoints.PushBack(x);
     }
 
-    std::vector<VkDescriptorSetLayoutBinding>& layoutBindings = internal_state->layoutBindings;
-    std::vector<VkImageViewType>& imageViewTypes = internal_state->imageViewTypes;
+    ezDynamicArray<VkDescriptorSetLayoutBinding>& layoutBindings = internal_state->layoutBindings;
+    ezDynamicArray<VkImageViewType>& imageViewTypes = internal_state->imageViewTypes;
 
     for (auto& x : resources.separate_samplers)
     {
@@ -3793,8 +3833,8 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
       layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
       layoutBinding.binding = comp.get_decoration(x.id, spv::Decoration::DecorationBinding);
       layoutBinding.descriptorCount = 1;
-      layoutBindings.push_back(layoutBinding);
-      imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+      layoutBindings.PushBack(layoutBinding);
+      imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
     }
     for (auto& x : resources.separate_images)
     {
@@ -3807,50 +3847,50 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
           if (image.arrayed)
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_1D_ARRAY);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_1D_ARRAY);
           }
           else
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_1D);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_1D);
           }
           break;
         case spv::Dim2D:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
           if (image.arrayed)
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_2D_ARRAY);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_2D_ARRAY);
           }
           else
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_2D);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_2D);
           }
           break;
         case spv::Dim3D:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-          imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_3D);
+          imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_3D);
           break;
         case spv::DimCube:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
           if (image.arrayed)
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_CUBE_ARRAY);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_CUBE_ARRAY);
           }
           else
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_CUBE);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_CUBE);
           }
           break;
         case spv::DimBuffer:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-          imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+          imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
           break;
         default:
-          imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+          imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
           break;
       }
       layoutBinding.binding = comp.get_decoration(x.id, spv::Decoration::DecorationBinding);
       layoutBinding.descriptorCount = 1;
-      layoutBindings.push_back(layoutBinding);
+      layoutBindings.PushBack(layoutBinding);
     }
     for (auto& x : resources.storage_images)
     {
@@ -3863,50 +3903,50 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
           if (image.arrayed)
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_1D_ARRAY);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_1D_ARRAY);
           }
           else
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_1D);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_1D);
           }
           break;
         case spv::Dim2D:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
           if (image.arrayed)
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_2D_ARRAY);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_2D_ARRAY);
           }
           else
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_2D);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_2D);
           }
           break;
         case spv::Dim3D:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-          imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_3D);
+          imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_3D);
           break;
         case spv::DimCube:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
           if (image.arrayed)
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_CUBE_ARRAY);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_CUBE_ARRAY);
           }
           else
           {
-            imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_CUBE);
+            imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_CUBE);
           }
           break;
         case spv::DimBuffer:
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-          imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+          imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
           break;
         default:
-          imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+          imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
           break;
       }
       layoutBinding.binding = comp.get_decoration(x.id, spv::Decoration::DecorationBinding);
       layoutBinding.descriptorCount = 1;
-      layoutBindings.push_back(layoutBinding);
+      layoutBindings.PushBack(layoutBinding);
     }
     for (auto& x : resources.uniform_buffers)
     {
@@ -3915,8 +3955,8 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
       layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
       layoutBinding.binding = comp.get_decoration(x.id, spv::Decoration::DecorationBinding);
       layoutBinding.descriptorCount = 1;
-      layoutBindings.push_back(layoutBinding);
-      imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+      layoutBindings.PushBack(layoutBinding);
+      imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
     }
     for (auto& x : resources.storage_buffers)
     {
@@ -3925,8 +3965,8 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
       layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
       layoutBinding.binding = comp.get_decoration(x.id, spv::Decoration::DecorationBinding);
       layoutBinding.descriptorCount = 1;
-      layoutBindings.push_back(layoutBinding);
-      imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+      layoutBindings.PushBack(layoutBinding);
+      imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
     }
     for (auto& x : resources.acceleration_structures)
     {
@@ -3935,16 +3975,16 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
       layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
       layoutBinding.binding = comp.get_decoration(x.id, spv::Decoration::DecorationBinding);
       layoutBinding.descriptorCount = 1;
-      layoutBindings.push_back(layoutBinding);
-      imageViewTypes.push_back(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+      layoutBindings.PushBack(layoutBinding);
+      imageViewTypes.PushBack(VK_IMAGE_VIEW_TYPE_MAX_ENUM);
     }
 
     if (stage == ezRHIShaderStage::ComputeShader || stage == ezRHIShaderStage::ENUM_COUNT)
     {
       VkDescriptorSetLayoutCreateInfo descriptorSetlayoutInfo = {};
       descriptorSetlayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-      descriptorSetlayoutInfo.pBindings = layoutBindings.data();
-      descriptorSetlayoutInfo.bindingCount = static_cast<ezUInt32>(layoutBindings.size());
+      descriptorSetlayoutInfo.pBindings = layoutBindings.GetData();
+      descriptorSetlayoutInfo.bindingCount = static_cast<ezUInt32>(layoutBindings.GetCount());
       res = vkCreateDescriptorSetLayout(device, &descriptorSetlayoutInfo, nullptr, &internal_state->descriptorSetLayout);
       assert(res == VK_SUCCESS);
 
@@ -4256,7 +4296,7 @@ bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, 
       auto shader_internal = to_internal(shader);
 
       ezUInt32 i = 0;
-      size_t check_max = internal_state->layoutBindings.size(); // dont't check for duplicates within self table
+      size_t check_max = internal_state->layoutBindings.GetCount(); // dont't check for duplicates within self table
       for (auto& x : shader_internal->layoutBindings)
       {
         bool found = false;
@@ -4280,8 +4320,8 @@ bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, 
 
         if (!found)
         {
-          internal_state->layoutBindings.push_back(x);
-          internal_state->imageViewTypes.push_back(shader_internal->imageViewTypes[i]);
+          internal_state->layoutBindings.PushBack(x);
+          internal_state->imageViewTypes.PushBack(shader_internal->imageViewTypes[i]);
         }
         i++;
       }
@@ -4297,8 +4337,8 @@ bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, 
 
     VkDescriptorSetLayoutCreateInfo descriptorSetlayoutInfo = {};
     descriptorSetlayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetlayoutInfo.pBindings = internal_state->layoutBindings.data();
-    descriptorSetlayoutInfo.bindingCount = static_cast<ezUInt32>(internal_state->layoutBindings.size());
+    descriptorSetlayoutInfo.pBindings = internal_state->layoutBindings.GetData();
+    descriptorSetlayoutInfo.bindingCount = internal_state->layoutBindings.GetCount();
     VkResult res = vkCreateDescriptorSetLayout(device, &descriptorSetlayoutInfo, nullptr, &internal_state->descriptorSetLayout);
     assert(res == VK_SUCCESS);
 
@@ -4385,13 +4425,13 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
 
     if (attachment.type == RenderPassAttachment::RENDERTARGET)
     {
-      if (subresource < 0 || texture_internal_state->subresources_rtv.empty())
+      if (subresource < 0 || texture_internal_state->subresources_rtv.IsEmpty())
       {
         attachments[validAttachmentCount] = texture_internal_state->rtv;
       }
       else
       {
-        assert(texture_internal_state->subresources_rtv.size() > size_t(subresource) && "Invalid RTV subresource!");
+        assert(texture_internal_state->subresources_rtv.GetCount() > size_t(subresource) && "Invalid RTV subresource!");
         attachments[validAttachmentCount] = texture_internal_state->subresources_rtv[subresource];
       }
       if (attachments[validAttachmentCount] == VK_NULL_HANDLE)
@@ -4406,13 +4446,13 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
     }
     else if (attachment.type == RenderPassAttachment::DEPTH_STENCIL)
     {
-      if (subresource < 0 || texture_internal_state->subresources_dsv.empty())
+      if (subresource < 0 || texture_internal_state->subresources_dsv.IsEmpty())
       {
         attachments[validAttachmentCount] = texture_internal_state->dsv;
       }
       else
       {
-        assert(texture_internal_state->subresources_dsv.size() > size_t(subresource) && "Invalid DSV subresource!");
+        assert(texture_internal_state->subresources_dsv.GetCount() > size_t(subresource) && "Invalid DSV subresource!");
         attachments[validAttachmentCount] = texture_internal_state->subresources_dsv[subresource];
       }
       if (attachments[validAttachmentCount] == VK_NULL_HANDLE)
@@ -4460,13 +4500,13 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
       }
       else
       {
-        if (subresource < 0 || texture_internal_state->subresources_srv.empty())
+        if (subresource < 0 || texture_internal_state->subresources_srv.IsEmpty())
         {
           attachments[validAttachmentCount] = texture_internal_state->srv;
         }
         else
         {
-          assert(texture_internal_state->subresources_srv.size() > size_t(subresource) && "Invalid SRV subresource!");
+          assert(texture_internal_state->subresources_srv.GetCount() > size_t(subresource) && "Invalid SRV subresource!");
           attachments[validAttachmentCount] = texture_internal_state->subresources_srv[subresource];
         }
         if (attachments[validAttachmentCount] == VK_NULL_HANDLE)
@@ -4603,8 +4643,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingAccelerationStructure(const Raytraci
 
       for (auto& x : pDesc->bottomlevel.geometries)
       {
-        internal_state->geometries.emplace_back();
-        auto& geometry = internal_state->geometries.back();
+        auto& geometry = internal_state->geometries.ExpandAndGetRef();
         geometry = {};
         geometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_GEOMETRY_TYPE_INFO_KHR;
 
@@ -4633,8 +4672,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingAccelerationStructure(const Raytraci
     {
       info.type = VkAccelerationStructureTypeKHR::VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
 
-      internal_state->geometries.emplace_back();
-      auto& geometry = internal_state->geometries.back();
+      auto& geometry = internal_state->geometries.ExpandAndGetRef();
       geometry = {};
       geometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_GEOMETRY_TYPE_INFO_KHR;
       geometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
@@ -4644,8 +4682,8 @@ bool GraphicsDevice_Vulkan::CreateRaytracingAccelerationStructure(const Raytraci
     break;
   }
 
-  info.pGeometryInfos = internal_state->geometries.data();
-  info.maxGeometryCount = (ezUInt32)internal_state->geometries.size();
+  info.pGeometryInfos = internal_state->geometries.GetData();
+  info.maxGeometryCount = (ezUInt32)internal_state->geometries.GetCount();
   internal_state->info = info;
 
   VkResult res = createAccelerationStructureKHR(device, &info, nullptr, &internal_state->resource);
@@ -4720,11 +4758,10 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
 
   info.libraries.sType = VK_STRUCTURE_TYPE_PIPELINE_LIBRARY_CREATE_INFO_KHR;
 
-  std::vector<VkPipelineShaderStageCreateInfo> stages;
+  ezDynamicArray<VkPipelineShaderStageCreateInfo> stages;
   for (auto& x : pDesc->shaderlibraries)
   {
-    stages.emplace_back();
-    auto& stage = stages.back();
+    auto& stage = stages.ExpandAndGetRef();
     stage = {};
     stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stage.module = to_internal(x.shader)->shaderModule;
@@ -4749,15 +4786,14 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
     }
     stage.pName = x.function_name.GetData();
   }
-  info.stageCount = (ezUInt32)stages.size();
-  info.pStages = stages.data();
+  info.stageCount = stages.GetCount();
+  info.pStages = stages.GetData();
 
-  std::vector<VkRayTracingShaderGroupCreateInfoKHR> groups;
-  groups.reserve(pDesc->hitgroups.GetCount());
+  ezDynamicArray<VkRayTracingShaderGroupCreateInfoKHR> groups;
+  groups.Reserve(pDesc->hitgroups.GetCount());
   for (auto& x : pDesc->hitgroups)
   {
-    groups.emplace_back();
-    auto& group = groups.back();
+    auto& group = groups.ExpandAndGetRef();
     group = {};
     group.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     switch (x.type)
@@ -4778,8 +4814,8 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
     group.anyHitShader = x.anyhit_shader;
     group.intersectionShader = x.intersection_shader;
   }
-  info.groupCount = (ezUInt32)groups.size();
-  info.pGroups = groups.data();
+  info.groupCount = groups.GetCount();
+  info.pGroups = groups.GetData();
 
   info.maxRecursionDepth = pDesc->max_trace_recursion_depth;
 
@@ -4813,19 +4849,18 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
   internal_state->allocationhandler = allocationhandler;
   table->internal_state = internal_state;
 
-  std::vector<VkDescriptorSetLayoutBinding> bindings;
-  bindings.reserve(table->samplers.GetCount() + table->resources.GetCount() + table->staticsamplers.GetCount());
+  ezDynamicArray<VkDescriptorSetLayoutBinding> bindings;
+  bindings.Reserve(table->samplers.GetCount() + table->resources.GetCount() + table->staticsamplers.GetCount());
 
-  std::vector<VkDescriptorUpdateTemplateEntry> entries;
-  entries.reserve(table->samplers.GetCount() + table->resources.GetCount());
+  ezDynamicArray<VkDescriptorUpdateTemplateEntry> entries;
+  entries.Reserve(table->samplers.GetCount() + table->resources.GetCount());
 
-  internal_state->descriptors.reserve(table->samplers.GetCount() + table->resources.GetCount());
+  internal_state->descriptors.Reserve(table->samplers.GetCount() + table->resources.GetCount());
 
   size_t offset = 0;
   for (auto& x : table->resources)
   {
-    bindings.emplace_back();
-    auto& binding = bindings.back();
+    auto& binding = bindings.ExpandAndGetRef();
     binding = {};
     binding.stageFlags = _ConvertStageFlags(table->stage);
     binding.descriptorCount = x.count;
@@ -4894,12 +4929,11 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
     }
 
     // Unroll, because we need the ability to update an array element individually:
-    internal_state->resource_write_remap.push_back(entries.size());
+    internal_state->resource_write_remap.PushBack(entries.GetCount());
     for (ezUInt32 i = 0; i < binding.descriptorCount; ++i)
     {
-      internal_state->descriptors.emplace_back();
-      entries.emplace_back();
-      auto& entry = entries.back();
+      internal_state->descriptors.ExpandAndGetRef();
+      auto& entry = entries.ExpandAndGetRef();
       entry = {};
       entry.descriptorCount = 1;
       entry.descriptorType = binding.descriptorType;
@@ -4913,9 +4947,8 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
   }
   for (auto& x : table->samplers)
   {
-    internal_state->descriptors.emplace_back();
-    bindings.emplace_back();
-    auto& binding = bindings.back();
+    internal_state->descriptors.ExpandAndGetRef();
+    auto& binding = bindings.ExpandAndGetRef();
     binding = {};
     binding.stageFlags = _ConvertStageFlags(table->stage);
     binding.descriptorCount = x.count;
@@ -4923,11 +4956,10 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
     binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
 
     // Unroll, because we need the ability to update an array element individually:
-    internal_state->sampler_write_remap.push_back(entries.size());
+    internal_state->sampler_write_remap.PushBack(entries.GetCount());
     for (ezUInt32 i = 0; i < binding.descriptorCount; ++i)
     {
-      entries.emplace_back();
-      auto& entry = entries.back();
+      auto& entry = entries.ExpandAndGetRef();
       entry = {};
       entry.descriptorCount = 1;
       entry.descriptorType = binding.descriptorType;
@@ -4940,17 +4972,15 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
     }
   }
 
-  std::vector<VkSampler> immutableSamplers;
-  immutableSamplers.reserve(table->staticsamplers.GetCount());
+  ezDynamicArray<VkSampler> immutableSamplers;
+  immutableSamplers.Reserve(table->staticsamplers.GetCount());
 
   for (auto& x : table->staticsamplers)
   {
-    immutableSamplers.emplace_back();
-    auto& immutablesampler = immutableSamplers.back();
+    auto& immutablesampler = immutableSamplers.ExpandAndGetRef();
     immutablesampler = to_internal(&x.sampler)->resource;
 
-    bindings.emplace_back();
-    auto& binding = bindings.back();
+    auto& binding = bindings.ExpandAndGetRef();
     binding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
     binding.stageFlags = VK_SHADER_STAGE_ALL;
     binding.binding = x.slot + VULKAN_BINDING_SHIFT_S;
@@ -4961,8 +4991,8 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
   VkDescriptorSetLayoutCreateInfo layoutinfo = {};
   layoutinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
   layoutinfo.flags = 0;
-  layoutinfo.pBindings = bindings.data();
-  layoutinfo.bindingCount = (ezUInt32)bindings.size();
+  layoutinfo.pBindings = bindings.GetData();
+  layoutinfo.bindingCount = bindings.GetCount();
   VkResult res = vkCreateDescriptorSetLayout(device, &layoutinfo, nullptr, &internal_state->layout);
   assert(res == VK_SUCCESS);
 
@@ -4971,8 +5001,8 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
   updatetemplateinfo.templateType = VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET;
   updatetemplateinfo.flags = 0;
   updatetemplateinfo.descriptorSetLayout = internal_state->layout;
-  updatetemplateinfo.pDescriptorUpdateEntries = entries.data();
-  updatetemplateinfo.descriptorUpdateEntryCount = (ezUInt32)entries.size();
+  updatetemplateinfo.pDescriptorUpdateEntries = entries.GetData();
+  updatetemplateinfo.descriptorUpdateEntryCount = (ezUInt32)entries.GetCount();
   res = vkCreateDescriptorUpdateTemplate(device, &updatetemplateinfo, nullptr, &internal_state->updatetemplate);
   assert(res == VK_SUCCESS);
 
@@ -5003,12 +5033,12 @@ bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
   internal_state->allocationhandler = allocationhandler;
   rootsig->internal_state = internal_state;
 
-  std::vector<VkDescriptorSetLayout> layouts;
-  layouts.reserve(rootsig->tables.GetCount());
+  ezDynamicArray<VkDescriptorSetLayout> layouts;
+  layouts.Reserve(rootsig->tables.GetCount());
   ezUInt32 space = 0;
   for (auto& x : rootsig->tables)
   {
-    layouts.push_back(to_internal(&x)->layout);
+    layouts.PushBack(to_internal(&x)->layout);
 
     ezUInt32 rangeIndex = 0;
     for (auto& binding : x.resources)
@@ -5016,10 +5046,10 @@ bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
       if (binding.binding < CONSTANTBUFFER)
       {
         assert(binding.count == 1); // descriptor array not allowed in the root
-        internal_state->root_remap.emplace_back();
-        internal_state->root_remap.back().space = space;
-        internal_state->root_remap.back().binding = binding.slot;
-        internal_state->root_remap.back().rangeIndex = rangeIndex;
+        internal_state->root_remap.ExpandAndGetRef();
+        internal_state->root_remap.PeekBack().space = space;
+        internal_state->root_remap.PeekBack().binding = binding.slot;
+        internal_state->root_remap.PeekBack().rangeIndex = rangeIndex;
       }
       rangeIndex++;
     }
@@ -5028,8 +5058,8 @@ bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
 
   for (CommandList cmd = 0; cmd < COMMANDLIST_COUNT; ++cmd)
   {
-    internal_state->last_tables[cmd].resize(layouts.size());
-    internal_state->last_descriptorsets[cmd].resize(layouts.size());
+    internal_state->last_tables[cmd].SetCount(layouts.GetCount());
+    internal_state->last_descriptorsets[cmd].SetCount(layouts.GetCount());
 
     for (auto& x : rootsig->tables)
     {
@@ -5037,30 +5067,32 @@ bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
       {
         if (binding.binding < CONSTANTBUFFER)
         {
-          internal_state->root_descriptors[cmd].emplace_back();
-          internal_state->root_offsets[cmd].emplace_back();
+          internal_state->root_descriptors[cmd].ExpandAndGetRef();
+          internal_state->root_offsets[cmd].ExpandAndGetRef();
         }
       }
     }
   }
 
-  std::vector<VkPushConstantRange> pushranges;
-  pushranges.reserve(rootsig->rootconstants.GetCount());
+  ezDynamicArray<VkPushConstantRange> pushranges;
+  pushranges.Reserve(rootsig->rootconstants.GetCount());
   for (auto& x : rootsig->rootconstants)
   {
-    pushranges.emplace_back();
-    pushranges.back() = {};
-    pushranges.back().stageFlags = _ConvertStageFlags(x.stage);
-    pushranges.back().offset = 0;
-    pushranges.back().size = x.size;
+    // ez on
+    auto& pushrange = pushranges.ExpandAndGetRef();
+    pushrange = {};
+    pushrange.stageFlags = _ConvertStageFlags(x.stage);
+    pushrange.offset = 0;
+    pushrange.size = x.size;
+    // ez off
   }
 
   VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipelineLayoutInfo.pSetLayouts = layouts.data();
-  pipelineLayoutInfo.setLayoutCount = (ezUInt32)layouts.size();
-  pipelineLayoutInfo.pPushConstantRanges = pushranges.data();
-  pipelineLayoutInfo.pushConstantRangeCount = (ezUInt32)pushranges.size();
+  pipelineLayoutInfo.pSetLayouts = layouts.GetData();
+  pipelineLayoutInfo.setLayoutCount = layouts.GetCount();
+  pipelineLayoutInfo.pPushConstantRanges = pushranges.GetData();
+  pipelineLayoutInfo.pushConstantRangeCount = (ezUInt32)pushranges.GetCount();
 
   VkResult res = vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &internal_state->pipelineLayout);
   assert(res == VK_SUCCESS);
@@ -5158,8 +5190,8 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
           internal_state->srv = srv;
           return -1;
         }
-        internal_state->subresources_srv.push_back(srv);
-        return int(internal_state->subresources_srv.size() - 1);
+        internal_state->subresources_srv.PushBack(srv);
+        return int(internal_state->subresources_srv.GetCount() - 1);
       }
       else
       {
@@ -5184,8 +5216,8 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
           internal_state->uav = uav;
           return -1;
         }
-        internal_state->subresources_uav.push_back(uav);
-        return int(internal_state->subresources_uav.size() - 1);
+        internal_state->subresources_uav.PushBack(uav);
+        return int(internal_state->subresources_uav.GetCount() - 1);
       }
       else
       {
@@ -5206,8 +5238,8 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
           internal_state->rtv = rtv;
           return -1;
         }
-        internal_state->subresources_rtv.push_back(rtv);
-        return int(internal_state->subresources_rtv.size() - 1);
+        internal_state->subresources_rtv.PushBack(rtv);
+        return int(internal_state->subresources_rtv.GetCount() - 1);
       }
       else
       {
@@ -5248,8 +5280,8 @@ int GraphicsDevice_Vulkan::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE 
           internal_state->dsv = dsv;
           return -1;
         }
-        internal_state->subresources_dsv.push_back(dsv);
-        return int(internal_state->subresources_dsv.size() - 1);
+        internal_state->subresources_dsv.PushBack(dsv);
+        return int(internal_state->subresources_dsv.GetCount() - 1);
       }
       else
       {
@@ -5298,8 +5330,8 @@ int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE
             internal_state->srv = view;
             return -1;
           }
-          internal_state->subresources_srv.push_back(view);
-          return int(internal_state->subresources_srv.size() - 1);
+          internal_state->subresources_srv.PushBack(view);
+          return int(internal_state->subresources_srv.GetCount() - 1);
         }
         else
         {
@@ -5308,8 +5340,8 @@ int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE
             internal_state->uav = view;
             return -1;
           }
-          internal_state->subresources_uav.push_back(view);
-          return int(internal_state->subresources_uav.size() - 1);
+          internal_state->subresources_uav.PushBack(view);
+          return int(internal_state->subresources_uav.GetCount() - 1);
         }
       }
       else
@@ -6642,8 +6674,8 @@ void GraphicsDevice_Vulkan::BuildRaytracingAccelerationStructure(const Raytracin
     info.srcAccelerationStructure = src_internal->resource;
   }
 
-  std::vector<VkAccelerationStructureGeometryKHR> geometries;
-  std::vector<VkAccelerationStructureBuildOffsetInfoKHR> offsetinfos;
+  ezDynamicArray<VkAccelerationStructureGeometryKHR> geometries;
+  ezDynamicArray<VkAccelerationStructureBuildOffsetInfoKHR> offsetinfos;
 
   switch (dst->desc.type)
   {
@@ -6651,20 +6683,17 @@ void GraphicsDevice_Vulkan::BuildRaytracingAccelerationStructure(const Raytracin
     {
       info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
       info.geometryCount = (ezUInt32)dst->desc.bottomlevel.geometries.GetCount();
-      geometries.reserve(info.geometryCount);
-      offsetinfos.reserve(info.geometryCount);
+      geometries.Reserve(info.geometryCount);
+      offsetinfos.Reserve(info.geometryCount);
 
       size_t i = 0;
       for (auto& x : dst->desc.bottomlevel.geometries)
       {
-        geometries.emplace_back();
-        offsetinfos.emplace_back();
-
-        auto& geometry = geometries.back();
+        auto& geometry = geometries.ExpandAndGetRef();
         geometry = {};
         geometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
 
-        auto& offset = offsetinfos.back();
+        auto& offset = offsetinfos.ExpandAndGetRef();
         offset = {};
 
         if (x._flags & RaytracingAccelerationStructureDesc::BottomLevel::Geometry::FLAG_OPAQUE)
@@ -6720,13 +6749,10 @@ void GraphicsDevice_Vulkan::BuildRaytracingAccelerationStructure(const Raytracin
     {
       info.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
       info.geometryCount = 1;
-      geometries.reserve(info.geometryCount);
-      offsetinfos.reserve(info.geometryCount);
+      geometries.Reserve(info.geometryCount);
+      offsetinfos.Reserve(info.geometryCount);
 
-      geometries.emplace_back();
-      offsetinfos.emplace_back();
-
-      auto& geometry = geometries.back();
+      auto& geometry = geometries.ExpandAndGetRef();
       geometry = {};
       geometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
       geometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
@@ -6736,7 +6762,7 @@ void GraphicsDevice_Vulkan::BuildRaytracingAccelerationStructure(const Raytracin
       addressinfo.buffer = to_internal(&dst->desc.toplevel.instanceBuffer)->resource;
       geometry.geometry.instances.data.deviceAddress = vkGetBufferDeviceAddress(device, &addressinfo);
 
-      auto& offset = offsetinfos.back();
+      auto& offset = offsetinfos.ExpandAndGetRef();
       offset = {};
       offset.primitiveCount = dst->desc.toplevel.count;
       offset.primitiveOffset = dst->desc.toplevel.offset;
@@ -6744,10 +6770,10 @@ void GraphicsDevice_Vulkan::BuildRaytracingAccelerationStructure(const Raytracin
     break;
   }
 
-  VkAccelerationStructureGeometryKHR* pGeomtries = geometries.data();
+  VkAccelerationStructureGeometryKHR* pGeomtries = geometries.GetData();
   info.ppGeometries = &pGeomtries;
 
-  VkAccelerationStructureBuildOffsetInfoKHR* pOffsetinfo = offsetinfos.data();
+  VkAccelerationStructureBuildOffsetInfoKHR* pOffsetinfo = offsetinfos.GetData();
 
   cmdBuildAccelerationStructureKHR(GetDirectCommandList(cmd), 1, &info, &pOffsetinfo);
 }
