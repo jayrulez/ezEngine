@@ -1418,7 +1418,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
     ID3D12DescriptorHeap* heaps[] = {
       heaps_resource[current_resource_heap].heap_GPU.Get(),
       heaps_sampler[current_sampler_heap].heap_GPU.Get()};
-    device->GetDirectCommandList(cmd)->SetDescriptorHeaps(arraysize(heaps), heaps);
+    device->GetDirectCommandList(cmd)->SetDescriptorHeaps(EZ_ARRAY_SIZE(heaps), heaps);
   }
 }
 void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::validate(bool graphics, CommandList cmd)
@@ -4812,7 +4812,7 @@ void GraphicsDevice_DX12::ClearPipelineStateCache()
   }
   pipelines_global.clear();
 
-  for (int i = 0; i < arraysize(pipelines_worker); ++i)
+  for (int i = 0; i < EZ_ARRAY_SIZE(pipelines_worker); ++i)
   {
     for (auto& x : pipelines_worker[i])
     {

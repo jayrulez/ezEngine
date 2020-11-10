@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 
-#define arraysize(a) (sizeof(a) / sizeof(a[0]))
 #define NOMINMAX
 #define ALIGN_16                                             \
   void* operator new(size_t i) { return _mm_malloc(i, 16); } \

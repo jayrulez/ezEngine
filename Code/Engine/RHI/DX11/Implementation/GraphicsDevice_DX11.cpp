@@ -1317,14 +1317,14 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
       D3D_DRIVER_TYPE_WARP,
       D3D_DRIVER_TYPE_REFERENCE,
     };
-  ezUInt32 numDriverTypes = arraysize(driverTypes);
+  ezUInt32 numDriverTypes = EZ_ARRAY_SIZE(driverTypes);
 
   D3D_FEATURE_LEVEL featureLevels[] =
     {
       D3D_FEATURE_LEVEL_11_1,
       D3D_FEATURE_LEVEL_11_0,
     };
-  ezUInt32 numFeatureLevels = arraysize(featureLevels);
+  ezUInt32 numFeatureLevels = EZ_ARRAY_SIZE(featureLevels);
 
   for (ezUInt32 driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
   {
@@ -2895,7 +2895,7 @@ void GraphicsDevice_DX11::BindUAVs(ezEnum<ezRHIShaderStage> stage, const GPUReso
 }
 void GraphicsDevice_DX11::UnbindResources(ezUInt32 slot, ezUInt32 num, CommandList cmd)
 {
-  EZ_ASSERT_ALWAYS(num <= arraysize(__nullBlob), "Extend nullBlob to support more resource unbinding!");
+  EZ_ASSERT_ALWAYS(num <= EZ_ARRAY_SIZE(__nullBlob), "Extend nullBlob to support more resource unbinding!");
   deviceContexts[cmd]->PSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
   deviceContexts[cmd]->VSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
   deviceContexts[cmd]->GSSetShaderResources(slot, num, (ID3D11ShaderResourceView**)__nullBlob);
@@ -2905,7 +2905,7 @@ void GraphicsDevice_DX11::UnbindResources(ezUInt32 slot, ezUInt32 num, CommandLi
 }
 void GraphicsDevice_DX11::UnbindUAVs(ezUInt32 slot, ezUInt32 num, CommandList cmd)
 {
-  EZ_ASSERT_ALWAYS(num <= arraysize(__nullBlob), "Extend nullBlob to support more resource unbinding!");
+  EZ_ASSERT_ALWAYS(num <= EZ_ARRAY_SIZE(__nullBlob), "Extend nullBlob to support more resource unbinding!");
   deviceContexts[cmd]->CSSetUnorderedAccessViews(slot, num, (ID3D11UnorderedAccessView**)__nullBlob, 0);
 
   raster_uavs_count[cmd] = 0;

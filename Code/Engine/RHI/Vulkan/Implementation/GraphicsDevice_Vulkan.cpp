@@ -1323,7 +1323,7 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::init(
 
   VkDescriptorPoolCreateInfo poolInfo = {};
   poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-  poolInfo.poolSizeCount = arraysize(poolSizes);
+  poolInfo.poolSizeCount = EZ_ARRAY_SIZE(poolSizes);
   poolInfo.pPoolSizes = poolSizes;
   poolInfo.maxSets = poolSize;
   //poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -2142,7 +2142,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
       VkPipelineDynamicStateCreateInfo dynamicState = {};
       dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-      dynamicState.dynamicStateCount = arraysize(dynamicStates);
+      dynamicState.dynamicStateCount = EZ_ARRAY_SIZE(dynamicStates);
       dynamicState.pDynamicStates = dynamicStates;
 
       pipelineInfo.pDynamicState = &dynamicState;
@@ -5757,7 +5757,7 @@ void GraphicsDevice_Vulkan::PresentEnd(CommandList cmd)
   presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
   VkSemaphore signalSemaphores[] = {frames[swapChainImageIndex].swapchainReleaseSemaphore};
-  presentInfo.waitSemaphoreCount = arraysize(signalSemaphores);
+  presentInfo.waitSemaphoreCount = EZ_ARRAY_SIZE(signalSemaphores);
   presentInfo.pWaitSemaphores = signalSemaphores;
 
   VkSwapchainKHR swapChains[] = {swapChain};
@@ -5817,7 +5817,7 @@ CommandList GraphicsDevice_Vulkan::BeginCommandList()
   assert(res == VK_SUCCESS);
 
   VkViewport viewports[6];
-  for (ezUInt32 i = 0; i < arraysize(viewports); ++i)
+  for (ezUInt32 i = 0; i < EZ_ARRAY_SIZE(viewports); ++i)
   {
     viewports[i].x = 0;
     viewports[i].y = 0;
@@ -5826,17 +5826,17 @@ CommandList GraphicsDevice_Vulkan::BeginCommandList()
     viewports[i].minDepth = 0;
     viewports[i].maxDepth = 1;
   }
-  vkCmdSetViewport(GetDirectCommandList(cmd), 0, arraysize(viewports), viewports);
+  vkCmdSetViewport(GetDirectCommandList(cmd), 0, EZ_ARRAY_SIZE(viewports), viewports);
 
   VkRect2D scissors[8];
-  for (int i = 0; i < arraysize(scissors); ++i)
+  for (int i = 0; i < EZ_ARRAY_SIZE(scissors); ++i)
   {
     scissors[i].offset.x = 0;
     scissors[i].offset.y = 0;
     scissors[i].extent.width = 65535;
     scissors[i].extent.height = 65535;
   }
-  vkCmdSetScissor(GetDirectCommandList(cmd), 0, arraysize(scissors), scissors);
+  vkCmdSetScissor(GetDirectCommandList(cmd), 0, EZ_ARRAY_SIZE(scissors), scissors);
 
   float blendConstants[] = {1, 1, 1, 1};
   vkCmdSetBlendConstants(GetDirectCommandList(cmd), blendConstants);
@@ -5893,7 +5893,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
       submitInfo.commandBufferCount = 1;
       submitInfo.pCommandBuffers = &frame.copyCommandBuffer;
       submitInfo.pSignalSemaphores = semaphores;
-      submitInfo.signalSemaphoreCount = arraysize(semaphores);
+      submitInfo.signalSemaphoreCount = EZ_ARRAY_SIZE(semaphores);
 
       res = vkQueueSubmit(frame.copyQueue, 1, &submitInfo, VK_NULL_HANDLE);
       assert(res == VK_SUCCESS);
@@ -5981,7 +5981,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
     submitInfo.pCommandBuffers = cmdLists;
 
     VkSemaphore signalSemaphores[] = {frame.swapchainReleaseSemaphore};
-    submitInfo.signalSemaphoreCount = arraysize(signalSemaphores);
+    submitInfo.signalSemaphoreCount = EZ_ARRAY_SIZE(signalSemaphores);
     submitInfo.pSignalSemaphores = signalSemaphores;
 
     VkResult res = vkQueueSubmit(graphicsQueue, 1, &submitInfo, frame.frameFence);
@@ -6037,7 +6037,7 @@ void GraphicsDevice_Vulkan::ClearPipelineStateCache()
   }
   pipelines_global.clear();
 
-  for (int i = 0; i < arraysize(pipelines_worker); ++i)
+  for (int i = 0; i < EZ_ARRAY_SIZE(pipelines_worker); ++i)
   {
     for (auto& x : pipelines_worker[i])
     {
