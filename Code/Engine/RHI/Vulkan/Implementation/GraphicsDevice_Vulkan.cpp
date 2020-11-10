@@ -4247,20 +4247,7 @@ bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, 
 
   pso->desc = *pDesc;
 
-  pso->hash = 0;
-  RHIHelper::hash_combine(pso->hash, pDesc->ms);
-  RHIHelper::hash_combine(pso->hash, pDesc->as);
-  RHIHelper::hash_combine(pso->hash, pDesc->vs);
-  RHIHelper::hash_combine(pso->hash, pDesc->ps);
-  RHIHelper::hash_combine(pso->hash, pDesc->hs);
-  RHIHelper::hash_combine(pso->hash, pDesc->ds);
-  RHIHelper::hash_combine(pso->hash, pDesc->gs);
-  RHIHelper::hash_combine(pso->hash, pDesc->il);
-  RHIHelper::hash_combine(pso->hash, pDesc->rs);
-  RHIHelper::hash_combine(pso->hash, pDesc->bs);
-  RHIHelper::hash_combine(pso->hash, pDesc->dss);
-  RHIHelper::hash_combine(pso->hash, pDesc->pt);
-  RHIHelper::hash_combine(pso->hash, pDesc->sampleMask);
+  pso->hash = ezHashHelper<PipelineStateDesc>::Hash(pso->desc);
 
   if (pDesc->rootSignature == nullptr)
   {
@@ -4340,13 +4327,7 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
 
   renderpass->desc = *pDesc;
 
-  renderpass->hash = 0;
-  RHIHelper::hash_combine(renderpass->hash, pDesc->attachments.size());
-  for (auto& attachment : pDesc->attachments)
-  {
-    RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.Format);
-    RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.SampleCount);
-  }
+  renderpass->hash = ezHashHelper<RenderPassDesc>::Hash(renderpass->desc);
 
   VkResult res;
 
@@ -6202,11 +6183,10 @@ void GraphicsDevice_Vulkan::BindBlendFactor(float r, float g, float b, float a, 
 }
 void GraphicsDevice_Vulkan::BindPipelineState(const PipelineState* pso, CommandList cmd)
 {
-  size_t pipeline_hash = 0;
-  RHIHelper::hash_combine(pipeline_hash, pso->hash);
+  size_t pipeline_hash = pso->hash;
   if (active_renderpass[cmd] != nullptr)
   {
-    RHIHelper::hash_combine(pipeline_hash, active_renderpass[cmd]->hash);
+    pipeline_hash = ezHashingUtils::xxHash32(&active_renderpass[cmd]->hash, sizeof(ezUInt32), pipeline_hash);
   }
   if (prev_pipeline_hash[cmd] == pipeline_hash)
   {

@@ -138,6 +138,7 @@ struct EZ_RHI_DLL GPUQueryResult
   ezUInt64 result_timestamp = 0;
   ezUInt64 result_timestamp_frequency = 0;
 };
+
 struct EZ_RHI_DLL PipelineStateDesc
 {
   const RootSignature* rootSignature = nullptr;
@@ -155,6 +156,13 @@ struct EZ_RHI_DLL PipelineStateDesc
   ezRHIPrimitiveTopology::Enum pt = ezRHIPrimitiveTopology::TriangleList;
   ezUInt32 sampleMask = 0xFFFFFFFF;
 };
+
+template <>
+struct ezHashHelper<PipelineStateDesc>
+{
+  static ezUInt32 Hash(const PipelineStateDesc& value);
+};
+
 struct EZ_RHI_DLL GPUBarrier
 {
   enum TYPE
@@ -299,6 +307,13 @@ struct EZ_RHI_DLL RenderPassDesc
   ezUInt32 _flags = FLAG_EMPTY;
   std::vector<RenderPassAttachment> attachments;
 };
+
+template <>
+struct ezHashHelper<RenderPassDesc>
+{
+  static ezUInt32 Hash(const RenderPassDesc& value);
+};
+
 struct EZ_RHI_DLL IndirectDrawArgsInstanced
 {
   ezUInt32 VertexCountPerInstance = 0;

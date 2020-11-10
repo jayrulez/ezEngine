@@ -145,7 +145,6 @@ struct GPUBuffer;
 struct Texture;
 struct RootSignature;
 
-
 struct EZ_RHI_DLL ezRHIPrimitiveTopology
 {
   typedef ezUInt32 StorageType;

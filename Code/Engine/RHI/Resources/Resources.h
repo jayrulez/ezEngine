@@ -87,7 +87,7 @@ struct EZ_RHI_DLL GPUQuery : public GraphicsDeviceChild
 
 struct EZ_RHI_DLL PipelineState : public GraphicsDeviceChild
 {
-  size_t hash = 0;
+  ezUInt32 hash = 0;
   PipelineStateDesc desc;
 
   const PipelineStateDesc& GetDesc() const { return desc; }
@@ -95,7 +95,7 @@ struct EZ_RHI_DLL PipelineState : public GraphicsDeviceChild
 
 struct EZ_RHI_DLL RenderPass : public GraphicsDeviceChild
 {
-  size_t hash = 0;
+  ezUInt32 hash = 0;
   RenderPassDesc desc;
 
   const RenderPassDesc& GetDesc() const { return desc; }

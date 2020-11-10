@@ -3003,6 +3003,7 @@ bool GraphicsDevice_DX12::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuer
 
   return SUCCEEDED(hr);
 }
+
 bool GraphicsDevice_DX12::CreatePipelineState(const PipelineStateDesc* pDesc, PipelineState* pso)
 {
   auto internal_state = std::make_shared<PipelineState_DX12>();
@@ -3011,20 +3012,7 @@ bool GraphicsDevice_DX12::CreatePipelineState(const PipelineStateDesc* pDesc, Pi
 
   pso->desc = *pDesc;
 
-  pso->hash = 0;
-  RHIHelper::hash_combine(pso->hash, pDesc->ms);
-  RHIHelper::hash_combine(pso->hash, pDesc->as);
-  RHIHelper::hash_combine(pso->hash, pDesc->vs);
-  RHIHelper::hash_combine(pso->hash, pDesc->ps);
-  RHIHelper::hash_combine(pso->hash, pDesc->hs);
-  RHIHelper::hash_combine(pso->hash, pDesc->ds);
-  RHIHelper::hash_combine(pso->hash, pDesc->gs);
-  RHIHelper::hash_combine(pso->hash, pDesc->il);
-  RHIHelper::hash_combine(pso->hash, pDesc->rs);
-  RHIHelper::hash_combine(pso->hash, pDesc->bs);
-  RHIHelper::hash_combine(pso->hash, pDesc->dss);
-  RHIHelper::hash_combine(pso->hash, pDesc->pt);
-  RHIHelper::hash_combine(pso->hash, pDesc->sampleMask);
+  pso->hash = ezHashHelper<PipelineStateDesc>::Hash(pso->desc);
 
   if (pDesc->rootSignature == nullptr)
   {
@@ -3145,14 +3133,7 @@ bool GraphicsDevice_DX12::CreateRenderPass(const RenderPassDesc* pDesc, RenderPa
 
   renderpass->desc = *pDesc;
 
-  renderpass->hash = 0;
-  RHIHelper::hash_combine(renderpass->hash, pDesc->attachments.size());
-  for (auto& attachment : pDesc->attachments)
-  {
-    RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.Format);
-    RHIHelper::hash_combine(renderpass->hash, attachment.texture->desc.SampleCount);
-  }
-
+  renderpass->hash = ezHashHelper<RenderPassDesc>::Hash(renderpass->desc);
 
   // Beginning barriers:
   for (auto& attachment : renderpass->desc.attachments)
@@ -5178,16 +5159,18 @@ void GraphicsDevice_DX12::BindShadingRateImage(const Texture* texture, CommandLi
 }
 void GraphicsDevice_DX12::BindPipelineState(const PipelineState* pso, CommandList cmd)
 {
-  size_t pipeline_hash = 0;
-  RHIHelper::hash_combine(pipeline_hash, pso->hash);
+  size_t pipeline_hash = pso->hash;
+
   if (active_renderpass[cmd] != nullptr)
   {
-    RHIHelper::hash_combine(pipeline_hash, active_renderpass[cmd]->hash);
+    pipeline_hash = ezHashingUtils::xxHash32(&active_renderpass[cmd]->hash, sizeof(ezUInt32), pipeline_hash);
   }
+
   if (prev_pipeline_hash[cmd] == pipeline_hash)
   {
     return;
   }
+
   prev_pipeline_hash[cmd] = pipeline_hash;
 
   if (pso->desc.rootSignature == nullptr)
