@@ -1716,32 +1716,32 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
 
       if (pso->desc.vs != nullptr)
       {
-        stream.VS = {pso->desc.vs->code.data(), pso->desc.vs->code.size()};
+        stream.VS = {pso->desc.vs->code.GetData(), pso->desc.vs->code.GetCount()};
       }
       if (pso->desc.hs != nullptr)
       {
-        stream.HS = {pso->desc.hs->code.data(), pso->desc.hs->code.size()};
+        stream.HS = {pso->desc.hs->code.GetData(), pso->desc.hs->code.GetCount()};
       }
       if (pso->desc.ds != nullptr)
       {
-        stream.DS = {pso->desc.ds->code.data(), pso->desc.ds->code.size()};
+        stream.DS = {pso->desc.ds->code.GetData(), pso->desc.ds->code.GetCount()};
       }
       if (pso->desc.gs != nullptr)
       {
-        stream.GS = {pso->desc.gs->code.data(), pso->desc.gs->code.size()};
+        stream.GS = {pso->desc.gs->code.GetData(), pso->desc.gs->code.GetCount()};
       }
       if (pso->desc.ps != nullptr)
       {
-        stream.PS = {pso->desc.ps->code.data(), pso->desc.ps->code.size()};
+        stream.PS = {pso->desc.ps->code.GetData(), pso->desc.ps->code.GetCount()};
       }
 
       if (pso->desc.ms != nullptr)
       {
-        stream.MS = {pso->desc.ms->code.data(), pso->desc.ms->code.size()};
+        stream.MS = {pso->desc.ms->code.GetData(), pso->desc.ms->code.GetCount()};
       }
       if (pso->desc.as != nullptr)
       {
-        stream.AS = {pso->desc.as->code.data(), pso->desc.as->code.size()};
+        stream.AS = {pso->desc.as->code.GetData(), pso->desc.as->code.GetCount()};
       }
 
       RasterizerStateDesc pRasterizerStateDesc = pso->desc.rs != nullptr ? pso->desc.rs->GetDesc() : RasterizerStateDesc();
@@ -1798,7 +1798,7 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
       D3D12_INPUT_LAYOUT_DESC il = {};
       if (pso->desc.il != nullptr)
       {
-        il.NumElements = (ezUInt32)pso->desc.il->desc.size();
+        il.NumElements = (ezUInt32)pso->desc.il->desc.GetCount();
         elements.SetCount(il.NumElements);
         for (ezUInt32 i = 0; i < il.NumElements; ++i)
         {
@@ -2706,11 +2706,11 @@ bool GraphicsDevice_DX12::CreateInputLayout(const InputLayoutDesc* pInputElement
 {
   pInputLayout->internal_state = allocationhandler;
 
-  pInputLayout->desc.clear();
-  pInputLayout->desc.reserve((size_t)NumElements);
+  pInputLayout->desc.Clear();
+  pInputLayout->desc.Reserve((size_t)NumElements);
   for (ezUInt32 i = 0; i < NumElements; ++i)
   {
-    pInputLayout->desc.push_back(pInputElementDescs[i]);
+    pInputLayout->desc.PushBack(pInputElementDescs[i]);
   }
 
   return true;
@@ -2721,11 +2721,11 @@ bool GraphicsDevice_DX12::CreateShader(ezEnum<ezRHIShaderStage> stage, const voi
   internal_state->allocationhandler = allocationhandler;
   pShader->internal_state = internal_state;
 
-  pShader->code.resize(BytecodeLength);
-  std::memcpy(pShader->code.data(), pShaderBytecode, BytecodeLength);
+  pShader->code.SetCount(BytecodeLength);
+  std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
   pShader->stage = stage;
 
-  HRESULT hr = (pShader->code.empty() ? E_FAIL : S_OK);
+  HRESULT hr = (pShader->code.IsEmpty() ? E_FAIL : S_OK);
   assert(SUCCEEDED(hr));
 
 
@@ -2899,7 +2899,7 @@ bool GraphicsDevice_DX12::CreateShader(ezEnum<ezRHIShaderStage> stage, const voi
         } stream;
 
         stream.pRootSignature = internal_state->rootSignature.Get();
-        stream.CS = {pShader->code.data(), pShader->code.size()};
+        stream.CS = {pShader->code.GetData(), pShader->code.GetCount()};
 
         D3D12_PIPELINE_STATE_STREAM_DESC streamDesc = {};
         streamDesc.pPipelineStateSubobjectStream = &stream;
@@ -3372,7 +3372,8 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
     subobject.Type = D3D12_STATE_SUBOBJECT_TYPE_GLOBAL_ROOT_SIGNATURE;
     if (pDesc->rootSignature == nullptr)
     {
-      auto shader_internal = to_internal(pDesc->shaderlibraries.front().shader); // think better way
+      //auto shader_internal = to_internal(pDesc->shaderlibraries.front().shader); // think better way
+      auto shader_internal = to_internal(pDesc->shaderlibraries[0].shader);  // ezTODO: do much better
       global_rootsig.pGlobalRootSignature = shader_internal->rootSignature.Get();
     }
     else
@@ -3382,8 +3383,8 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
     subobject.pDesc = &global_rootsig;
   }
 
-  internal_state->exports.Reserve(pDesc->shaderlibraries.size());
-  internal_state->library_descs.Reserve(pDesc->shaderlibraries.size());
+  internal_state->exports.Reserve(pDesc->shaderlibraries.GetCount());
+  internal_state->library_descs.Reserve(pDesc->shaderlibraries.GetCount());
   for (auto& x : pDesc->shaderlibraries)
   {
     auto& subobject = subobjects.ExpandAndGetRef();
@@ -3391,8 +3392,8 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
     subobject.Type = D3D12_STATE_SUBOBJECT_TYPE_DXIL_LIBRARY;
     auto& library_desc = internal_state->library_descs.ExpandAndGetRef();
     library_desc = {};
-    library_desc.DXILLibrary.pShaderBytecode = x.shader->code.data();
-    library_desc.DXILLibrary.BytecodeLength = x.shader->code.size();
+    library_desc.DXILLibrary.pShaderBytecode = x.shader->code.GetData();
+    library_desc.DXILLibrary.BytecodeLength = x.shader->code.GetCount();
     library_desc.NumExports = 1;
 
     D3D12_EXPORT_DESC& export_desc = internal_state->exports.ExpandAndGetRef();
@@ -3404,7 +3405,7 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
     subobject.pDesc = &library_desc;
   }
 
-  internal_state->hitgroup_descs.Reserve(pDesc->hitgroups.size());
+  internal_state->hitgroup_descs.Reserve(pDesc->hitgroups.GetCount());
   for (auto& x : pDesc->hitgroups)
   {
     internal_state->group_strings.PushBack(x.name);
@@ -3597,16 +3598,16 @@ bool GraphicsDevice_DX12::CreateRootSignature(RootSignature* rootsig)
   internal_state->allocationhandler = allocationhandler;
   rootsig->internal_state = internal_state;
 
-  internal_state->params.Reserve(rootsig->tables.size());
+  internal_state->params.Reserve(rootsig->tables.GetCount());
 
   ezDynamicArray<D3D12_STATIC_SAMPLER_DESC> staticsamplers;
 
   ezDynamicArray<ezDynamicArray<D3D12_DESCRIPTOR_RANGE>> table_ranges_resource;
   ezDynamicArray<ezDynamicArray<D3D12_DESCRIPTOR_RANGE>> table_ranges_sampler;
 
-  table_ranges_resource.Reserve(rootsig->tables.size());
+  table_ranges_resource.Reserve(rootsig->tables.GetCount());
 
-  table_ranges_sampler.Reserve(rootsig->tables.size());
+  table_ranges_sampler.Reserve(rootsig->tables.GetCount());
 
   ezUInt32 space = 0;
   for (auto& x : rootsig->tables)
@@ -5498,7 +5499,8 @@ void GraphicsDevice_DX12::BindRaytracingPipelineState(const RaytracingPipelineSt
     if (rtpso->desc.rootSignature == nullptr)
     {
       // we just take the first shader (todo: better)
-      active_cs[cmd] = rtpso->desc.shaderlibraries.front().shader;
+      //active_cs[cmd] = rtpso->desc.shaderlibraries.front().shader;
+      active_cs[cmd] = rtpso->desc.shaderlibraries[0].shader; // ezTODO: do much better
       active_rootsig_compute[cmd] = nullptr;
       GetDirectCommandList(cmd)->SetComputeRootSignature(to_internal(active_cs[cmd])->rootSignature.Get());
     }

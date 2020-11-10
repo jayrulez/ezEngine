@@ -3708,11 +3708,11 @@ bool GraphicsDevice_Vulkan::CreateInputLayout(const InputLayoutDesc* pInputEleme
 {
   pInputLayout->internal_state = allocationhandler;
 
-  pInputLayout->desc.clear();
-  pInputLayout->desc.reserve((size_t)NumElements);
+  pInputLayout->desc.Clear();
+  pInputLayout->desc.Reserve((size_t)NumElements);
   for (ezUInt32 i = 0; i < NumElements; ++i)
   {
-    pInputLayout->desc.push_back(pInputElementDescs[i]);
+    pInputLayout->desc.PushBack(pInputElementDescs[i]);
   }
 
   return true;
@@ -3723,16 +3723,16 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
   internal_state->allocationhandler = allocationhandler;
   pShader->internal_state = internal_state;
 
-  pShader->code.resize(BytecodeLength);
-  std::memcpy(pShader->code.data(), pShaderBytecode, BytecodeLength);
+  pShader->code.SetCount(BytecodeLength);
+  std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
   pShader->stage = stage;
 
   VkResult res = VK_SUCCESS;
 
   VkShaderModuleCreateInfo moduleInfo = {};
   moduleInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-  moduleInfo.codeSize = pShader->code.size();
-  moduleInfo.pCode = (ezUInt32*)pShader->code.data();
+  moduleInfo.codeSize = pShader->code.GetCount();
+  moduleInfo.pCode = reinterpret_cast<ezUInt32*>(pShader->code.GetData()); // ezTODO: assigning const uint32_t* from uint8* ?
   res = vkCreateShaderModule(device, &moduleInfo, nullptr, &internal_state->shaderModule);
   assert(res == VK_SUCCESS);
 
@@ -3774,7 +3774,7 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
   if (pShader->rootSignature == nullptr)
   {
     // Perform shader reflection for shaders that don't specify a root signature:
-    spirv_cross::Compiler comp((ezUInt32*)pShader->code.data(), pShader->code.size() / sizeof(ezUInt32));
+    spirv_cross::Compiler comp((ezUInt32*)pShader->code.GetData(), pShader->code.GetCount() / sizeof(ezUInt32));
     auto entrypoints = comp.get_entry_points_and_stages();
     auto active = comp.get_active_interface_variables();
     spirv_cross::ShaderResources resources = comp.get_shader_resources(active);
@@ -4756,7 +4756,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
   info.pStages = stages.data();
 
   std::vector<VkRayTracingShaderGroupCreateInfoKHR> groups;
-  groups.reserve(pDesc->hitgroups.size());
+  groups.reserve(pDesc->hitgroups.GetCount());
   for (auto& x : pDesc->hitgroups)
   {
     groups.emplace_back();
@@ -4788,7 +4788,8 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
 
   if (pDesc->rootSignature == nullptr)
   {
-    info.layout = to_internal(pDesc->shaderlibraries.front().shader)->pipelineLayout_cs; // think better way
+    //info.layout = to_internal(pDesc->shaderlibraries.front().shader)->pipelineLayout_cs; // think better way
+    info.layout = to_internal(pDesc->shaderlibraries[0].shader)->pipelineLayout_cs; // ezTODO: do much better
   }
   else
   {
@@ -4816,12 +4817,12 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
   table->internal_state = internal_state;
 
   std::vector<VkDescriptorSetLayoutBinding> bindings;
-  bindings.reserve(table->samplers.size() + table->resources.size() + table->staticsamplers.size());
+  bindings.reserve(table->samplers.GetCount() + table->resources.GetCount() + table->staticsamplers.GetCount());
 
   std::vector<VkDescriptorUpdateTemplateEntry> entries;
-  entries.reserve(table->samplers.size() + table->resources.size());
+  entries.reserve(table->samplers.GetCount() + table->resources.GetCount());
 
-  internal_state->descriptors.reserve(table->samplers.size() + table->resources.size());
+  internal_state->descriptors.reserve(table->samplers.GetCount() + table->resources.GetCount());
 
   size_t offset = 0;
   for (auto& x : table->resources)
@@ -4943,7 +4944,7 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
   }
 
   std::vector<VkSampler> immutableSamplers;
-  immutableSamplers.reserve(table->staticsamplers.size());
+  immutableSamplers.reserve(table->staticsamplers.GetCount());
 
   for (auto& x : table->staticsamplers)
   {
@@ -5006,7 +5007,7 @@ bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
   rootsig->internal_state = internal_state;
 
   std::vector<VkDescriptorSetLayout> layouts;
-  layouts.reserve(rootsig->tables.size());
+  layouts.reserve(rootsig->tables.GetCount());
   ezUInt32 space = 0;
   for (auto& x : rootsig->tables)
   {
@@ -5047,7 +5048,7 @@ bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
   }
 
   std::vector<VkPushConstantRange> pushranges;
-  pushranges.reserve(rootsig->rootconstants.size());
+  pushranges.reserve(rootsig->rootconstants.GetCount());
   for (auto& x : rootsig->rootconstants)
   {
     pushranges.emplace_back();
@@ -5568,7 +5569,7 @@ void GraphicsDevice_Vulkan::WriteDescriptor(const DescriptorTable* table, ezUInt
 void GraphicsDevice_Vulkan::WriteDescriptor(const DescriptorTable* table, ezUInt32 rangeIndex, ezUInt32 arrayIndex, const Sampler* sampler)
 {
   auto table_internal = to_internal(table);
-  size_t sampler_remap = table->resources.size() + (size_t)rangeIndex;
+  size_t sampler_remap = table->resources.GetCount() + (size_t)rangeIndex;
   size_t remap = table_internal->sampler_write_remap[rangeIndex];
   auto& descriptor = table_internal->descriptors[remap];
   descriptor.imageinfo.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -6652,7 +6653,7 @@ void GraphicsDevice_Vulkan::BuildRaytracingAccelerationStructure(const Raytracin
     case RaytracingAccelerationStructureDesc::BOTTOMLEVEL:
     {
       info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-      info.geometryCount = (ezUInt32)dst->desc.bottomlevel.geometries.size();
+      info.geometryCount = (ezUInt32)dst->desc.bottomlevel.geometries.GetCount();
       geometries.reserve(info.geometryCount);
       offsetinfos.reserve(info.geometryCount);
 
@@ -6757,7 +6758,8 @@ void GraphicsDevice_Vulkan::BindRaytracingPipelineState(const RaytracingPipeline
 {
   prev_pipeline_hash[cmd] = 0;
   GetFrameResources().descriptors[cmd].dirty = true;
-  active_cs[cmd] = rtpso->desc.shaderlibraries.front().shader; // we just take the first shader (todo: better)
+  //active_cs[cmd] = rtpso->desc.shaderlibraries.front().shader; // we just take the first shader (todo: better)
+  active_cs[cmd] = rtpso->desc.shaderlibraries[0].shader; // ezTODO: do much better
   active_rt[cmd] = rtpso;
 
   vkCmdBindPipeline(GetDirectCommandList(cmd), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, to_internal(rtpso)->pipeline);

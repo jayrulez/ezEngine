@@ -13,7 +13,7 @@ struct EZ_RHI_DLL GraphicsDeviceChild
 struct EZ_RHI_DLL Shader : public GraphicsDeviceChild
 {
   ezEnum<ezRHIShaderStage> stage = ezRHIShaderStage::ENUM_COUNT;
-  std::vector<ezUInt8> code;
+  ezDynamicArray<ezUInt8> code;
   const RootSignature* rootSignature = nullptr;
 };
 
@@ -47,7 +47,7 @@ struct EZ_RHI_DLL GPUBuffer : public GPUResource
 
 struct EZ_RHI_DLL InputLayout : public GraphicsDeviceChild
 {
-  std::vector<InputLayoutDesc> desc;
+  ezDynamicArray<InputLayoutDesc> desc;
 };
 
 struct EZ_RHI_DLL BlendState : public GraphicsDeviceChild
@@ -162,7 +162,7 @@ struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
         ezUInt32 stride = 0;
       } aabbs;
     };
-    std::vector<Geometry> geometries;
+    ezDynamicArray<Geometry> geometries;
   } bottomlevel;
 
   struct TopLevel
@@ -218,8 +218,8 @@ struct EZ_RHI_DLL ShaderHitGroup
 struct EZ_RHI_DLL RaytracingPipelineStateDesc
 {
   const RootSignature* rootSignature = nullptr;
-  std::vector<ShaderLibrary> shaderlibraries;
-  std::vector<ShaderHitGroup> hitgroups;
+  ezDynamicArray<ShaderLibrary> shaderlibraries;
+  ezDynamicArray<ShaderHitGroup> hitgroups;
   ezUInt32 max_trace_recursion_depth = 1;
   ezUInt32 max_attribute_size_in_bytes = 0;
   ezUInt32 max_payload_size_in_bytes = 0;
@@ -305,9 +305,9 @@ struct EZ_RHI_DLL StaticSampler
 struct EZ_RHI_DLL DescriptorTable : public GraphicsDeviceChild
 {
   ezEnum<ezRHIShaderStage> stage = ezRHIShaderStage::ENUM_COUNT;
-  std::vector<ResourceRange> resources;
-  std::vector<SamplerRange> samplers;
-  std::vector<StaticSampler> staticsamplers;
+  ezDynamicArray<ResourceRange> resources;
+  ezDynamicArray<SamplerRange> samplers;
+  ezDynamicArray<StaticSampler> staticsamplers;
 };
 struct EZ_RHI_DLL RootConstantRange
 {
@@ -324,6 +324,6 @@ struct EZ_RHI_DLL RootSignature : public GraphicsDeviceChild
     FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT = 1 << 0,
   };
   ezUInt32 _flags = FLAG_EMPTY;
-  std::vector<DescriptorTable> tables;
-  std::vector<RootConstantRange> rootconstants;
+  ezDynamicArray<DescriptorTable> tables;
+  ezDynamicArray<RootConstantRange> rootconstants;
 };

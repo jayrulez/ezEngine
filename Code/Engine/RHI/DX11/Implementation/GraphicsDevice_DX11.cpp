@@ -1596,7 +1596,7 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
   auto internal_state = std::make_shared<InputLayout_DX11>();
   pInputLayout->internal_state = internal_state;
 
-  pInputLayout->desc.reserve((size_t)NumElements);
+  pInputLayout->desc.Reserve(NumElements);
 
   ezDynamicArray<D3D11_INPUT_ELEMENT_DESC> desc;
   desc.SetCount(NumElements);
@@ -1612,17 +1612,17 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
     desc[i].InputSlotClass = _ConvertInputClassification(pInputElementDescs[i].InputSlotClass);
     desc[i].InstanceDataStepRate = pInputElementDescs[i].InstanceDataStepRate;
 
-    pInputLayout->desc.push_back(pInputElementDescs[i]);
+    pInputLayout->desc.PushBack(pInputElementDescs[i]);
   }
 
-  HRESULT hr = device->CreateInputLayout(desc.GetData(), NumElements, shader->code.data(), shader->code.size(), &internal_state->resource);
+  HRESULT hr = device->CreateInputLayout(desc.GetData(), NumElements, shader->code.GetData(), shader->code.GetCount(), &internal_state->resource);
 
   return SUCCEEDED(hr);
 }
 bool GraphicsDevice_DX11::CreateShader(ezEnum<ezRHIShaderStage> stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
 {
-  pShader->code.resize(BytecodeLength);
-  std::memcpy(pShader->code.data(), pShaderBytecode, BytecodeLength);
+  pShader->code.SetCount(BytecodeLength);
+  std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
   pShader->stage = stage;
 
   HRESULT hr = E_FAIL;
