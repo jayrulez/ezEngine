@@ -15,6 +15,9 @@
 
 #  include <atomic>
 
+EZ_DEFINE_AS_POD_TYPE(D3D11_SUBRESOURCE_DATA);
+EZ_DEFINE_AS_POD_TYPE(D3D11_INPUT_ELEMENT_DESC);
+
 class EZ_RHI_DLL GraphicsDevice_DX11 : public GraphicsDevice
 {
 private:

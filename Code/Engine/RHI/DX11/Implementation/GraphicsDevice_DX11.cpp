@@ -1079,15 +1079,15 @@ namespace DX11_Internal
     ComPtr<ID3D11Resource> resource;
     ComPtr<ID3D11ShaderResourceView> srv;
     ComPtr<ID3D11UnorderedAccessView> uav;
-    std::vector<ComPtr<ID3D11ShaderResourceView>> subresources_srv;
-    std::vector<ComPtr<ID3D11UnorderedAccessView>> subresources_uav;
+    ezDynamicArray<ComPtr<ID3D11ShaderResourceView>> subresources_srv;
+    ezDynamicArray<ComPtr<ID3D11UnorderedAccessView>> subresources_uav;
   };
   struct Texture_DX11 : public Resource_DX11
   {
     ComPtr<ID3D11RenderTargetView> rtv;
     ComPtr<ID3D11DepthStencilView> dsv;
-    std::vector<ComPtr<ID3D11RenderTargetView>> subresources_rtv;
-    std::vector<ComPtr<ID3D11DepthStencilView>> subresources_dsv;
+    ezDynamicArray<ComPtr<ID3D11RenderTargetView>> subresources_rtv;
+    ezDynamicArray<ComPtr<ID3D11DepthStencilView>> subresources_dsv;
   };
   struct InputLayout_DX11
   {
@@ -1525,11 +1525,11 @@ bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const Subresou
 
   pTexture->desc = *pDesc;
 
-  std::vector<D3D11_SUBRESOURCE_DATA> data;
+  ezDynamicArray<D3D11_SUBRESOURCE_DATA> data;
   if (pInitialData != nullptr)
   {
     ezUInt32 dataCount = pDesc->ArraySize * ezMath::Max(1u, pDesc->MipLevels);
-    data.resize(dataCount);
+    data.SetCount(dataCount);
     for (ezUInt32 slice = 0; slice < dataCount; ++slice)
     {
       data[slice] = _ConvertSubresourceData(pInitialData[slice]);
@@ -1543,19 +1543,19 @@ bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const Subresou
     case TextureDesc::TEXTURE_1D:
     {
       D3D11_TEXTURE1D_DESC desc = _ConvertTextureDesc1D(&pTexture->desc);
-      hr = device->CreateTexture1D(&desc, data.data(), (ID3D11Texture1D**)internal_state->resource.ReleaseAndGetAddressOf());
+      hr = device->CreateTexture1D(&desc, data.GetData(), (ID3D11Texture1D**)internal_state->resource.ReleaseAndGetAddressOf());
     }
     break;
     case TextureDesc::TEXTURE_2D:
     {
       D3D11_TEXTURE2D_DESC desc = _ConvertTextureDesc2D(&pTexture->desc);
-      hr = device->CreateTexture2D(&desc, data.data(), (ID3D11Texture2D**)internal_state->resource.ReleaseAndGetAddressOf());
+      hr = device->CreateTexture2D(&desc, data.GetData(), (ID3D11Texture2D**)internal_state->resource.ReleaseAndGetAddressOf());
     }
     break;
     case TextureDesc::TEXTURE_3D:
     {
       D3D11_TEXTURE3D_DESC desc = _ConvertTextureDesc3D(&pTexture->desc);
-      hr = device->CreateTexture3D(&desc, data.data(), (ID3D11Texture3D**)internal_state->resource.ReleaseAndGetAddressOf());
+      hr = device->CreateTexture3D(&desc, data.GetData(), (ID3D11Texture3D**)internal_state->resource.ReleaseAndGetAddressOf());
     }
     break;
     default:
@@ -1598,7 +1598,8 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
 
   pInputLayout->desc.reserve((size_t)NumElements);
 
-  std::vector<D3D11_INPUT_ELEMENT_DESC> desc(NumElements);
+  ezDynamicArray<D3D11_INPUT_ELEMENT_DESC> desc;
+  desc.SetCount(NumElements);
   for (ezUInt32 i = 0; i < NumElements; ++i)
   {
     desc[i].SemanticName = pInputElementDescs[i].SemanticName.GetData();
@@ -1614,7 +1615,7 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
     pInputLayout->desc.push_back(pInputElementDescs[i]);
   }
 
-  HRESULT hr = device->CreateInputLayout(desc.data(), NumElements, shader->code.data(), shader->code.size(), &internal_state->resource);
+  HRESULT hr = device->CreateInputLayout(desc.GetData(), NumElements, shader->code.data(), shader->code.size(), &internal_state->resource);
 
   return SUCCEEDED(hr);
 }
@@ -2009,8 +2010,8 @@ int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
           internal_state->srv = srv;
           return -1;
         }
-        internal_state->subresources_srv.push_back(srv);
-        return int(internal_state->subresources_srv.size() - 1);
+        internal_state->subresources_srv.PushBack(srv);
+        return int(internal_state->subresources_srv.GetCount() - 1);
       }
       else
       {
@@ -2089,8 +2090,8 @@ int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
           internal_state->uav = uav;
           return -1;
         }
-        internal_state->subresources_uav.push_back(uav);
-        return int(internal_state->subresources_uav.size() - 1);
+        internal_state->subresources_uav.PushBack(uav);
+        return int(internal_state->subresources_uav.GetCount() - 1);
       }
       else
       {
@@ -2185,8 +2186,8 @@ int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
           internal_state->rtv = rtv;
           return -1;
         }
-        internal_state->subresources_rtv.push_back(rtv);
-        return int(internal_state->subresources_rtv.size() - 1);
+        internal_state->subresources_rtv.PushBack(rtv);
+        return int(internal_state->subresources_rtv.GetCount() - 1);
       }
       else
       {
@@ -2274,8 +2275,8 @@ int GraphicsDevice_DX11::CreateSubresource(Texture* texture, SUBRESOURCE_TYPE ty
           internal_state->dsv = dsv;
           return -1;
         }
-        internal_state->subresources_dsv.push_back(dsv);
-        return int(internal_state->subresources_dsv.size() - 1);
+        internal_state->subresources_dsv.PushBack(dsv);
+        return int(internal_state->subresources_dsv.GetCount() - 1);
       }
       else
       {
@@ -2339,8 +2340,8 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
         }
         else
         {
-          internal_state->subresources_srv.push_back(srv);
-          return int(internal_state->subresources_srv.size() - 1);
+          internal_state->subresources_srv.PushBack(srv);
+          return int(internal_state->subresources_srv.GetCount() - 1);
         }
       }
       else
@@ -2390,8 +2391,8 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
         }
         else
         {
-          internal_state->subresources_uav.push_back(uav);
-          return int(internal_state->subresources_uav.size() - 1);
+          internal_state->subresources_uav.PushBack(uav);
+          return int(internal_state->subresources_uav.GetCount() - 1);
         }
       }
       else
@@ -2644,13 +2645,13 @@ void GraphicsDevice_DX11::RenderPassBegin(const RenderPass* renderpass, CommandL
 
     if (attachment.type == RenderPassAttachment::RENDERTARGET)
     {
-      if (subresource < 0 || internal_state->subresources_rtv.empty())
+      if (subresource < 0 || internal_state->subresources_rtv.IsEmpty())
       {
         RTVs[rt_count] = internal_state->rtv.Get();
       }
       else
       {
-        EZ_ASSERT_ALWAYS(internal_state->subresources_rtv.size() > size_t(subresource), "Invalid RTV subresource!");
+        EZ_ASSERT_ALWAYS(internal_state->subresources_rtv.GetCount() > size_t(subresource), "Invalid RTV subresource!");
         RTVs[rt_count] = internal_state->subresources_rtv[subresource].Get();
       }
 
@@ -2663,13 +2664,13 @@ void GraphicsDevice_DX11::RenderPassBegin(const RenderPass* renderpass, CommandL
     }
     else if (attachment.type == RenderPassAttachment::DEPTH_STENCIL)
     {
-      if (subresource < 0 || internal_state->subresources_dsv.empty())
+      if (subresource < 0 || internal_state->subresources_dsv.IsEmpty())
       {
         DSV = internal_state->dsv.Get();
       }
       else
       {
-        EZ_ASSERT_ALWAYS(internal_state->subresources_dsv.size() > size_t(subresource), "Invalid DSV subresource!");
+        EZ_ASSERT_ALWAYS(internal_state->subresources_dsv.GetCount() > size_t(subresource), "Invalid DSV subresource!");
         DSV = internal_state->subresources_dsv[subresource].Get();
       }
 
@@ -2776,7 +2777,7 @@ void GraphicsDevice_DX11::BindResource(ezEnum<ezRHIShaderStage> stage, const GPU
     }
     else
     {
-      EZ_ASSERT_ALWAYS(internal_state->subresources_srv.size() > static_cast<size_t>(subresource), "Invalid subresource!");
+      EZ_ASSERT_ALWAYS(internal_state->subresources_srv.GetCount() > static_cast<size_t>(subresource), "Invalid subresource!");
       SRV = internal_state->subresources_srv[subresource].Get();
     }
 
@@ -2853,7 +2854,7 @@ void GraphicsDevice_DX11::BindUAV(ezEnum<ezRHIShaderStage> stage, const GPUResou
     }
     else
     {
-      EZ_ASSERT_ALWAYS(internal_state->subresources_uav.size() > static_cast<size_t>(subresource), "Invalid subresource!");
+      EZ_ASSERT_ALWAYS(internal_state->subresources_uav.GetCount() > static_cast<size_t>(subresource), "Invalid subresource!");
       UAV = internal_state->subresources_uav[subresource].Get();
     }
 
