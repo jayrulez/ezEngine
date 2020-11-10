@@ -305,7 +305,7 @@ struct EZ_RHI_DLL RenderPassDesc
     FLAG_ALLOW_UAV_WRITES = 1 << 0,
   };
   ezUInt32 _flags = FLAG_EMPTY;
-  std::vector<RenderPassAttachment> attachments;
+  ezDynamicArray<RenderPassAttachment> attachments;
 };
 
 template <>

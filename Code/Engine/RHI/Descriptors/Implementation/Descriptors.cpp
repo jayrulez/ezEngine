@@ -24,7 +24,7 @@ ezUInt32 ezHashHelper<PipelineStateDesc>::Hash(const PipelineStateDesc& value)
 
 ezUInt32 ezHashHelper<RenderPassDesc>::Hash(const RenderPassDesc& value)
 {
-  ezUInt32 combinedHash = value.attachments.size();
+  ezUInt32 combinedHash = value.attachments.GetCount();
 
   for (auto& attachment : value.attachments)
   {

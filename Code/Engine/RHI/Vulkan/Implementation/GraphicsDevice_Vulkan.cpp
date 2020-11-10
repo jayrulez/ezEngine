@@ -2054,7 +2054,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
       multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
       multisampling.sampleShadingEnable = VK_FALSE;
       multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-      if (active_renderpass[cmd] != nullptr && active_renderpass[cmd]->desc.attachments.size() > 0)
+      if (active_renderpass[cmd] != nullptr && active_renderpass[cmd]->desc.attachments.GetCount() > 0)
       {
         multisampling.rasterizationSamples = (VkSampleCountFlagBits)active_renderpass[cmd]->desc.attachments[0].texture->desc.SampleCount;
       }
@@ -2070,7 +2070,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
       // Blending:
       ezUInt32 numBlendAttachments = 0;
       VkPipelineColorBlendAttachmentState colorBlendAttachments[8];
-      const size_t blend_loopCount = active_renderpass[cmd] == nullptr ? 1 : active_renderpass[cmd]->desc.attachments.size();
+      const size_t blend_loopCount = active_renderpass[cmd] == nullptr ? 1 : active_renderpass[cmd]->desc.attachments.GetCount();
       for (size_t i = 0; i < blend_loopCount; ++i)
       {
         if (active_renderpass[cmd] != nullptr && active_renderpass[cmd]->desc.attachments[i].type != RenderPassAttachment::RENDERTARGET)
@@ -4486,7 +4486,7 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
 
     validAttachmentCount++;
   }
-  assert(renderpass->desc.attachments.size() == validAttachmentCount);
+  assert(renderpass->desc.attachments.GetCount() == validAttachmentCount);
 
   VkRenderPassCreateInfo renderPassInfo = {};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
