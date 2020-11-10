@@ -27,6 +27,11 @@
 
 #  include <RHI/RHIInternal.h>
 
+EZ_DEFINE_AS_POD_TYPE(VkImageMemoryBarrier);
+EZ_DEFINE_AS_POD_TYPE(VkWriteDescriptorSet);
+EZ_DEFINE_AS_POD_TYPE(VkDescriptorBufferInfo);
+EZ_DEFINE_AS_POD_TYPE(VkDescriptorImageInfo);
+EZ_DEFINE_AS_POD_TYPE(VkWriteDescriptorSetAccelerationStructureNV);
 
 struct FrameResources;
 struct DescriptorTableFrameAllocator;
@@ -75,9 +80,9 @@ private:
   VkFormat swapChainImageFormat;
   VkExtent2D swapChainExtent;
   ezUInt32 swapChainImageIndex = 0;
-  std::vector<VkImage> swapChainImages;
-  std::vector<VkImageView> swapChainImageViews;
-  std::vector<VkFramebuffer> swapChainFramebuffers;
+  ezDynamicArray<VkImage> swapChainImages;
+  ezDynamicArray<VkImageView> swapChainImageViews;
+  ezDynamicArray<VkFramebuffer> swapChainFramebuffers;
 
   VkRenderPass defaultRenderPass = VK_NULL_HANDLE;
 
@@ -105,8 +110,8 @@ private:
   static const size_t timestamp_query_count = 1024;
   static const size_t occlusion_query_count = 1024;
   bool initial_querypool_reset = false;
-  std::vector<ezUInt32> timestamps_to_reset;
-  std::vector<ezUInt32> occlusions_to_reset;
+  ezDynamicArray<ezUInt32> timestamps_to_reset;
+  ezDynamicArray<ezUInt32> occlusions_to_reset;
 
   void CreateBackBufferResources();
 
@@ -126,7 +131,7 @@ private:
 
     VkCommandPool transitionCommandPool = VK_NULL_HANDLE;
     VkCommandBuffer transitionCommandBuffer = VK_NULL_HANDLE;
-    std::vector<VkImageMemoryBarrier> loadedimagetransitions;
+    ezDynamicArray<VkImageMemoryBarrier> loadedimagetransitions;
 
     VkSemaphore swapchainAcquireSemaphore = VK_NULL_HANDLE;
     VkSemaphore swapchainReleaseSemaphore = VK_NULL_HANDLE;
@@ -137,11 +142,11 @@ private:
       VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
       ezUInt32 poolSize = 256;
 
-      std::vector<VkWriteDescriptorSet> descriptorWrites;
-      std::vector<VkDescriptorBufferInfo> bufferInfos;
-      std::vector<VkDescriptorImageInfo> imageInfos;
-      std::vector<VkBufferView> texelBufferViews;
-      std::vector<VkWriteDescriptorSetAccelerationStructureNV> accelerationStructureViews;
+      ezDynamicArray<VkWriteDescriptorSet> descriptorWrites;
+      ezDynamicArray<VkDescriptorBufferInfo> bufferInfos;
+      ezDynamicArray<VkDescriptorImageInfo> imageInfos;
+      ezDynamicArray<VkBufferView> texelBufferViews;
+      ezDynamicArray<VkWriteDescriptorSetAccelerationStructureNV> accelerationStructureViews;
       bool dirty = false;
 
       const GPUBuffer* CBV[GPU_RESOURCE_HEAP_CBV_COUNT];
@@ -182,7 +187,7 @@ private:
   inline VkCommandBuffer GetDirectCommandList(CommandList cmd) { return GetFrameResources().commandBuffers[cmd]; }
 
   std::unordered_map<size_t, VkPipeline> pipelines_global;
-  std::vector<std::pair<size_t, VkPipeline>> pipelines_worker[COMMANDLIST_COUNT];
+  ezDynamicArray<std::pair<size_t, VkPipeline>> pipelines_worker[COMMANDLIST_COUNT];
   size_t prev_pipeline_hash[COMMANDLIST_COUNT] = {};
   const PipelineState* active_pso[COMMANDLIST_COUNT] = {};
   const Shader* active_cs[COMMANDLIST_COUNT] = {};

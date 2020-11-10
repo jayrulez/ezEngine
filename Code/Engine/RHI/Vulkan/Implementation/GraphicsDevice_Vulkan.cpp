@@ -1283,11 +1283,11 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::init(
   this->device = device;
 
   // Important that these don't reallocate themselves during writing dexcriptors!
-  descriptorWrites.reserve(128);
-  bufferInfos.reserve(128);
-  imageInfos.reserve(128);
-  texelBufferViews.reserve(128);
-  accelerationStructureViews.reserve(128);
+  descriptorWrites.Reserve(128);
+  bufferInfos.Reserve(128);
+  imageInfos.Reserve(128);
+  texelBufferViews.Reserve(128);
+  accelerationStructureViews.Reserve(128);
 
   VkResult res;
 
@@ -1398,11 +1398,11 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
   }
   assert(res == VK_SUCCESS);
 
-  descriptorWrites.clear();
-  bufferInfos.clear();
-  imageInfos.clear();
-  texelBufferViews.clear();
-  accelerationStructureViews.clear();
+  descriptorWrites.Clear();
+  bufferInfos.Clear();
+  imageInfos.Clear();
+  texelBufferViews.Clear();
+  accelerationStructureViews.Clear();
 
   const auto& layoutBindings = graphics ? pso_internal->layoutBindings : cs_internal->layoutBindings;
   const auto& imageViewTypes = graphics ? pso_internal->imageViewTypes : cs_internal->imageViewTypes;
@@ -1411,8 +1411,7 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
   int i = 0;
   for (auto& x : layoutBindings)
   {
-    descriptorWrites.emplace_back();
-    auto& write = descriptorWrites.back();
+    auto& write = descriptorWrites.ExpandAndGetRef();
     write = {};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write.dstSet = descriptorSet;
@@ -1427,29 +1426,27 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
     {
       case VK_DESCRIPTOR_TYPE_SAMPLER:
       {
-        imageInfos.emplace_back();
-        write.pImageInfo = &imageInfos.back();
-        imageInfos.back() = {};
+        write.pImageInfo = &imageInfos.ExpandAndGetRef();
+        imageInfos.PeekBack() = {};
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_S;
         const Sampler* sampler = SAM[original_binding];
         if (sampler == nullptr || !sampler->IsValid())
         {
-          imageInfos.back().sampler = device->nullSampler;
+          imageInfos.PeekBack().sampler = device->nullSampler;
         }
         else
         {
-          imageInfos.back().sampler = to_internal(sampler)->resource;
+          imageInfos.PeekBack().sampler = to_internal(sampler)->resource;
         }
       }
       break;
 
       case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
       {
-        imageInfos.emplace_back();
-        write.pImageInfo = &imageInfos.back();
-        imageInfos.back() = {};
-        imageInfos.back().imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        write.pImageInfo = &imageInfos.ExpandAndGetRef();
+        imageInfos.PeekBack() = {};
+        imageInfos.PeekBack().imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_T;
         const GPUResource* resource = SRV[original_binding];
@@ -1458,25 +1455,25 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           switch (viewtype)
           {
             case VK_IMAGE_VIEW_TYPE_1D:
-              imageInfos.back().imageView = device->nullImageView1D;
+              imageInfos.PeekBack().imageView = device->nullImageView1D;
               break;
             case VK_IMAGE_VIEW_TYPE_2D:
-              imageInfos.back().imageView = device->nullImageView2D;
+              imageInfos.PeekBack().imageView = device->nullImageView2D;
               break;
             case VK_IMAGE_VIEW_TYPE_3D:
-              imageInfos.back().imageView = device->nullImageView3D;
+              imageInfos.PeekBack().imageView = device->nullImageView3D;
               break;
             case VK_IMAGE_VIEW_TYPE_CUBE:
-              imageInfos.back().imageView = device->nullImageViewCube;
+              imageInfos.PeekBack().imageView = device->nullImageViewCube;
               break;
             case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
-              imageInfos.back().imageView = device->nullImageView1DArray;
+              imageInfos.PeekBack().imageView = device->nullImageView1DArray;
               break;
             case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
-              imageInfos.back().imageView = device->nullImageView2DArray;
+              imageInfos.PeekBack().imageView = device->nullImageView2DArray;
               break;
             case VK_IMAGE_VIEW_TYPE_CUBE_ARRAY:
-              imageInfos.back().imageView = device->nullImageViewCubeArray;
+              imageInfos.PeekBack().imageView = device->nullImageViewCubeArray;
               break;
             case VK_IMAGE_VIEW_TYPE_MAX_ENUM:
               break;
@@ -1490,11 +1487,11 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           const Texture* texture = (const Texture*)resource;
           if (subresource >= 0)
           {
-            imageInfos.back().imageView = to_internal(texture)->subresources_srv[subresource];
+            imageInfos.PeekBack().imageView = to_internal(texture)->subresources_srv[subresource];
           }
           else
           {
-            imageInfos.back().imageView = to_internal(texture)->srv;
+            imageInfos.PeekBack().imageView = to_internal(texture)->srv;
           }
 
           VkImageLayout layout = _ConvertImageLayout(texture->desc.layout);
@@ -1503,17 +1500,16 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
             // Means texture initial layout is not compatible, so it must have been transitioned
             layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
           }
-          imageInfos.back().imageLayout = layout;
+          imageInfos.PeekBack().imageLayout = layout;
         }
       }
       break;
 
       case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
       {
-        imageInfos.emplace_back();
-        write.pImageInfo = &imageInfos.back();
-        imageInfos.back() = {};
-        imageInfos.back().imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        write.pImageInfo = &imageInfos.ExpandAndGetRef();
+        imageInfos.PeekBack() = {};
+        imageInfos.PeekBack().imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_U;
         const GPUResource* resource = UAV[original_binding];
@@ -1522,25 +1518,25 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           switch (viewtype)
           {
             case VK_IMAGE_VIEW_TYPE_1D:
-              imageInfos.back().imageView = device->nullImageView1D;
+              imageInfos.PeekBack().imageView = device->nullImageView1D;
               break;
             case VK_IMAGE_VIEW_TYPE_2D:
-              imageInfos.back().imageView = device->nullImageView2D;
+              imageInfos.PeekBack().imageView = device->nullImageView2D;
               break;
             case VK_IMAGE_VIEW_TYPE_3D:
-              imageInfos.back().imageView = device->nullImageView3D;
+              imageInfos.PeekBack().imageView = device->nullImageView3D;
               break;
             case VK_IMAGE_VIEW_TYPE_CUBE:
-              imageInfos.back().imageView = device->nullImageViewCube;
+              imageInfos.PeekBack().imageView = device->nullImageViewCube;
               break;
             case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
-              imageInfos.back().imageView = device->nullImageView1DArray;
+              imageInfos.PeekBack().imageView = device->nullImageView1DArray;
               break;
             case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
-              imageInfos.back().imageView = device->nullImageView2DArray;
+              imageInfos.PeekBack().imageView = device->nullImageView2DArray;
               break;
             case VK_IMAGE_VIEW_TYPE_CUBE_ARRAY:
-              imageInfos.back().imageView = device->nullImageViewCubeArray;
+              imageInfos.PeekBack().imageView = device->nullImageViewCubeArray;
               break;
             case VK_IMAGE_VIEW_TYPE_MAX_ENUM:
               break;
@@ -1554,11 +1550,11 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           const Texture* texture = (const Texture*)resource;
           if (subresource >= 0)
           {
-            imageInfos.back().imageView = to_internal(texture)->subresources_uav[subresource];
+            imageInfos.PeekBack().imageView = to_internal(texture)->subresources_uav[subresource];
           }
           else
           {
-            imageInfos.back().imageView = to_internal(texture)->uav;
+            imageInfos.PeekBack().imageView = to_internal(texture)->uav;
           }
         }
       }
@@ -1566,16 +1562,15 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
 
       case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
       {
-        bufferInfos.emplace_back();
-        write.pBufferInfo = &bufferInfos.back();
-        bufferInfos.back() = {};
+        write.pBufferInfo = &bufferInfos.ExpandAndGetRef();
+        bufferInfos.PeekBack() = {};
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_B;
         const GPUBuffer* buffer = CBV[original_binding];
         if (buffer == nullptr || !buffer->IsValid())
         {
-          bufferInfos.back().buffer = device->nullBuffer;
-          bufferInfos.back().range = VK_WHOLE_SIZE;
+          bufferInfos.PeekBack().buffer = device->nullBuffer;
+          bufferInfos.PeekBack().range = VK_WHOLE_SIZE;
         }
         else
         {
@@ -1583,15 +1578,15 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           if (buffer->desc.Usage == ezRHIUsage::Dynamic)
           {
             const GPUAllocation& allocation = internal_state->dynamic[cmd];
-            bufferInfos.back().buffer = to_internal(allocation.buffer)->resource;
-            bufferInfos.back().offset = allocation.offset;
-            bufferInfos.back().range = buffer->desc.ByteWidth;
+            bufferInfos.PeekBack().buffer = to_internal(allocation.buffer)->resource;
+            bufferInfos.PeekBack().offset = allocation.offset;
+            bufferInfos.PeekBack().range = buffer->desc.ByteWidth;
           }
           else
           {
-            bufferInfos.back().buffer = internal_state->resource;
-            bufferInfos.back().offset = 0;
-            bufferInfos.back().range = buffer->desc.ByteWidth;
+            bufferInfos.PeekBack().buffer = internal_state->resource;
+            bufferInfos.PeekBack().offset = 0;
+            bufferInfos.PeekBack().range = buffer->desc.ByteWidth;
           }
         }
       }
@@ -1599,15 +1594,14 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
 
       case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
       {
-        texelBufferViews.emplace_back();
-        write.pTexelBufferView = &texelBufferViews.back();
-        texelBufferViews.back() = {};
+        write.pTexelBufferView = &texelBufferViews.ExpandAndGetRef();
+        texelBufferViews.PeekBack() = {};
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_T;
         const GPUResource* resource = SRV[original_binding];
         if (resource == nullptr || !resource->IsValid() || !resource->IsBuffer())
         {
-          texelBufferViews.back() = device->nullBufferView;
+          texelBufferViews.PeekBack() = device->nullBufferView;
         }
         else
         {
@@ -1615,11 +1609,11 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           const GPUBuffer* buffer = (const GPUBuffer*)resource;
           if (subresource >= 0)
           {
-            texelBufferViews.back() = to_internal(buffer)->subresources_srv[subresource];
+            texelBufferViews.PeekBack() = to_internal(buffer)->subresources_srv[subresource];
           }
           else
           {
-            texelBufferViews.back() = to_internal(buffer)->srv;
+            texelBufferViews.PeekBack() = to_internal(buffer)->srv;
           }
         }
       }
@@ -1627,15 +1621,14 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
 
       case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
       {
-        texelBufferViews.emplace_back();
-        write.pTexelBufferView = &texelBufferViews.back();
-        texelBufferViews.back() = {};
+        write.pTexelBufferView = &texelBufferViews.ExpandAndGetRef();
+        texelBufferViews.PeekBack() = {};
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_U;
         const GPUResource* resource = UAV[original_binding];
         if (resource == nullptr || !resource->IsValid() || !resource->IsBuffer())
         {
-          texelBufferViews.back() = device->nullBufferView;
+          texelBufferViews.PeekBack() = device->nullBufferView;
         }
         else
         {
@@ -1643,11 +1636,11 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           const GPUBuffer* buffer = (const GPUBuffer*)resource;
           if (subresource >= 0)
           {
-            texelBufferViews.back() = to_internal(buffer)->subresources_uav[subresource];
+            texelBufferViews.PeekBack() = to_internal(buffer)->subresources_uav[subresource];
           }
           else
           {
-            texelBufferViews.back() = to_internal(buffer)->uav;
+            texelBufferViews.PeekBack() = to_internal(buffer)->uav;
           }
         }
       }
@@ -1655,9 +1648,8 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
 
       case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
       {
-        bufferInfos.emplace_back();
-        write.pBufferInfo = &bufferInfos.back();
-        bufferInfos.back() = {};
+        write.pBufferInfo = &bufferInfos.ExpandAndGetRef();
+        bufferInfos.PeekBack() = {};
 
         if (x.binding < VULKAN_BINDING_SHIFT_U)
         {
@@ -1666,15 +1658,15 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           const GPUResource* resource = SRV[original_binding];
           if (resource == nullptr || !resource->IsValid() || !resource->IsBuffer())
           {
-            bufferInfos.back().buffer = device->nullBuffer;
-            bufferInfos.back().range = VK_WHOLE_SIZE;
+            bufferInfos.PeekBack().buffer = device->nullBuffer;
+            bufferInfos.PeekBack().range = VK_WHOLE_SIZE;
           }
           else
           {
             int subresource = SRV_index[original_binding];
             const GPUBuffer* buffer = (const GPUBuffer*)resource;
-            bufferInfos.back().buffer = to_internal(buffer)->resource;
-            bufferInfos.back().range = buffer->desc.ByteWidth;
+            bufferInfos.PeekBack().buffer = to_internal(buffer)->resource;
+            bufferInfos.PeekBack().range = buffer->desc.ByteWidth;
           }
         }
         else
@@ -1684,15 +1676,15 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
           const GPUResource* resource = UAV[original_binding];
           if (resource == nullptr || !resource->IsValid() || !resource->IsBuffer())
           {
-            bufferInfos.back().buffer = device->nullBuffer;
-            bufferInfos.back().range = VK_WHOLE_SIZE;
+            bufferInfos.PeekBack().buffer = device->nullBuffer;
+            bufferInfos.PeekBack().range = VK_WHOLE_SIZE;
           }
           else
           {
             int subresource = UAV_index[original_binding];
             const GPUBuffer* buffer = (const GPUBuffer*)resource;
-            bufferInfos.back().buffer = to_internal(buffer)->resource;
-            bufferInfos.back().range = buffer->desc.ByteWidth;
+            bufferInfos.PeekBack().buffer = to_internal(buffer)->resource;
+            bufferInfos.PeekBack().range = buffer->desc.ByteWidth;
           }
         }
       }
@@ -1700,11 +1692,10 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
 
       case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
       {
-        accelerationStructureViews.emplace_back();
-        write.pNext = &accelerationStructureViews.back();
-        accelerationStructureViews.back() = {};
-        accelerationStructureViews.back().sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
-        accelerationStructureViews.back().accelerationStructureCount = 1;
+        write.pNext = &accelerationStructureViews.ExpandAndGetRef();
+        accelerationStructureViews.PeekBack() = {};
+        accelerationStructureViews.PeekBack().sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+        accelerationStructureViews.PeekBack().accelerationStructureCount = 1;
 
         const ezUInt32 original_binding = x.binding - VULKAN_BINDING_SHIFT_T;
         const GPUResource* resource = SRV[original_binding];
@@ -1715,14 +1706,14 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::valid
         else
         {
           const RaytracingAccelerationStructure* as = (const RaytracingAccelerationStructure*)resource;
-          accelerationStructureViews.back().pAccelerationStructures = &to_internal(as)->resource;
+          accelerationStructureViews.PeekBack().pAccelerationStructures = &to_internal(as)->resource;
         }
       }
       break;
     }
   }
 
-  vkUpdateDescriptorSets(device->device, (ezUInt32)descriptorWrites.size(), descriptorWrites.data(), 0, nullptr);
+  vkUpdateDescriptorSets(device->device, descriptorWrites.GetCount(), descriptorWrites.GetData(), 0, nullptr);
 
   vkCmdBindDescriptorSets(device->GetDirectCommandList(cmd),
     graphics ? VK_PIPELINE_BIND_POINT_GRAPHICS : (raytracing ? VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR : VK_PIPELINE_BIND_POINT_COMPUTE),
@@ -2068,6 +2059,10 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
 
 
       // Blending:
+
+      // ez new
+      BlendStateDesc psoBlendStateDesc = pso->desc.bs != nullptr ? pso->desc.bs->GetDesc() : BlendStateDesc();
+
       ezUInt32 numBlendAttachments = 0;
       VkPipelineColorBlendAttachmentState colorBlendAttachments[8];
       const size_t blend_loopCount = active_renderpass[cmd] == nullptr ? 1 : active_renderpass[cmd]->desc.attachments.GetCount();
@@ -2078,7 +2073,9 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
           continue;
         }
 
-        RenderTargetBlendStateDesc desc = pso->desc.bs->desc.RenderTarget[numBlendAttachments];
+        // ez new
+        RenderTargetBlendStateDesc desc = psoBlendStateDesc.RenderTarget[numBlendAttachments];
+
         VkPipelineColorBlendAttachmentState& attachment = colorBlendAttachments[numBlendAttachments];
         numBlendAttachments++;
 
@@ -2150,7 +2147,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
       VkResult res = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline);
       assert(res == VK_SUCCESS);
 
-      pipelines_worker[cmd].push_back(std::make_pair(pipeline_hash, pipeline));
+      pipelines_worker[cmd].PushBack(std::make_pair(pipeline_hash, pipeline));
     }
   }
   else
@@ -2789,13 +2786,13 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
       barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
       barrier.image = nullImage1D;
       barrier.subresourceRange.layerCount = 1;
-      frame.loadedimagetransitions.push_back(barrier);
+      frame.loadedimagetransitions.PushBack(barrier);
       barrier.image = nullImage2D;
       barrier.subresourceRange.layerCount = 6;
-      frame.loadedimagetransitions.push_back(barrier);
+      frame.loadedimagetransitions.PushBack(barrier);
       barrier.image = nullImage3D;
       barrier.subresourceRange.layerCount = 1;
-      frame.loadedimagetransitions.push_back(barrier);
+      frame.loadedimagetransitions.PushBack(barrier);
     }
     copyQueueLock.unlock();
 
@@ -2869,7 +2866,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     poolInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
     res = vkCreateQueryPool(device, &poolInfo, nullptr, &querypool_timestamp);
     assert(res == VK_SUCCESS);
-    timestamps_to_reset.reserve(timestamp_query_count);
+    timestamps_to_reset.Reserve(timestamp_query_count);
 
     for (ezUInt32 i = 0; i < occlusion_query_count; ++i)
     {
@@ -2879,7 +2876,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     poolInfo.queryType = VK_QUERY_TYPE_OCCLUSION;
     res = vkCreateQueryPool(device, &poolInfo, nullptr, &querypool_occlusion);
     assert(res == VK_SUCCESS);
-    occlusions_to_reset.reserve(occlusion_query_count);
+    occlusions_to_reset.Reserve(occlusion_query_count);
   }
 
   ezLog::Info("Created GraphicsDevice_Vulkan");
@@ -2942,7 +2939,7 @@ GraphicsDevice_Vulkan::~GraphicsDevice_Vulkan()
   vkDestroySampler(device, nullSampler, nullptr);
 
   vkDestroyRenderPass(device, defaultRenderPass, nullptr);
-  for (size_t i = 0; i < swapChainImages.size(); ++i)
+  for (size_t i = 0; i < swapChainImages.GetCount(); ++i)
   {
     vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
     vkDestroyImageView(device, swapChainImageViews[i], nullptr);
@@ -3046,8 +3043,8 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
   res = vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
   assert(res == VK_SUCCESS);
   assert(BACKBUFFER_COUNT <= imageCount);
-  swapChainImages.resize(imageCount);
-  res = vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
+  swapChainImages.SetCount(imageCount);
+  res = vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.GetData());
   assert(res == VK_SUCCESS);
   swapChainImageFormat = surfaceFormat.format;
 
@@ -3111,9 +3108,9 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
   }
 
   // Create swap chain render targets:
-  swapChainImageViews.resize(swapChainImages.size());
-  swapChainFramebuffers.resize(swapChainImages.size());
-  for (size_t i = 0; i < swapChainImages.size(); ++i)
+  swapChainImageViews.SetCount(swapChainImages.GetCount());
+  swapChainFramebuffers.SetCount(swapChainImages.GetCount());
+  for (size_t i = 0; i < swapChainImages.GetCount(); ++i)
   {
     VkImageViewCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -3630,7 +3627,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
       barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
       barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
 
-      frame.loadedimagetransitions.push_back(barrier);
+      frame.loadedimagetransitions.PushBack(barrier);
     }
     copyQueueLock.unlock();
   }
@@ -3680,7 +3677,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
     barrier.subresourceRange.levelCount = imageInfo.mipLevels;
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    frame.loadedimagetransitions.push_back(barrier);
+    frame.loadedimagetransitions.PushBack(barrier);
 
     copyQueueLock.unlock();
   }
@@ -5650,9 +5647,9 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
     case GPU_QUERY_TYPE_TIMESTAMP:
       res = vkGetQueryPoolResults(device, querypool_timestamp, (ezUInt32)internal_state->query_index, 1, sizeof(ezUInt64),
         &result->result_timestamp, sizeof(ezUInt64), VK_QUERY_RESULT_64_BIT);
-      if (timestamps_to_reset.empty() || timestamps_to_reset.back() != (ezUInt32)internal_state->query_index)
+      if (timestamps_to_reset.IsEmpty() || timestamps_to_reset.PeekBack() != internal_state->query_index)
       {
-        timestamps_to_reset.push_back((ezUInt32)internal_state->query_index);
+        timestamps_to_reset.PushBack(internal_state->query_index);
       }
       break;
     case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
@@ -5662,9 +5659,9 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
     case GPU_QUERY_TYPE_OCCLUSION:
       res = vkGetQueryPoolResults(device, querypool_occlusion, (ezUInt32)internal_state->query_index, 1, sizeof(ezUInt64),
         &result->result_passed_sample_count, sizeof(ezUInt64), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_PARTIAL_BIT);
-      if (occlusions_to_reset.empty() || occlusions_to_reset.back() != (ezUInt32)internal_state->query_index)
+      if (occlusions_to_reset.IsEmpty() || occlusions_to_reset.PeekBack() != internal_state->query_index)
       {
-        occlusions_to_reset.push_back((ezUInt32)internal_state->query_index);
+        occlusions_to_reset.PushBack((ezUInt32)internal_state->query_index);
       }
       break;
   }
@@ -5839,12 +5836,12 @@ CommandList GraphicsDevice_Vulkan::BeginCommandList()
   {
     vkCmdResetQueryPool(GetDirectCommandList(cmd), querypool_timestamp, x, 1);
   }
-  timestamps_to_reset.clear();
+  timestamps_to_reset.Clear();
   for (auto& x : occlusions_to_reset)
   {
     vkCmdResetQueryPool(GetDirectCommandList(cmd), querypool_occlusion, x, 1);
   }
-  occlusions_to_reset.clear();
+  occlusions_to_reset.Clear();
 
   prev_pipeline_hash[cmd] = 0;
   active_pso[cmd] = nullptr;
@@ -5894,7 +5891,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
           0, nullptr,
           1, &barrier);
       }
-      frame.loadedimagetransitions.clear();
+      frame.loadedimagetransitions.Clear();
 
       VkResult res = vkEndCommandBuffer(frame.transitionCommandBuffer);
       assert(res == VK_SUCCESS);
@@ -5941,7 +5938,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
           allocationhandler->destroylocker.unlock();
         }
       }
-      pipelines_worker[cmd].clear();
+      pipelines_worker[cmd].Clear();
     }
 
     VkSubmitInfo submitInfo = {};
@@ -6025,7 +6022,7 @@ void GraphicsDevice_Vulkan::ClearPipelineStateCache()
     {
       allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
     }
-    pipelines_worker[i].clear();
+    pipelines_worker[i].Clear();
   }
   allocationhandler->destroylocker.unlock();
 }

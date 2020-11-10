@@ -141,7 +141,7 @@ public:
 
     // Create a device
     {
-      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX11, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
+      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_Vulkan, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -155,8 +155,8 @@ public:
       ezFileReader fReader;
       ezDynamicArray<ezUInt8> dataBuffer;
 
-      fReader.Open("ps5_0.o").IgnoreResult();
-      //fReader.Open("ps_sv11.o").IgnoreResult();
+      //fReader.Open("ps5_0.o").IgnoreResult();
+      fReader.Open("ps_sv11.o").IgnoreResult();
       //fReader.Open("ps6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
@@ -170,8 +170,8 @@ public:
         fReader.Close();
       }
 
-      fReader.Open("vs5_0.o").IgnoreResult();
-      //fReader.Open("vs_sv11.o").IgnoreResult();
+      //fReader.Open("vs5_0.o").IgnoreResult();
+      fReader.Open("vs_sv11.o").IgnoreResult();
       //fReader.Open("vs6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
@@ -209,17 +209,17 @@ public:
 
       //BlendStateDesc bd;
       //bd.RenderTarget[0].BlendEnable = true;
-      //bd.RenderTarget[0].SrcBlend = BLEND_SRC_ALPHA;
-      //bd.RenderTarget[0].DestBlend = BLEND_INV_SRC_ALPHA;
-      //bd.RenderTarget[0].BlendOp = BLEND_OP_ADD;
-      //bd.RenderTarget[0].SrcBlendAlpha = BLEND_ONE;
-      //bd.RenderTarget[0].DestBlendAlpha = BLEND_ONE;
-      //bd.RenderTarget[0].BlendOpAlpha = BLEND_OP_ADD;
-      //bd.RenderTarget[0].RenderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
+      //bd.RenderTarget[0].SrcBlend = ezRHIBlendFactor::SourceAlpha;
+      //bd.RenderTarget[0].DestBlend = ezRHIBlendFactor::InverseSourceAlpha;
+      //bd.RenderTarget[0].BlendOp = ezRHIBlendOp::Add;
+      //bd.RenderTarget[0].SrcBlendAlpha = ezRHIBlendFactor::One;
+      //bd.RenderTarget[0].DestBlendAlpha = ezRHIBlendFactor::One;
+      //bd.RenderTarget[0].BlendOpAlpha = ezRHIBlendOp::Add;
+      //bd.RenderTarget[0].RenderTargetWriteMask = ezRHIColorWriteMask::All;
       //bd.IndependentBlendEnable = false;
       //m_pDevice->CreateBlendState(&bd, &blendState);
 
-      //pipelineDesc.bs = &blendState;
+      pipelineDesc.bs = &blendState;
 
       m_pDevice->CreatePipelineState(&pipelineDesc, &pipeline);
     }
@@ -365,8 +365,8 @@ public:
 
     float aspect = (float)(m_pWindow->GetClientAreaSize().width / m_pWindow->GetClientAreaSize().height);
 
-    ezMat4 view = ezGraphicsUtils::CreateLookAtViewMatrix(ezVec3(0, 0, 5), ezVec3::ZeroVector(), ezVec3::UnitYAxis());
-    ezMat4 proj = ezGraphicsUtils::CreatePerspectiveProjectionMatrixFromFovX(ezAngle::Radian(ezMath::Pi<float>() / 4.0f), aspect, .1f, 100.f);
+    ezMat4 view = ezGraphicsUtils::CreateLookAtViewMatrix(ezVec3(0, 0, 5), ezVec3::ZeroVector(), ezVec3::UnitYAxis(), ezHandedness::Default);
+    ezMat4 proj = ezGraphicsUtils::CreatePerspectiveProjectionMatrixFromFovX(ezAngle::Radian(ezMath::Pi<float>() / 4.0f), aspect, .1f, 100.f, ezClipSpaceDepthRange::Default, ezClipSpaceYMode::Regular, ezHandedness::Default);
 
     ezMat4 viewProj = proj * view * world;
 
