@@ -141,7 +141,7 @@ public:
 
     // Create a device
     {
-      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_Vulkan, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
+      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX11, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -155,8 +155,8 @@ public:
       ezFileReader fReader;
       ezDynamicArray<ezUInt8> dataBuffer;
 
-      //fReader.Open("ps5_0.o").IgnoreResult();
-      fReader.Open("ps_sv11.o").IgnoreResult();
+      fReader.Open("ps5_0.o").IgnoreResult();
+      //fReader.Open("ps_sv11.o").IgnoreResult();
       //fReader.Open("ps6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
@@ -170,8 +170,8 @@ public:
         fReader.Close();
       }
 
-      //fReader.Open("vs5_0.o").IgnoreResult();
-      fReader.Open("vs_sv11.o").IgnoreResult();
+      fReader.Open("vs5_0.o").IgnoreResult();
+      //fReader.Open("vs_sv11.o").IgnoreResult();
       //fReader.Open("vs6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
@@ -200,12 +200,12 @@ public:
       pipelineDesc.pt = ezRHIPrimitiveTopology::TriangleList;
       pipelineDesc.il = &inputLayout;
 
-      //BlendStateDesc bsDesc;
-      //bsDesc.IndependentBlendEnable = true;
+      BlendStateDesc bsDesc;
+      bsDesc.IndependentBlendEnable = true;
 
-      //m_pDevice->CreateBlendState(&bsDesc, &blendState);
+      m_pDevice->CreateBlendState(&bsDesc, &blendState);
 
-      //pipelineDesc.bs = &blendState;
+      pipelineDesc.bs = &blendState;
 
       //BlendStateDesc bd;
       //bd.RenderTarget[0].BlendEnable = true;
