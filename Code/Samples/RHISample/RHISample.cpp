@@ -141,7 +141,7 @@ public:
 
     // Create a device
     {
-      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX12, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
+      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_Vulkan, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -156,8 +156,8 @@ public:
       ezDynamicArray<ezUInt8> dataBuffer;
 
       //fReader.Open("ps5_0.o").IgnoreResult();
-      //fReader.Open("ps_sv11.o").IgnoreResult();
-      fReader.Open("ps6_2.o").IgnoreResult();
+      fReader.Open("ps_sv11.o").IgnoreResult();
+      //fReader.Open("ps6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
       {
@@ -171,8 +171,8 @@ public:
       }
 
       //fReader.Open("vs5_0.o").IgnoreResult();
-      //fReader.Open("vs_sv11.o").IgnoreResult();
-      fReader.Open("vs6_2.o").IgnoreResult();
+      fReader.Open("vs_sv11.o").IgnoreResult();
+      //fReader.Open("vs6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
       {
@@ -207,18 +207,18 @@ public:
 
       pipelineDesc.bs = &blendState;
 
-      RasterizerStateDesc rssDesc;
+      //RasterizerStateDesc rssDesc;
 
-      m_pDevice->CreateRasterizerState(&rssDesc, &rasterizerState);
+      //m_pDevice->CreateRasterizerState(&rssDesc, &rasterizerState);
 
-      pipelineDesc.rs = &rasterizerState;
+      //pipelineDesc.rs = &rasterizerState;
 
-      DepthStencilStateDesc dssDesc;
+      //DepthStencilStateDesc dssDesc;
 
 
-      m_pDevice->CreateDepthStencilState(&dssDesc, &depthStencilState);
+      //m_pDevice->CreateDepthStencilState(&dssDesc, &depthStencilState);
 
-      pipelineDesc.dss = &depthStencilState;
+      //pipelineDesc.dss = &depthStencilState;
 
       //BlendStateDesc bd;
       //bd.RenderTarget[0].BlendEnable = true;
@@ -234,8 +234,8 @@ public:
 
       pipelineDesc.bs = &blendState;
 
-      SamplerDesc samplerDesc;
-      m_pDevice->CreateSampler(&samplerDesc, &sampler);
+      //SamplerDesc samplerDesc;
+      //m_pDevice->CreateSampler(&samplerDesc, &sampler);
 
       m_pDevice->CreatePipelineState(&pipelineDesc, &pipeline);
     }

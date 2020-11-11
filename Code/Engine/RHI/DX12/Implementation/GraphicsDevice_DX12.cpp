@@ -514,8 +514,9 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
         CD3DX12_PIPELINE_STATE_STREAM_SAMPLE_DESC SampleDesc;
         CD3DX12_PIPELINE_STATE_STREAM_SAMPLE_MASK SampleMask;
 
-        CD3DX12_PIPELINE_STATE_STREAM_MS MS;
-        CD3DX12_PIPELINE_STATE_STREAM_AS AS;
+        // ez Need to update to latest win10 to support these
+        //CD3DX12_PIPELINE_STATE_STREAM_MS MS;
+        //CD3DX12_PIPELINE_STATE_STREAM_AS AS;
       } stream = {};
 
       if (pso->desc.vs != nullptr)
@@ -539,14 +540,15 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
         stream.PS = {pso->desc.ps->code.GetData(), pso->desc.ps->code.GetCount()};
       }
 
-      if (pso->desc.ms != nullptr)
-      {
-        stream.MS = {pso->desc.ms->code.GetData(), pso->desc.ms->code.GetCount()};
-      }
-      if (pso->desc.as != nullptr)
-      {
-        stream.AS = {pso->desc.as->code.GetData(), pso->desc.as->code.GetCount()};
-      }
+      // ez enable these when win10 updated
+      //if (pso->desc.ms != nullptr)
+      //{
+      //  stream.MS = {pso->desc.ms->code.GetData(), pso->desc.ms->code.GetCount()};
+      //}
+      //if (pso->desc.as != nullptr)
+      //{
+      //  stream.AS = {pso->desc.as->code.GetData(), pso->desc.as->code.GetCount()};
+      //}
 
       RasterizerStateDesc pRasterizerStateDesc = pso->desc.rs != nullptr ? pso->desc.rs->GetDesc() : RasterizerStateDesc();
       CD3DX12_RASTERIZER_DESC rs = {};

@@ -20,8 +20,8 @@ cbuffer ProjectionMatrixBuffer : register(b0)
 PS_INPUT VSMain(VS_INPUT input)
 {
     PS_INPUT output;
-    //output.Position = float4(input.Position.xyz, 1.0f);
-    output.Position = mul(ProjectionMatrix, float4(input.Position.xyz, 1.0f));
+    //output.Position = float4(input.Position, 1.0f);
+    output.Position = mul(ProjectionMatrix, float4(input.Position, 1.0f));
     output.Color = input.Color;
     return output;
 }
