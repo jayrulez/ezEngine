@@ -1336,7 +1336,7 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
   }
   if (FAILED(hr))
   {
-    EZ_REPORT_FAILURE("Failed to create the graphics device! ERROR: {0}", ezHRESULTtoString(hr) /*todo: std::hex*/);
+    EZ_REPORT_FAILURE("Failed to create the graphics device! ERROR: {0}", ezHRESULTtoString(hr) /*ez TODO: std::hex*/);
   }
 
   ComPtr<IDXGIDevice2> pDXGIDevice;
