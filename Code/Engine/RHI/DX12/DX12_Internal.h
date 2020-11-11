@@ -275,7 +275,7 @@ namespace DX12_Internal
   struct Query_DX12
   {
     std::shared_ptr<DX12AllocationHandler> allocationhandler;
-    GPU_QUERY_TYPE query_type = GPU_QUERY_TYPE_INVALID;
+    ezRHIGPUQueryType::Enum query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
     ezUInt32 query_index = ~0;
 
     ~Query_DX12()
@@ -286,11 +286,11 @@ namespace DX12_Internal
         ezUInt64 framecount = allocationhandler->framecount;
         switch (query_type)
         {
-          case GPU_QUERY_TYPE_OCCLUSION:
-          case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+          case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
+          case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
             allocationhandler->destroyer_queries_occlusion.push_back(std::make_pair(query_index, framecount));
             break;
-          case GPU_QUERY_TYPE_TIMESTAMP:
+          case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
             allocationhandler->destroyer_queries_timestamp.push_back(std::make_pair(query_index, framecount));
             break;
         }

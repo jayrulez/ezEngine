@@ -188,7 +188,7 @@ public:
 
     {
       InputLayoutDesc layout[] = {
-        {"ATTRIBUTE", 0, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, ezRHIInputClassification::PerVertexData, 0},
+        {"ATTRIBUTE", 0, ezRHIFormat::R32G32B32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, ezRHIInputClassification::PerVertexData, 0},
         {"ATTRIBUTE", 1, ezRHIFormat::R32G32B32A32_FLOAT, 0, InputLayoutDesc::APPEND_ALIGNED_ELEMENT, ezRHIInputClassification::PerVertexData, 0},
       };
 
@@ -257,7 +257,7 @@ public:
       bufferDesc.Usage = ezRHIUsage::Immutable;
       bufferDesc.BindFlags = BIND_VERTEX_BUFFER;
       bufferDesc.ByteWidth = sizeof(cubeVertices);
-      bufferDesc.StructureByteStride = sizeof(Vertex);
+      //bufferDesc.StructureByteStride = sizeof(Vertex);
       SubresourceData quadData;
       quadData.pSysMem = cubeVertices;
       m_pDevice->CreateBuffer(&bufferDesc, &quadData, &vertexBuffer);

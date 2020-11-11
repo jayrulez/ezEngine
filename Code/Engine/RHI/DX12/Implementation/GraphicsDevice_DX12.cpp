@@ -1780,29 +1780,29 @@ bool GraphicsDevice_DX12::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuer
 
   switch (pDesc->Type)
   {
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       if (allocationhandler->free_timestampqueries.pop_front(internal_state->query_index))
       {
         hr = S_OK;
       }
       else
       {
-        internal_state->query_type = GPU_QUERY_TYPE_INVALID;
+        internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
         assert(0);
       }
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
       hr = S_OK;
       break;
-    case GPU_QUERY_TYPE_OCCLUSION:
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       if (allocationhandler->free_occlusionqueries.pop_front(internal_state->query_index))
       {
         hr = S_OK;
       }
       else
       {
-        internal_state->query_type = GPU_QUERY_TYPE_INVALID;
+        internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
         assert(0);
       }
       break;
@@ -3306,18 +3306,18 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
 
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_EVENT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT:
       assert(0); // not implemented yet
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       querypool_timestamp_readback->Map(0, &range, &data);
       result->result_timestamp = *(ezUInt64*)((size_t)data + range.Begin);
       querypool_timestamp_readback->Unmap(0, &nullrange);
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
       directQueue->GetTimestampFrequency(&result->result_timestamp_frequency);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
     {
       BOOL passed = FALSE;
       querypool_occlusion_readback->Map(0, &range, &data);
@@ -3326,7 +3326,7 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
       result->result_passed_sample_count = (ezUInt64)passed;
       break;
     }
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       querypool_occlusion_readback->Map(0, &range, &data);
       result->result_passed_sample_count = *(ezUInt64*)((size_t)data + range.Begin);
       querypool_occlusion_readback->Unmap(0, &nullrange);
@@ -3508,13 +3508,13 @@ void GraphicsDevice_DX12::SubmitCommandLists()
       {
         switch (x.type)
         {
-          case GPU_QUERY_TYPE_TIMESTAMP:
+          case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
             GetDirectCommandList(cmd)->ResolveQueryData(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, x.index, 1, querypool_timestamp_readback.Get(), (ezUInt64)x.index * sizeof(ezUInt64));
             break;
-          case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+          case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
             GetDirectCommandList(cmd)->ResolveQueryData(querypool_occlusion.Get(), D3D12_QUERY_TYPE_BINARY_OCCLUSION, x.index, 1, querypool_occlusion_readback.Get(), (ezUInt64)x.index * sizeof(ezUInt64));
             break;
-          case GPU_QUERY_TYPE_OCCLUSION:
+          case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
             GetDirectCommandList(cmd)->ResolveQueryData(querypool_occlusion.Get(), D3D12_QUERY_TYPE_OCCLUSION, x.index, 1, querypool_occlusion_readback.Get(), (ezUInt64)x.index * sizeof(ezUInt64));
             break;
         }
@@ -4145,13 +4145,13 @@ void GraphicsDevice_DX12::QueryBegin(const GPUQuery* query, CommandList cmd)
 
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       GetDirectCommandList(cmd)->BeginQuery(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, internal_state->query_index);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       GetDirectCommandList(cmd)->BeginQuery(querypool_occlusion.Get(), D3D12_QUERY_TYPE_BINARY_OCCLUSION, internal_state->query_index);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       GetDirectCommandList(cmd)->BeginQuery(querypool_occlusion.Get(), D3D12_QUERY_TYPE_OCCLUSION, internal_state->query_index);
       break;
   }
@@ -4162,13 +4162,13 @@ void GraphicsDevice_DX12::QueryEnd(const GPUQuery* query, CommandList cmd)
 
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       GetDirectCommandList(cmd)->EndQuery(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, internal_state->query_index);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       GetDirectCommandList(cmd)->EndQuery(querypool_occlusion.Get(), D3D12_QUERY_TYPE_BINARY_OCCLUSION, internal_state->query_index);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       GetDirectCommandList(cmd)->EndQuery(querypool_occlusion.Get(), D3D12_QUERY_TYPE_OCCLUSION, internal_state->query_index);
       break;
   }

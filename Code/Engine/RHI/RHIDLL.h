@@ -475,16 +475,21 @@ struct EZ_RHI_DLL ezRHIFilter
   };
 };
 
-
-enum GPU_QUERY_TYPE
+struct EZ_RHI_DLL ezRHIGPUQueryType
 {
-  GPU_QUERY_TYPE_INVALID,             // do not use! Indicates if query was not created.
-  GPU_QUERY_TYPE_EVENT,               // has the GPU reached this point?
-  GPU_QUERY_TYPE_OCCLUSION,           // how many samples passed depthstencil test?
-  GPU_QUERY_TYPE_OCCLUSION_PREDICATE, // are there any samples that passed depthstencil test
-  GPU_QUERY_TYPE_TIMESTAMP,           // retrieve time point of gpu execution
-  GPU_QUERY_TYPE_TIMESTAMP_DISJOINT,  // timestamp frequency information
+  typedef ezUInt32 StorageType;
+  enum Enum
+  {
+    GPU_QUERY_TYPE_INVALID,             // do not use! Indicates if query was not created.
+    GPU_QUERY_TYPE_EVENT,               // has the GPU reached this point?
+    GPU_QUERY_TYPE_OCCLUSION,           // how many samples passed depthstencil test?
+    GPU_QUERY_TYPE_OCCLUSION_PREDICATE, // are there any samples that passed depthstencil test
+    GPU_QUERY_TYPE_TIMESTAMP,           // retrieve time point of gpu execution
+    GPU_QUERY_TYPE_TIMESTAMP_DISJOINT,  // timestamp frequency information
+  };
 };
+
+
 
 enum SUBRESOURCE_TYPE
 {

@@ -130,7 +130,7 @@ struct EZ_RHI_DLL GPUBufferDesc
 };
 struct EZ_RHI_DLL GPUQueryDesc
 {
-  GPU_QUERY_TYPE Type = GPU_QUERY_TYPE_INVALID;
+  ezRHIGPUQueryType::Enum Type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
 };
 struct EZ_RHI_DLL GPUQueryResult
 {

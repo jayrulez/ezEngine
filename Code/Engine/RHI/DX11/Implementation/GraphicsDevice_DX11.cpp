@@ -688,23 +688,23 @@ bool GraphicsDevice_DX11::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuer
   D3D11_QUERY_DESC desc;
   desc.MiscFlags = 0;
   desc.Query = D3D11_QUERY_EVENT;
-  if (pDesc->Type == GPU_QUERY_TYPE_EVENT)
+  if (pDesc->Type == ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT)
   {
     desc.Query = D3D11_QUERY_EVENT;
   }
-  else if (pDesc->Type == GPU_QUERY_TYPE_OCCLUSION)
+  else if (pDesc->Type == ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION)
   {
     desc.Query = D3D11_QUERY_OCCLUSION;
   }
-  else if (pDesc->Type == GPU_QUERY_TYPE_OCCLUSION_PREDICATE)
+  else if (pDesc->Type == ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE)
   {
     desc.Query = D3D11_QUERY_OCCLUSION_PREDICATE;
   }
-  else if (pDesc->Type == GPU_QUERY_TYPE_TIMESTAMP)
+  else if (pDesc->Type == ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP)
   {
     desc.Query = D3D11_QUERY_TIMESTAMP;
   }
-  else if (pDesc->Type == GPU_QUERY_TYPE_TIMESTAMP_DISJOINT)
+  else if (pDesc->Type == ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT)
   {
     desc.Query = D3D11_QUERY_TIMESTAMP_DISJOINT;
   }
@@ -1294,21 +1294,21 @@ bool GraphicsDevice_DX11::QueryRead(const GPUQuery* query, GPUQueryResult* resul
   HRESULT hr = S_OK;
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       hr = immediateContext->GetData(QUERY, &result->result_timestamp, sizeof(ezUInt64), _flags);
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
     {
       D3D11_QUERY_DATA_TIMESTAMP_DISJOINT _temp;
       hr = immediateContext->GetData(QUERY, &_temp, sizeof(_temp), _flags);
       result->result_timestamp_frequency = _temp.Frequency;
     }
     break;
-    case GPU_QUERY_TYPE_EVENT:
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       hr = immediateContext->GetData(QUERY, &result->result_passed_sample_count, sizeof(ezUInt64), _flags);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
     {
       BOOL passed = FALSE;
       hr = immediateContext->GetData(QUERY, &passed, sizeof(BOOL), _flags);
@@ -1441,7 +1441,7 @@ void GraphicsDevice_DX11::WaitForGPU()
 
   GPUQuery query;
   GPUQueryDesc desc;
-  desc.Type = GPU_QUERY_TYPE_EVENT;
+  desc.Type = ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT;
   bool success = CreateQuery(&desc, &query);
   EZ_ASSERT_ALWAYS(success, "Failed to create query.");
   auto internal_state = to_internal(&query);

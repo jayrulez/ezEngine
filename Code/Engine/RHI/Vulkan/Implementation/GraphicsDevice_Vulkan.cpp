@@ -2961,29 +2961,29 @@ bool GraphicsDevice_Vulkan::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQu
 
   switch (pDesc->Type)
   {
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       if (allocationhandler->free_timestampqueries.pop_front(internal_state->query_index))
       {
         hr = true;
       }
       else
       {
-        internal_state->query_type = GPU_QUERY_TYPE_INVALID;
+        internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
         assert(0);
       }
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
       hr = true;
       break;
-    case GPU_QUERY_TYPE_OCCLUSION:
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       if (allocationhandler->free_occlusionqueries.pop_front(internal_state->query_index))
       {
         hr = true;
       }
       else
       {
-        internal_state->query_type = GPU_QUERY_TYPE_INVALID;
+        internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
         assert(0);
       }
       break;
@@ -4390,10 +4390,10 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
 
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_EVENT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT:
       assert(0); // not implemented yet
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       res = vkGetQueryPoolResults(device, querypool_timestamp, (ezUInt32)internal_state->query_index, 1, sizeof(ezUInt64),
         &result->result_timestamp, sizeof(ezUInt64), VK_QUERY_RESULT_64_BIT);
       if (timestamps_to_reset.IsEmpty() || timestamps_to_reset.PeekBack() != internal_state->query_index)
@@ -4401,11 +4401,11 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
         timestamps_to_reset.PushBack(internal_state->query_index);
       }
       break;
-    case GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
       result->result_timestamp_frequency = timestamp_frequency;
       break;
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       res = vkGetQueryPoolResults(device, querypool_occlusion, (ezUInt32)internal_state->query_index, 1, sizeof(ezUInt64),
         &result->result_passed_sample_count, sizeof(ezUInt64), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_PARTIAL_BIT);
       if (occlusions_to_reset.IsEmpty() || occlusions_to_reset.PeekBack() != internal_state->query_index)
@@ -5242,10 +5242,10 @@ void GraphicsDevice_Vulkan::QueryBegin(const GPUQuery* query, CommandList cmd)
 
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       vkCmdBeginQuery(GetDirectCommandList(cmd), querypool_occlusion, (ezUInt32)internal_state->query_index, 0);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       vkCmdBeginQuery(GetDirectCommandList(cmd), querypool_occlusion, (ezUInt32)internal_state->query_index, VK_QUERY_CONTROL_PRECISE_BIT);
       break;
   }
@@ -5256,13 +5256,13 @@ void GraphicsDevice_Vulkan::QueryEnd(const GPUQuery* query, CommandList cmd)
 
   switch (query->desc.Type)
   {
-    case GPU_QUERY_TYPE_TIMESTAMP:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       vkCmdWriteTimestamp(GetDirectCommandList(cmd), VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, querypool_timestamp, internal_state->query_index);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       vkCmdEndQuery(GetDirectCommandList(cmd), querypool_occlusion, internal_state->query_index);
       break;
-    case GPU_QUERY_TYPE_OCCLUSION:
+    case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
       vkCmdEndQuery(GetDirectCommandList(cmd), querypool_occlusion, internal_state->query_index);
       break;
   }

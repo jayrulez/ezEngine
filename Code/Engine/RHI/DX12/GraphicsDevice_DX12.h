@@ -171,7 +171,7 @@ private:
   struct Query_Resolve
   {
     EZ_DECLARE_POD_TYPE();
-    GPU_QUERY_TYPE type;
+    ezRHIGPUQueryType::Enum type;
     UINT index;
   };
   ezDynamicArray<Query_Resolve> query_resolves[COMMANDLIST_COUNT] = {};
