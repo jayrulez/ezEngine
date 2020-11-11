@@ -16,7 +16,8 @@
 #  include <iostream>
 #  include <set>
 #  include <sstream>
-#  include <vector>
+
+#  include <RHI/FormatHelpers.h>
 
 // Enabling ray tracing might crash RenderDoc:
 #  define ENABLE_RAYTRACING_EXTENSION
@@ -1876,7 +1877,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
           if (bind.stride == InputLayoutDesc::APPEND_ALIGNED_ELEMENT)
           {
             // need to manually resolve this from the format spec.
-            bind.stride = GetFormatStride(x.Format);
+            bind.stride = FormatHelpers::GetFormatStride(x.Format);
           }
 
           if (lastBinding != bind.binding)
@@ -1909,7 +1910,7 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
           {
             // need to manually resolve this from the format spec.
             attr.offset = offset;
-            offset += GetFormatStride(x.Format);
+            offset += FormatHelpers::GetFormatStride(x.Format);
           }
 
           attributes.PushBack(attr);
@@ -3517,7 +3518,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
     VkBufferCreateInfo bufferInfo = {};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = imageInfo.extent.width * imageInfo.extent.height * imageInfo.extent.depth * imageInfo.arrayLayers *
-                      GetFormatStride(pTexture->desc.Format);
+                      FormatHelpers::GetFormatStride(pTexture->desc.Format);
 
     allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
     if (pDesc->Usage == ezRHIUsage::Staging)
@@ -3583,7 +3584,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
       {
         const SubresourceData& subresourceData = pInitialData[initDataIdx++];
         size_t cpysize = subresourceData.SysMemPitch * height;
-        if (IsFormatBlockCompressed(pDesc->Format))
+        if (FormatHelpers::IsFormatBlockCompressed(pDesc->Format))
         {
           cpysize /= 4;
         }
@@ -3611,7 +3612,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
 
         copyRegions.PushBack(copyRegion);
 
-        cpyoffset += Align(cpysize, GetFormatStride(pDesc->Format));
+        cpyoffset += Align(cpysize, FormatHelpers::GetFormatStride(pDesc->Format));
       }
     }
 
@@ -3700,7 +3701,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
     if (pTexture->desc.BindFlags & BIND_DEPTH_STENCIL)
     {
       barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-      if (IsFormatStencilSupport(pTexture->desc.Format))
+      if (FormatHelpers::IsFormatStencilSupport(pTexture->desc.Format))
       {
         barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
       }
@@ -4389,7 +4390,7 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
         continue;
       }
 
-      if (IsFormatStencilSupport(texdesc.Format))
+      if (FormatHelpers::IsFormatStencilSupport(texdesc.Format))
       {
         switch (attachment.loadop)
         {
@@ -6284,7 +6285,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
       if (src_desc.BindFlags & BIND_DEPTH_STENCIL)
       {
         copy.srcSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        if (IsFormatStencilSupport(src_desc.Format))
+        if (FormatHelpers::IsFormatStencilSupport(src_desc.Format))
         {
           copy.srcSubresource.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
         }
@@ -6300,7 +6301,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
       if (dst_desc.BindFlags & BIND_DEPTH_STENCIL)
       {
         copy.dstSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        if (IsFormatStencilSupport(dst_desc.Format))
+        if (FormatHelpers::IsFormatStencilSupport(dst_desc.Format))
         {
           copy.dstSubresource.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
         }
@@ -6525,7 +6526,7 @@ void GraphicsDevice_Vulkan::Barrier(const GPUBarrier* barriers, ezUInt32 numBarr
         if (desc.BindFlags & BIND_DEPTH_STENCIL)
         {
           barrierdesc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-          if (IsFormatStencilSupport(desc.Format))
+          if (FormatHelpers::IsFormatStencilSupport(desc.Format))
           {
             barrierdesc.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
           }

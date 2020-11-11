@@ -101,11 +101,6 @@ public:
 
   bool CheckCapability(GRAPHICSDEVICE_CAPABILITY capability) const;
 
-  ezUInt32 GetFormatStride(ezEnum<ezRHIFormat> value) const;
-  bool IsFormatUnorm(ezEnum<ezRHIFormat> value) const;
-  bool IsFormatBlockCompressed(ezEnum<ezRHIFormat> value) const;
-  bool IsFormatStencilSupport(ezEnum<ezRHIFormat> value) const;
-
   inline ezMat4 GetScreenProjection() const
   {
     return ezGraphicsUtils::CreateOrthographicProjectionMatrix(0, (float)GetScreenWidth(), (float)GetScreenHeight(), 0, -1, 1);

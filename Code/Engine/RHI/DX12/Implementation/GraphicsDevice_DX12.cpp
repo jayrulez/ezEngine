@@ -30,6 +30,9 @@
 #  include <tchar.h>
 #  include <wincodec.h>
 
+
+#include <RHI/FormatHelpers.h>
+
 using namespace Microsoft::WRL;
 
 namespace DX12_Internal
@@ -4145,7 +4148,7 @@ int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        ezUInt32 stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = FormatHelpers::GetFormatStride(desc.Format);
         srv_desc.Format = _ConvertFormat(desc.Format);
         srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
         srv_desc.Buffer.FirstElement = offset / stride;
@@ -4187,7 +4190,7 @@ int GraphicsDevice_DX12::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        ezUInt32 stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = FormatHelpers::GetFormatStride(desc.Format);
         uav_desc.Format = _ConvertFormat(desc.Format);
         uav_desc.Buffer.FirstElement = (UINT)offset / stride;
         uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
@@ -4350,7 +4353,7 @@ void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32
             srv.Buffer.FirstElement += offset / srv.Buffer.StructureByteStride;
             break;
           case TYPEDBUFFER:
-            srv.Buffer.FirstElement += offset / GetFormatStride(buffer->desc.Format);
+            srv.Buffer.FirstElement += offset / FormatHelpers::GetFormatStride(buffer->desc.Format);
             break;
         }
         device->CreateShaderResourceView(internal_state->resource.Get(), &srv, dst);
@@ -4428,7 +4431,7 @@ void GraphicsDevice_DX12::WriteDescriptor(const DescriptorTable* table, ezUInt32
             uav.Buffer.FirstElement += offset / uav.Buffer.StructureByteStride;
             break;
           case RWTYPEDBUFFER:
-            uav.Buffer.FirstElement += offset / GetFormatStride(buffer->desc.Format);
+            uav.Buffer.FirstElement += offset / FormatHelpers::GetFormatStride(buffer->desc.Format);
             break;
         }
         device->CreateUnorderedAccessView(internal_state->resource.Get(), nullptr, &uav, dst);

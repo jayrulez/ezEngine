@@ -11,6 +11,8 @@
 #  include <algorithm>
 #  include <sstream>
 
+#include <RHI/FormatHelpers.h>
+
 using namespace Microsoft::WRL;
 
 namespace DX11_Internal
@@ -2321,7 +2323,7 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        ezUInt32 stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = FormatHelpers::GetFormatStride(desc.Format);
         srv_desc.Format = _ConvertFormat(desc.Format);
         srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
         srv_desc.Buffer.FirstElement = (UINT)offset / stride;
@@ -2373,7 +2375,7 @@ int GraphicsDevice_DX11::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE t
       else
       {
         // This is a Typed Buffer
-        ezUInt32 stride = GetFormatStride(desc.Format);
+        ezUInt32 stride = FormatHelpers::GetFormatStride(desc.Format);
         uav_desc.Format = _ConvertFormat(desc.Format);
         uav_desc.Buffer.FirstElement = (UINT)offset / stride;
         uav_desc.Buffer.NumElements = ezMath::Min((UINT)size, desc.ByteWidth - (UINT)offset) / stride;
@@ -2677,7 +2679,7 @@ void GraphicsDevice_DX11::RenderPassBegin(const RenderPass* renderpass, CommandL
       if (attachment.loadop == RenderPassAttachment::LOADOP_CLEAR)
       {
         ezUInt32 _flags = D3D11_CLEAR_DEPTH;
-        if (IsFormatStencilSupport(texture->desc.Format))
+        if (FormatHelpers::IsFormatStencilSupport(texture->desc.Format))
           _flags |= D3D11_CLEAR_STENCIL;
         deviceContexts[cmd]->ClearDepthStencilView(DSV, _flags, texture->desc.clear.depthstencil.depth, texture->desc.clear.depthstencil.stencil);
       }
