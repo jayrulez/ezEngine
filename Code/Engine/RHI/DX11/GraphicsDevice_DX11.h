@@ -1,10 +1,6 @@
 #pragma once
 
-#if __has_include("d3d11_3.h")
-#  define WICKEDENGINE_BUILD_DX11
-#endif // HAS DX11
-
-#ifdef WICKEDENGINE_BUILD_DX11
+#if EZ_RHI_D3D11_SUPPORTED
 #  include <RHI/GraphicsDevice.h>
 #  include <RHI/RHIDLL.h>
 #  include <RHI/RHIPCH.h>

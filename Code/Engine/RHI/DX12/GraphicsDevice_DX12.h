@@ -1,11 +1,8 @@
 #pragma once
 
-#if __has_include("d3d12.h")
-#  define WICKEDENGINE_BUILD_DX12
-#endif // HAS DX12
-
-#ifdef WICKEDENGINE_BUILD_DX12
+#ifdef EZ_RHI_D3D12_SUPPORTED
 #  include <RHI/DX12/D3D12MemAlloc.h>
+#  include <RHI/DX12/DX12_Internal.h>
 #  include <RHI/GraphicsDevice.h>
 #  include <RHI/RHIDLL.h>
 #  include <RHI/RHIPCH.h>
@@ -15,11 +12,8 @@
 #  include <wrl/client.h> // ComPtr
 
 #  include <atomic>
-#  include <deque>
 #  include <mutex>
-#  include <unordered_map>
 
-#  include <RHI/RHIInternal.h>
 
 EZ_DEFINE_AS_POD_TYPE(D3D12_STATIC_SAMPLER_DESC);
 EZ_DEFINE_AS_POD_TYPE(D3D12_SHADER_RESOURCE_VIEW_DESC);
@@ -36,6 +30,8 @@ EZ_DEFINE_AS_POD_TYPE(D3D12_DXIL_LIBRARY_DESC);
 EZ_DEFINE_AS_POD_TYPE(D3D12_HIT_GROUP_DESC);
 EZ_DEFINE_AS_POD_TYPE(D3D12_ROOT_PARAMETER);
 EZ_DEFINE_AS_POD_TYPE(D3D12_STATE_SUBOBJECT);
+
+using namespace DX12_Internal;
 
 class EZ_RHI_DLL GraphicsDevice_DX12 : public GraphicsDevice
 {
@@ -55,8 +51,6 @@ private:
 
   Microsoft::WRL::ComPtr<ID3D12QueryHeap> querypool_timestamp;
   Microsoft::WRL::ComPtr<ID3D12QueryHeap> querypool_occlusion;
-  static const size_t timestamp_query_count = 1024;
-  static const size_t occlusion_query_count = 1024;
   Microsoft::WRL::ComPtr<ID3D12Resource> querypool_timestamp_readback;
   Microsoft::WRL::ComPtr<ID3D12Resource> querypool_occlusion_readback;
   D3D12MA::Allocation* allocation_querypool_timestamp_readback = nullptr;
@@ -283,140 +277,7 @@ public:
   void EventEnd(CommandList cmd) override;
   void SetMarker(const char* name, CommandList cmd) override;
 
-
-  struct AllocationHandler
-  {
-    D3D12MA::Allocator* allocator = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Device> device;
-    ezUInt64 framecount = 0;
-    std::mutex destroylocker;
-    std::deque<std::pair<D3D12MA::Allocation*, ezUInt64>> destroyer_allocations;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, ezUInt64>> destroyer_resources;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12PipelineState>, ezUInt64>> destroyer_pipelines;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12RootSignature>, ezUInt64>> destroyer_rootSignatures;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12StateObject>, ezUInt64>> destroyer_stateobjects;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>, ezUInt64>> destroyer_descriptorHeaps;
-
-    ThreadSafeRingBuffer<ezUInt32, timestamp_query_count> free_timestampqueries;
-    ThreadSafeRingBuffer<ezUInt32, occlusion_query_count> free_occlusionqueries;
-
-    ~AllocationHandler()
-    {
-      Update(~0, 0); // destroy all remaining
-      if (allocator)
-        allocator->Release();
-    }
-
-    // Deferred destroy of resources that the GPU is already finished with:
-    void Update(ezUInt64 FRAMECOUNT, ezUInt32 BACKBUFFER_COUNT)
-    {
-      destroylocker.lock();
-      framecount = FRAMECOUNT;
-      while (!destroyer_allocations.empty())
-      {
-        if (destroyer_allocations.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_allocations.front();
-          destroyer_allocations.pop_front();
-          item.first->Release();
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_resources.empty())
-      {
-        if (destroyer_resources.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          destroyer_resources.pop_front();
-          // comptr auto delete
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_queries_occlusion.empty())
-      {
-        if (destroyer_queries_occlusion.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_queries_occlusion.front();
-          destroyer_queries_occlusion.pop_front();
-          free_occlusionqueries.push_back(item.first);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_queries_timestamp.empty())
-      {
-        if (destroyer_queries_timestamp.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_queries_timestamp.front();
-          destroyer_queries_timestamp.pop_front();
-          free_timestampqueries.push_back(item.first);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_pipelines.empty())
-      {
-        if (destroyer_pipelines.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          destroyer_pipelines.pop_front();
-          // comptr auto delete
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_rootSignatures.empty())
-      {
-        if (destroyer_rootSignatures.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          destroyer_rootSignatures.pop_front();
-          // comptr auto delete
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_stateobjects.empty())
-      {
-        if (destroyer_stateobjects.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          destroyer_stateobjects.pop_front();
-          // comptr auto delete
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_descriptorHeaps.empty())
-      {
-        if (destroyer_descriptorHeaps.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          destroyer_descriptorHeaps.pop_front();
-          // comptr auto delete
-        }
-        else
-        {
-          break;
-        }
-      }
-      destroylocker.unlock();
-    }
-  };
-  std::shared_ptr<AllocationHandler> allocationhandler;
+  std::shared_ptr<DX12AllocationHandler> allocationhandler;
 };
 
 #endif // WICKEDENGINE_BUILD_DX12

@@ -1,22 +1,11 @@
 #pragma once
 
-#if __has_include("vulkan/vulkan.h")
-#  define WICKEDENGINE_BUILD_VULKAN
-#endif // HAS VULKAN
-
-#ifdef WICKEDENGINE_BUILD_VULKAN
+#ifdef EZ_RHI_VULKAN_SUPPORTED
 #  include <RHI/GraphicsDevice.h>
 #  include <RHI/RHIDLL.h>
 #  include <RHI/RHIPCH.h>
 
-#  ifdef _WIN32
-#    define VK_USE_PLATFORM_WIN32_KHR
-#  endif // _WIN32
-
-#  define VK_ENABLE_BETA_EXTENSIONS
-#  include <vulkan/vulkan.h>
-
-#  include <RHI/Vulkan/ThirdParty/vk_mem_alloc.h>
+#include <RHI/Vulkan/Vulkan_Internal.h>
 
 #  include <algorithm>
 #  include <atomic>
@@ -27,11 +16,7 @@
 
 #  include <RHI/RHIInternal.h>
 
-EZ_DEFINE_AS_POD_TYPE(VkImageMemoryBarrier);
-EZ_DEFINE_AS_POD_TYPE(VkWriteDescriptorSet);
-EZ_DEFINE_AS_POD_TYPE(VkDescriptorBufferInfo);
-EZ_DEFINE_AS_POD_TYPE(VkDescriptorImageInfo);
-EZ_DEFINE_AS_POD_TYPE(VkWriteDescriptorSetAccelerationStructureNV);
+using namespace Vulkan_Internal;
 
 struct FrameResources;
 struct DescriptorTableFrameAllocator;
@@ -107,8 +92,6 @@ private:
   ezUInt64 timestamp_frequency = 0;
   VkQueryPool querypool_timestamp = VK_NULL_HANDLE;
   VkQueryPool querypool_occlusion = VK_NULL_HANDLE;
-  static const size_t timestamp_query_count = 1024;
-  static const size_t occlusion_query_count = 1024;
   bool initial_querypool_reset = false;
   ezDynamicArray<ezUInt32> timestamps_to_reset;
   ezDynamicArray<ezUInt32> occlusions_to_reset;
@@ -202,19 +185,6 @@ private:
   void preraytrace(CommandList cmd);
 
   std::atomic<CommandList> cmd_count{0};
-
-  static PFN_vkCreateRayTracingPipelinesKHR createRayTracingPipelinesKHR;
-  static PFN_vkCreateAccelerationStructureKHR createAccelerationStructureKHR;
-  static PFN_vkBindAccelerationStructureMemoryKHR bindAccelerationStructureMemoryKHR;
-  static PFN_vkDestroyAccelerationStructureKHR destroyAccelerationStructureKHR;
-  static PFN_vkGetAccelerationStructureMemoryRequirementsKHR getAccelerationStructureMemoryRequirementsKHR;
-  static PFN_vkGetAccelerationStructureDeviceAddressKHR getAccelerationStructureDeviceAddressKHR;
-  static PFN_vkGetRayTracingShaderGroupHandlesKHR getRayTracingShaderGroupHandlesKHR;
-  static PFN_vkCmdBuildAccelerationStructureKHR cmdBuildAccelerationStructureKHR;
-  static PFN_vkCmdTraceRaysKHR cmdTraceRaysKHR;
-
-  static PFN_vkCmdDrawMeshTasksNV cmdDrawMeshTasksNV;
-  static PFN_vkCmdDrawMeshTasksIndirectNV cmdDrawMeshTasksIndirectNV;
 
 public:
   GraphicsDevice_Vulkan(RHIWindowType window, bool fullscreen = false, bool debuglayer = false);
@@ -318,259 +288,7 @@ public:
   void EventEnd(CommandList cmd) override;
   void SetMarker(const char* name, CommandList cmd) override;
 
-
-  struct AllocationHandler
-  {
-    VmaAllocator allocator = VK_NULL_HANDLE;
-    VkDevice device = VK_NULL_HANDLE;
-    VkInstance instance;
-    ezUInt64 framecount = 0;
-    std::mutex destroylocker;
-    std::deque<std::pair<std::pair<VkImage, VmaAllocation>, ezUInt64>> destroyer_images;
-    std::deque<std::pair<VkImageView, ezUInt64>> destroyer_imageviews;
-    std::deque<std::pair<std::pair<VkBuffer, VmaAllocation>, ezUInt64>> destroyer_buffers;
-    std::deque<std::pair<VkBufferView, ezUInt64>> destroyer_bufferviews;
-    std::deque<std::pair<VkAccelerationStructureKHR, ezUInt64>> destroyer_bvhs;
-    std::deque<std::pair<VkSampler, ezUInt64>> destroyer_samplers;
-    std::deque<std::pair<VkDescriptorPool, ezUInt64>> destroyer_descriptorPools;
-    std::deque<std::pair<VkDescriptorSetLayout, ezUInt64>> destroyer_descriptorSetLayouts;
-    std::deque<std::pair<VkDescriptorUpdateTemplate, ezUInt64>> destroyer_descriptorUpdateTemplates;
-    std::deque<std::pair<VkShaderModule, ezUInt64>> destroyer_shadermodules;
-    std::deque<std::pair<VkPipelineLayout, ezUInt64>> destroyer_pipelineLayouts;
-    std::deque<std::pair<VkPipeline, ezUInt64>> destroyer_pipelines;
-    std::deque<std::pair<VkRenderPass, ezUInt64>> destroyer_renderpasses;
-    std::deque<std::pair<VkFramebuffer, ezUInt64>> destroyer_framebuffers;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
-
-    ThreadSafeRingBuffer<ezUInt32, timestamp_query_count> free_timestampqueries;
-    ThreadSafeRingBuffer<ezUInt32, occlusion_query_count> free_occlusionqueries;
-
-    ~AllocationHandler()
-    {
-      Update(~0, 0); // destroy all remaining
-      vmaDestroyAllocator(allocator);
-      vkDestroyDevice(device, nullptr);
-      vkDestroyInstance(instance, nullptr);
-    }
-
-    // Deferred destroy of resources that the GPU is already finished with:
-    void Update(ezUInt64 FRAMECOUNT, ezUInt32 BACKBUFFER_COUNT)
-    {
-      destroylocker.lock();
-      framecount = FRAMECOUNT;
-      while (!destroyer_images.empty())
-      {
-        if (destroyer_images.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_images.front();
-          destroyer_images.pop_front();
-          vmaDestroyImage(allocator, item.first.first, item.first.second);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_imageviews.empty())
-      {
-        if (destroyer_imageviews.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_imageviews.front();
-          destroyer_imageviews.pop_front();
-          vkDestroyImageView(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_buffers.empty())
-      {
-        if (destroyer_buffers.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_buffers.front();
-          destroyer_buffers.pop_front();
-          vmaDestroyBuffer(allocator, item.first.first, item.first.second);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_bufferviews.empty())
-      {
-        if (destroyer_bufferviews.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_bufferviews.front();
-          destroyer_bufferviews.pop_front();
-          vkDestroyBufferView(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_bvhs.empty())
-      {
-        if (destroyer_bvhs.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_bvhs.front();
-          destroyer_bvhs.pop_front();
-          destroyAccelerationStructureKHR(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_samplers.empty())
-      {
-        if (destroyer_samplers.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_samplers.front();
-          destroyer_samplers.pop_front();
-          vkDestroySampler(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_descriptorPools.empty())
-      {
-        if (destroyer_descriptorPools.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_descriptorPools.front();
-          destroyer_descriptorPools.pop_front();
-          vkDestroyDescriptorPool(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_descriptorSetLayouts.empty())
-      {
-        if (destroyer_descriptorSetLayouts.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_descriptorSetLayouts.front();
-          destroyer_descriptorSetLayouts.pop_front();
-          vkDestroyDescriptorSetLayout(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_descriptorUpdateTemplates.empty())
-      {
-        if (destroyer_descriptorUpdateTemplates.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_descriptorUpdateTemplates.front();
-          destroyer_descriptorUpdateTemplates.pop_front();
-          vkDestroyDescriptorUpdateTemplate(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_shadermodules.empty())
-      {
-        if (destroyer_shadermodules.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_shadermodules.front();
-          destroyer_shadermodules.pop_front();
-          vkDestroyShaderModule(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_pipelineLayouts.empty())
-      {
-        if (destroyer_pipelineLayouts.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_pipelineLayouts.front();
-          destroyer_pipelineLayouts.pop_front();
-          vkDestroyPipelineLayout(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_pipelines.empty())
-      {
-        if (destroyer_pipelines.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_pipelines.front();
-          destroyer_pipelines.pop_front();
-          vkDestroyPipeline(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_renderpasses.empty())
-      {
-        if (destroyer_renderpasses.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_renderpasses.front();
-          destroyer_renderpasses.pop_front();
-          vkDestroyRenderPass(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_framebuffers.empty())
-      {
-        if (destroyer_framebuffers.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_framebuffers.front();
-          destroyer_framebuffers.pop_front();
-          vkDestroyFramebuffer(device, item.first, nullptr);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_queries_occlusion.empty())
-      {
-        if (destroyer_queries_occlusion.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_queries_occlusion.front();
-          destroyer_queries_occlusion.pop_front();
-          free_occlusionqueries.push_back(item.first);
-        }
-        else
-        {
-          break;
-        }
-      }
-      while (!destroyer_queries_timestamp.empty())
-      {
-        if (destroyer_queries_timestamp.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
-        {
-          auto item = destroyer_queries_timestamp.front();
-          destroyer_queries_timestamp.pop_front();
-          free_timestampqueries.push_back(item.first);
-        }
-        else
-        {
-          break;
-        }
-      }
-      destroylocker.unlock();
-    }
-  };
-  std::shared_ptr<AllocationHandler> allocationhandler;
+  std::shared_ptr<VulkanAllocationHandler> allocationhandler;
 };
 
 #endif // WICKEDENGINE_BUILD_VULKAN

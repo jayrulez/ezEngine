@@ -141,7 +141,7 @@ public:
 
     // Create a device
     {
-      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX11, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
+      m_pDevice = EZ_DEFAULT_NEW(GraphicsDevice_DX12, (HWND)m_pWindow->GetNativeWindowHandle(), false, true);
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -155,9 +155,9 @@ public:
       ezFileReader fReader;
       ezDynamicArray<ezUInt8> dataBuffer;
 
-      fReader.Open("ps5_0.o").IgnoreResult();
+      //fReader.Open("ps5_0.o").IgnoreResult();
       //fReader.Open("ps_sv11.o").IgnoreResult();
-      //fReader.Open("ps6_2.o").IgnoreResult();
+      fReader.Open("ps6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
       {
@@ -170,9 +170,9 @@ public:
         fReader.Close();
       }
 
-      fReader.Open("vs5_0.o").IgnoreResult();
+      //fReader.Open("vs5_0.o").IgnoreResult();
       //fReader.Open("vs_sv11.o").IgnoreResult();
-      //fReader.Open("vs6_2.o").IgnoreResult();
+      fReader.Open("vs6_2.o").IgnoreResult();
 
       if (fReader.IsOpen())
       {
@@ -207,6 +207,19 @@ public:
 
       pipelineDesc.bs = &blendState;
 
+      RasterizerStateDesc rssDesc;
+
+      m_pDevice->CreateRasterizerState(&rssDesc, &rasterizerState);
+
+      pipelineDesc.rs = &rasterizerState;
+
+      DepthStencilStateDesc dssDesc;
+
+
+      m_pDevice->CreateDepthStencilState(&dssDesc, &depthStencilState);
+
+      pipelineDesc.dss = &depthStencilState;
+
       //BlendStateDesc bd;
       //bd.RenderTarget[0].BlendEnable = true;
       //bd.RenderTarget[0].SrcBlend = ezRHIBlendFactor::SourceAlpha;
@@ -220,6 +233,9 @@ public:
       //m_pDevice->CreateBlendState(&bd, &blendState);
 
       pipelineDesc.bs = &blendState;
+
+      SamplerDesc samplerDesc;
+      m_pDevice->CreateSampler(&samplerDesc, &sampler);
 
       m_pDevice->CreatePipelineState(&pipelineDesc, &pipeline);
     }
@@ -423,6 +439,8 @@ private:
   GPUBuffer constantBuffer;
   PipelineState pipeline;
   InputLayout inputLayout;
+  RasterizerState rasterizerState;
+  DepthStencilState depthStencilState;
   Sampler sampler;
 
   Shader* vertexShader = nullptr;
