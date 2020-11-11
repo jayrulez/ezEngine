@@ -73,10 +73,21 @@ if(${EZ_RHI_D3D11_SUPPORTED})
   ez_link_target_dx11(${PROJECT_NAME})
 endif()
 
-find_package(Vulkan REQUIRED)
+if(${EZ_RHI_D3D12_SUPPORTED})
+  # TODO link dx12
+endif()
+
+if(${EZ_RHI_VULKAN_SUPPORTED})
+  # TODO link vulkan properly
+  # TODO link spirv and spirv-reflect
+  find_package(Vulkan REQUIRED)
+  target_link_libraries(${PROJECT_NAME}
+      PUBLIC
+      Vulkan::Vulkan
+  )
+endif()
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
   Foundation
-  Vulkan::Vulkan
 )
