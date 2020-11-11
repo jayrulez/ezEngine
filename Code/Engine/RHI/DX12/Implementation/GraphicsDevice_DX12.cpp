@@ -2447,7 +2447,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
     assert(SUCCEEDED(hr));
     memcpy(pData, pInitialData->pSysMem, pDesc->ByteWidth);
 
-    copyQueueLock.lock();
+    copyQueueMutex.lock();
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -2461,7 +2461,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
       }
       static_cast<ID3D12GraphicsCommandList*>(frame.copyCommandList.Get())->CopyBufferRegion(internal_state->resource.Get(), 0, upload_resource, 0, pDesc->ByteWidth);
     }
-    copyQueueLock.unlock();
+    copyQueueMutex.unlock();
   }
 
 
@@ -2660,7 +2660,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
       MemcpySubresource(&DestData, &data[i], (SIZE_T)rowSizesInBytes[i], numRows[i], layouts[i].Footprint.Depth);
     }
 
-    copyQueueLock.lock();
+    copyQueueMutex.lock();
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -2680,7 +2680,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
         static_cast<ID3D12GraphicsCommandList*>(frame.copyCommandList.Get())->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);
       }
     }
-    copyQueueLock.unlock();
+    copyQueueMutex.unlock();
   }
 
   if (pTexture->desc.BindFlags & BIND_RENDER_TARGET)
@@ -4670,7 +4670,7 @@ CommandList GraphicsDevice_DX12::BeginCommandList()
 void GraphicsDevice_DX12::SubmitCommandLists()
 {
   // Sync up copy queue:
-  copyQueueLock.lock();
+  copyQueueMutex.lock();
   if (copyQueueUse)
   {
     copyQueueUse = false;
@@ -4757,7 +4757,7 @@ void GraphicsDevice_DX12::SubmitCommandLists()
 
   allocationhandler->Update(FRAMECOUNT, BACKBUFFER_COUNT);
 
-  copyQueueLock.unlock();
+  copyQueueMutex.unlock();
 }
 
 void GraphicsDevice_DX12::WaitForGPU()

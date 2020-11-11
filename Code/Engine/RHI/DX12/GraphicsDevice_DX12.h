@@ -78,7 +78,7 @@ private:
   D3D12_CPU_DESCRIPTOR_HANDLE rtv_descriptor_heap_start = {};
   D3D12_CPU_DESCRIPTOR_HANDLE dsv_descriptor_heap_start = {};
 
-  std::mutex copyQueueLock;
+  std::mutex copyQueueMutex;
   bool copyQueueUse = false;
   Microsoft::WRL::ComPtr<ID3D12Fence> copyFence; // GPU only
 

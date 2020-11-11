@@ -2791,7 +2791,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     assert(res == VK_SUCCESS);
 
     // Transitions:
-    copyQueueLock.lock();
+    copyQueueMutex.lock();
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -2832,7 +2832,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
       barrier.subresourceRange.layerCount = 1;
       frame.loadedimagetransitions.PushBack(barrier);
     }
-    copyQueueLock.unlock();
+    copyQueueMutex.unlock();
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -3332,7 +3332,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
 
     memcpy(pData, pInitialData->pSysMem, pBuffer->desc.ByteWidth);
 
-    copyQueueLock.lock();
+    copyQueueMutex.lock();
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -3417,7 +3417,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
         1, &barrier,
         0, nullptr);
     }
-    copyQueueLock.unlock();
+    copyQueueMutex.unlock();
   }
 
 
@@ -3615,7 +3615,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
       }
     }
 
-    copyQueueLock.lock();
+    copyQueueMutex.lock();
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -3667,11 +3667,11 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
 
       frame.loadedimagetransitions.PushBack(barrier);
     }
-    copyQueueLock.unlock();
+    copyQueueMutex.unlock();
   }
   else
   {
-    copyQueueLock.lock();
+    copyQueueMutex.lock();
 
     auto& frame = GetFrameResources();
     if (!copyQueueUse)
@@ -3717,7 +3717,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     frame.loadedimagetransitions.PushBack(barrier);
 
-    copyQueueLock.unlock();
+    copyQueueMutex.unlock();
   }
 
   if (pTexture->desc.BindFlags & BIND_RENDER_TARGET)
@@ -5816,7 +5816,7 @@ CommandList GraphicsDevice_Vulkan::BeginCommandList()
 void GraphicsDevice_Vulkan::SubmitCommandLists()
 {
   // Sync up copy queue and transitions:
-  copyQueueLock.lock();
+  copyQueueMutex.lock();
   if (copyQueueUse)
   {
     auto& frame = GetFrameResources();
@@ -5960,7 +5960,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
   }
 
   copyQueueUse = false;
-  copyQueueLock.unlock();
+  copyQueueMutex.unlock();
 }
 
 void GraphicsDevice_Vulkan::WaitForGPU()

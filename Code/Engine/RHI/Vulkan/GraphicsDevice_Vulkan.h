@@ -115,7 +115,7 @@ private:
 
   void CreateBackBufferResources();
 
-  std::mutex copyQueueLock;
+  std::mutex copyQueueMutex;
   bool copyQueueUse = false;
   VkSemaphore copySemaphore = VK_NULL_HANDLE;
 
