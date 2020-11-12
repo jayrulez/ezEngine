@@ -202,6 +202,7 @@ struct EZ_RHI_DLL GPUBarrier
     barrier.memory.resource = resource;
     return barrier;
   }
+
   static GPUBarrier Image(const Texture* texture, IMAGE_LAYOUT before, IMAGE_LAYOUT after)
   {
     GPUBarrier barrier;
@@ -211,6 +212,7 @@ struct EZ_RHI_DLL GPUBarrier
     barrier.image.layout_after = after;
     return barrier;
   }
+
   static GPUBarrier Buffer(const GPUBuffer* buffer, BUFFER_STATE before, BUFFER_STATE after)
   {
     GPUBarrier barrier;
@@ -221,6 +223,7 @@ struct EZ_RHI_DLL GPUBarrier
     return barrier;
   }
 };
+
 struct EZ_RHI_DLL RenderPassAttachment
 {
   enum TYPE
@@ -229,19 +232,23 @@ struct EZ_RHI_DLL RenderPassAttachment
     DEPTH_STENCIL,
     RESOLVE,
   } type = RENDERTARGET;
+
   enum LOAD_OPERATION
   {
     LOADOP_LOAD,
     LOADOP_CLEAR,
     LOADOP_DONTCARE,
   } loadop = LOADOP_LOAD;
+
   const Texture* texture = nullptr;
   int subresource = -1;
+
   enum STORE_OPERATION
   {
     STOREOP_STORE,
     STOREOP_DONTCARE,
   } storeop = STOREOP_STORE;
+
   IMAGE_LAYOUT initial_layout = IMAGE_LAYOUT_GENERAL;      // layout before the render pass
   IMAGE_LAYOUT final_layout = IMAGE_LAYOUT_GENERAL;        // layout after the render pass
   IMAGE_LAYOUT subpass_layout = IMAGE_LAYOUT_RENDERTARGET; // layout within the render pass
@@ -297,6 +304,7 @@ struct EZ_RHI_DLL RenderPassAttachment
     return attachment;
   }
 };
+
 struct EZ_RHI_DLL RenderPassDesc
 {
   enum FLAGS
@@ -321,6 +329,7 @@ struct EZ_RHI_DLL IndirectDrawArgsInstanced
   ezUInt32 StartVertexLocation = 0;
   ezUInt32 StartInstanceLocation = 0;
 };
+
 struct EZ_RHI_DLL IndirectDrawArgsIndexedInstanced
 {
   ezUInt32 IndexCountPerInstance = 0;
@@ -329,18 +338,21 @@ struct EZ_RHI_DLL IndirectDrawArgsIndexedInstanced
   int32_t BaseVertexLocation = 0;
   ezUInt32 StartInstanceLocation = 0;
 };
+
 struct EZ_RHI_DLL IndirectDispatchArgs
 {
   ezUInt32 ThreadGroupCountX = 0;
   ezUInt32 ThreadGroupCountY = 0;
   ezUInt32 ThreadGroupCountZ = 0;
 };
+
 struct EZ_RHI_DLL SubresourceData
 {
   const void* pSysMem = nullptr;
   ezUInt32 SysMemPitch = 0;
   ezUInt32 SysMemSlicePitch = 0;
 };
+
 struct EZ_RHI_DLL Rect
 {
   int32_t left = 0;
@@ -348,6 +360,7 @@ struct EZ_RHI_DLL Rect
   int32_t right = 0;
   int32_t bottom = 0;
 };
+
 struct EZ_RHI_DLL Mapping
 {
   enum FLAGS

@@ -616,7 +616,7 @@ namespace Vulkan_Internal
 
     return VK_FALSE;
   }
-  VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, ezUInt64 obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData)
+  VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, ezUInt64 obj, size_t location, ezInt32 code, const char* layerPrefix, const char* msg, void* userData)
   {
 
     ezStringBuilder sb("");
