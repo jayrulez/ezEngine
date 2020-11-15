@@ -41,7 +41,7 @@ namespace DX12_Internal
 
 
 
-  struct DX12AllocationHandler
+  struct DX12AllocationHandler : public ezRefCounted
   {
     D3D12MA::Allocator* allocator = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Device> device;
@@ -220,9 +220,9 @@ namespace DX12_Internal
   }
 
 
-  struct Resource_DX12
+  struct Resource_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
     D3D12MA::Allocation* allocation = nullptr;
     ComPtr<ID3D12Resource> resource;
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbv = {};
@@ -260,9 +260,9 @@ namespace DX12_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct Sampler_DX12
+  struct Sampler_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
     D3D12_SAMPLER_DESC descriptor;
 
     ~Sampler_DX12()
@@ -272,9 +272,9 @@ namespace DX12_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct Query_DX12
+  struct Query_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
     ezRHIGPUQueryType::Enum query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
     ezUInt32 query_index = ~0;
 
@@ -298,9 +298,9 @@ namespace DX12_Internal
       }
     }
   };
-  struct PipelineState_DX12
+  struct PipelineState_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
     ComPtr<ID3D12PipelineState> resource;
     ComPtr<ID3D12RootSignature> rootSignature;
 
@@ -325,9 +325,9 @@ namespace DX12_Internal
     D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO info = {};
     GPUBuffer scratch;
   };
-  struct RTPipelineState_DX12
+  struct RTPipelineState_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
     ComPtr<ID3D12StateObject> resource;
 
     ezDynamicArray<ezString> export_strings;
@@ -345,16 +345,16 @@ namespace DX12_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct RenderPass_DX12
+  struct RenderPass_DX12 : public ezRefCounted
   {
     D3D12_RESOURCE_BARRIER barrierdescs_begin[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
     ezUInt32 num_barriers_begin = 0;
     D3D12_RESOURCE_BARRIER barrierdescs_end[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
     ezUInt32 num_barriers_end = 0;
   };
-  struct DescriptorTable_DX12
+  struct DescriptorTable_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
 
     struct Heap
     {
@@ -379,9 +379,9 @@ namespace DX12_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct RootSignature_DX12
+  struct RootSignature_DX12 : public ezRefCounted
   {
-    std::shared_ptr<DX12AllocationHandler> allocationhandler;
+    ezSharedPtr<DX12AllocationHandler> allocationhandler;
     ComPtr<ID3D12RootSignature> resource;
     ezDynamicArray<D3D12_ROOT_PARAMETER> params;
 
@@ -407,50 +407,50 @@ namespace DX12_Internal
 
   Resource_DX12* to_internal(const GPUResource* param)
   {
-    return static_cast<Resource_DX12*>(param->internal_state.get());
+    return static_cast<Resource_DX12*>(param->internal_state.Borrow());
   }
   Resource_DX12* to_internal(const GPUBuffer* param)
   {
-    return static_cast<Resource_DX12*>(param->internal_state.get());
+    return static_cast<Resource_DX12*>(param->internal_state.Borrow());
   }
   Texture_DX12* to_internal(const Texture* param)
   {
-    return static_cast<Texture_DX12*>(param->internal_state.get());
+    return static_cast<Texture_DX12*>(param->internal_state.Borrow());
   }
   Sampler_DX12* to_internal(const Sampler* param)
   {
-    return static_cast<Sampler_DX12*>(param->internal_state.get());
+    return static_cast<Sampler_DX12*>(param->internal_state.Borrow());
   }
   Query_DX12* to_internal(const GPUQuery* param)
   {
-    return static_cast<Query_DX12*>(param->internal_state.get());
+    return static_cast<Query_DX12*>(param->internal_state.Borrow());
   }
   PipelineState_DX12* to_internal(const Shader* param)
   {
-    return static_cast<PipelineState_DX12*>(param->internal_state.get());
+    return static_cast<PipelineState_DX12*>(param->internal_state.Borrow());
   }
   PipelineState_DX12* to_internal(const PipelineState* param)
   {
-    return static_cast<PipelineState_DX12*>(param->internal_state.get());
+    return static_cast<PipelineState_DX12*>(param->internal_state.Borrow());
   }
   BVH_DX12* to_internal(const RaytracingAccelerationStructure* param)
   {
-    return static_cast<BVH_DX12*>(param->internal_state.get());
+    return static_cast<BVH_DX12*>(param->internal_state.Borrow());
   }
   RTPipelineState_DX12* to_internal(const RaytracingPipelineState* param)
   {
-    return static_cast<RTPipelineState_DX12*>(param->internal_state.get());
+    return static_cast<RTPipelineState_DX12*>(param->internal_state.Borrow());
   }
   RenderPass_DX12* to_internal(const RenderPass* param)
   {
-    return static_cast<RenderPass_DX12*>(param->internal_state.get());
+    return static_cast<RenderPass_DX12*>(param->internal_state.Borrow());
   }
   DescriptorTable_DX12* to_internal(const DescriptorTable* param)
   {
-    return static_cast<DescriptorTable_DX12*>(param->internal_state.get());
+    return static_cast<DescriptorTable_DX12*>(param->internal_state.Borrow());
   }
   RootSignature_DX12* to_internal(const RootSignature* param)
   {
-    return static_cast<RootSignature_DX12*>(param->internal_state.get());
+    return static_cast<RootSignature_DX12*>(param->internal_state.Borrow());
   }
 } // namespace DX12_Internal

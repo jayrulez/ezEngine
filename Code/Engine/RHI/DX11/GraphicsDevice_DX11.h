@@ -4,6 +4,7 @@
 #  include <RHI/GraphicsDevice.h>
 #  include <RHI/RHIDLL.h>
 #  include <RHI/RHIPCH.h>
+#include <Foundation/Types/SharedPtr.h>
 
 #  include <DXGI1_3.h>
 #  include <d3d11_3.h>
@@ -70,10 +71,10 @@ private:
 
   std::atomic<CommandList> cmd_count{0};
 
-  struct EmptyResourceHandle
+  struct EmptyResourceHandle : public ezRefCounted
   {
   }; // only care about control-block
-  std::shared_ptr<EmptyResourceHandle> emptyresource;
+  ezSharedPtr<EmptyResourceHandle> emptyresource;
 
 public:
   GraphicsDevice_DX11(RHIWindowType window, bool fullscreen = false, bool debuglayer = false);

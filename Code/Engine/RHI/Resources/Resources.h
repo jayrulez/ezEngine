@@ -1,13 +1,14 @@
 #pragma once
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
+#include <Foundation/Types/SharedPtr.h>
 
 // Resources:
 
 struct EZ_RHI_DLL GraphicsDeviceChild
 {
-  std::shared_ptr<void> internal_state;
-  inline bool IsValid() const { return internal_state.get() != nullptr; }
+  ezSharedPtr<ezRefCounted> internal_state;
+  inline bool IsValid() const { return internal_state != nullptr; }
 };
 
 struct EZ_RHI_DLL Shader : public GraphicsDeviceChild

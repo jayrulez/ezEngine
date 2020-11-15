@@ -22,7 +22,7 @@ using namespace DX12_Internal;
 void GraphicsDevice_DX12::FrameResources::ResourceFrameAllocator::init(GraphicsDevice_DX12* device, size_t size)
 {
   this->device = device;
-  auto internal_state = std::make_shared<Resource_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(Resource_DX12);
   internal_state->allocationhandler = device->allocationhandler;
   buffer.internal_state = internal_state;
 
@@ -515,8 +515,8 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
         CD3DX12_PIPELINE_STATE_STREAM_SAMPLE_MASK SampleMask;
 
         // ez Need to update to latest win10 to support these
-        //CD3DX12_PIPELINE_STATE_STREAM_MS MS;
-        //CD3DX12_PIPELINE_STATE_STREAM_AS AS;
+        CD3DX12_PIPELINE_STATE_STREAM_MS MS;
+        CD3DX12_PIPELINE_STATE_STREAM_AS AS;
       } stream = {};
 
       if (pso->desc.vs != nullptr)
@@ -541,14 +541,14 @@ void GraphicsDevice_DX12::pso_validate(CommandList cmd)
       }
 
       // ez enable these when win10 updated
-      //if (pso->desc.ms != nullptr)
-      //{
-      //  stream.MS = {pso->desc.ms->code.GetData(), pso->desc.ms->code.GetCount()};
-      //}
-      //if (pso->desc.as != nullptr)
-      //{
-      //  stream.AS = {pso->desc.as->code.GetData(), pso->desc.as->code.GetCount()};
-      //}
+      if (pso->desc.ms != nullptr)
+      {
+        stream.MS = {pso->desc.ms->code.GetData(), pso->desc.ms->code.GetCount()};
+      }
+      if (pso->desc.as != nullptr)
+      {
+        stream.AS = {pso->desc.as->code.GetData(), pso->desc.as->code.GetCount()};
+      }
 
       RasterizerStateDesc pRasterizerStateDesc = pso->desc.rs != nullptr ? pso->desc.rs->GetDesc() : RasterizerStateDesc();
       CD3DX12_RASTERIZER_DESC rs = {};
@@ -858,7 +858,7 @@ GraphicsDevice_DX12::GraphicsDevice_DX12(RHIWindowType window, bool fullscreen, 
   D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
   allocatorDesc.pDevice = device.Get();
 
-  allocationhandler = std::make_shared<DX12AllocationHandler>();
+  allocationhandler = EZ_DEFAULT_NEW(DX12AllocationHandler);
   allocationhandler->device = device;
 
   hr = D3D12MA::CreateAllocator(&allocatorDesc, &allocationhandler->allocator);
@@ -1149,7 +1149,7 @@ void GraphicsDevice_DX12::SetResolution(int width, int height)
 
 Texture GraphicsDevice_DX12::GetBackBuffer()
 {
-  auto internal_state = std::make_shared<Texture_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(Texture_DX12);
   internal_state->allocationhandler = allocationhandler;
   internal_state->resource = backBuffers[backbuffer_index];
   internal_state->rtv = {};
@@ -1167,7 +1167,7 @@ Texture GraphicsDevice_DX12::GetBackBuffer()
 
 bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const SubresourceData* pInitialData, GPUBuffer* pBuffer)
 {
-  auto internal_state = std::make_shared<Resource_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(Resource_DX12);
   internal_state->allocationhandler = allocationhandler;
   pBuffer->internal_state = internal_state;
   pBuffer->type = GPUResource::GPU_RESOURCE_TYPE::BUFFER;
@@ -1295,7 +1295,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
 }
 bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const SubresourceData* pInitialData, Texture* pTexture)
 {
-  auto internal_state = std::make_shared<Texture_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(Texture_DX12);
   internal_state->allocationhandler = allocationhandler;
   pTexture->internal_state = internal_state;
   pTexture->type = GPUResource::GPU_RESOURCE_TYPE::TEXTURE;
@@ -1523,7 +1523,7 @@ bool GraphicsDevice_DX12::CreateInputLayout(const InputLayoutDesc* pInputElement
 }
 bool GraphicsDevice_DX12::CreateShader(ezEnum<ezRHIShaderStage> stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
 {
-  auto internal_state = std::make_shared<PipelineState_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(PipelineState_DX12);
   internal_state->allocationhandler = allocationhandler;
   pShader->internal_state = internal_state;
 
@@ -1742,7 +1742,7 @@ bool GraphicsDevice_DX12::CreateRasterizerState(const RasterizerStateDesc* pRast
 }
 bool GraphicsDevice_DX12::CreateSampler(const SamplerDesc* pSamplerDesc, Sampler* pSamplerState)
 {
-  auto internal_state = std::make_shared<Sampler_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(Sampler_DX12);
   internal_state->allocationhandler = allocationhandler;
   pSamplerState->internal_state = internal_state;
 
@@ -1769,7 +1769,7 @@ bool GraphicsDevice_DX12::CreateSampler(const SamplerDesc* pSamplerDesc, Sampler
 }
 bool GraphicsDevice_DX12::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuery)
 {
-  auto internal_state = std::make_shared<Query_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(Query_DX12);
   internal_state->allocationhandler = allocationhandler;
   pQuery->internal_state = internal_state;
 
@@ -1815,7 +1815,7 @@ bool GraphicsDevice_DX12::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuer
 
 bool GraphicsDevice_DX12::CreatePipelineState(const PipelineStateDesc* pDesc, PipelineState* pso)
 {
-  auto internal_state = std::make_shared<PipelineState_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(PipelineState_DX12);
   internal_state->allocationhandler = allocationhandler;
   pso->internal_state = internal_state;
 
@@ -1935,7 +1935,7 @@ bool GraphicsDevice_DX12::CreatePipelineState(const PipelineStateDesc* pDesc, Pi
 }
 bool GraphicsDevice_DX12::CreateRenderPass(const RenderPassDesc* pDesc, RenderPass* renderpass)
 {
-  auto internal_state = std::make_shared<RenderPass_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(RenderPass_DX12);
   renderpass->internal_state = internal_state;
 
   renderpass->desc = *pDesc;
@@ -2008,7 +2008,7 @@ bool GraphicsDevice_DX12::CreateRenderPass(const RenderPassDesc* pDesc, RenderPa
 }
 bool GraphicsDevice_DX12::CreateRaytracingAccelerationStructure(const RaytracingAccelerationStructureDesc* pDesc, RaytracingAccelerationStructure* bvh)
 {
-  auto internal_state = std::make_shared<BVH_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(BVH_DX12);
   internal_state->allocationhandler = allocationhandler;
   bvh->internal_state = internal_state;
   bvh->type = GPUResource::GPU_RESOURCE_TYPE::RAYTRACING_ACCELERATION_STRUCTURE;
@@ -2141,7 +2141,7 @@ bool GraphicsDevice_DX12::CreateRaytracingAccelerationStructure(const Raytracing
 }
 bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipelineStateDesc* pDesc, RaytracingPipelineState* rtpso)
 {
-  auto internal_state = std::make_shared<RTPipelineState_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(RTPipelineState_DX12);
   internal_state->allocationhandler = allocationhandler;
   rtpso->internal_state = internal_state;
 
@@ -2262,7 +2262,7 @@ bool GraphicsDevice_DX12::CreateRaytracingPipelineState(const RaytracingPipeline
 }
 bool GraphicsDevice_DX12::CreateDescriptorTable(DescriptorTable* table)
 {
-  auto internal_state = std::make_shared<DescriptorTable_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(DescriptorTable_DX12);
   internal_state->allocationhandler = allocationhandler;
   table->internal_state = internal_state;
 
@@ -2400,7 +2400,7 @@ bool GraphicsDevice_DX12::CreateDescriptorTable(DescriptorTable* table)
 }
 bool GraphicsDevice_DX12::CreateRootSignature(RootSignature* rootsig)
 {
-  auto internal_state = std::make_shared<RootSignature_DX12>();
+  auto internal_state = EZ_DEFAULT_NEW(RootSignature_DX12);
   internal_state->allocationhandler = allocationhandler;
   rootsig->internal_state = internal_state;
 
@@ -4107,7 +4107,9 @@ void GraphicsDevice_DX12::UpdateBuffer(const GPUBuffer* buffer, const void* data
     assert(active_renderpass[cmd] == nullptr);
 
     // Contents will be transferred to device memory:
-    auto internal_state_src = std::static_pointer_cast<Resource_DX12>(GetFrameResources().resourceBuffer[cmd].buffer.internal_state);
+    //auto internal_state_src = std::static_pointer_cast<Resource_DX12>(GetFrameResources().resourceBuffer[cmd].buffer.internal_state);
+    auto internal_state_src = GetFrameResources().resourceBuffer[cmd].buffer.internal_state.Downcast<Resource_DX12>();
+    
     auto internal_state_dst = to_internal(buffer);
 
     D3D12_RESOURCE_BARRIER barrier = {};

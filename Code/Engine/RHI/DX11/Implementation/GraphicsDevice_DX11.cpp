@@ -22,31 +22,31 @@ void GraphicsDevice_DX11::pso_validate(CommandList cmd)
   const PipelineState* pso = active_pso[cmd];
   const PipelineStateDesc& desc = pso != nullptr ? pso->GetDesc() : PipelineStateDesc();
 
-  ID3D11VertexShader* vs = desc.vs == nullptr ? nullptr : static_cast<VertexShader_DX11*>(desc.vs->internal_state.get())->resource.Get();
+  ID3D11VertexShader* vs = desc.vs == nullptr ? nullptr : static_cast<VertexShader_DX11*>(desc.vs->internal_state.Borrow())->resource.Get();
   if (vs != prev_vs[cmd])
   {
     deviceContexts[cmd]->VSSetShader(vs, nullptr, 0);
     prev_vs[cmd] = vs;
   }
-  ID3D11PixelShader* ps = desc.ps == nullptr ? nullptr : static_cast<PixelShader_DX11*>(desc.ps->internal_state.get())->resource.Get();
+  ID3D11PixelShader* ps = desc.ps == nullptr ? nullptr : static_cast<PixelShader_DX11*>(desc.ps->internal_state.Borrow())->resource.Get();
   if (ps != prev_ps[cmd])
   {
     deviceContexts[cmd]->PSSetShader(ps, nullptr, 0);
     prev_ps[cmd] = ps;
   }
-  ID3D11HullShader* hs = desc.hs == nullptr ? nullptr : static_cast<HullShader_DX11*>(desc.hs->internal_state.get())->resource.Get();
+  ID3D11HullShader* hs = desc.hs == nullptr ? nullptr : static_cast<HullShader_DX11*>(desc.hs->internal_state.Borrow())->resource.Get();
   if (hs != prev_hs[cmd])
   {
     deviceContexts[cmd]->HSSetShader(hs, nullptr, 0);
     prev_hs[cmd] = hs;
   }
-  ID3D11DomainShader* ds = desc.ds == nullptr ? nullptr : static_cast<DomainShader_DX11*>(desc.ds->internal_state.get())->resource.Get();
+  ID3D11DomainShader* ds = desc.ds == nullptr ? nullptr : static_cast<DomainShader_DX11*>(desc.ds->internal_state.Borrow())->resource.Get();
   if (ds != prev_ds[cmd])
   {
     deviceContexts[cmd]->DSSetShader(ds, nullptr, 0);
     prev_ds[cmd] = ds;
   }
-  ID3D11GeometryShader* gs = desc.gs == nullptr ? nullptr : static_cast<GeometryShader_DX11*>(desc.gs->internal_state.get())->resource.Get();
+  ID3D11GeometryShader* gs = desc.gs == nullptr ? nullptr : static_cast<GeometryShader_DX11*>(desc.gs->internal_state.Borrow())->resource.Get();
   if (gs != prev_gs[cmd])
   {
     deviceContexts[cmd]->GSSetShader(gs, nullptr, 0);
@@ -260,7 +260,7 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
 
   CreateBackBufferResources();
 
-  emptyresource = std::make_shared<EmptyResourceHandle>();
+  emptyresource = EZ_DEFAULT_NEW(EmptyResourceHandle);
 
   ezLog::Info("Created GraphicsDevice_DX11");
 }
@@ -301,7 +301,7 @@ void GraphicsDevice_DX11::SetResolution(int width, int height)
 
 Texture GraphicsDevice_DX11::GetBackBuffer()
 {
-  auto internal_state = std::make_shared<Texture_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(Texture_DX11);
   internal_state->resource = backBuffer;
 
   Texture result;
@@ -317,7 +317,7 @@ Texture GraphicsDevice_DX11::GetBackBuffer()
 
 bool GraphicsDevice_DX11::CreateBuffer(const GPUBufferDesc* pDesc, const SubresourceData* pInitialData, GPUBuffer* pBuffer)
 {
-  auto internal_state = std::make_shared<Resource_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(Resource_DX11);
   pBuffer->internal_state = internal_state;
   pBuffer->type = GPUResource::GPU_RESOURCE_TYPE::BUFFER;
 
@@ -356,7 +356,7 @@ bool GraphicsDevice_DX11::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
 }
 bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const SubresourceData* pInitialData, Texture* pTexture)
 {
-  auto internal_state = std::make_shared<Texture_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(Texture_DX11);
   pTexture->internal_state = internal_state;
   pTexture->type = GPUResource::GPU_RESOURCE_TYPE::TEXTURE;
 
@@ -430,7 +430,7 @@ bool GraphicsDevice_DX11::CreateTexture(const TextureDesc* pDesc, const Subresou
 }
 bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElementDescs, ezUInt32 NumElements, const Shader* shader, InputLayout* pInputLayout)
 {
-  auto internal_state = std::make_shared<InputLayout_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(InputLayout_DX11);
   pInputLayout->internal_state = internal_state;
 
   pInputLayout->desc.Reserve(NumElements);
@@ -468,42 +468,42 @@ bool GraphicsDevice_DX11::CreateShader(ezEnum<ezRHIShaderStage> stage, const voi
   {
     case ezRHIShaderStage::VertexShader:
     {
-      auto internal_state = std::make_shared<VertexShader_DX11>();
+      auto internal_state = EZ_DEFAULT_NEW(VertexShader_DX11);
       pShader->internal_state = internal_state;
       hr = device->CreateVertexShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
     case ezRHIShaderStage::HullShader:
     {
-      auto internal_state = std::make_shared<HullShader_DX11>();
+      auto internal_state = EZ_DEFAULT_NEW(HullShader_DX11);
       pShader->internal_state = internal_state;
       hr = device->CreateHullShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
     case ezRHIShaderStage::DomainShader:
     {
-      auto internal_state = std::make_shared<DomainShader_DX11>();
+      auto internal_state = EZ_DEFAULT_NEW(DomainShader_DX11);
       pShader->internal_state = internal_state;
       hr = device->CreateDomainShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
     case ezRHIShaderStage::GeometryShader:
     {
-      auto internal_state = std::make_shared<GeometryShader_DX11>();
+      auto internal_state = EZ_DEFAULT_NEW(GeometryShader_DX11);
       pShader->internal_state = internal_state;
       hr = device->CreateGeometryShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
     case ezRHIShaderStage::PixelShader:
     {
-      auto internal_state = std::make_shared<PixelShader_DX11>();
+      auto internal_state = EZ_DEFAULT_NEW(PixelShader_DX11);
       pShader->internal_state = internal_state;
       hr = device->CreatePixelShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
     break;
     case ezRHIShaderStage::ComputeShader:
     {
-      auto internal_state = std::make_shared<ComputeShader_DX11>();
+      auto internal_state = EZ_DEFAULT_NEW(ComputeShader_DX11);
       pShader->internal_state = internal_state;
       hr = device->CreateComputeShader(pShaderBytecode, BytecodeLength, nullptr, &internal_state->resource);
     }
@@ -516,7 +516,7 @@ bool GraphicsDevice_DX11::CreateShader(ezEnum<ezRHIShaderStage> stage, const voi
 }
 bool GraphicsDevice_DX11::CreateBlendState(const BlendStateDesc* pBlendStateDesc, BlendState* pBlendState)
 {
-  auto internal_state = std::make_shared<BlendState_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(BlendState_DX11);
   pBlendState->internal_state = internal_state;
 
   D3D11_BLEND_DESC desc;
@@ -542,7 +542,7 @@ bool GraphicsDevice_DX11::CreateBlendState(const BlendStateDesc* pBlendStateDesc
 }
 bool GraphicsDevice_DX11::CreateDepthStencilState(const DepthStencilStateDesc* pDepthStencilStateDesc, DepthStencilState* pDepthStencilState)
 {
-  auto internal_state = std::make_shared<DepthStencilState_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(DepthStencilState_DX11);
   pDepthStencilState->internal_state = internal_state;
 
   D3D11_DEPTH_STENCIL_DESC desc;
@@ -569,7 +569,7 @@ bool GraphicsDevice_DX11::CreateDepthStencilState(const DepthStencilStateDesc* p
 }
 bool GraphicsDevice_DX11::CreateRasterizerState(const RasterizerStateDesc* pRasterizerStateDesc, RasterizerState* pRasterizerState)
 {
-  auto internal_state = std::make_shared<RasterizerState_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(RasterizerState_DX11);
   pRasterizerState->internal_state = internal_state;
 
   pRasterizerState->desc = *pRasterizerStateDesc;
@@ -654,7 +654,7 @@ bool GraphicsDevice_DX11::CreateRasterizerState(const RasterizerStateDesc* pRast
 }
 bool GraphicsDevice_DX11::CreateSampler(const SamplerDesc* pSamplerDesc, Sampler* pSamplerState)
 {
-  auto internal_state = std::make_shared<Sampler_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(Sampler_DX11);
   pSamplerState->internal_state = internal_state;
 
   D3D11_SAMPLER_DESC desc;
@@ -680,7 +680,7 @@ bool GraphicsDevice_DX11::CreateSampler(const SamplerDesc* pSamplerDesc, Sampler
 }
 bool GraphicsDevice_DX11::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuery)
 {
-  auto internal_state = std::make_shared<Query_DX11>();
+  auto internal_state = EZ_DEFAULT_NEW(Query_DX11);
   pQuery->internal_state = internal_state;
 
   pQuery->desc = *pDesc;
@@ -1852,7 +1852,7 @@ void GraphicsDevice_DX11::BindPipelineState(const PipelineState* pso, CommandLis
 }
 void GraphicsDevice_DX11::BindComputeShader(const Shader* cs, CommandList cmd)
 {
-  ID3D11ComputeShader* _cs = cs == nullptr ? nullptr : static_cast<ComputeShader_DX11*>(cs->internal_state.get())->resource.Get();
+  ID3D11ComputeShader* _cs = cs == nullptr ? nullptr : static_cast<ComputeShader_DX11*>(cs->internal_state.Borrow())->resource.Get();
   if (_cs != prev_cs[cmd])
   {
     deviceContexts[cmd]->CSSetShader(_cs, nullptr, 0);

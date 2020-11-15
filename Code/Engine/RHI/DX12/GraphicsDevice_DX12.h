@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef EZ_RHI_D3D12_SUPPORTED
+#  include <Foundation/Types/SharedPtr.h>
 #  include <RHI/DX12/D3D12MemAlloc.h>
 #  include <RHI/DX12/DX12_Internal.h>
 #  include <RHI/GraphicsDevice.h>
@@ -277,7 +278,7 @@ public:
   void EventEnd(CommandList cmd) override;
   void SetMarker(const char* name, CommandList cmd) override;
 
-  std::shared_ptr<DX12AllocationHandler> allocationhandler;
+  ezSharedPtr<DX12AllocationHandler> allocationhandler;
 };
 
 #endif // WICKEDENGINE_BUILD_DX12

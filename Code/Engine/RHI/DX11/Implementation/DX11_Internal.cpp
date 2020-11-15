@@ -1047,38 +1047,38 @@ namespace DX11_Internal
   }
   Resource_DX11* to_internal(const GPUResource* param)
   {
-    return static_cast<Resource_DX11*>(param->internal_state.get());
+    return static_cast<Resource_DX11*>(param->internal_state.Borrow());
   }
   Resource_DX11* to_internal(const GPUBuffer* param)
   {
-    return static_cast<Resource_DX11*>(param->internal_state.get());
+    return static_cast<Resource_DX11*>(param->internal_state.Borrow());
   }
   Texture_DX11* to_internal(const Texture* param)
   {
-    return static_cast<Texture_DX11*>(param->internal_state.get());
+    return static_cast<Texture_DX11*>(param->internal_state.Borrow());
   }
   InputLayout_DX11* to_internal(const InputLayout* param)
   {
-    return static_cast<InputLayout_DX11*>(param->internal_state.get());
+    return static_cast<InputLayout_DX11*>(param->internal_state.Borrow());
   }
   BlendState_DX11* to_internal(const BlendState* param)
   {
-    return static_cast<BlendState_DX11*>(param->internal_state.get());
+    return static_cast<BlendState_DX11*>(param->internal_state.Borrow());
   }
   DepthStencilState_DX11* to_internal(const DepthStencilState* param)
   {
-    return static_cast<DepthStencilState_DX11*>(param->internal_state.get());
+    return static_cast<DepthStencilState_DX11*>(param->internal_state.Borrow());
   }
   RasterizerState_DX11* to_internal(const RasterizerState* param)
   {
-    return static_cast<RasterizerState_DX11*>(param->internal_state.get());
+    return static_cast<RasterizerState_DX11*>(param->internal_state.Borrow());
   }
   Sampler_DX11* to_internal(const Sampler* param)
   {
-    return static_cast<Sampler_DX11*>(param->internal_state.get());
+    return static_cast<Sampler_DX11*>(param->internal_state.Borrow());
   }
   Query_DX11* to_internal(const GPUQuery* param)
   {
-    return static_cast<Query_DX11*>(param->internal_state.get());
+    return static_cast<Query_DX11*>(param->internal_state.Borrow());
   }
 } // namespace DX11_Internal

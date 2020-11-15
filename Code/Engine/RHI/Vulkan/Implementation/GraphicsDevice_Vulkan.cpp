@@ -40,7 +40,7 @@ using namespace Vulkan_Internal;
 void GraphicsDevice_Vulkan::FrameResources::ResourceFrameAllocator::init(GraphicsDevice_Vulkan* device, size_t size)
 {
   this->device = device;
-  auto internal_state = std::make_shared<Buffer_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Buffer_Vulkan);
   internal_state->allocationhandler = device->allocationhandler;
   buffer.internal_state = internal_state;
 
@@ -1384,7 +1384,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     vkGetDeviceQueue(device, queueIndices.presentFamily, 0, &presentQueue);
   }
 
-  allocationhandler = std::make_shared<VulkanAllocationHandler>();
+  allocationhandler = EZ_DEFAULT_NEW(VulkanAllocationHandler);
   allocationhandler->device = device;
   allocationhandler->instance = instance;
 
@@ -1994,7 +1994,7 @@ void GraphicsDevice_Vulkan::SetResolution(int width, int height)
 
 Texture GraphicsDevice_Vulkan::GetBackBuffer()
 {
-  auto internal_state = std::make_shared<Texture_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Texture_Vulkan);
   internal_state->resource = swapChainImages[swapChainImageIndex];
 
   Texture result;
@@ -2009,7 +2009,7 @@ Texture GraphicsDevice_Vulkan::GetBackBuffer()
 
 bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const SubresourceData* pInitialData, GPUBuffer* pBuffer)
 {
-  auto internal_state = std::make_shared<Buffer_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Buffer_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   pBuffer->internal_state = internal_state;
   pBuffer->type = GPUResource::GPU_RESOURCE_TYPE::BUFFER;
@@ -2225,7 +2225,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
 }
 bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const SubresourceData* pInitialData, Texture* pTexture)
 {
-  auto internal_state = std::make_shared<Texture_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Texture_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   pTexture->internal_state = internal_state;
   pTexture->type = GPUResource::GPU_RESOURCE_TYPE::TEXTURE;
@@ -2542,7 +2542,7 @@ bool GraphicsDevice_Vulkan::CreateInputLayout(const InputLayoutDesc* pInputEleme
 }
 bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
 {
-  auto internal_state = std::make_shared<Shader_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Shader_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   pShader->internal_state = internal_state;
 
@@ -2765,7 +2765,7 @@ bool GraphicsDevice_Vulkan::CreateRasterizerState(const RasterizerStateDesc* pRa
 }
 bool GraphicsDevice_Vulkan::CreateSampler(const SamplerDesc* pSamplerDesc, Sampler* pSamplerState)
 {
-  auto internal_state = std::make_shared<Sampler_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Sampler_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   pSamplerState->internal_state = internal_state;
 
@@ -2950,7 +2950,7 @@ bool GraphicsDevice_Vulkan::CreateSampler(const SamplerDesc* pSamplerDesc, Sampl
 }
 bool GraphicsDevice_Vulkan::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuery)
 {
-  auto internal_state = std::make_shared<Query_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(Query_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   pQuery->internal_state = internal_state;
 
@@ -2995,7 +2995,7 @@ bool GraphicsDevice_Vulkan::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQu
 }
 bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, PipelineState* pso)
 {
-  auto internal_state = std::make_shared<PipelineState_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(PipelineState_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   pso->internal_state = internal_state;
 
@@ -3075,7 +3075,7 @@ bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, 
 }
 bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, RenderPass* renderpass)
 {
-  auto internal_state = std::make_shared<RenderPass_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(RenderPass_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   renderpass->internal_state = internal_state;
 
@@ -3321,7 +3321,7 @@ bool GraphicsDevice_Vulkan::CreateRenderPass(const RenderPassDesc* pDesc, Render
 }
 bool GraphicsDevice_Vulkan::CreateRaytracingAccelerationStructure(const RaytracingAccelerationStructureDesc* pDesc, RaytracingAccelerationStructure* bvh)
 {
-  auto internal_state = std::make_shared<BVH_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(BVH_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   bvh->internal_state = internal_state;
   bvh->type = GPUResource::GPU_RESOURCE_TYPE::RAYTRACING_ACCELERATION_STRUCTURE;
@@ -3463,7 +3463,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingAccelerationStructure(const Raytraci
 }
 bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipelineStateDesc* pDesc, RaytracingPipelineState* rtpso)
 {
-  auto internal_state = std::make_shared<RTPipelineState_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(RTPipelineState_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   rtpso->internal_state = internal_state;
 
@@ -3562,7 +3562,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingPipelineState(const RaytracingPipeli
 }
 bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
 {
-  auto internal_state = std::make_shared<DescriptorTable_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(DescriptorTable_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   table->internal_state = internal_state;
 
@@ -3746,7 +3746,7 @@ bool GraphicsDevice_Vulkan::CreateDescriptorTable(DescriptorTable* table)
 }
 bool GraphicsDevice_Vulkan::CreateRootSignature(RootSignature* rootsig)
 {
-  auto internal_state = std::make_shared<RootSignature_Vulkan>();
+  auto internal_state = EZ_DEFAULT_NEW(RootSignature_Vulkan);
   internal_state->allocationhandler = allocationhandler;
   rootsig->internal_state = internal_state;
 
@@ -5217,9 +5217,8 @@ void GraphicsDevice_Vulkan::UpdateBuffer(const GPUBuffer* buffer, const void* da
     copyRegion.srcOffset = GetFrameResources().resourceBuffer[cmd].calculateOffset(dest);
     copyRegion.dstOffset = 0;
 
-    vkCmdCopyBuffer(GetDirectCommandList(cmd),
-      std::static_pointer_cast<Buffer_Vulkan>(GetFrameResources().resourceBuffer[cmd].buffer.internal_state)->resource,
-      internal_state->resource, 1, &copyRegion);
+    //vkCmdCopyBuffer(GetDirectCommandList(cmd), std::static_pointer_cast<Buffer_Vulkan>(GetFrameResources().resourceBuffer[cmd].buffer.internal_state)->resource, internal_state->resource, 1, &copyRegion);
+    vkCmdCopyBuffer(GetDirectCommandList(cmd), GetFrameResources().resourceBuffer[cmd].buffer.internal_state.Downcast<Buffer_Vulkan>()->resource, internal_state->resource, 1, &copyRegion);
 
 
 

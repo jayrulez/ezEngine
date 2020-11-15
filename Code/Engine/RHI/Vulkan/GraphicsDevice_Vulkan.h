@@ -4,6 +4,7 @@
 #  include <RHI/GraphicsDevice.h>
 #  include <RHI/RHIDLL.h>
 #  include <RHI/RHIPCH.h>
+#include <Foundation/Types/SharedPtr.h>
 
 #include <RHI/Vulkan/Vulkan_Internal.h>
 
@@ -288,7 +289,7 @@ public:
   void EventEnd(CommandList cmd) override;
   void SetMarker(const char* name, CommandList cmd) override;
 
-  std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+  ezSharedPtr<VulkanAllocationHandler> allocationhandler;
 };
 
 #endif // WICKEDENGINE_BUILD_VULKAN

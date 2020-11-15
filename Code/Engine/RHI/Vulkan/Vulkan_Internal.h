@@ -5,6 +5,7 @@
 #include <RHI/RHIInternal.h>
 #include <RHI/RHIPCH.h>
 #include <RHI/Resources/Resources.h>
+#include <Foundation/Types/SharedPtr.h>
 
 #ifdef _WIN32
 #  define VK_USE_PLATFORM_WIN32_KHR
@@ -68,7 +69,7 @@ namespace Vulkan_Internal
   static PFN_vkCmdDrawMeshTasksNV cmdDrawMeshTasksNV;
   static PFN_vkCmdDrawMeshTasksIndirectNV cmdDrawMeshTasksIndirectNV;
 
-  struct VulkanAllocationHandler
+  struct VulkanAllocationHandler : public ezRefCounted
   {
     VmaAllocator allocator = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
@@ -406,9 +407,9 @@ namespace Vulkan_Internal
 
 
   // Destroyers:
-  struct Buffer_Vulkan
+  struct Buffer_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VmaAllocation allocation = nullptr;
     VkBuffer resource = VK_NULL_HANDLE;
     VkBufferView cbv = VK_NULL_HANDLE;
@@ -444,9 +445,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct Texture_Vulkan
+  struct Texture_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VmaAllocation allocation = nullptr;
     VkImage resource = VK_NULL_HANDLE;
     VkBuffer staging_resource = VK_NULL_HANDLE;
@@ -498,9 +499,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct Sampler_Vulkan
+  struct Sampler_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkSampler resource = VK_NULL_HANDLE;
 
     ~Sampler_Vulkan()
@@ -514,9 +515,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct Query_Vulkan
+  struct Query_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     ezRHIGPUQueryType::Enum query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
     ezUInt32 query_index = ~0;
 
@@ -542,9 +543,9 @@ namespace Vulkan_Internal
       }
     }
   };
-  struct Shader_Vulkan
+  struct Shader_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkShaderModule shaderModule = VK_NULL_HANDLE;
     VkPipeline pipeline_cs = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout_cs = VK_NULL_HANDLE;
@@ -570,9 +571,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct PipelineState_Vulkan
+  struct PipelineState_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
     ezDynamicArray<VkDescriptorSetLayoutBinding> layoutBindings;
@@ -591,9 +592,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct RenderPass_Vulkan
+  struct RenderPass_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkRenderPass renderpass = VK_NULL_HANDLE;
     VkFramebuffer framebuffer = VK_NULL_HANDLE;
     VkRenderPassBeginInfo beginInfo;
@@ -612,9 +613,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct BVH_Vulkan
+  struct BVH_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VmaAllocation allocation = nullptr;
     VkBuffer buffer = VK_NULL_HANDLE;
     VkAccelerationStructureKHR resource = VK_NULL_HANDLE;
@@ -637,9 +638,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct RTPipelineState_Vulkan
+  struct RTPipelineState_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkPipeline pipeline;
 
     ~RTPipelineState_Vulkan()
@@ -653,9 +654,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct DescriptorTable_Vulkan
+  struct DescriptorTable_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkDescriptorSetLayout layout = VK_NULL_HANDLE;
     VkDescriptorUpdateTemplate updatetemplate = VK_NULL_HANDLE;
 
@@ -688,9 +689,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.unlock();
     }
   };
-  struct RootSignature_Vulkan
+  struct RootSignature_Vulkan : public ezRefCounted
   {
-    std::shared_ptr<VulkanAllocationHandler> allocationhandler;
+    ezSharedPtr<VulkanAllocationHandler> allocationhandler;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
 
     bool dirty[COMMANDLIST_COUNT] = {};
@@ -721,46 +722,46 @@ namespace Vulkan_Internal
 
   Buffer_Vulkan* to_internal(const GPUBuffer* param)
   {
-    return static_cast<Buffer_Vulkan*>(param->internal_state.get());
+    return static_cast<Buffer_Vulkan*>(param->internal_state.Borrow());
   }
   Texture_Vulkan* to_internal(const Texture* param)
   {
-    return static_cast<Texture_Vulkan*>(param->internal_state.get());
+    return static_cast<Texture_Vulkan*>(param->internal_state.Borrow());
   }
   Sampler_Vulkan* to_internal(const Sampler* param)
   {
-    return static_cast<Sampler_Vulkan*>(param->internal_state.get());
+    return static_cast<Sampler_Vulkan*>(param->internal_state.Borrow());
   }
   Query_Vulkan* to_internal(const GPUQuery* param)
   {
-    return static_cast<Query_Vulkan*>(param->internal_state.get());
+    return static_cast<Query_Vulkan*>(param->internal_state.Borrow());
   }
   Shader_Vulkan* to_internal(const Shader* param)
   {
-    return static_cast<Shader_Vulkan*>(param->internal_state.get());
+    return static_cast<Shader_Vulkan*>(param->internal_state.Borrow());
   }
   PipelineState_Vulkan* to_internal(const PipelineState* param)
   {
-    return static_cast<PipelineState_Vulkan*>(param->internal_state.get());
+    return static_cast<PipelineState_Vulkan*>(param->internal_state.Borrow());
   }
   RenderPass_Vulkan* to_internal(const RenderPass* param)
   {
-    return static_cast<RenderPass_Vulkan*>(param->internal_state.get());
+    return static_cast<RenderPass_Vulkan*>(param->internal_state.Borrow());
   }
   BVH_Vulkan* to_internal(const RaytracingAccelerationStructure* param)
   {
-    return static_cast<BVH_Vulkan*>(param->internal_state.get());
+    return static_cast<BVH_Vulkan*>(param->internal_state.Borrow());
   }
   RTPipelineState_Vulkan* to_internal(const RaytracingPipelineState* param)
   {
-    return static_cast<RTPipelineState_Vulkan*>(param->internal_state.get());
+    return static_cast<RTPipelineState_Vulkan*>(param->internal_state.Borrow());
   }
   DescriptorTable_Vulkan* to_internal(const DescriptorTable* param)
   {
-    return static_cast<DescriptorTable_Vulkan*>(param->internal_state.get());
+    return static_cast<DescriptorTable_Vulkan*>(param->internal_state.Borrow());
   }
   RootSignature_Vulkan* to_internal(const RootSignature* param)
   {
-    return static_cast<RootSignature_Vulkan*>(param->internal_state.get());
+    return static_cast<RootSignature_Vulkan*>(param->internal_state.Borrow());
   }
 } // namespace Vulkan_Internal

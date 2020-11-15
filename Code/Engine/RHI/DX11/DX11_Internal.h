@@ -58,7 +58,7 @@ namespace DX11_Internal
   const void* const __nullBlob[128] = {}; // this is initialized to nullptrs and used to unbind resources!
 
 
-  struct Resource_DX11
+  struct Resource_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11Resource> resource;
     ComPtr<ID3D11ShaderResourceView> srv;
@@ -73,51 +73,51 @@ namespace DX11_Internal
     ezDynamicArray<ComPtr<ID3D11RenderTargetView>> subresources_rtv;
     ezDynamicArray<ComPtr<ID3D11DepthStencilView>> subresources_dsv;
   };
-  struct InputLayout_DX11
+  struct InputLayout_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11InputLayout> resource;
   };
-  struct VertexShader_DX11
+  struct VertexShader_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11VertexShader> resource;
   };
-  struct HullShader_DX11
+  struct HullShader_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11HullShader> resource;
   };
-  struct DomainShader_DX11
+  struct DomainShader_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11DomainShader> resource;
   };
-  struct GeometryShader_DX11
+  struct GeometryShader_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11GeometryShader> resource;
   };
-  struct PixelShader_DX11
+  struct PixelShader_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11PixelShader> resource;
   };
-  struct ComputeShader_DX11
+  struct ComputeShader_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11ComputeShader> resource;
   };
-  struct BlendState_DX11
+  struct BlendState_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11BlendState> resource;
   };
-  struct DepthStencilState_DX11
+  struct DepthStencilState_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11DepthStencilState> resource;
   };
-  struct RasterizerState_DX11
+  struct RasterizerState_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11RasterizerState> resource;
   };
-  struct Sampler_DX11
+  struct Sampler_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11SamplerState> resource;
   };
-  struct Query_DX11
+  struct Query_DX11 : public ezRefCounted
   {
     ComPtr<ID3D11Query> resource;
   };
