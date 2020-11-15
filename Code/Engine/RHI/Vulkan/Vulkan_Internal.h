@@ -76,22 +76,22 @@ namespace Vulkan_Internal
     VkInstance instance;
     ezUInt64 framecount = 0;
     std::mutex destroylocker;
-    std::deque<std::pair<std::pair<VkImage, VmaAllocation>, ezUInt64>> destroyer_images;
-    std::deque<std::pair<VkImageView, ezUInt64>> destroyer_imageviews;
-    std::deque<std::pair<std::pair<VkBuffer, VmaAllocation>, ezUInt64>> destroyer_buffers;
-    std::deque<std::pair<VkBufferView, ezUInt64>> destroyer_bufferviews;
-    std::deque<std::pair<VkAccelerationStructureKHR, ezUInt64>> destroyer_bvhs;
-    std::deque<std::pair<VkSampler, ezUInt64>> destroyer_samplers;
-    std::deque<std::pair<VkDescriptorPool, ezUInt64>> destroyer_descriptorPools;
-    std::deque<std::pair<VkDescriptorSetLayout, ezUInt64>> destroyer_descriptorSetLayouts;
-    std::deque<std::pair<VkDescriptorUpdateTemplate, ezUInt64>> destroyer_descriptorUpdateTemplates;
-    std::deque<std::pair<VkShaderModule, ezUInt64>> destroyer_shadermodules;
-    std::deque<std::pair<VkPipelineLayout, ezUInt64>> destroyer_pipelineLayouts;
-    std::deque<std::pair<VkPipeline, ezUInt64>> destroyer_pipelines;
-    std::deque<std::pair<VkRenderPass, ezUInt64>> destroyer_renderpasses;
-    std::deque<std::pair<VkFramebuffer, ezUInt64>> destroyer_framebuffers;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
+    ezDeque<std::pair<std::pair<VkImage, VmaAllocation>, ezUInt64>> destroyer_images;
+    ezDeque<std::pair<VkImageView, ezUInt64>> destroyer_imageviews;
+    ezDeque<std::pair<std::pair<VkBuffer, VmaAllocation>, ezUInt64>> destroyer_buffers;
+    ezDeque<std::pair<VkBufferView, ezUInt64>> destroyer_bufferviews;
+    ezDeque<std::pair<VkAccelerationStructureKHR, ezUInt64>> destroyer_bvhs;
+    ezDeque<std::pair<VkSampler, ezUInt64>> destroyer_samplers;
+    ezDeque<std::pair<VkDescriptorPool, ezUInt64>> destroyer_descriptorPools;
+    ezDeque<std::pair<VkDescriptorSetLayout, ezUInt64>> destroyer_descriptorSetLayouts;
+    ezDeque<std::pair<VkDescriptorUpdateTemplate, ezUInt64>> destroyer_descriptorUpdateTemplates;
+    ezDeque<std::pair<VkShaderModule, ezUInt64>> destroyer_shadermodules;
+    ezDeque<std::pair<VkPipelineLayout, ezUInt64>> destroyer_pipelineLayouts;
+    ezDeque<std::pair<VkPipeline, ezUInt64>> destroyer_pipelines;
+    ezDeque<std::pair<VkRenderPass, ezUInt64>> destroyer_renderpasses;
+    ezDeque<std::pair<VkFramebuffer, ezUInt64>> destroyer_framebuffers;
+    ezDeque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
+    ezDeque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
 
     ThreadSafeRingBuffer<ezUInt32, timestamp_query_count> free_timestampqueries;
     ThreadSafeRingBuffer<ezUInt32, occlusion_query_count> free_occlusionqueries;
@@ -109,12 +109,12 @@ namespace Vulkan_Internal
     {
       destroylocker.lock();
       framecount = FRAMECOUNT;
-      while (!destroyer_images.empty())
+      while (!destroyer_images.IsEmpty())
       {
-        if (destroyer_images.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_images.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_images.front();
-          destroyer_images.pop_front();
+          auto item = destroyer_images.PeekFront();
+          destroyer_images.PopFront();
           vmaDestroyImage(allocator, item.first.first, item.first.second);
         }
         else
@@ -122,12 +122,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_imageviews.empty())
+      while (!destroyer_imageviews.IsEmpty())
       {
-        if (destroyer_imageviews.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_imageviews.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_imageviews.front();
-          destroyer_imageviews.pop_front();
+          auto item = destroyer_imageviews.PeekFront();
+          destroyer_imageviews.PopFront();
           vkDestroyImageView(device, item.first, nullptr);
         }
         else
@@ -135,12 +135,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_buffers.empty())
+      while (!destroyer_buffers.IsEmpty())
       {
-        if (destroyer_buffers.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_buffers.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_buffers.front();
-          destroyer_buffers.pop_front();
+          auto item = destroyer_buffers.PeekFront();
+          destroyer_buffers.PopFront();
           vmaDestroyBuffer(allocator, item.first.first, item.first.second);
         }
         else
@@ -148,12 +148,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_bufferviews.empty())
+      while (!destroyer_bufferviews.IsEmpty())
       {
-        if (destroyer_bufferviews.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_bufferviews.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_bufferviews.front();
-          destroyer_bufferviews.pop_front();
+          auto item = destroyer_bufferviews.PeekFront();
+          destroyer_bufferviews.PopFront();
           vkDestroyBufferView(device, item.first, nullptr);
         }
         else
@@ -161,12 +161,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_bvhs.empty())
+      while (!destroyer_bvhs.IsEmpty())
       {
-        if (destroyer_bvhs.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_bvhs.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_bvhs.front();
-          destroyer_bvhs.pop_front();
+          auto item = destroyer_bvhs.PeekFront();
+          destroyer_bvhs.PopFront();
           destroyAccelerationStructureKHR(device, item.first, nullptr);
         }
         else
@@ -174,12 +174,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_samplers.empty())
+      while (!destroyer_samplers.IsEmpty())
       {
-        if (destroyer_samplers.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_samplers.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_samplers.front();
-          destroyer_samplers.pop_front();
+          auto item = destroyer_samplers.PeekFront();
+          destroyer_samplers.PopFront();
           vkDestroySampler(device, item.first, nullptr);
         }
         else
@@ -187,12 +187,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_descriptorPools.empty())
+      while (!destroyer_descriptorPools.IsEmpty())
       {
-        if (destroyer_descriptorPools.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_descriptorPools.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_descriptorPools.front();
-          destroyer_descriptorPools.pop_front();
+          auto item = destroyer_descriptorPools.PeekFront();
+          destroyer_descriptorPools.PopFront();
           vkDestroyDescriptorPool(device, item.first, nullptr);
         }
         else
@@ -200,12 +200,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_descriptorSetLayouts.empty())
+      while (!destroyer_descriptorSetLayouts.IsEmpty())
       {
-        if (destroyer_descriptorSetLayouts.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_descriptorSetLayouts.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_descriptorSetLayouts.front();
-          destroyer_descriptorSetLayouts.pop_front();
+          auto item = destroyer_descriptorSetLayouts.PeekFront();
+          destroyer_descriptorSetLayouts.PopFront();
           vkDestroyDescriptorSetLayout(device, item.first, nullptr);
         }
         else
@@ -213,12 +213,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_descriptorUpdateTemplates.empty())
+      while (!destroyer_descriptorUpdateTemplates.IsEmpty())
       {
-        if (destroyer_descriptorUpdateTemplates.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_descriptorUpdateTemplates.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_descriptorUpdateTemplates.front();
-          destroyer_descriptorUpdateTemplates.pop_front();
+          auto item = destroyer_descriptorUpdateTemplates.PeekFront();
+          destroyer_descriptorUpdateTemplates.PopFront();
           vkDestroyDescriptorUpdateTemplate(device, item.first, nullptr);
         }
         else
@@ -226,12 +226,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_shadermodules.empty())
+      while (!destroyer_shadermodules.IsEmpty())
       {
-        if (destroyer_shadermodules.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_shadermodules.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_shadermodules.front();
-          destroyer_shadermodules.pop_front();
+          auto item = destroyer_shadermodules.PeekFront();
+          destroyer_shadermodules.PopFront();
           vkDestroyShaderModule(device, item.first, nullptr);
         }
         else
@@ -239,12 +239,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_pipelineLayouts.empty())
+      while (!destroyer_pipelineLayouts.IsEmpty())
       {
-        if (destroyer_pipelineLayouts.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_pipelineLayouts.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_pipelineLayouts.front();
-          destroyer_pipelineLayouts.pop_front();
+          auto item = destroyer_pipelineLayouts.PeekFront();
+          destroyer_pipelineLayouts.PopFront();
           vkDestroyPipelineLayout(device, item.first, nullptr);
         }
         else
@@ -252,12 +252,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_pipelines.empty())
+      while (!destroyer_pipelines.IsEmpty())
       {
-        if (destroyer_pipelines.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_pipelines.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_pipelines.front();
-          destroyer_pipelines.pop_front();
+          auto item = destroyer_pipelines.PeekFront();
+          destroyer_pipelines.PopFront();
           vkDestroyPipeline(device, item.first, nullptr);
         }
         else
@@ -265,12 +265,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_renderpasses.empty())
+      while (!destroyer_renderpasses.IsEmpty())
       {
-        if (destroyer_renderpasses.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_renderpasses.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_renderpasses.front();
-          destroyer_renderpasses.pop_front();
+          auto item = destroyer_renderpasses.PeekFront();
+          destroyer_renderpasses.PopFront();
           vkDestroyRenderPass(device, item.first, nullptr);
         }
         else
@@ -278,12 +278,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_framebuffers.empty())
+      while (!destroyer_framebuffers.IsEmpty())
       {
-        if (destroyer_framebuffers.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_framebuffers.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_framebuffers.front();
-          destroyer_framebuffers.pop_front();
+          auto item = destroyer_framebuffers.PeekFront();
+          destroyer_framebuffers.PopFront();
           vkDestroyFramebuffer(device, item.first, nullptr);
         }
         else
@@ -291,12 +291,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_queries_occlusion.empty())
+      while (!destroyer_queries_occlusion.IsEmpty())
       {
-        if (destroyer_queries_occlusion.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_queries_occlusion.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_queries_occlusion.front();
-          destroyer_queries_occlusion.pop_front();
+          auto item = destroyer_queries_occlusion.PeekFront();
+          destroyer_queries_occlusion.PopFront();
           free_occlusionqueries.push_back(item.first);
         }
         else
@@ -304,12 +304,12 @@ namespace Vulkan_Internal
           break;
         }
       }
-      while (!destroyer_queries_timestamp.empty())
+      while (!destroyer_queries_timestamp.IsEmpty())
       {
-        if (destroyer_queries_timestamp.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_queries_timestamp.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_queries_timestamp.front();
-          destroyer_queries_timestamp.pop_front();
+          auto item = destroyer_queries_timestamp.PeekFront();
+          destroyer_queries_timestamp.PopFront();
           free_timestampqueries.push_back(item.first);
         }
         else
@@ -427,20 +427,20 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
-        allocationhandler->destroyer_buffers.push_back(std::make_pair(std::make_pair(resource, allocation), framecount));
+        allocationhandler->destroyer_buffers.PushBack(std::make_pair(std::make_pair(resource, allocation), framecount));
       if (cbv)
-        allocationhandler->destroyer_bufferviews.push_back(std::make_pair(cbv, framecount));
+        allocationhandler->destroyer_bufferviews.PushBack(std::make_pair(cbv, framecount));
       if (srv)
-        allocationhandler->destroyer_bufferviews.push_back(std::make_pair(srv, framecount));
+        allocationhandler->destroyer_bufferviews.PushBack(std::make_pair(srv, framecount));
       if (uav)
-        allocationhandler->destroyer_bufferviews.push_back(std::make_pair(uav, framecount));
+        allocationhandler->destroyer_bufferviews.PushBack(std::make_pair(uav, framecount));
       for (auto x : subresources_srv)
       {
-        allocationhandler->destroyer_bufferviews.push_back(std::make_pair(x, framecount));
+        allocationhandler->destroyer_bufferviews.PushBack(std::make_pair(x, framecount));
       }
       for (auto x : subresources_uav)
       {
-        allocationhandler->destroyer_bufferviews.push_back(std::make_pair(x, framecount));
+        allocationhandler->destroyer_bufferviews.PushBack(std::make_pair(x, framecount));
       }
       allocationhandler->destroylocker.unlock();
     }
@@ -469,32 +469,32 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
-        allocationhandler->destroyer_images.push_back(std::make_pair(std::make_pair(resource, allocation), framecount));
+        allocationhandler->destroyer_images.PushBack(std::make_pair(std::make_pair(resource, allocation), framecount));
       if (staging_resource)
-        allocationhandler->destroyer_buffers.push_back(std::make_pair(std::make_pair(staging_resource, allocation), framecount));
+        allocationhandler->destroyer_buffers.PushBack(std::make_pair(std::make_pair(staging_resource, allocation), framecount));
       if (srv)
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(srv, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(srv, framecount));
       if (uav)
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(uav, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(uav, framecount));
       if (srv)
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(rtv, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(rtv, framecount));
       if (uav)
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(dsv, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(dsv, framecount));
       for (auto x : subresources_srv)
       {
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(x, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(x, framecount));
       }
       for (auto x : subresources_uav)
       {
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(x, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(x, framecount));
       }
       for (auto x : subresources_rtv)
       {
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(x, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(x, framecount));
       }
       for (auto x : subresources_dsv)
       {
-        allocationhandler->destroyer_imageviews.push_back(std::make_pair(x, framecount));
+        allocationhandler->destroyer_imageviews.PushBack(std::make_pair(x, framecount));
       }
       allocationhandler->destroylocker.unlock();
     }
@@ -511,7 +511,7 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
-        allocationhandler->destroyer_samplers.push_back(std::make_pair(resource, framecount));
+        allocationhandler->destroyer_samplers.PushBack(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -533,10 +533,10 @@ namespace Vulkan_Internal
         {
           case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
           case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
-            allocationhandler->destroyer_queries_occlusion.push_back(std::make_pair(query_index, framecount));
+            allocationhandler->destroyer_queries_occlusion.PushBack(std::make_pair(query_index, framecount));
             break;
           case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
-            allocationhandler->destroyer_queries_timestamp.push_back(std::make_pair(query_index, framecount));
+            allocationhandler->destroyer_queries_timestamp.PushBack(std::make_pair(query_index, framecount));
             break;
         }
         allocationhandler->destroylocker.unlock();
@@ -561,13 +561,13 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (shaderModule)
-        allocationhandler->destroyer_shadermodules.push_back(std::make_pair(shaderModule, framecount));
+        allocationhandler->destroyer_shadermodules.PushBack(std::make_pair(shaderModule, framecount));
       if (pipeline_cs)
-        allocationhandler->destroyer_pipelines.push_back(std::make_pair(pipeline_cs, framecount));
+        allocationhandler->destroyer_pipelines.PushBack(std::make_pair(pipeline_cs, framecount));
       if (pipelineLayout_cs)
-        allocationhandler->destroyer_pipelineLayouts.push_back(std::make_pair(pipelineLayout_cs, framecount));
+        allocationhandler->destroyer_pipelineLayouts.PushBack(std::make_pair(pipelineLayout_cs, framecount));
       if (descriptorSetLayout)
-        allocationhandler->destroyer_descriptorSetLayouts.push_back(std::make_pair(descriptorSetLayout, framecount));
+        allocationhandler->destroyer_descriptorSetLayouts.PushBack(std::make_pair(descriptorSetLayout, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -586,9 +586,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (pipelineLayout)
-        allocationhandler->destroyer_pipelineLayouts.push_back(std::make_pair(pipelineLayout, framecount));
+        allocationhandler->destroyer_pipelineLayouts.PushBack(std::make_pair(pipelineLayout, framecount));
       if (descriptorSetLayout)
-        allocationhandler->destroyer_descriptorSetLayouts.push_back(std::make_pair(descriptorSetLayout, framecount));
+        allocationhandler->destroyer_descriptorSetLayouts.PushBack(std::make_pair(descriptorSetLayout, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -607,9 +607,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (renderpass)
-        allocationhandler->destroyer_renderpasses.push_back(std::make_pair(renderpass, framecount));
+        allocationhandler->destroyer_renderpasses.PushBack(std::make_pair(renderpass, framecount));
       if (framebuffer)
-        allocationhandler->destroyer_framebuffers.push_back(std::make_pair(framebuffer, framecount));
+        allocationhandler->destroyer_framebuffers.PushBack(std::make_pair(framebuffer, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -632,9 +632,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (buffer)
-        allocationhandler->destroyer_buffers.push_back(std::make_pair(std::make_pair(buffer, allocation), framecount));
+        allocationhandler->destroyer_buffers.PushBack(std::make_pair(std::make_pair(buffer, allocation), framecount));
       if (resource)
-        allocationhandler->destroyer_bvhs.push_back(std::make_pair(resource, framecount));
+        allocationhandler->destroyer_bvhs.PushBack(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -650,7 +650,7 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (pipeline)
-        allocationhandler->destroyer_pipelines.push_back(std::make_pair(pipeline, framecount));
+        allocationhandler->destroyer_pipelines.PushBack(std::make_pair(pipeline, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -683,9 +683,9 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (layout)
-        allocationhandler->destroyer_descriptorSetLayouts.push_back(std::make_pair(layout, framecount));
+        allocationhandler->destroyer_descriptorSetLayouts.PushBack(std::make_pair(layout, framecount));
       if (updatetemplate)
-        allocationhandler->destroyer_descriptorUpdateTemplates.push_back(std::make_pair(updatetemplate, framecount));
+        allocationhandler->destroyer_descriptorUpdateTemplates.PushBack(std::make_pair(updatetemplate, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -715,7 +715,7 @@ namespace Vulkan_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (pipelineLayout)
-        allocationhandler->destroyer_pipelineLayouts.push_back(std::make_pair(pipelineLayout, framecount));
+        allocationhandler->destroyer_pipelineLayouts.PushBack(std::make_pair(pipelineLayout, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };

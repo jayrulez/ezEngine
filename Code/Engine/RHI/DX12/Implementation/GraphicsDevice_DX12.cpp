@@ -153,7 +153,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
       // Issue destruction of the old heap:
       device->allocationhandler->destroylocker.lock();
       ezUInt64 framecount = device->allocationhandler->framecount;
-      device->allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(heap.heap_GPU, framecount));
+      device->allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(heap.heap_GPU, framecount));
       device->allocationhandler->destroylocker.unlock();
 
       heap.heapDesc.NodeMask = 0;
@@ -198,7 +198,7 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
       // Issue destruction of the old heap:
       device->allocationhandler->destroylocker.lock();
       ezUInt64 framecount = device->allocationhandler->framecount;
-      device->allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(heap.heap_GPU, framecount));
+      device->allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(heap.heap_GPU, framecount));
       device->allocationhandler->destroylocker.unlock();
 
       heap.heapDesc.NodeMask = 0;
@@ -3537,7 +3537,7 @@ void GraphicsDevice_DX12::SubmitCommandLists()
         else
         {
           allocationhandler->destroylocker.lock();
-          allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
+          allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
           allocationhandler->destroylocker.unlock();
         }
       }
@@ -3579,7 +3579,7 @@ void GraphicsDevice_DX12::ClearPipelineStateCache()
   allocationhandler->destroylocker.lock();
   for (auto& x : pipelines_global)
   {
-    allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
+    allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
   }
   pipelines_global.clear();
 
@@ -3587,7 +3587,7 @@ void GraphicsDevice_DX12::ClearPipelineStateCache()
   {
     for (auto& x : pipelines_worker[i])
     {
-      allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
+      allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
     }
     pipelines_worker[i].Clear();
   }

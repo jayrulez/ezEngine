@@ -47,14 +47,14 @@ namespace DX12_Internal
     Microsoft::WRL::ComPtr<ID3D12Device> device;
     ezUInt64 framecount = 0;
     std::mutex destroylocker;
-    std::deque<std::pair<D3D12MA::Allocation*, ezUInt64>> destroyer_allocations;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, ezUInt64>> destroyer_resources;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
-    std::deque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12PipelineState>, ezUInt64>> destroyer_pipelines;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12RootSignature>, ezUInt64>> destroyer_rootSignatures;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12StateObject>, ezUInt64>> destroyer_stateobjects;
-    std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>, ezUInt64>> destroyer_descriptorHeaps;
+    ezDeque<std::pair<D3D12MA::Allocation*, ezUInt64>> destroyer_allocations;
+    ezDeque<std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, ezUInt64>> destroyer_resources;
+    ezDeque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
+    ezDeque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_occlusion;
+    ezDeque<std::pair<Microsoft::WRL::ComPtr<ID3D12PipelineState>, ezUInt64>> destroyer_pipelines;
+    ezDeque<std::pair<Microsoft::WRL::ComPtr<ID3D12RootSignature>, ezUInt64>> destroyer_rootSignatures;
+    ezDeque<std::pair<Microsoft::WRL::ComPtr<ID3D12StateObject>, ezUInt64>> destroyer_stateobjects;
+    ezDeque<std::pair<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>, ezUInt64>> destroyer_descriptorHeaps;
 
     ThreadSafeRingBuffer<ezUInt32, timestamp_query_count> free_timestampqueries;
     ThreadSafeRingBuffer<ezUInt32, occlusion_query_count> free_occlusionqueries;
@@ -71,12 +71,12 @@ namespace DX12_Internal
     {
       destroylocker.lock();
       framecount = FRAMECOUNT;
-      while (!destroyer_allocations.empty())
+      while (!destroyer_allocations.IsEmpty())
       {
-        if (destroyer_allocations.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_allocations.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_allocations.front();
-          destroyer_allocations.pop_front();
+          auto item = destroyer_allocations.PeekFront();
+          destroyer_allocations.PopFront();
           item.first->Release();
         }
         else
@@ -84,11 +84,11 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_resources.empty())
+      while (!destroyer_resources.IsEmpty())
       {
-        if (destroyer_resources.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_resources.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          destroyer_resources.pop_front();
+          destroyer_resources.PopFront();
           // comptr auto delete
         }
         else
@@ -96,12 +96,12 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_queries_occlusion.empty())
+      while (!destroyer_queries_occlusion.IsEmpty())
       {
-        if (destroyer_queries_occlusion.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_queries_occlusion.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_queries_occlusion.front();
-          destroyer_queries_occlusion.pop_front();
+          auto item = destroyer_queries_occlusion.PeekFront();
+          destroyer_queries_occlusion.PopFront();
           free_occlusionqueries.push_back(item.first);
         }
         else
@@ -109,12 +109,12 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_queries_timestamp.empty())
+      while (!destroyer_queries_timestamp.IsEmpty())
       {
-        if (destroyer_queries_timestamp.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_queries_timestamp.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          auto item = destroyer_queries_timestamp.front();
-          destroyer_queries_timestamp.pop_front();
+          auto item = destroyer_queries_timestamp.PeekFront();
+          destroyer_queries_timestamp.PopFront();
           free_timestampqueries.push_back(item.first);
         }
         else
@@ -122,11 +122,11 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_pipelines.empty())
+      while (!destroyer_pipelines.IsEmpty())
       {
-        if (destroyer_pipelines.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_pipelines.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          destroyer_pipelines.pop_front();
+          destroyer_pipelines.PopFront();
           // comptr auto delete
         }
         else
@@ -134,11 +134,11 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_rootSignatures.empty())
+      while (!destroyer_rootSignatures.IsEmpty())
       {
-        if (destroyer_rootSignatures.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_rootSignatures.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          destroyer_rootSignatures.pop_front();
+          destroyer_rootSignatures.PopFront();
           // comptr auto delete
         }
         else
@@ -146,11 +146,11 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_stateobjects.empty())
+      while (!destroyer_stateobjects.IsEmpty())
       {
-        if (destroyer_stateobjects.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_stateobjects.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          destroyer_stateobjects.pop_front();
+          destroyer_stateobjects.PopFront();
           // comptr auto delete
         }
         else
@@ -158,11 +158,11 @@ namespace DX12_Internal
           break;
         }
       }
-      while (!destroyer_descriptorHeaps.empty())
+      while (!destroyer_descriptorHeaps.IsEmpty())
       {
-        if (destroyer_descriptorHeaps.front().second + BACKBUFFER_COUNT < FRAMECOUNT)
+        if (destroyer_descriptorHeaps.PeekFront().second + BACKBUFFER_COUNT < FRAMECOUNT)
         {
-          destroyer_descriptorHeaps.pop_front();
+          destroyer_descriptorHeaps.PopFront();
           // comptr auto delete
         }
         else
@@ -240,9 +240,9 @@ namespace DX12_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (allocation)
-        allocationhandler->destroyer_allocations.push_back(std::make_pair(allocation, framecount));
+        allocationhandler->destroyer_allocations.PushBack(std::make_pair(allocation, framecount));
       if (resource)
-        allocationhandler->destroyer_resources.push_back(std::make_pair(resource, framecount));
+        allocationhandler->destroyer_resources.PushBack(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -288,10 +288,10 @@ namespace DX12_Internal
         {
           case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
           case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
-            allocationhandler->destroyer_queries_occlusion.push_back(std::make_pair(query_index, framecount));
+            allocationhandler->destroyer_queries_occlusion.PushBack(std::make_pair(query_index, framecount));
             break;
           case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
-            allocationhandler->destroyer_queries_timestamp.push_back(std::make_pair(query_index, framecount));
+            allocationhandler->destroyer_queries_timestamp.PushBack(std::make_pair(query_index, framecount));
             break;
         }
         allocationhandler->destroylocker.unlock();
@@ -312,9 +312,9 @@ namespace DX12_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
-        allocationhandler->destroyer_pipelines.push_back(std::make_pair(resource, framecount));
+        allocationhandler->destroyer_pipelines.PushBack(std::make_pair(resource, framecount));
       if (rootSignature)
-        allocationhandler->destroyer_rootSignatures.push_back(std::make_pair(rootSignature, framecount));
+        allocationhandler->destroyer_rootSignatures.PushBack(std::make_pair(rootSignature, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -341,7 +341,7 @@ namespace DX12_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
-        allocationhandler->destroyer_stateobjects.push_back(std::make_pair(resource, framecount));
+        allocationhandler->destroyer_stateobjects.PushBack(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -373,9 +373,9 @@ namespace DX12_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (sampler_heap.heap)
-        allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(sampler_heap.heap, framecount));
+        allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(sampler_heap.heap, framecount));
       if (resource_heap.heap)
-        allocationhandler->destroyer_descriptorHeaps.push_back(std::make_pair(resource_heap.heap, framecount));
+        allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(resource_heap.heap, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };
@@ -400,7 +400,7 @@ namespace DX12_Internal
       allocationhandler->destroylocker.lock();
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
-        allocationhandler->destroyer_rootSignatures.push_back(std::make_pair(resource, framecount));
+        allocationhandler->destroyer_rootSignatures.PushBack(std::make_pair(resource, framecount));
       allocationhandler->destroylocker.unlock();
     }
   };

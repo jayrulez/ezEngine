@@ -158,7 +158,7 @@ void GraphicsDevice_Vulkan::FrameResources::DescriptorTableFrameAllocator::destr
 {
   if (descriptorPool != VK_NULL_HANDLE)
   {
-    device->allocationhandler->destroyer_descriptorPools.push_back(std::make_pair(descriptorPool, device->FRAMECOUNT));
+    device->allocationhandler->destroyer_descriptorPools.PushBack(std::make_pair(descriptorPool, device->FRAMECOUNT));
     descriptorPool = VK_NULL_HANDLE;
   }
 }
@@ -1809,8 +1809,8 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
   }
 
   swapChainExtent = {static_cast<ezUInt32>(RESOLUTIONWIDTH), static_cast<ezUInt32>(RESOLUTIONHEIGHT)};
-  swapChainExtent.width = std::max(swapChainSupport.capabilities.minImageExtent.width, std::min(swapChainSupport.capabilities.maxImageExtent.width, swapChainExtent.width));
-  swapChainExtent.height = std::max(swapChainSupport.capabilities.minImageExtent.height, std::min(swapChainSupport.capabilities.maxImageExtent.height, swapChainExtent.height));
+  swapChainExtent.width = ezMath::Max(swapChainSupport.capabilities.minImageExtent.width, ezMath::Min(swapChainSupport.capabilities.maxImageExtent.width, swapChainExtent.width));
+  swapChainExtent.height = ezMath::Max(swapChainSupport.capabilities.minImageExtent.height, ezMath::Min(swapChainSupport.capabilities.maxImageExtent.height, swapChainExtent.height));
 
 
   ezUInt32 imageCount = BACKBUFFER_COUNT;
@@ -1927,7 +1927,7 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
 
     if (defaultRenderPass != VK_NULL_HANDLE)
     {
-      allocationhandler->destroyer_renderpasses.push_back(std::make_pair(defaultRenderPass, allocationhandler->framecount));
+      allocationhandler->destroyer_renderpasses.PushBack(std::make_pair(defaultRenderPass, allocationhandler->framecount));
     }
     res = vkCreateRenderPass(device, &renderPassInfo, nullptr, &defaultRenderPass);
     assert(res == VK_SUCCESS);
@@ -1955,7 +1955,7 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
 
     if (swapChainImageViews[i] != VK_NULL_HANDLE)
     {
-      allocationhandler->destroyer_imageviews.push_back(std::make_pair(swapChainImageViews[i], allocationhandler->framecount));
+      allocationhandler->destroyer_imageviews.PushBack(std::make_pair(swapChainImageViews[i], allocationhandler->framecount));
     }
     res = vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]);
     assert(res == VK_SUCCESS);
@@ -1974,7 +1974,7 @@ void GraphicsDevice_Vulkan::CreateBackBufferResources()
 
     if (swapChainFramebuffers[i] != VK_NULL_HANDLE)
     {
-      allocationhandler->destroyer_framebuffers.push_back(std::make_pair(swapChainFramebuffers[i], allocationhandler->framecount));
+      allocationhandler->destroyer_framebuffers.PushBack(std::make_pair(swapChainFramebuffers[i], allocationhandler->framecount));
     }
     res = vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]);
     assert(res == VK_SUCCESS);
@@ -2234,7 +2234,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
 
   if (pTexture->desc.MipLevels == 0)
   {
-    pTexture->desc.MipLevels = (ezUInt32)log2(std::max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
+    pTexture->desc.MipLevels = (ezUInt32)log2(ezMath::Max(pTexture->desc.Width, pTexture->desc.Height)) + 1;
   }
 
   VmaAllocationCreateInfo allocInfo = {};
@@ -2394,8 +2394,8 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
           height,
           1};
 
-        width = std::max(1u, width / 2);
-        height = std::max(1u, height / 2);
+        width = ezMath::Max(1u, width / 2);
+        height = ezMath::Max(1u, height / 2);
 
         copyRegions.PushBack(copyRegion);
 
@@ -3431,7 +3431,7 @@ bool GraphicsDevice_Vulkan::CreateRaytracingAccelerationStructure(const Raytraci
   VkBufferCreateInfo bufferInfo = {};
   bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
   bufferInfo.size = memrequirements.memoryRequirements.size +
-                    std::max(memrequirements_scratch_build.memoryRequirements.size, memrequirements_scratch_update.memoryRequirements.size);
+                    ezMath::Max(memrequirements_scratch_build.memoryRequirements.size, memrequirements_scratch_update.memoryRequirements.size);
   bufferInfo.usage = VK_BUFFER_USAGE_RAY_TRACING_BIT_KHR | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
   assert(features_1_2.bufferDeviceAddress == VK_TRUE);
   bufferInfo.usage |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
@@ -4033,7 +4033,7 @@ int GraphicsDevice_Vulkan::CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE
       srv_desc.flags = 0;
       srv_desc.format = _ConvertFormat(desc.Format);
       srv_desc.offset = Align(offset, device_properties.properties.limits.minTexelBufferOffsetAlignment); // damn, if this needs alignment, that could break a lot of things! (index buffer, index offset?)
-      srv_desc.range = std::min(size, (ezUInt64)desc.ByteWidth - srv_desc.offset);
+      srv_desc.range = ezMath::Min(size, (ezUInt64)desc.ByteWidth - srv_desc.offset);
 
       VkBufferView view;
       res = vkCreateBufferView(device, &srv_desc, nullptr, &view);
@@ -4683,7 +4683,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
         else
         {
           allocationhandler->destroylocker.lock();
-          allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
+          allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
           allocationhandler->destroylocker.unlock();
         }
       }
@@ -4761,7 +4761,7 @@ void GraphicsDevice_Vulkan::ClearPipelineStateCache()
   allocationhandler->destroylocker.lock();
   for (auto& x : pipelines_global)
   {
-    allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
+    allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
   }
   pipelines_global.clear();
 
@@ -4769,7 +4769,7 @@ void GraphicsDevice_Vulkan::ClearPipelineStateCache()
   {
     for (auto& x : pipelines_worker[i])
     {
-      allocationhandler->destroyer_pipelines.push_back(std::make_pair(x.second, FRAMECOUNT));
+      allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
     }
     pipelines_worker[i].Clear();
   }
@@ -4799,8 +4799,8 @@ void GraphicsDevice_Vulkan::BindScissorRects(ezUInt32 numRects, const Rect* rect
   {
     scissors[i].extent.width = abs(rects[i].right - rects[i].left);
     scissors[i].extent.height = abs(rects[i].top - rects[i].bottom);
-    scissors[i].offset.x = std::max(0, rects[i].left);
-    scissors[i].offset.y = std::max(0, rects[i].top);
+    scissors[i].offset.x = ezMath::Max(0, rects[i].left);
+    scissors[i].offset.y = ezMath::Max(0, rects[i].top);
   }
   vkCmdSetScissor(GetDirectCommandList(cmd), 0, numRects, scissors);
 }
@@ -5059,7 +5059,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
       VkImageCopy copy = {};
       copy.extent.width = dst_desc.Width;
       copy.extent.height = dst_desc.Height;
-      copy.extent.depth = std::max(1u, dst_desc.Depth);
+      copy.extent.depth = ezMath::Max(1u, dst_desc.Depth);
 
       copy.srcOffset.x = 0;
       copy.srcOffset.y = 0;
@@ -5118,7 +5118,7 @@ void GraphicsDevice_Vulkan::CopyResource(const GPUResource* pDst, const GPUResou
     VkBufferCopy copy = {};
     copy.srcOffset = 0;
     copy.dstOffset = 0;
-    copy.size = (VkDeviceSize)std::min(src_desc.ByteWidth, dst_desc.ByteWidth);
+    copy.size = (VkDeviceSize)ezMath::Min(src_desc.ByteWidth, dst_desc.ByteWidth);
 
     vkCmdCopyBuffer(GetDirectCommandList(cmd),
       internal_state_src->resource,
@@ -5137,7 +5137,7 @@ void GraphicsDevice_Vulkan::UpdateBuffer(const GPUBuffer* buffer, const void* da
   }
   auto internal_state = to_internal(buffer);
 
-  dataSize = std::min((int)buffer->desc.ByteWidth, dataSize);
+  dataSize = ezMath::Min((int)buffer->desc.ByteWidth, dataSize);
   dataSize = (dataSize >= 0 ? dataSize : buffer->desc.ByteWidth);
 
 
@@ -5617,7 +5617,7 @@ void GraphicsDevice_Vulkan::BindRootDescriptor(BINDPOINT bindpoint, ezUInt32 ind
     switch (rootsig_internal->last_tables[cmd][remap.space]->resources[remap.rangeIndex].binding)
     {
       case ROOT_CONSTANTBUFFER:
-        bufferInfo.range = std::min(buffer->desc.ByteWidth, device_properties.properties.limits.maxUniformBufferRange);
+        bufferInfo.range = ezMath::Min(buffer->desc.ByteWidth, device_properties.properties.limits.maxUniformBufferRange);
         write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
         break;
       case ROOT_RAWBUFFER:
