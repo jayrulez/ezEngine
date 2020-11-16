@@ -151,10 +151,10 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
       allocation = ezMath::Min(1000000u, allocation);
 
       // Issue destruction of the old heap:
-      device->allocationhandler->destroylocker.lock();
+      ezLock lock(device->allocationhandler->destroylocker);
       ezUInt64 framecount = device->allocationhandler->framecount;
       device->allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(heap.heap_GPU, framecount));
-      device->allocationhandler->destroylocker.unlock();
+      device->allocationhandler->destroylocker.Unlock();
 
       heap.heapDesc.NodeMask = 0;
       heap.heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -196,10 +196,10 @@ void GraphicsDevice_DX12::FrameResources::DescriptorTableFrameAllocator::request
       allocation = ezMath::Min(2048u, allocation);
 
       // Issue destruction of the old heap:
-      device->allocationhandler->destroylocker.lock();
+      ezLock lock(device->allocationhandler->destroylocker);
       ezUInt64 framecount = device->allocationhandler->framecount;
       device->allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(heap.heap_GPU, framecount));
-      device->allocationhandler->destroylocker.unlock();
+      device->allocationhandler->destroylocker.Unlock();
 
       heap.heapDesc.NodeMask = 0;
       heap.heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
@@ -1253,7 +1253,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
     assert(SUCCEEDED(hr));
     memcpy(pData, pInitialData->pSysMem, pDesc->ByteWidth);
 
-    copyQueueMutex.lock();
+    ezLock lock(copyQueueMutex);
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -1267,7 +1267,7 @@ bool GraphicsDevice_DX12::CreateBuffer(const GPUBufferDesc* pDesc, const Subreso
       }
       static_cast<ID3D12GraphicsCommandList*>(frame.copyCommandList.Get())->CopyBufferRegion(internal_state->resource.Get(), 0, upload_resource, 0, pDesc->ByteWidth);
     }
-    copyQueueMutex.unlock();
+    copyQueueMutex.Unlock();
   }
 
 
@@ -1466,7 +1466,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
       MemcpySubresource(&DestData, &data[i], (SIZE_T)rowSizesInBytes[i], numRows[i], layouts[i].Footprint.Depth);
     }
 
-    copyQueueMutex.lock();
+    ezLock lock(copyQueueMutex);
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -1486,7 +1486,7 @@ bool GraphicsDevice_DX12::CreateTexture(const TextureDesc* pDesc, const Subresou
         static_cast<ID3D12GraphicsCommandList*>(frame.copyCommandList.Get())->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);
       }
     }
-    copyQueueMutex.unlock();
+    copyQueueMutex.Unlock();
   }
 
   if (pTexture->desc.BindFlags & BIND_RENDER_TARGET)
@@ -1528,7 +1528,8 @@ bool GraphicsDevice_DX12::CreateShader(ezEnum<ezRHIShaderStage> stage, const voi
   pShader->internal_state = internal_state;
 
   pShader->code.SetCount(BytecodeLength);
-  std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
+  //std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
+  ezMemoryUtils::Copy(pShader->code.GetData(), const_cast<ezUInt8*>(reinterpret_cast<const ezUInt8*>(pShaderBytecode)), BytecodeLength);
   pShader->stage = stage;
 
   HRESULT hr = (pShader->code.IsEmpty() ? E_FAIL : S_OK);
@@ -3476,7 +3477,7 @@ CommandList GraphicsDevice_DX12::BeginCommandList()
 void GraphicsDevice_DX12::SubmitCommandLists()
 {
   // Sync up copy queue:
-  copyQueueMutex.lock();
+  ezLock lock(copyQueueMutex);
   if (copyQueueUse)
   {
     copyQueueUse = false;
@@ -3536,9 +3537,9 @@ void GraphicsDevice_DX12::SubmitCommandLists()
         }
         else
         {
-          allocationhandler->destroylocker.lock();
+          ezLock lock(allocationhandler->destroylocker);
           allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
-          allocationhandler->destroylocker.unlock();
+          allocationhandler->destroylocker.Unlock();
         }
       }
       pipelines_worker[cmd].Clear();
@@ -3563,7 +3564,7 @@ void GraphicsDevice_DX12::SubmitCommandLists()
 
   allocationhandler->Update(FRAMECOUNT, BACKBUFFER_COUNT);
 
-  copyQueueMutex.unlock();
+  copyQueueMutex.Unlock();
 }
 
 void GraphicsDevice_DX12::WaitForGPU()
@@ -3576,7 +3577,7 @@ void GraphicsDevice_DX12::WaitForGPU()
 }
 void GraphicsDevice_DX12::ClearPipelineStateCache()
 {
-  allocationhandler->destroylocker.lock();
+  ezLock lock(allocationhandler->destroylocker);
   for (auto& x : pipelines_global)
   {
     allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
@@ -3591,7 +3592,7 @@ void GraphicsDevice_DX12::ClearPipelineStateCache()
     }
     pipelines_worker[i].Clear();
   }
-  allocationhandler->destroylocker.unlock();
+  allocationhandler->destroylocker.Unlock();
 }
 
 void GraphicsDevice_DX12::RenderPassBegin(const RenderPass* renderpass, CommandList cmd)

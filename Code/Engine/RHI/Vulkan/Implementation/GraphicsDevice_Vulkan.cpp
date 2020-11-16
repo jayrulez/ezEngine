@@ -31,8 +31,6 @@
 
 
 
-
-
 using namespace Vulkan_Internal;
 
 // Allocators:
@@ -1579,7 +1577,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     assert(res == VK_SUCCESS);
 
     // Transitions:
-    copyQueueMutex.lock();
+    ezLock lock(copyQueueMutex);
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -1620,7 +1618,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
       barrier.subresourceRange.layerCount = 1;
       frame.loadedimagetransitions.PushBack(barrier);
     }
-    copyQueueMutex.unlock();
+    copyQueueMutex.Unlock();
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -2120,7 +2118,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
 
     memcpy(pData, pInitialData->pSysMem, pBuffer->desc.ByteWidth);
 
-    copyQueueMutex.lock();
+    ezLock lock(copyQueueMutex);
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -2205,7 +2203,7 @@ bool GraphicsDevice_Vulkan::CreateBuffer(const GPUBufferDesc* pDesc, const Subre
         1, &barrier,
         0, nullptr);
     }
-    copyQueueMutex.unlock();
+    copyQueueMutex.Unlock();
   }
 
 
@@ -2403,7 +2401,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
       }
     }
 
-    copyQueueMutex.lock();
+    ezLock lock(copyQueueMutex);
     {
       auto& frame = GetFrameResources();
       if (!copyQueueUse)
@@ -2455,11 +2453,11 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
 
       frame.loadedimagetransitions.PushBack(barrier);
     }
-    copyQueueMutex.unlock();
+    copyQueueMutex.Unlock();
   }
   else
   {
-    copyQueueMutex.lock();
+    ezLock lock(copyQueueMutex);
 
     auto& frame = GetFrameResources();
     if (!copyQueueUse)
@@ -2505,7 +2503,7 @@ bool GraphicsDevice_Vulkan::CreateTexture(const TextureDesc* pDesc, const Subres
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     frame.loadedimagetransitions.PushBack(barrier);
 
-    copyQueueMutex.unlock();
+    copyQueueMutex.Unlock();
   }
 
   if (pTexture->desc.BindFlags & BIND_RENDER_TARGET)
@@ -2547,7 +2545,8 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
   pShader->internal_state = internal_state;
 
   pShader->code.SetCount(BytecodeLength);
-  std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
+  //std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
+  ezMemoryUtils::Copy(pShader->code.GetData(), const_cast<ezUInt8*>(reinterpret_cast<const ezUInt8*>(pShaderBytecode)), BytecodeLength);
   pShader->stage = stage;
 
   VkResult res = VK_SUCCESS;
@@ -4604,7 +4603,7 @@ CommandList GraphicsDevice_Vulkan::BeginCommandList()
 void GraphicsDevice_Vulkan::SubmitCommandLists()
 {
   // Sync up copy queue and transitions:
-  copyQueueMutex.lock();
+  ezLock lock(copyQueueMutex);
   if (copyQueueUse)
   {
     auto& frame = GetFrameResources();
@@ -4682,9 +4681,9 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
         }
         else
         {
-          allocationhandler->destroylocker.lock();
+          ezLock lock(allocationhandler->destroylocker);
           allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
-          allocationhandler->destroylocker.unlock();
+          allocationhandler->destroylocker.Unlock();
         }
       }
       pipelines_worker[cmd].Clear();
@@ -4748,7 +4747,7 @@ void GraphicsDevice_Vulkan::SubmitCommandLists()
   }
 
   copyQueueUse = false;
-  copyQueueMutex.unlock();
+  copyQueueMutex.Unlock();
 }
 
 void GraphicsDevice_Vulkan::WaitForGPU()
@@ -4758,7 +4757,7 @@ void GraphicsDevice_Vulkan::WaitForGPU()
 }
 void GraphicsDevice_Vulkan::ClearPipelineStateCache()
 {
-  allocationhandler->destroylocker.lock();
+  ezLock lock(allocationhandler->destroylocker);
   for (auto& x : pipelines_global)
   {
     allocationhandler->destroyer_pipelines.PushBack(std::make_pair(x.second, FRAMECOUNT));
@@ -4773,7 +4772,7 @@ void GraphicsDevice_Vulkan::ClearPipelineStateCache()
     }
     pipelines_worker[i].Clear();
   }
-  allocationhandler->destroylocker.unlock();
+  allocationhandler->destroylocker.Unlock();
 }
 
 

@@ -459,7 +459,8 @@ bool GraphicsDevice_DX11::CreateInputLayout(const InputLayoutDesc* pInputElement
 bool GraphicsDevice_DX11::CreateShader(ezEnum<ezRHIShaderStage> stage, const void* pShaderBytecode, size_t BytecodeLength, Shader* pShader)
 {
   pShader->code.SetCount(BytecodeLength);
-  std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
+  //std::memcpy(pShader->code.GetData(), pShaderBytecode, BytecodeLength);
+  ezMemoryUtils::Copy(pShader->code.GetData(), const_cast<ezUInt8*>(reinterpret_cast<const ezUInt8*>(pShaderBytecode)), BytecodeLength);
   pShader->stage = stage;
 
   HRESULT hr = E_FAIL;

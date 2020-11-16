@@ -75,7 +75,7 @@ namespace Vulkan_Internal
     VkDevice device = VK_NULL_HANDLE;
     VkInstance instance;
     ezUInt64 framecount = 0;
-    std::mutex destroylocker;
+    ezMutex destroylocker;
     ezDeque<std::pair<std::pair<VkImage, VmaAllocation>, ezUInt64>> destroyer_images;
     ezDeque<std::pair<VkImageView, ezUInt64>> destroyer_imageviews;
     ezDeque<std::pair<std::pair<VkBuffer, VmaAllocation>, ezUInt64>> destroyer_buffers;
@@ -107,7 +107,7 @@ namespace Vulkan_Internal
     // Deferred destroy of resources that the GPU is already finished with:
     void Update(ezUInt64 FRAMECOUNT, ezUInt32 BACKBUFFER_COUNT)
     {
-      destroylocker.lock();
+      ezLock lock(destroylocker);
       framecount = FRAMECOUNT;
       while (!destroyer_images.IsEmpty())
       {
@@ -317,7 +317,7 @@ namespace Vulkan_Internal
           break;
         }
       }
-      destroylocker.unlock();
+      destroylocker.Unlock();
     }
   };
 
@@ -424,7 +424,7 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_buffers.PushBack(std::make_pair(std::make_pair(resource, allocation), framecount));
@@ -442,7 +442,7 @@ namespace Vulkan_Internal
       {
         allocationhandler->destroyer_bufferviews.PushBack(std::make_pair(x, framecount));
       }
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct Texture_Vulkan : public ezRefCounted
@@ -466,7 +466,7 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_images.PushBack(std::make_pair(std::make_pair(resource, allocation), framecount));
@@ -496,7 +496,7 @@ namespace Vulkan_Internal
       {
         allocationhandler->destroyer_imageviews.PushBack(std::make_pair(x, framecount));
       }
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct Sampler_Vulkan : public ezRefCounted
@@ -508,11 +508,11 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_samplers.PushBack(std::make_pair(resource, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct Query_Vulkan : public ezRefCounted
@@ -527,7 +527,7 @@ namespace Vulkan_Internal
         return;
       if (query_index != ~0)
       {
-        allocationhandler->destroylocker.lock();
+        ezLock lock(allocationhandler->destroylocker);
         ezUInt64 framecount = allocationhandler->framecount;
         switch (query_type)
         {
@@ -539,7 +539,7 @@ namespace Vulkan_Internal
             allocationhandler->destroyer_queries_timestamp.PushBack(std::make_pair(query_index, framecount));
             break;
         }
-        allocationhandler->destroylocker.unlock();
+        allocationhandler->destroylocker.Unlock();
       }
     }
   };
@@ -558,7 +558,7 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (shaderModule)
         allocationhandler->destroyer_shadermodules.PushBack(std::make_pair(shaderModule, framecount));
@@ -568,7 +568,7 @@ namespace Vulkan_Internal
         allocationhandler->destroyer_pipelineLayouts.PushBack(std::make_pair(pipelineLayout_cs, framecount));
       if (descriptorSetLayout)
         allocationhandler->destroyer_descriptorSetLayouts.PushBack(std::make_pair(descriptorSetLayout, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct PipelineState_Vulkan : public ezRefCounted
@@ -583,13 +583,13 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (pipelineLayout)
         allocationhandler->destroyer_pipelineLayouts.PushBack(std::make_pair(pipelineLayout, framecount));
       if (descriptorSetLayout)
         allocationhandler->destroyer_descriptorSetLayouts.PushBack(std::make_pair(descriptorSetLayout, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct RenderPass_Vulkan : public ezRefCounted
@@ -604,13 +604,13 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (renderpass)
         allocationhandler->destroyer_renderpasses.PushBack(std::make_pair(renderpass, framecount));
       if (framebuffer)
         allocationhandler->destroyer_framebuffers.PushBack(std::make_pair(framebuffer, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct BVH_Vulkan : public ezRefCounted
@@ -629,13 +629,13 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (buffer)
         allocationhandler->destroyer_buffers.PushBack(std::make_pair(std::make_pair(buffer, allocation), framecount));
       if (resource)
         allocationhandler->destroyer_bvhs.PushBack(std::make_pair(resource, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct RTPipelineState_Vulkan : public ezRefCounted
@@ -647,11 +647,11 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (pipeline)
         allocationhandler->destroyer_pipelines.PushBack(std::make_pair(pipeline, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct DescriptorTable_Vulkan : public ezRefCounted
@@ -680,13 +680,13 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (layout)
         allocationhandler->destroyer_descriptorSetLayouts.PushBack(std::make_pair(layout, framecount));
       if (updatetemplate)
         allocationhandler->destroyer_descriptorUpdateTemplates.PushBack(std::make_pair(updatetemplate, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct RootSignature_Vulkan : public ezRefCounted
@@ -712,11 +712,11 @@ namespace Vulkan_Internal
     {
       if (allocationhandler == nullptr)
         return;
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (pipelineLayout)
         allocationhandler->destroyer_pipelineLayouts.PushBack(std::make_pair(pipelineLayout, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
 

@@ -99,7 +99,7 @@ private:
 
   void CreateBackBufferResources();
 
-  std::mutex copyQueueMutex;
+  ezMutex copyQueueMutex;
   bool copyQueueUse = false;
   VkSemaphore copySemaphore = VK_NULL_HANDLE;
 

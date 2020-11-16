@@ -46,7 +46,7 @@ namespace DX12_Internal
     D3D12MA::Allocator* allocator = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Device> device;
     ezUInt64 framecount = 0;
-    std::mutex destroylocker;
+    ezMutex destroylocker;
     ezDeque<std::pair<D3D12MA::Allocation*, ezUInt64>> destroyer_allocations;
     ezDeque<std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, ezUInt64>> destroyer_resources;
     ezDeque<std::pair<ezUInt32, ezUInt64>> destroyer_queries_timestamp;
@@ -69,7 +69,7 @@ namespace DX12_Internal
     // Deferred destroy of resources that the GPU is already finished with:
     void Update(ezUInt64 FRAMECOUNT, ezUInt32 BACKBUFFER_COUNT)
     {
-      destroylocker.lock();
+      ezLock lock(destroylocker);
       framecount = FRAMECOUNT;
       while (!destroyer_allocations.IsEmpty())
       {
@@ -170,7 +170,7 @@ namespace DX12_Internal
           break;
         }
       }
-      destroylocker.unlock();
+      destroylocker.Unlock();
     }
   };
 
@@ -237,13 +237,13 @@ namespace DX12_Internal
 
     virtual ~Resource_DX12()
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (allocation)
         allocationhandler->destroyer_allocations.PushBack(std::make_pair(allocation, framecount));
       if (resource)
         allocationhandler->destroyer_resources.PushBack(std::make_pair(resource, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct Texture_DX12 : public Resource_DX12
@@ -255,9 +255,9 @@ namespace DX12_Internal
 
     ~Texture_DX12() override
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct Sampler_DX12 : public ezRefCounted
@@ -267,9 +267,9 @@ namespace DX12_Internal
 
     ~Sampler_DX12()
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct Query_DX12 : public ezRefCounted
@@ -282,7 +282,7 @@ namespace DX12_Internal
     {
       if (query_index != ~0)
       {
-        allocationhandler->destroylocker.lock();
+        ezLock lock(allocationhandler->destroylocker);
         ezUInt64 framecount = allocationhandler->framecount;
         switch (query_type)
         {
@@ -294,7 +294,7 @@ namespace DX12_Internal
             allocationhandler->destroyer_queries_timestamp.PushBack(std::make_pair(query_index, framecount));
             break;
         }
-        allocationhandler->destroylocker.unlock();
+        allocationhandler->destroylocker.Unlock();
       }
     }
   };
@@ -309,13 +309,13 @@ namespace DX12_Internal
 
     ~PipelineState_DX12()
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_pipelines.PushBack(std::make_pair(resource, framecount));
       if (rootSignature)
         allocationhandler->destroyer_rootSignatures.PushBack(std::make_pair(rootSignature, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct BVH_DX12 : public Resource_DX12
@@ -338,11 +338,11 @@ namespace DX12_Internal
 
     ~RTPipelineState_DX12()
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_stateobjects.PushBack(std::make_pair(resource, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct RenderPass_DX12 : public ezRefCounted
@@ -370,13 +370,13 @@ namespace DX12_Internal
 
     ~DescriptorTable_DX12()
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (sampler_heap.heap)
         allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(sampler_heap.heap, framecount));
       if (resource_heap.heap)
         allocationhandler->destroyer_descriptorHeaps.PushBack(std::make_pair(resource_heap.heap, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
   struct RootSignature_DX12 : public ezRefCounted
@@ -397,11 +397,11 @@ namespace DX12_Internal
 
     ~RootSignature_DX12()
     {
-      allocationhandler->destroylocker.lock();
+      ezLock lock(allocationhandler->destroylocker);
       ezUInt64 framecount = allocationhandler->framecount;
       if (resource)
         allocationhandler->destroyer_rootSignatures.PushBack(std::make_pair(resource, framecount));
-      allocationhandler->destroylocker.unlock();
+      allocationhandler->destroylocker.Unlock();
     }
   };
 
