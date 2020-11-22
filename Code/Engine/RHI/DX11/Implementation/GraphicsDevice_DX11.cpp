@@ -129,7 +129,7 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
   FULLSCREEN = fullscreen;
 
 #  ifndef PLATFORM_UWP
-  RECT rect = RECT();
+  RECT rect;
   GetClientRect(window, &rect);
   RESOLUTIONWIDTH = rect.right - rect.left;
   RESOLUTIONHEIGHT = rect.bottom - rect.top;
@@ -186,7 +186,7 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
   pDXGIAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&pIDXGIFactory);
 
 
-  DXGI_SWAP_CHAIN_DESC1 sd = {0};
+  DXGI_SWAP_CHAIN_DESC1 sd = {};
   sd.Width = RESOLUTIONWIDTH;
   sd.Height = RESOLUTIONHEIGHT;
   sd.Format = _ConvertFormat(GetBackBufferFormat());
@@ -227,7 +227,10 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
 
 
   D3D_FEATURE_LEVEL aquiredFeatureLevel = device->GetFeatureLevel();
-  TESSELLATION = ((aquiredFeatureLevel >= D3D_FEATURE_LEVEL_11_0) ? true : false);
+  if (aquiredFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+  {
+    capabilities |= GRAPHICSDEVICE_CAPABILITY_TESSELLATION;
+  }
 
   //D3D11_FEATURE_DATA_D3D11_OPTIONS features_0;
   //hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &features_0, sizeof(features_0));
@@ -237,26 +240,35 @@ GraphicsDevice_DX11::GraphicsDevice_DX11(RHIWindowType window, bool fullscreen, 
 
   D3D11_FEATURE_DATA_D3D11_OPTIONS2 features_2;
   hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS2, &features_2, sizeof(features_2));
-  CONSERVATIVE_RASTERIZATION = features_2.ConservativeRasterizationTier >= D3D11_CONSERVATIVE_RASTERIZATION_TIER_1;
-  RASTERIZER_ORDERED_VIEWS = features_2.ROVsSupported == TRUE;
+  if (features_2.ConservativeRasterizationTier >= D3D11_CONSERVATIVE_RASTERIZATION_TIER_1)
+  {
+    capabilities |= GRAPHICSDEVICE_CAPABILITY_CONSERVATIVE_RASTERIZATION;
+  }
+  if (features_2.ROVsSupported == TRUE)
+  {
+    capabilities |= GRAPHICSDEVICE_CAPABILITY_RASTERIZER_ORDERED_VIEWS;
+  }
 
   if (features_2.TypedUAVLoadAdditionalFormats)
   {
     // More info about UAV format load support: https://docs.microsoft.com/en-us/windows/win32/direct3d12/typed-unordered-access-view-loads
-    UAV_LOAD_FORMAT_COMMON = true;
+    capabilities |= GRAPHICSDEVICE_CAPABILITY_UAV_LOAD_FORMAT_COMMON;
 
     D3D11_FEATURE_DATA_FORMAT_SUPPORT2 FormatSupport = {};
     FormatSupport.InFormat = DXGI_FORMAT_R11G11B10_FLOAT;
     hr = device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT2, &FormatSupport, sizeof(FormatSupport));
     if (SUCCEEDED(hr) && (FormatSupport.OutFormatSupport2 & D3D11_FORMAT_SUPPORT2_UAV_TYPED_LOAD) != 0)
     {
-      UAV_LOAD_FORMAT_R11G11B10_FLOAT = true;
+      capabilities |= GRAPHICSDEVICE_CAPABILITY_UAV_LOAD_FORMAT_R11G11B10_FLOAT;
     }
   }
 
   D3D11_FEATURE_DATA_D3D11_OPTIONS3 features_3;
   hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS3, &features_3, sizeof(features_3));
-  RENDERTARGET_AND_VIEWPORT_ARRAYINDEX_WITHOUT_GS = features_3.VPAndRTArrayIndexFromAnyShaderFeedingRasterizer == TRUE;
+  if (features_3.VPAndRTArrayIndexFromAnyShaderFeedingRasterizer == TRUE)
+  {
+    capabilities |= GRAPHICSDEVICE_CAPABILITY_RENDERTARGET_AND_VIEWPORT_ARRAYINDEX_WITHOUT_GS;
+  }
 
   CreateBackBufferResources();
 
@@ -588,7 +600,7 @@ bool GraphicsDevice_DX11::CreateRasterizerState(const RasterizerStateDesc* pRast
   desc.AntialiasedLineEnable = pRasterizerStateDesc->AntialiasedLineEnable;
 
 
-  if (CONSERVATIVE_RASTERIZATION && pRasterizerStateDesc->ConservativeRasterizationEnable == TRUE)
+  if (CheckCapability(GRAPHICSDEVICE_CAPABILITY_CONSERVATIVE_RASTERIZATION) && pRasterizerStateDesc->ConservativeRasterizationEnable == TRUE)
   {
     ComPtr<ID3D11Device3> device3;
     if (SUCCEEDED(device.As(&device3)))
@@ -605,7 +617,7 @@ bool GraphicsDevice_DX11::CreateRasterizerState(const RasterizerStateDesc* pRast
       desc2.MultisampleEnable = desc.MultisampleEnable;
       desc2.AntialiasedLineEnable = desc.AntialiasedLineEnable;
       desc2.ConservativeRaster = D3D11_CONSERVATIVE_RASTERIZATION_MODE_ON;
-      desc2.ForcedSampleCount = (RASTERIZER_ORDERED_VIEWS ? pRasterizerStateDesc->ForcedSampleCount : 0);
+      desc2.ForcedSampleCount = pRasterizerStateDesc->ForcedSampleCount;
 
       pRasterizerState->desc = *pRasterizerStateDesc;
 
@@ -618,7 +630,7 @@ bool GraphicsDevice_DX11::CreateRasterizerState(const RasterizerStateDesc* pRast
       return SUCCEEDED(hr);
     }
   }
-  else if (RASTERIZER_ORDERED_VIEWS && pRasterizerStateDesc->ForcedSampleCount > 0)
+  else if (pRasterizerStateDesc->ForcedSampleCount > 0)
   {
     ComPtr<ID3D11Device1> device1;
     if (SUCCEEDED(device.As(&device1)))
@@ -1820,7 +1832,7 @@ void GraphicsDevice_DX11::BindConstantBuffer(ezEnum<ezRHIShaderStage> stage, con
 void GraphicsDevice_DX11::BindVertexBuffers(const GPUBuffer* const* vertexBuffers, ezUInt32 slot, ezUInt32 count, const ezUInt32* strides, const ezUInt32* offsets, CommandList cmd)
 {
   EZ_ASSERT_ALWAYS(count <= 8, "count must be less then or equal to 8.");
-  ID3D11Buffer* res[8] = {0};
+  ID3D11Buffer* res[8] = {};
   for (ezUInt32 i = 0; i < count; ++i)
   {
     res[i] = vertexBuffers[i] != nullptr && vertexBuffers[i]->IsValid() ? (ID3D11Buffer*)to_internal(vertexBuffers[i])->resource.Get() : nullptr;

@@ -868,6 +868,14 @@ void GraphicsDevice_Vulkan::pso_validate(CommandList cmd)
       {
         multisampling.rasterizationSamples = (VkSampleCountFlagBits)active_renderpass[cmd]->desc.attachments[0].texture->desc.SampleCount;
       }
+      if (pso->desc.rs != nullptr)
+      {
+        const RasterizerStateDesc& desc = pso->desc.rs->desc;
+        if (desc.ForcedSampleCount > 1)
+        {
+          multisampling.rasterizationSamples = (VkSampleCountFlagBits)desc.ForcedSampleCount;
+        }
+      }
       multisampling.minSampleShading = 1.0f;
       VkSampleMask samplemask = pso->desc.sampleMask;
       multisampling.pSampleMask = &samplemask;
@@ -1056,7 +1064,7 @@ void GraphicsDevice_Vulkan::preraytrace(CommandList cmd)
 // Engine functions
 GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscreen, bool debuglayer)
 {
-  DESCRIPTOR_MANAGEMENT = true;
+  capabilities |= GRAPHICSDEVICE_CAPABILITY_DESCRIPTOR_MANAGEMENT;
   TOPLEVEL_ACCELERATION_STRUCTURE_INSTANCE_SIZE = sizeof(VkAccelerationStructureInstanceKHR);
 
   DEBUGDEVICE = debuglayer;
@@ -1064,7 +1072,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
   FULLSCREEN = fullscreen;
 
 #  ifdef _WIN32
-  RECT rect = RECT();
+  RECT rect;
   GetClientRect(window, &rect);
   RESOLUTIONWIDTH = rect.right - rect.left;
   RESOLUTIONHEIGHT = rect.bottom - rect.top;
@@ -1301,7 +1309,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     if (checkDeviceExtensionSupport(VK_KHR_RAY_TRACING_EXTENSION_NAME, available_deviceExtensions))
     {
       SHADER_IDENTIFIER_SIZE = raytracing_properties.shaderGroupHandleSize;
-      RAYTRACING = true;
+      capabilities |= GRAPHICSDEVICE_CAPABILITY_RAYTRACING;
       enabled_deviceExtensions.PushBack(VK_KHR_RAY_TRACING_EXTENSION_NAME);
       enabled_deviceExtensions.PushBack(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
       enabled_deviceExtensions.PushBack(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
@@ -1333,9 +1341,15 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     assert(device_features2.features.shaderClipDistance == VK_TRUE);
     assert(device_features2.features.textureCompressionBC == VK_TRUE);
     assert(device_features2.features.occlusionQueryPrecise == VK_TRUE);
-    TESSELLATION = device_features2.features.tessellationShader == VK_TRUE;
-    UAV_LOAD_FORMAT_COMMON = device_features2.features.shaderStorageImageExtendedFormats == VK_TRUE;
-    RENDERTARGET_AND_VIEWPORT_ARRAYINDEX_WITHOUT_GS = true; // let's hope for the best...
+    if (device_features2.features.tessellationShader == VK_TRUE)
+    {
+      capabilities |= GRAPHICSDEVICE_CAPABILITY_TESSELLATION;
+    }
+    if (device_features2.features.shaderStorageImageExtendedFormats == VK_TRUE)
+    {
+      capabilities |= GRAPHICSDEVICE_CAPABILITY_UAV_LOAD_FORMAT_COMMON;
+    }
+    capabilities |= GRAPHICSDEVICE_CAPABILITY_RENDERTARGET_AND_VIEWPORT_ARRAYINDEX_WITHOUT_GS; // let's hope for the best...
 
     if (RAYTRACING)
     {
@@ -1348,9 +1362,12 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
       //MESH_SHADER = true;
     }
 
-    VkFormatProperties formatProperties = {0};
+    VkFormatProperties formatProperties = {};
     vkGetPhysicalDeviceFormatProperties(physicalDevice, _ConvertFormat(ezRHIFormat::R11G11B10_FLOAT), &formatProperties);
-    UAV_LOAD_FORMAT_R11G11B10_FLOAT = formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT)
+    {
+      capabilities |= GRAPHICSDEVICE_CAPABILITY_UAV_LOAD_FORMAT_R11G11B10_FLOAT;
+    }
 
     VkDeviceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -1417,7 +1434,7 @@ GraphicsDevice_Vulkan::GraphicsDevice_Vulkan(RHIWindowType window, bool fullscre
     cmdTraceRaysKHR = (PFN_vkCmdTraceRaysKHR)vkGetDeviceProcAddr(device, "vkCmdTraceRaysKHR");
   }
 
-  if (MESH_SHADER)
+  if (CheckCapability(GRAPHICSDEVICE_CAPABILITY_MESH_SHADER))
   {
     cmdDrawMeshTasksNV = (PFN_vkCmdDrawMeshTasksNV)vkGetDeviceProcAddr(device, "vkCmdDrawMeshTasksNV");
     cmdDrawMeshTasksIndirectNV = (PFN_vkCmdDrawMeshTasksIndirectNV)vkGetDeviceProcAddr(device, "vkCmdDrawMeshTasksIndirectNV");
