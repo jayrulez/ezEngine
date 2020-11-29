@@ -153,4 +153,26 @@ struct EZ_RHI_DLL RHIBlendAttachmentDescription : public ezHashableStruct<RHIBle
       DestinationAlphaFactor == other.DestinationAlphaFactor &&
       AlphaFunction == other.AlphaFunction;
   }
+
+  ezUInt32 GetHash() const
+  {
+    RHIBlendFactor::StorageType sourceColorFactor = SourceColorFactor.GetValue();
+    RHIBlendFactor::StorageType destinationColorFactor = DestinationColorFactor.GetValue();
+    RHIBlendFunction::StorageType colorFunction = ColorFunction.GetValue();
+    RHIBlendFactor::StorageType sourceAlphaFactor = SourceAlphaFactor.GetValue();
+    RHIBlendFactor::StorageType destinationAlphaFactor = DestinationAlphaFactor.GetValue();
+    RHIBlendFunction::StorageType alphaFunction = AlphaFunction.GetValue();
+
+    ezUInt32 hash = 0;
+
+    hash = ezHashingUtils::xxHash32(&BlendEnabled, sizeof(BlendEnabled), hash);
+    hash = ezHashingUtils::xxHash32(&sourceColorFactor, sizeof(sourceColorFactor), hash);
+    hash = ezHashingUtils::xxHash32(&destinationColorFactor, sizeof(destinationColorFactor), hash);
+    hash = ezHashingUtils::xxHash32(&colorFunction, sizeof(colorFunction), hash);
+    hash = ezHashingUtils::xxHash32(&sourceAlphaFactor, sizeof(sourceAlphaFactor), hash);
+    hash = ezHashingUtils::xxHash32(&destinationAlphaFactor, sizeof(destinationAlphaFactor), hash);
+    hash = ezHashingUtils::xxHash32(&alphaFunction, sizeof(alphaFunction), hash);
+
+    return hash;
+  }
 };

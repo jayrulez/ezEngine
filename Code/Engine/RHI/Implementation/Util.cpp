@@ -7,6 +7,12 @@
 
 namespace Util
 {
+  void GetMipLevelAndArrayLayer(RHITexture* tex, ezUInt32 subresource, ezUInt32& mipLevel, ezUInt32& arrayLayer)
+  {
+    arrayLayer = subresource / tex->GetMipLevels();
+    mipLevel = subresource - (arrayLayer * tex->GetMipLevels());
+  }
+
   void GetMipDimensions(RHITexture* tex, ezUInt32 mipLevel, ezUInt32& width, ezUInt32& height, ezUInt32& depth)
   {
     width = GetDimension(tex->GetWidth(), mipLevel);
@@ -90,6 +96,7 @@ namespace Util
 
     if (srcRowPitch == dstRowPitch && srcDepthPitch == dstDepthPitch)
     {
+      // todo
       //ezUInt32 totalCopySize = depth * srcDepthPitch;
       //ezMemoryUtils::Copy(
       //  src,

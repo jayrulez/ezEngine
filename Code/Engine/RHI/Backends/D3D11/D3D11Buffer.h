@@ -77,6 +77,18 @@ public:
 
   virtual ezUInt32 GetHash() const override
   {
+    //ID3D11Device* Device = nullptr;
+    //ID3D11Buffer* Buffer = nullptr;
+
+    //ezUInt32 Size = 0;
+    //ezBitflags<RHIBufferUsage> Usage;
+
+    //ezMutex AccessViewMutex;
+    //ezHashTable<OffsetSizePair, ID3D11ShaderResourceView*> SRVs;
+    //ezHashTable<OffsetSizePair, ID3D11UnorderedAccessView*> UAVs;
+    //ezUInt32 StructureByteStride = 0;
+    //bool RawBuffer = false;
+
     ezUInt32 hash = 0;
 
     // TODO: hash

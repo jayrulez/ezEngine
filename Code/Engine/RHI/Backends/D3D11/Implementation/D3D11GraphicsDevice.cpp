@@ -317,9 +317,15 @@ RHIMappedResource* D3D11GraphicsDevice::MapCore(RHIResource* resource, ezEnum<RH
         ezLock lock(ImmediateContextMutex);
         D3D11_MAPPED_SUBRESOURCE msr;
 
+        ezUInt32 mipLevel = 0;
+        ezUInt32 arrayLayer = 0;
+        Util::GetMipLevelAndArrayLayer(texture, subresource, mipLevel, arrayLayer);
+
+        ezUInt32 subresourceIndex = (mipLevel * arrayLayer) + subresource;
+
         HRESULT hr = ImmediateContext->Map(
           texture->GetDeviceTexture(),
-          subresource,
+          subresourceIndex,
           D3D11Formats::RHIToD3D11MapMode(false, mode),
           0,
           &msr);

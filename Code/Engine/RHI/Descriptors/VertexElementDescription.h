@@ -20,7 +20,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <summary>
   /// The semantic type of the element.
   /// NOTE: When using SPIRV, all vertex elements will use
-  /// <see cref="RHIVertexElementSemantic.TextureCoordinate"/>.
+  /// <see cref="RHIVertexElementSemantic::TextureCoordinate"/>.
   /// </summary>
   ezEnum<RHIVertexElementSemantic> Semantic;
 

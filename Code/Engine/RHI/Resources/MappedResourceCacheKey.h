@@ -42,19 +42,7 @@ private:
 template <>
 struct ezHashHelper<RHIMappedResourceCacheKey>
 {
-  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIMappedResourceCacheKey& value)
-  {
-    ezUInt32 hash = 0;
-    RHIResource* resource = value.GetResource();
-    if (resource)
-    {
-      resource->GetHash();
-    }
-
-    ezUInt32 subresource = value.GetSubresource();
-    hash = ezHashingUtils::xxHash32(&subresource, sizeof(subresource), hash);
-    return hash;
-  }
+  static ezUInt32 Hash(const RHIMappedResourceCacheKey& value);
 
   EZ_ALWAYS_INLINE static bool Equal(const RHIMappedResourceCacheKey& a, const RHIMappedResourceCacheKey& b) { return a == b; }
 };

@@ -22,7 +22,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// An array of <see cref="RHIBlendAttachmentDescription"/> describing how blending is performed for each color target
   /// used in the <see cref="RHIPipeline"/>.
   /// </summary>
-  ezStaticArray<RHIBlendAttachmentDescription, 8> AttachmentStates;
+  ezStaticArray<RHIBlendAttachmentDescription, EZ_RHI_MAX_RENDER_TARGETS> AttachmentStates;
 
   /// <summary>
   /// Enables alpha-to-coverage, which causes a fragment's alpha value to be used when determining multi-sample coverage.
@@ -31,7 +31,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
 
   RHIBlendStateDescription()
   {
-    AttachmentStates.SetCount(8);
+    AttachmentStates.SetCount(EZ_RHI_MAX_RENDER_TARGETS);
   }
 
   RHIBlendStateDescription& operator=(const RHIBlendStateDescription& other)
@@ -53,7 +53,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   /// </summary>
   /// <param name="blendFactor">The constant blend color.</param>
   /// <param name="attachmentStates">The blend attachment states.</param>
-  RHIBlendStateDescription(ezColor blendFactor, ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates)
+  RHIBlendStateDescription(ezColor blendFactor, ezStaticArray<RHIBlendAttachmentDescription, EZ_RHI_MAX_RENDER_TARGETS> attachmentStates)
   {
     BlendFactor = blendFactor;
     AttachmentStates = attachmentStates;
@@ -70,7 +70,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
   RHIBlendStateDescription(
     ezColor blendFactor,
     bool alphaToCoverageEnabled,
-    ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates)
+    ezStaticArray<RHIBlendAttachmentDescription, EZ_RHI_MAX_RENDER_TARGETS> attachmentStates)
   {
     BlendFactor = blendFactor;
     AttachmentStates = attachmentStates;
@@ -148,7 +148,7 @@ struct EZ_RHI_DLL RHIBlendStateDescription : public ezHashableStruct<RHIBlendSta
 
   RHIBlendStateDescription Clone()
   {
-    ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates;
+    ezStaticArray<RHIBlendAttachmentDescription, EZ_RHI_MAX_RENDER_TARGETS> attachmentStates;
 
     // TODO: shallow copy
 
@@ -165,9 +165,16 @@ struct ezHashHelper<RHIBlendStateDescription>
 {
   EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIBlendStateDescription& value)
   {
-    // TODO: hash
-    return ezHashingUtils::xxHash32(&value.BlendFactor, sizeof(ezColor)) +
-           ezHashingUtils::xxHash32(&value.AlphaToCoverageEnabled, sizeof(bool));
+    ezUInt32 hash = 0;
+    hash = ezHashingUtils::xxHash32(&value.BlendFactor, sizeof(ezColor), hash);
+    for (auto attachment : value.AttachmentStates)
+    {
+      ezUInt32 attachmentHash = attachment.GetHash();
+      hash = ezHashingUtils::xxHash32(&attachmentHash, sizeof(attachmentHash), hash);
+    }
+    hash = ezHashingUtils::xxHash32(&value.AlphaToCoverageEnabled, sizeof(bool), hash);
+
+    return hash;
   }
 
   EZ_ALWAYS_INLINE static bool Equal(const RHIBlendStateDescription& a, const RHIBlendStateDescription& b) { return a == b; }

@@ -22,10 +22,12 @@
 #  define EZ_RHI_DLL
 #endif
 
+#define EZ_RHI_MAX_RENDER_TARGETS 8
+
 /*
-struct EZ_RHI_DLL RHI // : byte
+struct EZ_RHI_DLL RHI
 {
-  using StorageType = ezUInt8;
+  using StorageType = storage;
   enum Enum
   {
     ENUM_COUNT

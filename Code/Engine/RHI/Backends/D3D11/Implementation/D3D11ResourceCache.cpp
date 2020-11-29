@@ -76,6 +76,9 @@ void D3D11ResourceCache::Dispose()
   {
     it.Value()->Release();
   }
+  // todo: If there is every any problem with InputLayouts not having expected data here then check
+  // InputLayoutCacheKey::CreatePermanentKey, copy each element one at a time instead of just copying the original array
+  // for deep copy instead of shallow copy.
   InputLayouts.Clear();
 }
 
@@ -101,12 +104,12 @@ ID3D11BlendState* D3D11ResourceCache::GetBlendState(const RHIBlendStateDescripti
 
 ID3D11BlendState* D3D11ResourceCache::CreateNewBlendState(const RHIBlendStateDescription& description)
 {
-  ezStaticArray<RHIBlendAttachmentDescription, 8> attachmentStates = description.AttachmentStates;
+  EZ_ASSERT_ALWAYS(description.AttachmentStates.GetCount() == D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, "BlendStateDescription attachment count must be {}.", D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT);
   D3D11_BLEND_DESC d3dBlendStateDesc;
 
-  for (ezUInt32 i = 0; i < attachmentStates.GetCount(); i++)
+  for (ezUInt32 i = 0; i < description.AttachmentStates.GetCount(); i++)
   {
-    RHIBlendAttachmentDescription state = attachmentStates[i];
+    RHIBlendAttachmentDescription state = description.AttachmentStates[i];
     d3dBlendStateDesc.RenderTarget[i].BlendEnable = state.BlendEnabled;
     d3dBlendStateDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     d3dBlendStateDesc.RenderTarget[i].SrcBlend = D3D11Formats::RHIToD3D11Blend(state.SourceColorFactor);

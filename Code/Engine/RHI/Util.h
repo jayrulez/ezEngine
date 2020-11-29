@@ -76,6 +76,8 @@ namespace Util
     return ezDynamicArray(source);
   }
 
+  void GetMipLevelAndArrayLayer(RHITexture* tex, ezUInt32 subresource, ezUInt32& mipLevel, ezUInt32& arrayLayer);
+
   void GetMipDimensions(RHITexture* tex, ezUInt32 mipLevel, ezUInt32& width, ezUInt32& height, ezUInt32& depth);
 
   ezUInt32 GetDimension(ezUInt32 largestLevelDimension, ezUInt32 mipLevel);
