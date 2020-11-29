@@ -4,8 +4,8 @@
 #include <RHI/RHIPCH.h>
 #include <RHI/Resources/Pipeline.h>
 
-#include <RHI/Backends/D3D11/D3D11ResourceLayout.h>
 #include <RHI/Backends/D3D11/D3D11ResourceCache.h>
+#include <RHI/Backends/D3D11/D3D11ResourceLayout.h>
 
 struct ID3D11BlendState;
 struct ID3D11DepthStencilState;
@@ -67,4 +67,13 @@ public:
   ID3D11ComputeShader* GetComputeShader() const;
   ezDynamicArray<D3D11ResourceLayout*> GetResourceLayouts() const;
   ezDynamicArray<ezUInt32> GetVertexStrides() const;
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 };

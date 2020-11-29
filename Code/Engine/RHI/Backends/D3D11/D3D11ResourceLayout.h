@@ -62,25 +62,40 @@ public:
 
 public:
   D3D11ResourceLayout(const RHIResourceLayoutDescription& description);
+
   ezUInt32 GetUniformBufferCount() const
   {
     return UniformBufferCount;
   }
+
   ezUInt32 GetStorageBufferCount() const
   {
     return StorageBufferCount;
   }
+
   ezUInt32 GetTextureCount() const
   {
     return TextureCount;
   }
+
   ezUInt32 GetSamplerCount() const
   {
     return SamplerCount;
   }
+
   bool IsDynamicBuffer(ezUInt32 index) const
   {
     return BindingInfosByRHIIndex[index].DynamicBuffer;
   }
+
   ResourceBindingInfo& GetDeviceSlotIndex(ezUInt32 resourceLayoutIndex);
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 };

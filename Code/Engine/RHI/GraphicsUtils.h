@@ -10,9 +10,8 @@
 #  include <Foundation/Basics/Platform/Win/MinWindows.h>
 
 #  ifdef EZ_RHI_D3D11_SUPPORTED
-#include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
-#include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
-#include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
+#    include <RHI/Backends/D3D11/D3D11DeviceOptions.h>
+#    include <RHI/Backends/D3D11/D3D11GraphicsDevice.h>
 #  endif
 
 #endif
@@ -129,8 +128,15 @@ public:
   /// <returns>A new <see cref="GraphicsDevice"/> using the Direct3D 11 API.</returns>
   static RHIGraphicsDevice* CreateD3D11(const RHIGraphicsDeviceOptions& options, ezMinWindows::HWND hwnd, ezUInt32 width, ezUInt32 height)
   {
+    //RHISwapchainDescription swapchainDescription(
+    //  new RHIWin32SwapchainSource(hwnd, nullptr),
+    //  width, height,
+    //  options.SwapchainDepthFormat,
+    //  options.SyncToVerticalBlank,
+    //  options.SwapchainSrgbFormat);
+
     RHISwapchainDescription swapchainDescription(
-      new RHIWin32SwapchainSource(hwnd, nullptr),
+      std::move(EZ_DEFAULT_NEW(RHIWin32SwapchainSource, hwnd, nullptr)),
       width, height,
       options.SwapchainDepthFormat,
       options.SyncToVerticalBlank,

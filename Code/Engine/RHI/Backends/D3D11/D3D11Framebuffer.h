@@ -39,6 +39,15 @@ public:
 
   D3D11Framebuffer(ID3D11Device* device, const RHIFramebufferDescription& description);
 
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
+
 protected:
   friend class D3D11CommandList;
   friend class D3D11Swapchain;

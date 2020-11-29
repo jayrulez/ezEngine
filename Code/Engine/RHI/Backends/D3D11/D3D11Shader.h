@@ -42,6 +42,15 @@ public:
     return ByteCode;
   }
 
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
+
 private:
   void SetByteCode(ezDynamicArray<ezUInt8> byteCode)
   {

@@ -83,6 +83,17 @@ public:
     }
   }
 
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    hash = Buffer->GetHash();
+    hash = ezHashingUtils::xxHash32(&Offset, sizeof(Offset), hash);
+    hash = ezHashingUtils::xxHash32(&Size, sizeof(Size), hash);
+
+    return hash;
+  }
+
 private:
   bool Disposed = false;
   RHIBuffer* Buffer;

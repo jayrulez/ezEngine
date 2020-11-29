@@ -43,7 +43,6 @@ public:
   virtual void SetName(const ezString& name) override;
 
   virtual bool IsDisposed() const override;
-  virtual void Dispose() override;
 
   virtual ezEnum<RHIPixelFormat> GetFormat() const override;
 
@@ -71,6 +70,15 @@ public:
   D3D11Texture(ID3D11Device* device, const RHITextureDescription& description);
 
   D3D11Texture(ID3D11Texture2D* existingTexture, ezEnum<RHITextureType> type, ezEnum<RHIPixelFormat> format);
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 
 protected:
   virtual RHITextureView* CreateFullTextureView(RHIGraphicsDevice* graphicsDevice) override;

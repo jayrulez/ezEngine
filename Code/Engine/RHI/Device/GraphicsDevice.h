@@ -478,8 +478,13 @@ public:
   {
     WaitForIdle();
     PointSampler->Dispose();
+    EZ_DEFAULT_DELETE(PointSampler);
+
     LinearSampler->Dispose();
+    EZ_DEFAULT_DELETE(LinearSampler);
+
     Aniso4xSampler->Dispose();
+    EZ_DEFAULT_DELETE(Aniso4xSampler);
     DisposeCore();
   }
 

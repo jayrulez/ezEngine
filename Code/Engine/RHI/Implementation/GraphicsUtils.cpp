@@ -14,5 +14,5 @@ EZ_STATICLINK_FILE(RHI, RHI_Implementation_GraphicsUtils);
 RHIGraphicsDevice* GraphicsUtils::CreateD3D11(const RHIGraphicsDeviceOptions& options, const RHISwapchainDescription& swapchainDescription)
 {
   RHID3D11DeviceOptions d3d11DeviceOptions;
-  return new D3D11GraphicsDevice(options, d3d11DeviceOptions, std::make_optional(swapchainDescription));
+  return EZ_DEFAULT_NEW(D3D11GraphicsDevice, options, d3d11DeviceOptions, std::make_optional(swapchainDescription));
 }

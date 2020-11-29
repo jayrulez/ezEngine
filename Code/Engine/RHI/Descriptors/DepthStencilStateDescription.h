@@ -1,8 +1,8 @@
 #pragma once
 
+#include <RHI/Descriptors/StencilBehaviorDescription.h>
 #include <RHI/RHIDLL.h>
 #include <RHI/RHIPCH.h>
-#include <RHI/Descriptors/StencilBehaviorDescription.h>
 
 #include <Foundation/Algorithm/HashableStruct.h>
 
@@ -166,23 +166,35 @@ struct EZ_RHI_DLL RHIDepthStencilStateDescription : public ezHashableStruct<RHID
   bool operator==(const RHIDepthStencilStateDescription& other) const
   {
     return DepthTestEnabled == other.DepthTestEnabled &&
-      DepthWriteEnabled == other.DepthWriteEnabled &&
-      DepthComparison == other.DepthComparison &&
-      StencilTestEnabled == other.StencilTestEnabled &&
-      StencilFront == other.StencilFront &&
-      StencilBack == other.StencilBack &&
-      StencilReadMask == other.StencilReadMask &&
-      StencilWriteMask == other.StencilWriteMask &&
-      StencilReference == other.StencilReference;
+           DepthWriteEnabled == other.DepthWriteEnabled &&
+           DepthComparison == other.DepthComparison &&
+           StencilTestEnabled == other.StencilTestEnabled &&
+           StencilFront == other.StencilFront &&
+           StencilBack == other.StencilBack &&
+           StencilReadMask == other.StencilReadMask &&
+           StencilWriteMask == other.StencilWriteMask &&
+           StencilReference == other.StencilReference;
   }
 };
 
 template <>
 struct ezHashHelper<RHIDepthStencilStateDescription>
 {
-  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIDepthStencilStateDescription& value) {
-    // TODO: hash
-    return ezHashHelper<ezUInt64>::Hash(0);
+  EZ_ALWAYS_INLINE static ezUInt32 Hash(const RHIDepthStencilStateDescription& value)
+  {
+    ezUInt32 hash = 0;
+
+    hash = ezHashingUtils::xxHash32(&value.DepthTestEnabled, sizeof(value.DepthTestEnabled), hash);
+    hash = ezHashingUtils::xxHash32(&value.DepthWriteEnabled, sizeof(value.DepthWriteEnabled), hash);
+    hash = ezHashingUtils::xxHash32(&value.DepthComparison, sizeof(value.DepthComparison), hash);
+    hash = ezHashingUtils::xxHash32(&value.StencilTestEnabled, sizeof(value.StencilTestEnabled), hash);
+    hash = ezHashingUtils::xxHash32(&value.StencilFront, sizeof(value.StencilFront), hash);
+    hash = ezHashingUtils::xxHash32(&value.StencilBack, sizeof(value.StencilBack), hash);
+    hash = ezHashingUtils::xxHash32(&value.StencilReadMask, sizeof(value.StencilReadMask), hash);
+    hash = ezHashingUtils::xxHash32(&value.StencilWriteMask, sizeof(value.StencilWriteMask), hash);
+    hash = ezHashingUtils::xxHash32(&value.StencilReference, sizeof(value.StencilReference), hash);
+
+    return hash;
   }
 
   EZ_ALWAYS_INLINE static bool Equal(const RHIDepthStencilStateDescription& a, const RHIDepthStencilStateDescription& b) { return a == b; }

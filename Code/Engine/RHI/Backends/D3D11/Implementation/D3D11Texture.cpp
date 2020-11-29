@@ -19,15 +19,6 @@ bool D3D11Texture::IsDisposed() const
   return DeviceTexture == nullptr;
 }
 
-void D3D11Texture::Dispose()
-{
-  if (DeviceTexture != nullptr)
-  {
-    DeviceTexture->Release();
-    DeviceTexture = nullptr;
-  }
-}
-
 ezEnum<RHIPixelFormat> D3D11Texture::GetFormat() const
 {
   return Format;
@@ -238,12 +229,16 @@ RHITextureView* D3D11Texture::CreateFullTextureView(RHIGraphicsDevice* graphicsD
 
   D3D11GraphicsDevice* d3d11GD = Util::AssertSubtype<RHIGraphicsDevice, D3D11GraphicsDevice>(graphicsDevice);
 
-  return new D3D11TextureView(d3d11GD, desc);
+  //return new D3D11TextureView(d3d11GD, desc);
+  return EZ_DEFAULT_NEW(D3D11TextureView, d3d11GD, desc);
 }
 
 void D3D11Texture::DisposeCore()
 {
-  DeviceTexture->Release();
+  if (DeviceTexture != nullptr)
+  {
+    //DeviceTexture->Release();
+  }
 }
 
 

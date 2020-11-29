@@ -105,7 +105,7 @@ void D3D11CommandList::SetPipelineCore(RHIPipeline* pipeline)
     D3D11Pipeline* d3dPipeline = Util::AssertSubtype<RHIPipeline, D3D11Pipeline>(pipeline);
 
     GraphicsPipeline = d3dPipeline;
-    ClearSets(GraphicsResourceSets); // Invalidate resource set bindings -- they may be invalid.
+    ClearSets(GraphicsResourceSets);         // Invalidate resource set bindings -- they may be invalid.
     InvalidatedGraphicsResourceSets.Clear(); //Util::ClearArray(InvalidatedGraphicsResourceSets);
 
     ID3D11BlendState* blendState = d3dPipeline->GetBlendState();
@@ -195,7 +195,7 @@ void D3D11CommandList::SetPipelineCore(RHIPipeline* pipeline)
   {
     D3D11Pipeline* d3dPipeline = Util::AssertSubtype<RHIPipeline, D3D11Pipeline>(pipeline);
     ComputePipeline = d3dPipeline;
-    ClearSets(ComputeResourceSets); // Invalidate resource set bindings -- they may be invalid.
+    ClearSets(ComputeResourceSets);         // Invalidate resource set bindings -- they may be invalid.
     InvalidatedComputeResourceSets.Clear(); //Util::ClearArray(InvalidatedComputeResourceSets);
 
     ID3D11ComputeShader* computeShader = d3dPipeline->GetComputeShader();
@@ -604,7 +604,7 @@ void D3D11CommandList::ResetManagedState()
   VertexBindings.Clear(); //Util::ClearArray(VertexBindings);
   VertexBindings.EnsureCount(1);
   VertexStrides.Clear();
-  VertexOffsets .Clear();//Util::ClearArray(VertexOffsets);
+  VertexOffsets.Clear(); //Util::ClearArray(VertexOffsets);
   VertexOffsets.EnsureCount(1);
 
   m_pFramebuffer = nullptr;
@@ -633,20 +633,20 @@ void D3D11CommandList::ResetManagedState()
   VertexBoundUniformBuffers.Clear(); //Util::ClearArray(VertexBoundUniformBuffers);
   VertexBoundUniformBuffers.EnsureCount(MaxCachedUniformBuffers);
 
-  VertexBoundTextureViews.Clear();   //Util::ClearArray(VertexBoundTextureViews);
+  VertexBoundTextureViews.Clear(); //Util::ClearArray(VertexBoundTextureViews);
   VertexBoundTextureViews.EnsureCount(MaxCachedTextureViews);
-  
-  VertexBoundSamplers.Clear();       //Util::ClearArray(VertexBoundSamplers);
-  VertexBoundSamplers.EnsureCount(MaxCachedSamplers);       
 
-  FragmentBoundUniformBuffers.Clear(); //Util::ClearArray(FragmentBoundUniformBuffers);
+  VertexBoundSamplers.Clear(); //Util::ClearArray(VertexBoundSamplers);
+  VertexBoundSamplers.EnsureCount(MaxCachedSamplers);
+
+  FragmentBoundUniformBuffers.Clear();                              //Util::ClearArray(FragmentBoundUniformBuffers);
   FragmentBoundUniformBuffers.EnsureCount(MaxCachedUniformBuffers); //Util::ClearArray(FragmentBoundUniformBuffers);
 
-  FragmentBoundTextureViews.Clear();   //Util::ClearArray(FragmentBoundTextureViews);
+  FragmentBoundTextureViews.Clear(); //Util::ClearArray(FragmentBoundTextureViews);
   FragmentBoundTextureViews.EnsureCount(MaxCachedTextureViews);
 
-  FragmentBoundSamplers.Clear();       //Util::ClearArray(FragmentBoundSamplers);
-  FragmentBoundSamplers.EnsureCount(MaxCachedSamplers); 
+  FragmentBoundSamplers.Clear(); //Util::ClearArray(FragmentBoundSamplers);
+  FragmentBoundSamplers.EnsureCount(MaxCachedSamplers);
 
   ComputePipeline = nullptr;
   ClearSets(ComputeResourceSets);
@@ -780,20 +780,20 @@ void D3D11CommandList::BindUnorderedAccessView(RHITexture* texture, RHIBuffer* b
   }
 }
 
-void D3D11CommandList::PackRangeParams(D3D11BufferRange* range)
+void D3D11CommandList::PackRangeParams(D3D11BufferRange range)
 {
-  CBOut[0] = range->GetBuffer()->GetBuffer();
-  FirstConstRef[0] = range->GetOffset() / 16;
-  ezUInt32 roundedSize = range->GetSize() < 256 ? 256u : range->GetSize();
+  CBOut[0] = range.GetBuffer()->GetBuffer();
+  FirstConstRef[0] = range.GetOffset() / 16;
+  ezUInt32 roundedSize = range.GetSize() < 256 ? 256u : range.GetSize();
   NumConstsRef[0] = roundedSize / 16;
 }
 
-void D3D11CommandList::BindStorageBufferView(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages)
+void D3D11CommandList::BindStorageBufferView(D3D11BufferRange range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages)
 {
   bool compute = (stages & RHIShaderStages::Compute) != 0;
-  UnbindUAVBuffer(range->GetBuffer());
+  UnbindUAVBuffer(range.GetBuffer());
 
-  ID3D11ShaderResourceView* srv = range->GetBuffer()->GetShaderResourceView(range->GetOffset(), range->GetSize());
+  ID3D11ShaderResourceView* srv = range.GetBuffer()->GetShaderResourceView(range.GetOffset(), range.GetSize());
 
   if ((stages & RHIShaderStages::Vertex) == RHIShaderStages::Vertex)
   {
@@ -821,7 +821,7 @@ void D3D11CommandList::BindStorageBufferView(D3D11BufferRange* range, ezUInt32 s
   }
 }
 
-void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages)
+void D3D11CommandList::BindUniformBuffer(D3D11BufferRange range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages)
 {
   if ((stages & RHIShaderStages::Vertex) == RHIShaderStages::Vertex)
   {
@@ -840,9 +840,9 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
     }
     if (bind)
     {
-      if (range->IsFullRange())
+      if (range.IsFullRange())
       {
-        ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
+        ID3D11Buffer* buffer = range.GetBuffer()->GetBuffer();
         Context->VSSetConstantBuffers(slot, 1, &buffer);
       }
       else
@@ -858,9 +858,9 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   }
   if ((stages & RHIShaderStages::Geometry) == RHIShaderStages::Geometry)
   {
-    if (range->IsFullRange())
+    if (range.IsFullRange())
     {
-      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
+      ID3D11Buffer* buffer = range.GetBuffer()->GetBuffer();
       Context->GSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -875,9 +875,9 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   }
   if ((stages & RHIShaderStages::TessellationControl) == RHIShaderStages::TessellationControl)
   {
-    if (range->IsFullRange())
+    if (range.IsFullRange())
     {
-      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
+      ID3D11Buffer* buffer = range.GetBuffer()->GetBuffer();
       Context->HSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -892,9 +892,9 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   }
   if ((stages & RHIShaderStages::TessellationEvaluation) == RHIShaderStages::TessellationEvaluation)
   {
-    if (range->IsFullRange())
+    if (range.IsFullRange())
     {
-      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
+      ID3D11Buffer* buffer = range.GetBuffer()->GetBuffer();
       Context->DSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -912,7 +912,7 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
     bool bind = false;
     if (slot < MaxCachedUniformBuffers)
     {
-      if (!(*FragmentBoundUniformBuffers[slot] == *range))
+      if (!(FragmentBoundUniformBuffers[slot] == range))
       {
         FragmentBoundUniformBuffers[slot] = range;
         bind = true;
@@ -924,9 +924,9 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
     }
     if (bind)
     {
-      if (range->IsFullRange())
+      if (range.IsFullRange())
       {
-        ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
+        ID3D11Buffer* buffer = range.GetBuffer()->GetBuffer();
         Context->PSSetConstantBuffers(slot, 1, &buffer);
       }
       else
@@ -942,9 +942,9 @@ void D3D11CommandList::BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot,
   }
   if ((stages & RHIShaderStages::Compute) == RHIShaderStages::Compute)
   {
-    if (range->IsFullRange())
+    if (range.IsFullRange())
     {
-      ID3D11Buffer* buffer = range->GetBuffer()->GetBuffer();
+      ID3D11Buffer* buffer = range.GetBuffer()->GetBuffer();
       Context->CSSetConstantBuffers(slot, 1, &buffer);
     }
     else
@@ -1250,21 +1250,21 @@ void D3D11CommandList::ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInf
     {
       case RHIResourceKind::UniformBuffer:
       {
-        D3D11BufferRange* range = GetBufferRange(resource, bufferOffset);
+        D3D11BufferRange range = GetBufferRange(resource, bufferOffset);
         BindUniformBuffer(range, cbBase + rbi.Slot, rbi.Stages);
         break;
       }
       case RHIResourceKind::StructuredBufferReadOnly:
       {
-        D3D11BufferRange* range = GetBufferRange(resource, bufferOffset);
+        D3D11BufferRange range = GetBufferRange(resource, bufferOffset);
         BindStorageBufferView(range, textureBase + rbi.Slot, rbi.Stages);
         break;
       }
       case RHIResourceKind::StructuredBufferReadWrite:
       {
-        D3D11BufferRange* range = GetBufferRange(resource, bufferOffset);
-        ID3D11UnorderedAccessView* uav = range->GetBuffer()->GetUnorderedAccessView(range->GetOffset(), range->GetSize());
-        BindUnorderedAccessView(nullptr, range->GetBuffer(), uav, uaBase + rbi.Slot, rbi.Stages, slot);
+        D3D11BufferRange range = GetBufferRange(resource, bufferOffset);
+        ID3D11UnorderedAccessView* uav = range.GetBuffer()->GetUnorderedAccessView(range.GetOffset(), range.GetSize());
+        BindUnorderedAccessView(nullptr, range.GetBuffer(), uav, uaBase + rbi.Slot, rbi.Stages, slot);
       }
       break;
       case RHIResourceKind::TextureReadOnly:
@@ -1296,25 +1296,30 @@ void D3D11CommandList::ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInf
   }
 }
 
-D3D11CommandList::D3D11BufferRange* D3D11CommandList::GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset)
+D3D11CommandList::D3D11BufferRange D3D11CommandList::GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset)
 {
   D3D11DeviceBuffer* d3d11Buff = dynamic_cast<D3D11DeviceBuffer*>(resource);
   RHIBufferRange* range = dynamic_cast<RHIBufferRange*>(resource);
   if (d3d11Buff)
   {
-    return new D3D11BufferRange(d3d11Buff, additionalOffset, d3d11Buff->GetSize());
+    return D3D11BufferRange(d3d11Buff, additionalOffset, d3d11Buff->GetSize());
+    //return new D3D11BufferRange(d3d11Buff, additionalOffset, d3d11Buff->GetSize());
   }
   else if (range)
   {
-    return new D3D11BufferRange(
-      Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(range->GetBuffer()),
+    //return new D3D11BufferRange(
+    //  Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(range->GetBuffer()),
+    //  range->GetOffset() + additionalOffset,
+    //  range->GetSize());
+
+    return D3D11BufferRange(Util::AssertSubtype<RHIBuffer, D3D11DeviceBuffer>(range->GetBuffer()),
       range->GetOffset() + additionalOffset,
       range->GetSize());
   }
   else
   {
     EZ_REPORT_FAILURE("Unexpected resource type used in a buffer type slot: {resource.GetType().Name}");
-    return nullptr;
+    return D3D11BufferRange{nullptr, 0, 0};
   }
 }
 
@@ -1404,4 +1409,3 @@ ezUInt32 D3D11CommandList::GetSamplerBase(ezUInt32 slot, bool graphics)
 
 
 EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11CommandList);
-

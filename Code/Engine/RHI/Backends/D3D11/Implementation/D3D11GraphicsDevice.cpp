@@ -96,7 +96,8 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(const RHID3D11DeviceOptions& options, c
   if (swapchainDesc.has_value())
   {
     RHISwapchainDescription desc = swapchainDesc.value();
-    MainSwapchain = new D3D11Swapchain(this, desc);
+    //MainSwapchain = new D3D11Swapchain(this, desc);
+    MainSwapchain = EZ_DEFAULT_NEW(D3D11Swapchain, this, desc);
   }
 
   D3D11_FEATURE_DATA_THREADING threadingSupport;
@@ -138,7 +139,8 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(const RHID3D11DeviceOptions& options, c
     dataDoublesSupport.DoublePrecisionFloatShaderOps     //shaderFloat64
   );
 
-  ResourceFactory = new D3D11ResourceFactory(this);
+  //ResourceFactory = new D3D11ResourceFactory(this);
+  ResourceFactory = EZ_DEFAULT_NEW(D3D11ResourceFactory, this);
 
   PostDeviceCreated();
 }
@@ -299,7 +301,8 @@ RHIMappedResource* D3D11GraphicsDevice::MapCore(RHIResource* resource, ezEnum<RH
 
         ezUInt64* data = reinterpret_cast<ezUInt64*>(msr.pData);
 
-        info.Resource = new RHIMappedResource(resource, mode, data, buffer->GetSize());
+        //info.Resource = new RHIMappedResource(resource, mode, data, buffer->GetSize());
+        info.Resource = EZ_DEFAULT_NEW(RHIMappedResource, resource, mode, data, buffer->GetSize());
         info.RefCount = 1;
         info.Mode = mode;
         MappedResources.Insert(key, info);
@@ -323,7 +326,16 @@ RHIMappedResource* D3D11GraphicsDevice::MapCore(RHIResource* resource, ezEnum<RH
 
         ezUInt64* data = reinterpret_cast<ezUInt64*>(msr.pData);
 
-        info.Resource = new RHIMappedResource(
+        //info.Resource = new RHIMappedResource(
+        //  resource,
+        //  mode,
+        //  data,
+        //  texture->GetHeight() * msr.RowPitch,
+        //  subresource,
+        //  msr.RowPitch,
+        //  msr.DepthPitch);
+
+        info.Resource = EZ_DEFAULT_NEW(RHIMappedResource,
           resource,
           mode,
           data,
@@ -492,14 +504,14 @@ void D3D11GraphicsDevice::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOff
   {
     D3D11DeviceBuffer* staging = GetFreeStagingBuffer(size);
     UpdateBuffer(staging, 0, source, size);
-    D3D11_BOX* sourceRegion = new D3D11_BOX{0, 0, 0, size, 1, 1};
+    D3D11_BOX sourceRegion = D3D11_BOX{0, 0, 0, size, 1, 1};
 
     {
       ezLock lock(ImmediateContextMutex);
       ImmediateContext->CopySubresourceRegion(
         d3dBuffer->GetBuffer(), 0, bufferOffset, 0, 0,
         staging->GetBuffer(), 0,
-        sourceRegion);
+        &sourceRegion);
     }
 
 
@@ -522,10 +534,11 @@ void D3D11GraphicsDevice::DisposeCore()
   if (MainSwapchain != nullptr)
   {
     MainSwapchain->Dispose();
-    delete MainSwapchain;
+    EZ_DEFAULT_DELETE(MainSwapchain);
   }
 
   ResourceFactory->Dispose();
+  EZ_DEFAULT_DELETE(ResourceFactory);
 
   ImmediateContext->Release();
 
@@ -703,4 +716,3 @@ RHID3D11DeviceOptions D3D11GraphicsDevice::MergeOptions(const RHIGraphicsDeviceO
 
 
 EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11GraphicsDevice);
-

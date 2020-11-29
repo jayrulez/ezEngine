@@ -2,16 +2,22 @@
 
 ezString D3D11Swapchain::GetName() const
 {
-  ezUInt32 size = 1024 - 1;
-  char* pName = new char[size + 1];
+  if (Name.IsEmpty())
+  {
+    ezUInt32 size = 1024 - 1;
+    ezArrayPtr<char> pName = EZ_DEFAULT_NEW_ARRAY(char, size + 1);
+    DXGISwapChain->GetPrivateData(WKPDID_D3DDebugObjectName, &size, pName.GetPtr());
 
-  DXGISwapChain->GetPrivateData(WKPDID_D3DDebugObjectName, &size, pName);
+    pName[size] = '\0';
 
-  pName[size] = '\0';
+    ezString name(pName.GetPtr());
 
-  ezString name(pName);
+    EZ_DEFAULT_DELETE_ARRAY(pName);
 
-  return name;
+    return name;
+  }
+
+  return Name;
 }
 
 void D3D11Swapchain::SetName(const ezString& name)
@@ -31,10 +37,22 @@ void D3D11Swapchain::Dispose()
   if (!Disposed)
   {
     if (DepthTexture != nullptr)
+    {
       DepthTexture->Dispose();
+      EZ_DEFAULT_DELETE(DepthTexture);
+    }
 
     if (Framebuffer != nullptr)
+    {
       Framebuffer->Dispose();
+      EZ_DEFAULT_DELETE(Framebuffer);
+    }
+
+    if (BackBufferRHITexture != nullptr)
+    {
+      BackBufferRHITexture->Dispose();
+      EZ_DEFAULT_DELETE(BackBufferRHITexture);
+    }
 
     if (DXGISwapChain != nullptr)
     {
@@ -70,10 +88,12 @@ void D3D11Swapchain::Resize(ezUInt32 width, ezUInt32 height)
     if (DepthTexture != nullptr)
     {
       DepthTexture->Dispose();
+      EZ_DEFAULT_DELETE(DepthTexture);
       DepthTexture = nullptr;
     }
 
     Framebuffer->Dispose();
+    EZ_DEFAULT_DELETE(Framebuffer);
   }
 
   ezUInt32 actualWidth = (ezUInt32)(width * PixelScale);
@@ -100,22 +120,37 @@ void D3D11Swapchain::Resize(ezUInt32 width, ezUInt32 height)
         RHITextureType::Texture2D      // type
       );
 
-      DepthTexture = new D3D11Texture(GraphicsDevice->GetDevice(), depthDesc);
+      //DepthTexture = new D3D11Texture(GraphicsDevice->GetDevice(), depthDesc);
+      DepthTexture = EZ_DEFAULT_NEW(D3D11Texture, GraphicsDevice->GetDevice(), depthDesc);
     }
 
-    D3D11Texture* backBufferRHITexture = new D3D11Texture(
+    //D3D11Texture* backBufferRHITexture = new D3D11Texture(
+    //  backBufferTexture,
+    //  RHITextureType::Texture2D,
+    //  D3D11Formats::ToRHIFormat(ColorFormat));
+
+    if (BackBufferRHITexture)
+    {
+      BackBufferRHITexture->Dispose();
+      EZ_DEFAULT_DELETE(BackBufferRHITexture);
+      BackBufferRHITexture = nullptr;
+    }
+    BackBufferRHITexture = EZ_DEFAULT_NEW(
+      D3D11Texture,
       backBufferTexture,
       RHITextureType::Texture2D,
       D3D11Formats::ToRHIFormat(ColorFormat));
 
     ezDynamicArray<RHITexture*> colorTargets;
-    colorTargets.PushBack(backBufferRHITexture);
+    colorTargets.PushBack(BackBufferRHITexture);
 
     RHIFramebufferDescription desc(DepthTexture, colorTargets);
-    Framebuffer = new D3D11Framebuffer(GraphicsDevice->GetDevice(), desc);
+    //Framebuffer = new D3D11Framebuffer(GraphicsDevice->GetDevice(), desc);
+
+    Framebuffer = EZ_DEFAULT_NEW(D3D11Framebuffer, GraphicsDevice->GetDevice(), desc);
     Framebuffer->SetSwapchain(this);
 
-    //backBufferTexture->Release(); // TODO: confirm that this should be done, check veldrid and maybe message mellinoe
+    backBufferTexture->Release(); // TODO: confirm that this should be done, check veldrid and maybe message mellinoe
   }
 }
 
@@ -254,4 +289,3 @@ D3D11Swapchain::D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwa
 
 
 EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Swapchain);
-

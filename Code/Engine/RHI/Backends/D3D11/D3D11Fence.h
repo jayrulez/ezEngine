@@ -41,4 +41,13 @@ public:
   void Set();
 
   bool Wait(ezUInt64 nanosecondTimeout);
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 };

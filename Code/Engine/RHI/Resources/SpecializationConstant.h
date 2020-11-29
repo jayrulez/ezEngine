@@ -135,6 +135,8 @@ struct EZ_RHI_DLL RHISpecializationConstant : public ezHashableStruct<RHISpecial
 
     T value = (T)(*reinterpret_cast<T*>(outDataPtr));
 
+    delete[] outDataPtr;
+
     return value;
   }
 
@@ -143,7 +145,7 @@ struct EZ_RHI_DLL RHISpecializationConstant : public ezHashableStruct<RHISpecial
   {
     ezUInt64 data;
 
-    void* dataPtr = reinterpret_cast<void*>(&data);
+    T* dataPtr = reinterpret_cast<T*>(&data);
     ezMemoryUtils::Copy(dataPtr, &value, sizeof(T));
 
     return data;

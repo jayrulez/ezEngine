@@ -51,6 +51,8 @@ private:
       return Offset == 0 && Size == Buffer->GetSize();
     }
 
+    D3D11BufferRange() {}
+
     D3D11BufferRange(D3D11DeviceBuffer* buffer, ezUInt32 offset, ezUInt32 size)
     {
       Buffer = buffer;
@@ -101,6 +103,15 @@ public:
     return Disposed;
   }
   virtual void Dispose() override;
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 
 protected:
   virtual void BeginCore() override;
@@ -199,11 +210,11 @@ private:
     ezBitflags<RHIShaderStages> stages,
     ezUInt32 resourceSet);
 
-  void PackRangeParams(D3D11BufferRange* range);
+  void PackRangeParams(D3D11BufferRange range);
 
-  void BindStorageBufferView(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
+  void BindStorageBufferView(D3D11BufferRange range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
 
-  void BindUniformBuffer(D3D11BufferRange* range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
+  void BindUniformBuffer(D3D11BufferRange range, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
 
   void BindSampler(D3D11Sampler* sampler, ezUInt32 slot, ezBitflags<RHIShaderStages> stages);
 
@@ -234,7 +245,7 @@ private:
 
   void ActivateResourceSet(ezUInt32 slot, RHIBoundResourceSetInfo brsi, bool graphics);
 
-  D3D11BufferRange* GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset);
+  D3D11BufferRange GetBufferRange(RHIResource* resource, ezUInt32 additionalOffset);
 
   void UnbindSRVTexture(RHITexture* target);
 
@@ -257,7 +268,7 @@ private:
   bool Begun = false;
   ID3D11CommandList* CommandList = nullptr;
 
-  ezDynamicArray<D3D11_VIEWPORT> Viewports; // = new Vortice.Mathematics.Viewport[0];
+  ezDynamicArray<D3D11_VIEWPORT> Viewports;
   ezDynamicArray<RECT> Scissors;
   bool ViewportsChanged = false;
   bool ScissorRectsChanged = false;
@@ -299,8 +310,8 @@ private:
 
   // Cached resources
   static constexpr ezUInt32 MaxCachedUniformBuffers = 15;
-  ezStaticArray<D3D11BufferRange*, MaxCachedUniformBuffers> VertexBoundUniformBuffers;
-  ezStaticArray<D3D11BufferRange*, MaxCachedUniformBuffers> FragmentBoundUniformBuffers;
+  ezStaticArray<D3D11BufferRange, MaxCachedUniformBuffers> VertexBoundUniformBuffers;
+  ezStaticArray<D3D11BufferRange, MaxCachedUniformBuffers> FragmentBoundUniformBuffers;
   static constexpr ezUInt32 MaxCachedTextureViews = 16;
   ezStaticArray<D3D11TextureView*, MaxCachedTextureViews> VertexBoundTextureViews;
   ezStaticArray<D3D11TextureView*, MaxCachedTextureViews> FragmentBoundTextureViews;

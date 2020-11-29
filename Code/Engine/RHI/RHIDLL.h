@@ -4,6 +4,8 @@
 #include <Foundation/Reflection/Reflection.h>
 #include <Foundation/Types/Id.h>
 #include <Foundation/Types/RefCounted.h>
+#include <Foundation/Types/SharedPtr.h>
+#include <Foundation/Types/UniquePtr.h>
 
 #if EZ_ENABLED(EZ_PLATFORM_WINDOWS_DESKTOP)
 #  include <Foundation/Basics/Platform/Win/MinWindows.h>

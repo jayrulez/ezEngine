@@ -25,9 +25,25 @@ struct InputLayoutCacheKey : public ezHashableStruct<InputLayoutCacheKey>
     VertexLayouts = vertexLayouts;
   }
 
-  static InputLayoutCacheKey CreateTempKey(ezDynamicArray<RHIVertexLayoutDescription> original);
+  ~InputLayoutCacheKey()
+  {
+    Clear();
+  }
 
-  static InputLayoutCacheKey CreatePermanentKey(ezDynamicArray<RHIVertexLayoutDescription> original);
+  void Clear()
+  {
+    for (auto layout : VertexLayouts)
+    {
+      layout.Elements.Clear();
+      layout.Elements.Compact();
+    }
+    VertexLayouts.Clear();
+    VertexLayouts.Compact();
+  }
+
+  static const InputLayoutCacheKey CreateTempKey(ezDynamicArray<RHIVertexLayoutDescription>& original);
+
+  static const InputLayoutCacheKey CreatePermanentKey(ezDynamicArray<RHIVertexLayoutDescription>& original);
 
   bool operator==(const InputLayoutCacheKey& other) const
   {
@@ -38,7 +54,7 @@ struct InputLayoutCacheKey : public ezHashableStruct<InputLayoutCacheKey>
 template <>
 struct ezHashHelper<InputLayoutCacheKey>
 {
-  EZ_ALWAYS_INLINE static ezUInt32 Hash(const InputLayoutCacheKey& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+  static ezUInt32 Hash(const InputLayoutCacheKey& value);
 
   EZ_ALWAYS_INLINE static bool Equal(const InputLayoutCacheKey& a, const InputLayoutCacheKey& b) { return a == b; }
 };
@@ -67,7 +83,7 @@ struct D3D11RasterizerStateCacheKey : public ezHashableStruct<D3D11RasterizerSta
 template <>
 struct ezHashHelper<D3D11RasterizerStateCacheKey>
 {
-  EZ_ALWAYS_INLINE static ezUInt32 Hash(const D3D11RasterizerStateCacheKey& value) { return ezHashHelper<ezUInt64>::Hash(0); }
+  static ezUInt32 Hash(const D3D11RasterizerStateCacheKey& value);
 
   EZ_ALWAYS_INLINE static bool Equal(const D3D11RasterizerStateCacheKey& a, const D3D11RasterizerStateCacheKey& b) { return a == b; }
 };

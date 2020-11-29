@@ -3,6 +3,15 @@
 #include <Foundation/Basics/Platform/Win/IncludeWindows.h>
 #include <d3d11_1.h>
 
+ezUInt32 ezHashHelper<OffsetSizePair>::Hash(const OffsetSizePair& value)
+{
+  ezUInt32 hash = 0;
+
+  hash = ezHashingUtils::xxHash32(&value.Offset, sizeof(value.Offset), hash);
+  hash = ezHashingUtils::xxHash32(&value.Size, sizeof(value.Size), hash);
+
+  return hash;
+}
 
 void D3D11DeviceBuffer::SetName(const ezString& name)
 {

@@ -61,4 +61,6 @@ private:
   ezMat4 WorldViewProjectionMatrix;
   RHIResourceSet* ResourceSet = nullptr;
   RHIResourceFactory* ResourceFactory = nullptr;
+  RHISwapchainSource* m_pSwapchainSource = nullptr;
+  RHIResourceLayout* ResourceLayout = nullptr;
 };

@@ -3,6 +3,41 @@
 
 EZ_DEFINE_AS_POD_TYPE(D3D11_INPUT_ELEMENT_DESC);
 
+ezUInt32 ezHashHelper<InputLayoutCacheKey>::Hash(const InputLayoutCacheKey& value)
+{
+  ezUInt32 hash = 0;
+  for (auto layout : value.VertexLayouts)
+  {
+    for (auto element : layout.Elements)
+    {
+      RHIVertexElementFormat::StorageType format = element.Format.GetValue();
+      hash = ezHashingUtils::xxHash32(&format, sizeof(format), hash);
+
+      hash = ezHashingUtils::xxHash32String(element.Name, hash);
+      hash = ezHashingUtils::xxHash32(&element.Offset, sizeof(element.Offset), hash);
+
+      RHIVertexElementSemantic::StorageType semantic = element.Semantic.GetValue();
+      hash = ezHashingUtils::xxHash32(&semantic, sizeof(semantic), hash);
+    }
+  }
+  return hash;
+}
+
+ezUInt32 ezHashHelper<D3D11RasterizerStateCacheKey>::Hash(const D3D11RasterizerStateCacheKey& value)
+{
+  ezUInt32 hash = 0;
+  RHIFaceCullMode::StorageType cullMode = value.RHIDescription.CullMode.GetValue();
+  RHIPolygonFillMode::StorageType fillMode = value.RHIDescription.FillMode.GetValue();
+  RHIFrontFace::StorageType frontFace = value.RHIDescription.FrontFace.GetValue();
+  hash = ezHashingUtils::xxHash32(&cullMode, sizeof(cullMode), hash);
+  hash = ezHashingUtils::xxHash32(&fillMode, sizeof(fillMode), hash);
+  hash = ezHashingUtils::xxHash32(&frontFace, sizeof(frontFace), hash);
+  hash = ezHashingUtils::xxHash32(&value.RHIDescription.DepthClipEnabled, sizeof(value.RHIDescription.DepthClipEnabled), hash);
+  hash = ezHashingUtils::xxHash32(&value.RHIDescription.ScissorTestEnabled, sizeof(value.RHIDescription.ScissorTestEnabled), hash);
+  hash = ezHashingUtils::xxHash32(&value.Multisampled, sizeof(value.Multisampled), hash);
+  return hash;
+}
+
 D3D11ResourceCache::D3D11ResourceCache(ID3D11Device* device)
 {
   Device = device;
@@ -23,29 +58,25 @@ void D3D11ResourceCache::Dispose()
   {
     it.Value()->Release();
   }
-
-  //BlendStates.Clear();
+  BlendStates.Clear();
 
   for (auto& it : DepthStencilStates)
   {
     it.Value()->Release();
   }
-
-  //DepthStencilStates.Clear();
+  DepthStencilStates.Clear();
 
   for (auto& it : RasterizerStates)
   {
     it.Value()->Release();
   }
-
-  //RasterizerStates.Clear();
+  RasterizerStates.Clear();
 
   for (auto& it : InputLayouts)
   {
     it.Value()->Release();
   }
-
-  //InputLayouts.Clear();
+  InputLayouts.Clear();
 }
 
 ID3D11BlendState* D3D11ResourceCache::GetBlendState(const RHIBlendStateDescription& description)
@@ -255,12 +286,12 @@ const char* D3D11ResourceCache::GetSemanticString(ezEnum<RHIVertexElementSemanti
   }
 }
 
-InputLayoutCacheKey InputLayoutCacheKey::CreateTempKey(ezDynamicArray<RHIVertexLayoutDescription> original)
+const InputLayoutCacheKey InputLayoutCacheKey::CreateTempKey(ezDynamicArray<RHIVertexLayoutDescription>& original)
 {
-  return InputLayoutCacheKey{original};
+  return InputLayoutCacheKey(original);
 }
 
-InputLayoutCacheKey InputLayoutCacheKey::CreatePermanentKey(ezDynamicArray<RHIVertexLayoutDescription> original)
+const InputLayoutCacheKey InputLayoutCacheKey::CreatePermanentKey(ezDynamicArray<RHIVertexLayoutDescription>& original)
 {
   ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts;
   vertexLayouts.SetCountUninitialized(original.GetCount());
@@ -275,7 +306,7 @@ InputLayoutCacheKey InputLayoutCacheKey::CreatePermanentKey(ezDynamicArray<RHIVe
     vertexLayouts[i].Elements.GetArrayPtr().CopyFrom(original[i].Elements.GetArrayPtr());
   }
 
-  return InputLayoutCacheKey{vertexLayouts};
+  return InputLayoutCacheKey(std::move(vertexLayouts));
 }
 
 ezUInt32 D3D11ResourceCache::SemanticIndices::GetAndIncrement(SemanticIndices& si, ezEnum<RHIVertexElementSemantic> type)

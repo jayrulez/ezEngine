@@ -25,6 +25,7 @@ private:
   ezUInt32 SyncInterval = 0;
   D3D11Framebuffer* Framebuffer = nullptr;
   D3D11Texture* DepthTexture = nullptr;
+  D3D11Texture* BackBufferRHITexture = nullptr; // todo: this reference is only kept for freeing memory
   float PixelScale = 1.f;
   ezMutex ReferencedCLsMutex;
   ezHashSet<D3D11CommandList*> ReferencedCLs;
@@ -58,4 +59,13 @@ public:
   void RemoveCommandListReference(D3D11CommandList* cl);
 
   D3D11Swapchain(D3D11GraphicsDevice* graphicsDevice, const RHISwapchainDescription& description);
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 };

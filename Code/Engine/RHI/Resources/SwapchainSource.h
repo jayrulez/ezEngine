@@ -8,7 +8,7 @@
 /// A SwapchainSource can be created with one of several static factory methods.
 /// A SwapchainSource is used to describe a Swapchain (see <see cref="SwapchainDescription"/>).
 /// </summary>
-struct EZ_RHI_DLL RHISwapchainSource
+struct EZ_RHI_DLL RHISwapchainSource : ezRefCounted
 {
   RHISwapchainSource() = default;
 

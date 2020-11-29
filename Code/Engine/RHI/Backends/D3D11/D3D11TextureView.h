@@ -29,4 +29,13 @@ public:
   ID3D11ShaderResourceView* GetShaderResourceView() const;
 
   ID3D11UnorderedAccessView* GetUnorderedAccessView() const;
+
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
 };

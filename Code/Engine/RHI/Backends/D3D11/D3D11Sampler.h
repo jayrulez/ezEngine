@@ -27,6 +27,15 @@ public:
 
   D3D11Sampler(ID3D11Device* device, const RHISamplerDescription& description);
 
+  virtual ezUInt32 GetHash() const override
+  {
+    ezUInt32 hash = 0;
+
+    // TODO: hash
+
+    return hash;
+  }
+
 private:
   static ezColor ToRawColor4(ezEnum<RHISamplerBorderColor> borderColor);
 };

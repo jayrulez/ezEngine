@@ -79,6 +79,8 @@ public:
     return Flags.IsSet(RHIResourceFlags::Mappable);
   }
 
+  virtual ezUInt32 GetHash() const = 0;
+
 protected:
   ezBitflags<RHIResourceFlags> Flags = RHIResourceFlags::None;
 };
