@@ -20,25 +20,9 @@ struct InputLayoutCacheKey : public ezHashableStruct<InputLayoutCacheKey>
   ezDynamicArray<RHIVertexLayoutDescription> VertexLayouts;
 
   InputLayoutCacheKey() = default;
-  InputLayoutCacheKey(ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts)
+  InputLayoutCacheKey(ezDynamicArray<RHIVertexLayoutDescription>& vertexLayouts)
   {
     VertexLayouts = vertexLayouts;
-  }
-
-  ~InputLayoutCacheKey()
-  {
-    Clear();
-  }
-
-  void Clear()
-  {
-    for (auto layout : VertexLayouts)
-    {
-      layout.Elements.Clear();
-      layout.Elements.Compact();
-    }
-    VertexLayouts.Clear();
-    VertexLayouts.Compact();
   }
 
   static const InputLayoutCacheKey CreateTempKey(ezDynamicArray<RHIVertexLayoutDescription>& original);

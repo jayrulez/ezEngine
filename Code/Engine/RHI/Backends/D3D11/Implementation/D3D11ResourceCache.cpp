@@ -295,18 +295,19 @@ const InputLayoutCacheKey InputLayoutCacheKey::CreatePermanentKey(ezDynamicArray
 {
   ezDynamicArray<RHIVertexLayoutDescription> vertexLayouts;
   vertexLayouts.SetCountUninitialized(original.GetCount());
+  vertexLayouts.GetArrayPtr().CopyFrom(original.GetArrayPtr());
 
-  for (ezUInt32 i = 0; i < original.GetCount(); i++)
-  {
-    vertexLayouts[i].Stride = original[i].Stride;
-    vertexLayouts[i].InstanceStepRate = original[i].InstanceStepRate;
+  //for (ezUInt32 i = 0; i < original.GetCount(); i++)
+  //{
+  //  vertexLayouts[i].Stride = original[i].Stride;
+  //  vertexLayouts[i].InstanceStepRate = original[i].InstanceStepRate;
 
-    vertexLayouts[i].Elements.SetCountUninitialized(original[i].Elements.GetCount());
+  //  vertexLayouts[i].Elements.SetCountUninitialized(original[i].Elements.GetCount());
 
-    vertexLayouts[i].Elements.GetArrayPtr().CopyFrom(original[i].Elements.GetArrayPtr());
-  }
+  //  vertexLayouts[i].Elements.GetArrayPtr().CopyFrom(original[i].Elements.GetArrayPtr());
+  //}
 
-  return InputLayoutCacheKey(std::move(vertexLayouts));
+  return InputLayoutCacheKey(vertexLayouts);
 }
 
 ezUInt32 D3D11ResourceCache::SemanticIndices::GetAndIncrement(SemanticIndices& si, ezEnum<RHIVertexElementSemantic> type)
@@ -329,4 +330,3 @@ ezUInt32 D3D11ResourceCache::SemanticIndices::GetAndIncrement(SemanticIndices& s
 
 
 EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11ResourceCache);
-

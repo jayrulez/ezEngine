@@ -373,8 +373,9 @@ void RHISample::BeforeCoreSystemsShutdown()
   ezResourceManager::EngineAboutToShutdown();
 
   // now we can destroy the graphics device
-  Pipeline->Dispose();
+
   CommandList->Dispose();
+  EZ_DEFAULT_DELETE(CommandList);
 
   VertexBuffer->Dispose();
   EZ_DEFAULT_DELETE(VertexBuffer);
@@ -399,9 +400,6 @@ void RHISample::BeforeCoreSystemsShutdown()
 
   Pipeline->Dispose();
   EZ_DEFAULT_DELETE(Pipeline);
-
-  CommandList->Dispose();
-  EZ_DEFAULT_DELETE(CommandList);
 
   m_pDevice->Dispose();
   EZ_DEFAULT_DELETE(m_pDevice);
