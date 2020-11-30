@@ -5,8 +5,8 @@ cbuffer UB0 : register(b0)
 
 struct VS_INPUT
 {
-    float3 Position : POSITION0;
-    float4 Color: COLOR1;
+    float3 Position : POSITION;
+    float4 Color: COLOR;
 };
 
 struct PS_INPUT
@@ -19,7 +19,7 @@ struct PS_INPUT
 PS_INPUT VSMain(VS_INPUT input)
 {
     PS_INPUT output;
-    output.Position =  mul(Projection, float4(input.Position, 1.0));
+    output.Position = mul(Projection, float4(input.Position, 1.0));
     output.Color = input.Color;
     return output;
 }

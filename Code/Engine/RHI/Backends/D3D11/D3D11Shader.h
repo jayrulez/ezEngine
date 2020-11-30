@@ -37,6 +37,7 @@ public:
   {
     return DeviceShader;
   }
+
   ezDynamicArray<ezUInt8> GetByteCode() const
   {
     return ByteCode;

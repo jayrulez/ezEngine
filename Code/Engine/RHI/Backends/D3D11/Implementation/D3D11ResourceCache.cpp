@@ -74,7 +74,10 @@ void D3D11ResourceCache::Dispose()
 
   for (auto& it : InputLayouts)
   {
-    it.Value()->Release();
+    if (it.Value())
+    {
+      it.Value()->Release();
+    }
   }
   // todo: If there is every any problem with InputLayouts not having expected data here then check
   // InputLayoutCacheKey::CreatePermanentKey, copy each element one at a time instead of just copying the original array

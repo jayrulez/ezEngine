@@ -26,7 +26,6 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
   ezDynamicArray<RHIShader*> stages = description.ShaderSet.Shaders;
   for (ezUInt32 i = 0; i < description.ShaderSet.Shaders.GetCount(); i++)
   {
-    //TODO: maybe reinterpret cast here instead of C-Style cast
     if (stages[i]->GetStage() == RHIShaderStages::Vertex)
     {
       D3D11Shader* d3d11VertexShader = reinterpret_cast<D3D11Shader*>(stages[i]);
@@ -34,25 +33,30 @@ D3D11Pipeline::D3D11Pipeline(D3D11ResourceCache* cache, const RHIGraphicsPipelin
       VertexShader = reinterpret_cast<ID3D11VertexShader*>(d3d11VertexShader->GetDeviceShader());
       vsBytecode = d3d11VertexShader->GetByteCode();
     }
+
     if (stages[i]->GetStage() == RHIShaderStages::Geometry)
     {
-      GeometryShader = (ID3D11GeometryShader*)reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader();
+      GeometryShader = reinterpret_cast<ID3D11GeometryShader*>(reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader());
     }
+
     if (stages[i]->GetStage() == RHIShaderStages::TessellationControl)
     {
-      HullShader = (ID3D11HullShader*)reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader();
+      HullShader = reinterpret_cast<ID3D11HullShader*>(reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader());
     }
+
     if (stages[i]->GetStage() == RHIShaderStages::TessellationEvaluation)
     {
-      DomainShader = (ID3D11DomainShader*)reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader();
+      DomainShader = reinterpret_cast<ID3D11DomainShader*>(reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader());
     }
+
     if (stages[i]->GetStage() == RHIShaderStages::Fragment)
     {
-      PixelShader = (ID3D11PixelShader*)reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader();
+      PixelShader = reinterpret_cast<ID3D11PixelShader*>(reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader());
     }
+
     if (stages[i]->GetStage() == RHIShaderStages::Compute)
     {
-      ComputeShader = (ID3D11ComputeShader*)reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader();
+      ComputeShader = reinterpret_cast<ID3D11ComputeShader*>(reinterpret_cast<D3D11Shader*>(stages[i])->GetDeviceShader());
     }
   }
 

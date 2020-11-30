@@ -241,45 +241,73 @@ void RHISample::CreatePipelineState()
     // Shaders
     {
       ezFileReader fReader;
-
-      //fReader.Open("vs_no_rot.o");
-      fReader.Open("vs.o").IgnoreResult();
+      fReader.Open("triangle.hlsl").IgnoreResult();
       if (fReader.IsOpen())
       {
+        ezDynamicArray<ezUInt8> shaderBytes;
+        shaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+        fReader.ReadBytes(shaderBytes.GetData(), shaderBytes.GetCount());
+
         RHIShaderDescription vertexShaderDesc = RHIShaderDescription{
           RHIShaderStages::Vertex,
-          ezDynamicArray<ezUInt8>(),
+          shaderBytes,
           "VSMain",
-          false,
+          true,
         };
-
-        vertexShaderDesc.ShaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
-        fReader.ReadBytes(vertexShaderDesc.ShaderBytes.GetData(), vertexShaderDesc.ShaderBytes.GetCount());
 
         VertexShader = ResourceFactory->CreateShader(vertexShaderDesc);
         VertexShader->SetName("VertexShader");
 
-        fReader.Close();
-      }
-
-      fReader.Open("ps.o").IgnoreResult();
-      if (fReader.IsOpen())
-      {
         RHIShaderDescription fragmentShaderDesc = RHIShaderDescription{
           RHIShaderStages::Fragment,
-          ezDynamicArray<ezUInt8>(),
+          shaderBytes,
           "PSMain",
-          false,
+          true,
         };
-
-        fragmentShaderDesc.ShaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
-        fReader.ReadBytes(fragmentShaderDesc.ShaderBytes.GetData(), fragmentShaderDesc.ShaderBytes.GetCount());
 
         FragmentShader = ResourceFactory->CreateShader(fragmentShaderDesc);
         FragmentShader->SetName("FragmentShader");
 
         fReader.Close();
       }
+
+      //fReader.Open("vs.o").IgnoreResult();
+      //if (fReader.IsOpen())
+      //{
+      //  RHIShaderDescription vertexShaderDesc = RHIShaderDescription{
+      //    RHIShaderStages::Vertex,
+      //    ezDynamicArray<ezUInt8>(),
+      //    "VSMain",
+      //    false,
+      //  };
+
+      //  vertexShaderDesc.ShaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+      //  fReader.ReadBytes(vertexShaderDesc.ShaderBytes.GetData(), vertexShaderDesc.ShaderBytes.GetCount());
+
+      //  VertexShader = ResourceFactory->CreateShader(vertexShaderDesc);
+      //  VertexShader->SetName("VertexShader");
+
+      //  fReader.Close();
+      //}
+
+      //fReader.Open("ps.o").IgnoreResult();
+      //if (fReader.IsOpen())
+      //{
+      //  RHIShaderDescription fragmentShaderDesc = RHIShaderDescription{
+      //    RHIShaderStages::Fragment,
+      //    ezDynamicArray<ezUInt8>(),
+      //    "PSMain",
+      //    false,
+      //  };
+
+      //  fragmentShaderDesc.ShaderBytes.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+      //  fReader.ReadBytes(fragmentShaderDesc.ShaderBytes.GetData(), fragmentShaderDesc.ShaderBytes.GetCount());
+
+      //  FragmentShader = ResourceFactory->CreateShader(fragmentShaderDesc);
+      //  FragmentShader->SetName("FragmentShader");
+
+      //  fReader.Close();
+      //}
     }
 
     pipelineDesc.BlendState = RHIBlendStateDescription::SingleOverrideBlend();
@@ -427,6 +455,9 @@ void RHISample::BeforeCoreSystemsShutdown()
   EZ_DEFAULT_DELETE(m_pWindow);
 
   EZ_DEFAULT_DELETE(m_pSwapchainSource);
+
+  // TODO:
+  // Device::Dispose -> ResourceFactory::Dispose -> [Clean up all resources]
 }
 
 void RHISampleWindow::SetGraphicsDevice(RHIGraphicsDevice* pDevice)

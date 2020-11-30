@@ -15,7 +15,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <summary>
   /// The name of the element.
   /// </summary>
-  ezString Name;
+  const char* Name = nullptr;
 
   /// <summary>
   /// The semantic type of the element.
@@ -42,7 +42,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <param name="name">The name of the element.</param>
   /// <param name="semantic">The semantic type of the element.</param>
   /// <param name="format">The format of the element.</param>
-  RHIVertexElementDescription(ezString name, ezEnum<RHIVertexElementSemantic> semantic, ezEnum<RHIVertexElementFormat> format)
+  RHIVertexElementDescription(const char* name, ezEnum<RHIVertexElementSemantic> semantic, ezEnum<RHIVertexElementFormat> format)
     : RHIVertexElementDescription(name, format, semantic)
   {
   }
@@ -54,7 +54,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <param name="semantic">The semantic type of the element.</param>
   /// <param name="format">The format of the element.</param>
   RHIVertexElementDescription(
-    ezString name,
+    const char* name,
     ezEnum<RHIVertexElementFormat> format,
     ezEnum<RHIVertexElementSemantic> semantic)
   {
@@ -100,7 +100,7 @@ struct EZ_RHI_DLL RHIVertexElementDescription : public ezHashableStruct<RHIVerte
   /// <returns>True if all elements are equal; false otherswise.</returns>
   bool operator==(const RHIVertexElementDescription& other) const
   {
-    return Name.IsEqual(other.Name) &&
+    return ezStringUtils::Compare(Name, other.Name) == 0 &&
            Format == other.Format &&
            Semantic == other.Semantic &&
            Offset == other.Offset;

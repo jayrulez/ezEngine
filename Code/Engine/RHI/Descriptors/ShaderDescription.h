@@ -45,7 +45,8 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
   RHIShaderDescription(ezEnum<RHIShaderStages> stage, ezDynamicArray<ezUInt8> shaderBytes, ezString entryPoint)
   {
     Stage = stage;
-    ShaderBytes = shaderBytes;
+    ShaderBytes.SetCountUninitialized(shaderBytes.GetCount());
+    ShaderBytes.GetArrayPtr().CopyFrom(shaderBytes.GetArrayPtr());
     EntryPoint = entryPoint;
     Debug = false;
   }
@@ -61,7 +62,8 @@ struct EZ_RHI_DLL RHIShaderDescription : public ezHashableStruct<RHIShaderDescri
   RHIShaderDescription(ezEnum<RHIShaderStages> stage, ezDynamicArray<ezUInt8> shaderBytes, ezString entryPoint, bool debug)
   {
     Stage = stage;
-    ShaderBytes = shaderBytes;
+    ShaderBytes.SetCountUninitialized(shaderBytes.GetCount());
+    ShaderBytes.GetArrayPtr().CopyFrom(shaderBytes.GetArrayPtr());
     EntryPoint = entryPoint;
     Debug = debug;
   }

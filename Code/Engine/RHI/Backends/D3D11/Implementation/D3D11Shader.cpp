@@ -2,9 +2,8 @@
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
 
- void D3D11Shader::SetName(const ezString& name)
+void D3D11Shader::SetName(const ezString& name)
 {
-
   Name = name;
   if (DeviceShader != nullptr)
     DeviceShader->SetPrivateData(WKPDID_D3DDebugObjectName, name.GetCharacterCount(), name.GetData());
@@ -38,7 +37,9 @@ D3D11Shader::D3D11Shader(ID3D11Device* device, const RHIShaderDescription& descr
   }
   else
   {
-    ByteCode = CompileCode(description);
+    ezDynamicArray<ezUInt8> result = CompileCode(description);
+    ByteCode.SetCountUninitialized(result.GetCount());
+    ByteCode.GetArrayPtr().CopyFrom(result.GetArrayPtr());
   }
 
   HRESULT hr = 0;
@@ -95,24 +96,31 @@ ezDynamicArray<ezUInt8> D3D11Shader::CompileCode(const RHIShaderDescription& des
       EZ_REPORT_FAILURE("Invalid RHIShaderStages");
   }
 
-  // TODO
+  ezUInt32 flags = D3DCOMPILE_ENABLE_STRICTNESS;
+  flags |= (description.Debug ? D3DCOMPILE_DEBUG : D3DCOMPILE_OPTIMIZATION_LEVEL3);
 
-  ezUInt32 flags = description.Debug ? D3D10_SHADER_DEBUG : D3D10_SHADER_OPTIMIZATION_LEVEL3;
-  //Compiler.Compile(description.ShaderBytes,
-  //  description.EntryPoint, null,
-  //  profile, out Blob result, out Blob error);
+  ID3DBlob* shaderBlob = nullptr;
+  ID3DBlob* errorBlob = nullptr;
 
-  //if (result == null)
-  //{
-  //  EZ_REPORT_FAILURE("Failed to compile HLSL code: {Encoding.ASCII.GetString(error.GetBytes())}");
-  //}
+  HRESULT hr = D3DCompile(description.ShaderBytes.GetData(), description.ShaderBytes.GetCount(), nullptr, nullptr, nullptr, description.EntryPoint.GetData(), profile.GetData(), flags, 0, &shaderBlob, &errorBlob);
 
-  //return result.GetBytes();
+  if (FAILED(hr))
+  {
+    const char* error = static_cast<const char*>(errorBlob->GetBufferPointer());
+    errorBlob->Release();
+    EZ_REPORT_FAILURE("Failed to compile HLSL code: {}", error);
 
-  return ezDynamicArray<ezUInt8>();
+    return ezDynamicArray<ezUInt8>();
+  }
+
+  ezDynamicArray<ezUInt8> shaderBytes;
+  shaderBytes.SetCountUninitialized((ezUInt32)shaderBlob->GetBufferSize());
+  ezMemoryUtils::Copy(shaderBytes.GetData(), static_cast<ezUInt8*>(shaderBlob->GetBufferPointer()), shaderBytes.GetCount());
+  shaderBlob->Release();
+
+  return shaderBytes;
 }
 
 
 
 EZ_STATICLINK_FILE(RHI, RHI_Backends_D3D11_Implementation_D3D11Shader);
-
