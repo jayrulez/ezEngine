@@ -375,6 +375,7 @@ struct EZ_RHI_DLL RHIPixelFormat // : byte
   using StorageType = ezUInt8;
   enum Enum
   {
+    Invalid = 0,
     /// <summary>
     /// RGBA component order. Each component is an 8-bit unsigned normalized integer.
     /// </summary>
@@ -634,7 +635,7 @@ struct EZ_RHI_DLL RHIPixelFormat // : byte
     /// This is an sRGB format.
     /// </summary>
     BC7_UNorm_SRgb,
-    Default = R8_G8_B8_A8_UNorm
+    Default = R8_G8_B8_A8_UNorm_SRgb
   };
 };
 

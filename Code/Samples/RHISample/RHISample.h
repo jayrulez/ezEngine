@@ -38,7 +38,6 @@ public:
 
   ApplicationExecution Run() override;
 
-  void CreatePipelineState();
 
   void OnDraw();
   void Update();
@@ -63,4 +62,8 @@ private:
   RHIResourceFactory* ResourceFactory = nullptr;
   RHISwapchainSource* m_pSwapchainSource = nullptr;
   RHIResourceLayout* ResourceLayout = nullptr;
+  RHITexture* CubeTexture = nullptr;
+
+  void CreateTexturedCube();
+  void CreatePipelineState();
 };

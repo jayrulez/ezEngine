@@ -17,16 +17,174 @@
 #include <RHI/Resources/ResourceFactory.h>
 #include <RHI/Resources/Shader.h>
 #include <RHISample/RHISample.h>
+#include <Texture/Image/Formats/ImageFileFormat.h>
+#include <Texture/Image/Image.h>
+#include <Texture/Image/ImageHeader.h>
+
+RHIPixelFormat::Enum ImageFormatToRHIPixelFormat(ezImageFormat::Enum format, bool bSRGB)
+{
+  switch (format)
+  {
+    case ezImageFormat::R8G8B8A8_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::R8_G8_B8_A8_UNorm_SRgb;
+      else
+        return RHIPixelFormat::R8_G8_B8_A8_UNorm;
+
+      // case ezImageFormat::R8G8B8A8_TYPELESS:
+    case ezImageFormat::R8G8B8A8_UNORM_SRGB:
+      return RHIPixelFormat::R8_G8_B8_A8_UNorm_SRgb;
+
+    case ezImageFormat::R8G8B8A8_UINT:
+      return RHIPixelFormat::R8_G8_B8_A8_UInt;
+
+    case ezImageFormat::R8G8B8A8_SNORM:
+      return RHIPixelFormat::R8_G8_B8_A8_SNorm;
+
+    case ezImageFormat::R8G8B8A8_SINT:
+      return RHIPixelFormat::R8_G8_B8_A8_SInt;
+
+    case ezImageFormat::B8G8R8A8_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::B8_G8_R8_A8_UNorm_SRgb;
+      else
+        return RHIPixelFormat::B8_G8_R8_A8_UNorm;
+
+    case ezImageFormat::B8G8R8X8_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::B8_G8_R8_A8_UNorm_SRgb;
+      else
+        return RHIPixelFormat::B8_G8_R8_A8_UNorm;
+
+      // case ezImageFormat::B8G8R8A8_TYPELESS:
+    case ezImageFormat::B8G8R8A8_UNORM_SRGB:
+      return RHIPixelFormat::B8_G8_R8_A8_UNorm_SRgb;
+
+      // case ezImageFormat::B8G8R8X8_TYPELESS:
+    case ezImageFormat::B8G8R8X8_UNORM_SRGB:
+      return RHIPixelFormat::B8_G8_R8_A8_UNorm_SRgb;
+
+      // case ezImageFormat::B8G8R8_UNORM:
+
+      // case ezImageFormat::BC1_TYPELESS:
+    case ezImageFormat::BC1_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::BC1_Rgba_UNorm_SRgb;
+      else
+        return RHIPixelFormat::BC1_Rgba_UNorm;
+
+    case ezImageFormat::BC1_UNORM_SRGB:
+      return RHIPixelFormat::BC1_Rgba_UNorm_SRgb;
+
+      // case ezImageFormat::BC2_TYPELESS:
+    case ezImageFormat::BC2_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::BC2_UNorm_SRgb;
+      else
+        return RHIPixelFormat::BC2_UNorm;
+
+    case ezImageFormat::BC2_UNORM_SRGB:
+      return RHIPixelFormat::BC2_UNorm_SRgb;
+
+      // case ezImageFormat::BC3_TYPELESS:
+    case ezImageFormat::BC3_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::BC3_UNorm_SRgb;
+      else
+        return RHIPixelFormat::BC3_UNorm;
+
+    case ezImageFormat::BC3_UNORM_SRGB:
+      return RHIPixelFormat::BC3_UNorm_SRgb;
+
+      // case ezImageFormat::BC4_TYPELESS:
+    case ezImageFormat::BC4_UNORM:
+      return RHIPixelFormat::BC4_UNorm;
+
+    case ezImageFormat::BC4_SNORM:
+      return RHIPixelFormat::BC4_SNorm;
+
+      // case ezImageFormat::BC5_TYPELESS:
+    case ezImageFormat::BC5_UNORM:
+      return RHIPixelFormat::BC5_UNorm;
+
+    case ezImageFormat::BC5_SNORM:
+      return RHIPixelFormat::BC5_SNorm;
+
+      //  // case ezImageFormat::BC6H_TYPELESS:
+      //case ezImageFormat::BC6H_UF16:
+      //  return RHIPixelFormat::BC6UFloat;
+
+      //case ezImageFormat::BC6H_SF16:
+      //  return RHIPixelFormat::BC6Float;
+
+      // case ezImageFormat::BC7_TYPELESS:
+    case ezImageFormat::BC7_UNORM:
+      if (bSRGB)
+        return RHIPixelFormat::BC7_UNorm_SRgb;
+      else
+        return RHIPixelFormat::BC7_UNorm;
+
+    case ezImageFormat::BC7_UNORM_SRGB:
+      return RHIPixelFormat::BC7_UNorm_SRgb;
+
+      //case ezImageFormat::B5G6R5_UNORM:
+      //  return RHIPixelFormat::B5G6R5UNormalized; /// \todo Not supported by some GPUs ?
+
+    case ezImageFormat::R16_FLOAT:
+      return RHIPixelFormat::R16_Float;
+
+    case ezImageFormat::R32_FLOAT:
+      return RHIPixelFormat::R32_Float;
+
+    case ezImageFormat::R16G16_FLOAT:
+      return RHIPixelFormat::R16_G16_Float;
+
+    case ezImageFormat::R32G32_FLOAT:
+      return RHIPixelFormat::R32_G32_Float;
+
+      //case ezImageFormat::R32G32B32_FLOAT:
+      //  return RHIPixelFormat::RGBFloat;
+
+    case ezImageFormat::R16G16B16A16_FLOAT:
+      return RHIPixelFormat::R16_G16_B16_A16_Float;
+
+    case ezImageFormat::R32G32B32A32_FLOAT:
+      return RHIPixelFormat::R32_G32_B32_A32_Float;
+
+    case ezImageFormat::R16G16B16A16_UNORM:
+      return RHIPixelFormat::R16_G16_B16_A16_UNorm;
+
+    case ezImageFormat::R8_UNORM:
+      return RHIPixelFormat::R8_UNorm;
+
+    case ezImageFormat::R8G8_UNORM:
+      return RHIPixelFormat::R8_G8_UNorm;
+
+    case ezImageFormat::R16G16_UNORM:
+      return RHIPixelFormat::R16_G16_UNorm;
+
+    case ezImageFormat::R11G11B10_FLOAT:
+      return RHIPixelFormat::R11_G11_B10_Float;
+
+    default:
+      EZ_ASSERT_NOT_IMPLEMENTED;
+      break;
+  }
+
+  return RHIPixelFormat::Invalid;
+}
 
 struct Vertex
 {
   ezVec3 Position;
-  ezColor Color;
+  //ezColor Color;
+  ezVec2 UV;
 
-  Vertex(ezVec3 position, ezColor color)
+  Vertex(ezVec3 position, /*ezColor color,*/ ezVec2 uv)
   {
     Position = position;
-    Color = color;
+    //Color = color;
+    UV = uv;
   }
 };
 
@@ -138,6 +296,7 @@ void RHISample::AfterCoreSystemsStartup()
   // now that we have a window and device, tell the engine to initialize the rendering infrastructure
   ezStartup::StartupHighLevelSystems();
 
+  CreateTexturedCube();
   CreatePipelineState();
 }
 
@@ -180,63 +339,90 @@ ezApplication::ApplicationExecution RHISample::Run()
   return ezApplication::Continue;
 }
 
+void RHISample::CreateTexturedCube()
+{
+}
+
 void RHISample::CreatePipelineState()
 {
   // Cube
 
-  Vertex cubeVertices[] = {
-    {ezVec3(-.5f, -.5f, -.5f), ezColor::Red},
-    {ezVec3(-.5f, +.5f, -.5f), ezColor::Green},
-    {ezVec3(+.5f, +.5f, -.5f), ezColor::Blue},
-    {ezVec3(+.5f, -.5f, -.5f), ezColor::Violet},
+  //Vertex cubeVertices[] = {
+  //  {ezVec3(-.5f, -.5f, -.5f), ezColor::Red},
+  //  {ezVec3(-.5f, +.5f, -.5f), ezColor::Green},
+  //  {ezVec3(+.5f, +.5f, -.5f), ezColor::Blue},
+  //  {ezVec3(+.5f, -.5f, -.5f), ezColor::Violet},
 
-    {ezVec3(-.5f, -.5f, +.5f), ezColor::Yellow},
-    {ezVec3(-.5f, +.5f, +.5f), ezColor::Aqua},
-    {ezVec3(+.5f, +.5f, +.5f), ezColor::Fuchsia},
-    {ezVec3(+.5f, -.5f, +.5f), ezColor::Brown},
-  };
+  //  {ezVec3(-.5f, -.5f, +.5f), ezColor::Yellow},
+  //  {ezVec3(-.5f, +.5f, +.5f), ezColor::Aqua},
+  //  {ezVec3(+.5f, +.5f, +.5f), ezColor::Fuchsia},
+  //  {ezVec3(+.5f, -.5f, +.5f), ezColor::Brown},
+  //};
+
+  Vertex cubeVertices[] =
+    {
+      {ezVec3(-1, -1, -1), ezVec2(0, 1)},
+      {ezVec3(-1, +1, -1), ezVec2(0, 0)},
+      {ezVec3(+1, +1, -1), ezVec2(1, 0)},
+      {ezVec3(+1, -1, -1), ezVec2(1, 1)},
+
+      {ezVec3(-1, -1, -1), ezVec2(0, 1)},
+      {ezVec3(-1, -1, +1), ezVec2(0, 0)},
+      {ezVec3(+1, -1, +1), ezVec2(1, 0)},
+      {ezVec3(+1, -1, -1), ezVec2(1, 1)},
+
+      {ezVec3(+1, -1, -1), ezVec2(0, 1)},
+      {ezVec3(+1, -1, +1), ezVec2(1, 1)},
+      {ezVec3(+1, +1, +1), ezVec2(1, 0)},
+      {ezVec3(+1, +1, -1), ezVec2(0, 0)},
+
+      {ezVec3(+1, +1, -1), ezVec2(0, 1)},
+      {ezVec3(+1, +1, +1), ezVec2(0, 0)},
+      {ezVec3(-1, +1, +1), ezVec2(1, 0)},
+      {ezVec3(-1, +1, -1), ezVec2(1, 1)},
+
+      {ezVec3(-1, +1, -1), ezVec2(1, 0)},
+      {ezVec3(-1, +1, +1), ezVec2(0, 0)},
+      {ezVec3(-1, -1, +1), ezVec2(0, 1)},
+      {ezVec3(-1, -1, -1), ezVec2(1, 1)},
+
+      {ezVec3(-1, -1, +1), ezVec2(1, 1)},
+      {ezVec3(+1, -1, +1), ezVec2(0, 1)},
+      {ezVec3(+1, +1, +1), ezVec2(0, 0)},
+      {ezVec3(-1, +1, +1), ezVec2(1, 0)}};
 
   ezUInt16 cubeIndices[] = {
-    2,
-    0,
-    1,
-    2,
-    3,
-    0,
-    4,
-    6,
-    5,
-    4,
-    7,
-    6,
-    0,
-    7,
-    4,
-    0,
-    3,
-    7,
-    1,
-    0,
-    4,
-    1,
-    4,
-    5,
-    1,
-    5,
-    2,
-    5,
-    6,
-    2,
-    3,
-    6,
-    7,
-    3,
-    2,
-    6,
+    2, 0, 1, 2, 3, 0,
+    4, 6, 5, 4, 7, 6,
+    8, 10, 9, 8, 11, 10,
+    12, 14, 13, 12, 15, 14,
+    16, 18, 17, 16, 19, 18,
+    20, 21, 22, 20, 22, 23
   };
 
   {
     RHIGraphicsPipelineDescription pipelineDesc;
+
+    // Texture
+    {
+      ezFileReader fReader;
+      fReader.Open("ez-logo.png").IgnoreResult();
+
+      if (fReader.IsOpen())
+      {
+        ezDynamicArray<ezUInt8> fileBuffer;
+        fileBuffer.SetCountUninitialized((ezUInt32)fReader.GetFileSize());
+        fReader.ReadBytes(fileBuffer.GetData(), fileBuffer.GetCount());
+        fReader.Close();
+
+        ezImage img;
+        img.LoadFrom("ez-logo.png").IgnoreResult();
+
+        RHITextureDescription desc(img.GetWidth(), img.GetHeight(), img.GetDepth(), img.GetNumMipLevels(), img.GetNumArrayIndices(), ImageFormatToRHIPixelFormat(img.GetImageFormat(), true), RHITextureUsage::Sampled, RHITextureType::Texture2D);
+        CubeTexture = ResourceFactory->CreateTexture(desc);
+        m_pDevice->UpdateTexture(CubeTexture, img.GetByteBlobPtr().GetPtr(), (ezUInt32)img.GetByteBlobPtr().GetCount(), 0, 0, 0, img.GetWidth(), img.GetHeight(), img.GetDepth(), 0, 0);
+      }
+    }
 
     // Shaders
     {
@@ -324,7 +510,8 @@ void RHISample::CreatePipelineState()
 
     ezDynamicArray<RHIVertexElementDescription> layoutElements;
     layoutElements.PushBack(RHIVertexElementDescription{"Position", RHIVertexElementSemantic::Position, RHIVertexElementFormat::Float3});
-    layoutElements.PushBack(RHIVertexElementDescription{"Color", RHIVertexElementSemantic::Color, RHIVertexElementFormat::Float4});
+    //layoutElements.PushBack(RHIVertexElementDescription{"Color", RHIVertexElementSemantic::Color, RHIVertexElementFormat::Float4});
+    layoutElements.PushBack(RHIVertexElementDescription{"UV", RHIVertexElementSemantic::TextureCoordinate, RHIVertexElementFormat::Float2});
     RHIVertexLayoutDescription vertexLayout(layoutElements);
     pipelineDesc.ShaderSet.VertexLayouts.PushBack(vertexLayout);
 
@@ -343,8 +530,9 @@ void RHISample::CreatePipelineState()
     m_pDevice->UpdateBuffer(IndexBuffer, 0, reinterpret_cast<ezUInt8*>(cubeIndices), sizeof(cubeIndices));
 
     RHIResourceLayoutDescription resourceLayoutDesc;
-    RHIResourceLayoutElementDescription projectionElement("Projection", RHIResourceKind::UniformBuffer, RHIShaderStages::Vertex);
-    resourceLayoutDesc.Elements.PushBack(projectionElement);
+    resourceLayoutDesc.Elements.PushBack(RHIResourceLayoutElementDescription("Projection", RHIResourceKind::UniformBuffer, RHIShaderStages::Vertex));
+    resourceLayoutDesc.Elements.PushBack(RHIResourceLayoutElementDescription("LogoTexture", RHIResourceKind::TextureReadOnly, RHIShaderStages::Fragment));
+    resourceLayoutDesc.Elements.PushBack(RHIResourceLayoutElementDescription("LogoSampler", RHIResourceKind::Sampler, RHIShaderStages::Fragment));
     ResourceLayout = ResourceFactory->CreateResourceLayout(resourceLayoutDesc);
     ResourceLayout->SetName("ResourceLayout");
     pipelineDesc.ResourceLayouts.PushBack(ResourceLayout);
@@ -353,6 +541,8 @@ void RHISample::CreatePipelineState()
     ezDynamicArray<RHIResource*> boundResources;
 
     boundResources.PushBack(ConstantBuffer);
+    boundResources.PushBack(CubeTexture);
+    boundResources.PushBack(m_pDevice->GetAniso4xSampler());
 
 
     RHIResourceSetDescription resourceSetDesc = RHIResourceSetDescription(ResourceLayout, boundResources);
@@ -410,7 +600,7 @@ void RHISample::Update()
 
   WorldViewProjectionMatrix = viewProj;
 
-  time += 0.0005f;
+  time += 0.00025f;
 }
 
 void RHISample::BeforeCoreSystemsShutdown()
@@ -446,6 +636,9 @@ void RHISample::BeforeCoreSystemsShutdown()
 
   Pipeline->Dispose();
   EZ_DEFAULT_DELETE(Pipeline);
+
+  CubeTexture->Dispose();
+  EZ_DEFAULT_DELETE(CubeTexture);
 
   m_pDevice->Dispose();
   EZ_DEFAULT_DELETE(m_pDevice);

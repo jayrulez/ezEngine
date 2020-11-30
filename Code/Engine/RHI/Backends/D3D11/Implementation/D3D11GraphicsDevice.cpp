@@ -426,14 +426,13 @@ void D3D11GraphicsDevice::UpdateTextureCore(RHITexture* texture, ezUInt8* source
   else
   {
     ezUInt32 subresource = D3D11Util::ComputeSubresource(mipLevel, texture->GetMipLevels(), arrayLayer);
-    D3D11_BOX resourceRegion = {
-      x,
-      (x + width),
-      y,
-      z,
-      (y + height),
-      (z + depth),
-    };
+    D3D11_BOX resourceRegion;
+    resourceRegion.left = x;
+    resourceRegion.right = x + width;
+    resourceRegion.top = y;
+    resourceRegion.front = z;
+    resourceRegion.bottom = y + height;
+    resourceRegion.back = y + z + depth;
 
     ezUInt32 srcRowPitch = FormatHelpers::GetRowPitch(width, texture->GetFormat());
     ezUInt32 srcDepthPitch = FormatHelpers::GetDepthPitch(srcRowPitch, height, texture->GetFormat());

@@ -8,6 +8,7 @@ void RHITexture::Dispose()
   if (_fullTextureView != nullptr)
   {
     _fullTextureView->Dispose();
+    EZ_DEFAULT_DELETE(_fullTextureView);
     _fullTextureView = nullptr;
   }
 

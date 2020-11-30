@@ -413,7 +413,7 @@ void D3D11CommandList::UpdateBufferCore(RHIBuffer* buffer, ezUInt32 bufferOffset
 
   if (useUpdateSubresource)
   {
-    D3D11_BOX subregion = D3D11_BOX();
+    D3D11_BOX subregion;
     subregion.left = bufferOffset;
     subregion.right = size + bufferOffset;
     subregion.bottom = 1;
