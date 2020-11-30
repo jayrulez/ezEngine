@@ -7,6 +7,8 @@
 #include <Foundation/Algorithm/HashableStruct.h>
 #include <RHI/Util.h>
 
+#include <initializer_list>
+
 class RHIShader;
 struct RHISpecializationConstant;
 
@@ -53,6 +55,19 @@ struct EZ_RHI_DLL RHIShaderSetDescription : public ezHashableStruct<RHIShaderSet
     Shaders = shaders;
     //Specializations.Clear();
   }
+
+  //RHIShaderSetDescription(std::initializer_list<RHIVertexLayoutDescription> vertexLayouts, std::initializer_list<RHIShader*> shaders)
+  //{
+  //  for (auto& layout : vertexLayouts)
+  //  {
+  //    VertexLayouts.PushBack(layout);
+  //  }
+
+  //  for (auto shader : shaders)
+  //  {
+  //    Shaders.PushBack(shader);
+  //  }
+  //}
 
   /// <summary>
   /// Constructs a new ShaderSetDescription.

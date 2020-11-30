@@ -30,7 +30,7 @@ protected:
   {
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
     Description = description;
-    for (RHIResourceLayoutElementDescription element : description.Elements)
+    for (const RHIResourceLayoutElementDescription& element : description.Elements)
     {
       if ((element.Options & RHIResourceLayoutElementOptions::DynamicBinding) != 0)
       {

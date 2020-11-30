@@ -119,6 +119,8 @@ void RHISample::AfterCoreSystemsStartup()
     WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
     WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
     WindowCreationDesc.m_WindowMode = ezWindowMode::WindowResizable;
+    WindowCreationDesc.m_bClipMouseCursor = false;
+    WindowCreationDesc.m_bShowMouseCursor = true;
     m_pWindow = EZ_DEFAULT_NEW(RHISampleWindow);
     m_pWindow->Initialize(WindowCreationDesc).IgnoreResult();
   }
@@ -255,6 +257,7 @@ void RHISample::CreatePipelineState()
         fReader.ReadBytes(vertexShaderDesc.ShaderBytes.GetData(), vertexShaderDesc.ShaderBytes.GetCount());
 
         VertexShader = ResourceFactory->CreateShader(vertexShaderDesc);
+        VertexShader->SetName("VertexShader");
 
         fReader.Close();
       }
@@ -273,6 +276,7 @@ void RHISample::CreatePipelineState()
         fReader.ReadBytes(fragmentShaderDesc.ShaderBytes.GetData(), fragmentShaderDesc.ShaderBytes.GetCount());
 
         FragmentShader = ResourceFactory->CreateShader(fragmentShaderDesc);
+        FragmentShader->SetName("FragmentShader");
 
         fReader.Close();
       }
@@ -283,6 +287,12 @@ void RHISample::CreatePipelineState()
     pipelineDesc.RasterizerState = RHIRasterizerStateDescription(RHIFaceCullMode::Back, RHIPolygonFillMode::Solid, RHIFrontFace::Clockwise, true, false);
     pipelineDesc.PrimitiveTopology = RHIPrimitiveTopology::TriangleList;
 
+    //RHIShaderSetDescription shaderSet(
+    //  {{RHIVertexElementDescription{"Position", RHIVertexElementSemantic::Position, RHIVertexElementFormat::Float3},
+    //    RHIVertexElementDescription{"Color", RHIVertexElementSemantic::Color, RHIVertexElementFormat::Float4}}},
+    //  {VertexShader,
+    //    FragmentShader});
+    //pipelineDesc.ShaderSet = shaderSet;
 
     ezDynamicArray<RHIVertexElementDescription> layoutElements;
     layoutElements.PushBack(RHIVertexElementDescription{"Position", RHIVertexElementSemantic::Position, RHIVertexElementFormat::Float3});
@@ -293,9 +303,13 @@ void RHISample::CreatePipelineState()
     pipelineDesc.ShaderSet.Shaders.PushBack(VertexShader);
     pipelineDesc.ShaderSet.Shaders.PushBack(FragmentShader);
 
+
     VertexBuffer = ResourceFactory->CreateBuffer(RHIBufferDescription{sizeof(cubeVertices), RHIBufferUsage::VertexBuffer});
+    VertexBuffer->SetName("VertexBuffer");
     IndexBuffer = ResourceFactory->CreateBuffer(RHIBufferDescription{sizeof(cubeIndices), RHIBufferUsage::IndexBuffer});
+    IndexBuffer->SetName("IndexBuffer");
     ConstantBuffer = ResourceFactory->CreateBuffer(RHIBufferDescription{sizeof(ezMat4), RHIBufferUsage::UniformBuffer});
+    ConstantBuffer->SetName("ConstantBuffer");
 
     m_pDevice->UpdateBuffer(VertexBuffer, 0, reinterpret_cast<ezUInt8*>(cubeVertices), sizeof(cubeVertices));
     m_pDevice->UpdateBuffer(IndexBuffer, 0, reinterpret_cast<ezUInt8*>(cubeIndices), sizeof(cubeIndices));
@@ -304,6 +318,7 @@ void RHISample::CreatePipelineState()
     RHIResourceLayoutElementDescription projectionElement("Projection", RHIResourceKind::UniformBuffer, RHIShaderStages::Vertex);
     resourceLayoutDesc.Elements.PushBack(projectionElement);
     ResourceLayout = ResourceFactory->CreateResourceLayout(resourceLayoutDesc);
+    ResourceLayout->SetName("ResourceLayout");
     pipelineDesc.ResourceLayouts.PushBack(ResourceLayout);
 
 
@@ -315,10 +330,13 @@ void RHISample::CreatePipelineState()
     RHIResourceSetDescription resourceSetDesc = RHIResourceSetDescription(ResourceLayout, boundResources);
 
     ResourceSet = ResourceFactory->CreateResourceSet(resourceSetDesc);
+    ResourceSet->SetName("ResourceSet");
 
     pipelineDesc.Outputs = m_pDevice->GetSwapchainFramebuffer()->GetOutputDescription();
     Pipeline = ResourceFactory->CreateGraphicsPipeline(pipelineDesc);
+    Pipeline->SetName("Pipeline");
     CommandList = ResourceFactory->CreateCommandList();
+    CommandList->SetName("CommandList");
   }
 }
 

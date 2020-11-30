@@ -14,13 +14,13 @@
 struct EZ_RHI_DLL RHIFramebufferDescription : public ezHashableStruct<RHIFramebufferDescription>
 {
   /// <summary>
-  /// The depth texture, which must have been created with <see cref="RHITextureUsage.DepthStencil"/> usage flags.
+  /// The depth texture, which must have been created with <see cref="RHITextureUsage::DepthStencil"/> usage flags.
   /// May be null.
   /// </summary>
   std::optional<RHIFramebufferAttachmentDescription> DepthTarget;
 
   /// <summary>
-  /// An array of color textures, all of which must have been created with <see cref="RHITextureUsage.RenderTarget"/>
+  /// An array of color textures, all of which must have been created with <see cref="RHITextureUsage::RenderTarget"/>
   /// usage flags. May be null or empty.
   /// </summary>
   ezDynamicArray<RHIFramebufferAttachmentDescription> ColorTargets;

@@ -1,6 +1,16 @@
 #include <RHI/Device/GraphicsDevice.h>
 #include <RHI/Util.h>
 
+void RHIGraphicsDevice::FlushDeferredDisposals()
+{
+  ezLock lock(DeferredDisposalLock);
+  for (RHIResource* disposable : DisposableResources)
+  {
+    disposable->Dispose();
+  }
+  DisposableResources.Clear();
+}
+
 void RHIGraphicsDevice::ValidateUpdateTextureParameters(RHITexture* texture, ezUInt32 size, ezUInt32 x, ezUInt32 y, ezUInt32 z, ezUInt32 width, ezUInt32 height, ezUInt32 depth, ezUInt32 mipLevel, ezUInt32 arrayLayer)
 {
   if (FormatHelpers::IsCompressedFormat(texture->GetFormat()))
@@ -228,6 +238,37 @@ void RHIGraphicsDevice::UpdateTexture(RHITexture* texture, ezUInt8* source, ezUI
   ValidateUpdateTextureParameters(texture, size, x, y, z, width, height, depth, mipLevel, arrayLayer);
 #endif
   UpdateTextureCore(texture, source, size, x, y, z, width, height, depth, mipLevel, arrayLayer);
+}
+
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source)
+{
+  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source)
+{
+  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
+}
+
+template <typename T>
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size)
+{
+  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
+  UpdateBuffer(buffer, bufferOffset, ptr, size);
+}
+
+void RHIGraphicsDevice::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size)
+{
+  if (bufferOffset + size > buffer->GetSize())
+  {
+    EZ_REPORT_FAILURE("The data size given to UpdateBuffer is too large. The given buffer can only hold {} total bytes. The requested update would require {} bytes.", buffer->GetSize(), (bufferOffset + size));
+  }
+  UpdateBufferCore(buffer, bufferOffset, source, size);
 }
 
 bool RHIGraphicsDevice::GetPixelFormatSupport(ezEnum<RHIPixelFormat> format, ezEnum<RHITextureType> type, ezBitflags<RHITextureUsage> usage)

@@ -6,9 +6,9 @@ EZ_DEFINE_AS_POD_TYPE(D3D11_INPUT_ELEMENT_DESC);
 ezUInt32 ezHashHelper<InputLayoutCacheKey>::Hash(const InputLayoutCacheKey& value)
 {
   ezUInt32 hash = 0;
-  for (auto layout : value.VertexLayouts)
+  for (auto& layout : value.VertexLayouts)
   {
-    for (auto element : layout.Elements)
+    for (auto& element : layout.Elements)
     {
       RHIVertexElementFormat::StorageType format = element.Format.GetValue();
       hash = ezHashingUtils::xxHash32(&format, sizeof(format), hash);

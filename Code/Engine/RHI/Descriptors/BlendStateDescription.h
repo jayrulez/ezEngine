@@ -167,7 +167,7 @@ struct ezHashHelper<RHIBlendStateDescription>
   {
     ezUInt32 hash = 0;
     hash = ezHashingUtils::xxHash32(&value.BlendFactor, sizeof(ezColor), hash);
-    for (auto attachment : value.AttachmentStates)
+    for (auto& attachment : value.AttachmentStates)
     {
       ezUInt32 attachmentHash = attachment.GetHash();
       hash = ezHashingUtils::xxHash32(&attachmentHash, sizeof(attachmentHash), hash);

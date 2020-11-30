@@ -300,15 +300,8 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/> storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">The value to upload.</param>
-  //template <typename T>
-  //void UpdateBuffer(
-  //  RHIBuffer* buffer,
-  //  ezUInt32 bufferOffset,
-  //  T source)
-  //{
-  //  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-  //  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-  //}
+  template <typename T>
+  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -319,15 +312,8 @@ public:
   /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the single value to upload.</param>
-  //template <typename T>
-  //void UpdateBuffer(
-  //  RHIBuffer* buffer,
-  //  ezUInt32 bufferOffset,
-  //  const T& source)
-  //{
-  //  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-  //  UpdateBuffer(buffer, bufferOffset, ptr, (ezUInt32)sizeof(T));
-  //}
+  template <typename T>
+  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -339,52 +325,8 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">A reference to the first of a series of values to upload.</param>
   /// <param name="size">The total size of the uploaded data, in bytes.</param>
-  //template <typename T>
-  //void UpdateBuffer(
-  //  RHIBuffer* buffer,
-  //  ezUInt32 bufferOffset,
-  //  const T& source,
-  //  ezUInt32 size)
-  //{
-  //  ezUInt8* ptr = reinterpret_cast<ezUInt8*>(&source);
-  //  UpdateBuffer(buffer, bufferOffset, ptr, size);
-  //}
-
-  /// <summary>
-  /// Updates a <see cref="DeviceBuffer"/> region with new data.
-  /// This function must be used with a blittable value type <typeparamref name="T"/>.
-  /// </summary>
-  /// <typeparam name="T">The type of data to upload.</typeparam>
-  /// <param name="buffer">The resource to update.</param>
-  /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-  /// which new data will be uploaded.</param>
-  /// <param name="source">An array containing the data to upload.</param>
-  //template <typename T>
-  //void UpdateBuffer(
-  //  RHIBuffer* buffer,
-  //  ezUInt32 bufferOffset,
-  //  T[] source)
-  //{
-  //  UpdateBuffer(buffer, bufferOffset, (ReadOnlySpan<T>)source);
-  //}
-
-  /// <summary>
-  /// Updates a <see cref="DeviceBuffer"/> region with new data.
-  /// This function must be used with a blittable value type <typeparamref name="T"/>.
-  /// </summary>
-  /// <typeparam name="T">The type of data to upload.</typeparam>
-  /// <param name="buffer">The resource to update.</param>
-  /// <param name="bufferOffset">An offset, in bytes, from the beginning of the <see cref="DeviceBuffer"/>'s storage, at
-  /// which new data will be uploaded.</param>
-  /// <param name="source">A readonly span containing the data to upload.</param>
-  //template <typename T, typename TDerived>
-  //void UpdateBuffer(
-  //  RHIBuffer* buffer,
-  //  ezUInt32 bufferOffset,
-  //  ezArrayBase<T, TDerived> source)
-  //{
-  //  UpdateBuffer(buffer, bufferOffset, source.GetByteArrayPtr().GetPtr(), (ezUInt32)(sizeof(T) * source.GetCount()));
-  //}
+  template <typename T>
+  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, const T& source, ezUInt32 size);
 
   /// <summary>
   /// Updates a <see cref="DeviceBuffer"/> region with new data.
@@ -394,18 +336,7 @@ public:
   /// which new data will be uploaded.</param>
   /// <param name="source">A pointer to the start of the data to upload.</param>
   /// <param name="sizeInBytes">The total size of the uploaded data, in bytes.</param>
-  void UpdateBuffer(
-    RHIBuffer* buffer,
-    ezUInt32 bufferOffset,
-    ezUInt8* source,
-    ezUInt32 size)
-  {
-    if (bufferOffset + size > buffer->GetSize())
-    {
-      EZ_REPORT_FAILURE("The data size given to UpdateBuffer is too large. The given buffer can only hold {} total bytes. The requested update would require {} bytes.", buffer->GetSize(), (bufferOffset + size));
-    }
-    UpdateBufferCore(buffer, bufferOffset, source, size);
-  }
+  void UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, ezUInt8* source, ezUInt32 size);
 
   ///////////////////////////END UPDATE BU////////////////////////////////////
 
@@ -525,15 +456,7 @@ protected:
   virtual void DisposeCore() = 0;
 
 private:
-  void FlushDeferredDisposals()
-  {
-    ezLock lock(DeferredDisposalLock);
-    for (RHIResource* disposable : DisposableResources)
-    {
-      disposable->Dispose();
-    }
-    DisposableResources.Clear();
-  }
+  void FlushDeferredDisposals();
 
   static void ValidateUpdateTextureParameters(
     RHITexture* texture,

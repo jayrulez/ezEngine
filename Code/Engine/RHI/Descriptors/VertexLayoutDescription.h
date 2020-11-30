@@ -8,6 +8,7 @@
 #include <Foundation/Algorithm/HashableStruct.h>
 #include <RHI/Util.h>
 
+#include <initializer_list>
 
 /// <summary>
 /// Describes the layout of vertex data in a single <see cref="RHIBuffer"/> used as a vertex buffer.
@@ -42,7 +43,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// <param name="stride">The number of bytes in between successive elements in the <see cref="RHIBuffer"/>.</param>
   /// <param name="elements">An array of <see cref="RHIVertexElementDescription"/> objects, each describing a single element
   /// of vertex data.</param>
-  RHIVertexLayoutDescription(ezUInt32 stride, ezDynamicArray<RHIVertexElementDescription> elements)
+  RHIVertexLayoutDescription(ezUInt32 stride, ezDynamicArray<RHIVertexElementDescription>& elements)
   {
     Stride = stride;
     Elements = elements;
@@ -59,7 +60,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// per-vertex elements, this value should be 0.
   /// For example, an InstanceStepRate of 3 indicates that 3 instances will be drawn with the same value for this element.
   /// The next 3 instances will be drawn with the next value for this element, and so on.</param>
-  RHIVertexLayoutDescription(ezUInt32 stride, ezUInt32 instanceStepRate, ezDynamicArray<RHIVertexElementDescription> elements)
+  RHIVertexLayoutDescription(ezUInt32 stride, ezUInt32 instanceStepRate, ezDynamicArray<RHIVertexElementDescription>& elements)
   {
     Stride = stride;
     Elements = elements;
@@ -71,7 +72,7 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
   /// </summary>
   /// <param name="elements">An array of <see cref="VertexElementDescription"/> objects, each describing a single element
   /// of vertex data.</param>
-  RHIVertexLayoutDescription(ezDynamicArray<RHIVertexElementDescription> elements)
+  RHIVertexLayoutDescription(ezDynamicArray<RHIVertexElementDescription>& elements)
   {
     Elements = elements;
     ezUInt32 computedStride = 0;
@@ -91,6 +92,31 @@ struct EZ_RHI_DLL RHIVertexLayoutDescription : public ezHashableStruct<RHIVertex
     Stride = computedStride;
     InstanceStepRate = 0;
   }
+
+  //RHIVertexLayoutDescription(std::initializer_list<RHIVertexElementDescription> elementsList)
+  //{
+  //  for (auto& element : elementsList)
+  //  {
+  //    Elements.PushBack(element);
+  //  }
+
+  //  ezUInt32 computedStride = 0;
+  //  for (ezUInt32 i = 0; i < Elements.GetCount(); i++)
+  //  {
+  //    ezUInt32 elementSize = FormatHelpers::GetSize(Elements[i].Format);
+  //    if (Elements[i].Offset != 0)
+  //    {
+  //      computedStride = Elements[i].Offset + elementSize;
+  //    }
+  //    else
+  //    {
+  //      computedStride += elementSize;
+  //    }
+  //  }
+
+  //  Stride = computedStride;
+  //  InstanceStepRate = 0;
+  //}
 
   RHIVertexLayoutDescription& operator=(const RHIVertexLayoutDescription& other)
   {

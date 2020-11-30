@@ -16,13 +16,13 @@ ezUInt32 ezHashHelper<OffsetSizePair>::Hash(const OffsetSizePair& value)
 void D3D11DeviceBuffer::SetName(const ezString& name)
 {
   Name = name;
-  for (auto kvp : SRVs)
+  for (auto& kvp : SRVs)
   {
     ezStringBuilder sb(name, "_SRV");
 
     kvp.Value()->SetPrivateData(WKPDID_D3DDebugObjectName, sb.GetCharacterCount(), sb.GetData());
   }
-  for (auto kvp : UAVs)
+  for (auto& kvp : UAVs)
   {
     ezStringBuilder sb(name, "_UAV");
 
@@ -36,12 +36,12 @@ void D3D11DeviceBuffer::Dispose()
   {
     if (Buffer != nullptr)
     {
-      for (auto kvp : SRVs)
+      for (auto& kvp : SRVs)
       {
         kvp.Value()->Release();
       }
 
-      for (auto kvp : UAVs)
+      for (auto& kvp : UAVs)
       {
         kvp.Value()->Release();
       }

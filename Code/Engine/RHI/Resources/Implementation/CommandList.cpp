@@ -990,12 +990,26 @@ void RHICommandList::PreDrawValidation()
 
 void RHICommandList::ClearCachedState()
 {
-  m_pFramebuffer = nullptr;
-  m_pGraphicsPipeline = nullptr;
-  m_pComputePipeline = nullptr;
+  if (m_pFramebuffer)
+  {
+    m_pFramebuffer = nullptr;
+  }
+
+  if (m_pGraphicsPipeline)
+  {
+    m_pGraphicsPipeline = nullptr;
+  }
+
+  if (m_pComputePipeline)
+  {
+    m_pComputePipeline = nullptr;
+  }
 
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
-  m_pIndexBuffer = nullptr;
+  if (m_pIndexBuffer)
+  {
+    m_pIndexBuffer = nullptr;
+  }
 #endif
 }
 
@@ -1003,7 +1017,7 @@ template <typename T>
 void RHICommandList::UpdateBuffer(RHIBuffer* buffer, ezUInt32 bufferOffset, T source)
 {
   ezUInt8* sourcePtr = reinterpret_cast<ezUInt8*>(&source);
-  UpdateBuffer(buffer, bufferOffset, sourcePtr, sizeof(T));
+  UpdateBuffer(buffer, bufferOffset, sourcePtr, (ezUInt32)sizeof(T));
 }
 
 template <typename T>

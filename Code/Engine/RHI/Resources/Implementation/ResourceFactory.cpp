@@ -279,7 +279,6 @@ RHISampler* RHIResourceFactory::CreateSampler(const RHISamplerDescription& descr
 
 RHIShader* RHIResourceFactory::CreateShader(const RHIShaderDescription& description)
 {
-
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   if (!Features.ComputeShaderSupported() && description.Stage == RHIShaderStages::Compute)
   {
@@ -294,6 +293,7 @@ RHIShader* RHIResourceFactory::CreateShader(const RHIShaderDescription& descript
     EZ_REPORT_FAILURE("GraphicsDevice does not support Tessellation Shaders.");
   }
 #endif
+
   return CreateShaderCore(description);
 }
 
