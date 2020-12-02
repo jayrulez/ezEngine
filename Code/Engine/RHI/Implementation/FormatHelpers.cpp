@@ -57,6 +57,9 @@ namespace FormatHelpers
       case RHIPixelFormat::R32_G32_Float:
         return 8;
 
+      case RHIPixelFormat::R32_G32_B32_Float: // ez
+        return 12;
+
       case RHIPixelFormat::R32_G32_B32_A32_Float:
       case RHIPixelFormat::R32_G32_B32_A32_UInt:
       case RHIPixelFormat::R32_G32_B32_A32_SInt:
@@ -74,6 +77,8 @@ namespace FormatHelpers
       case RHIPixelFormat::BC4_SNorm:
       case RHIPixelFormat::BC5_UNorm:
       case RHIPixelFormat::BC5_SNorm:
+      case RHIPixelFormat::BC6_H_UFloat: // ez
+      case RHIPixelFormat::BC6_H_SFloat: // ez
       case RHIPixelFormat::BC7_UNorm:
       case RHIPixelFormat::BC7_UNorm_SRgb:
       case RHIPixelFormat::ETC2_R8_G8_B8_UNorm:
@@ -225,6 +230,8 @@ namespace FormatHelpers
            format == RHIPixelFormat::BC4_SNorm ||
            format == RHIPixelFormat::BC5_UNorm ||
            format == RHIPixelFormat::BC5_SNorm ||
+           format == RHIPixelFormat::BC6_H_UFloat || // ez
+           format == RHIPixelFormat::BC6_H_SFloat || // ez
            format == RHIPixelFormat::BC7_UNorm ||
            format == RHIPixelFormat::BC7_UNorm_SRgb ||
            format == RHIPixelFormat::ETC2_R8_G8_B8_UNorm ||
@@ -247,6 +254,8 @@ namespace FormatHelpers
       case RHIPixelFormat::BC4_SNorm:
       case RHIPixelFormat::BC5_UNorm:
       case RHIPixelFormat::BC5_SNorm:
+      case RHIPixelFormat::BC6_H_UFloat: // ez
+      case RHIPixelFormat::BC6_H_SFloat: // ez
       case RHIPixelFormat::BC7_UNorm:
       case RHIPixelFormat::BC7_UNorm_SRgb:
       case RHIPixelFormat::ETC2_R8_G8_B8_UNorm:
@@ -283,6 +292,8 @@ namespace FormatHelpers
       case RHIPixelFormat::BC3_UNorm_SRgb:
       case RHIPixelFormat::BC5_UNorm:
       case RHIPixelFormat::BC5_SNorm:
+      case RHIPixelFormat::BC6_H_UFloat: // ez
+      case RHIPixelFormat::BC6_H_SFloat: // ez
       case RHIPixelFormat::BC7_UNorm:
       case RHIPixelFormat::BC7_UNorm_SRgb:
       case RHIPixelFormat::ETC2_R8_G8_B8_A8_UNorm:
@@ -325,6 +336,8 @@ namespace FormatHelpers
       case RHIPixelFormat::BC4_SNorm:
       case RHIPixelFormat::BC5_UNorm:
       case RHIPixelFormat::BC5_SNorm:
+      case RHIPixelFormat::BC6_H_UFloat: // ez
+      case RHIPixelFormat::BC6_H_SFloat: // ez
       case RHIPixelFormat::BC7_UNorm:
       case RHIPixelFormat::BC7_UNorm_SRgb:
       case RHIPixelFormat::ETC2_R8_G8_B8_UNorm:
@@ -384,6 +397,8 @@ namespace FormatHelpers
   {
     switch (format)
     {
+      case RHIPixelFormat::R32_G32_B32_Float: // ez
+        return RHIPixelFormat::R32_G32_B32_Float;
       case RHIPixelFormat::R32_G32_B32_A32_Float:
       case RHIPixelFormat::R32_G32_B32_A32_UInt:
       case RHIPixelFormat::R32_G32_B32_A32_SInt:
@@ -450,6 +465,9 @@ namespace FormatHelpers
       case RHIPixelFormat::BC5_UNorm:
       case RHIPixelFormat::BC5_SNorm:
         return RHIPixelFormat::BC5_UNorm;
+      case RHIPixelFormat::BC6_H_UFloat:     // ez
+      case RHIPixelFormat::BC6_H_SFloat:     // ez
+        return RHIPixelFormat::BC6_H_UFloat; // ez
       case RHIPixelFormat::B8_G8_R8_A8_UNorm:
       case RHIPixelFormat::B8_G8_R8_A8_UNorm_SRgb:
         return RHIPixelFormat::B8_G8_R8_A8_UNorm;
@@ -464,4 +482,3 @@ namespace FormatHelpers
 
 
 EZ_STATICLINK_FILE(RHI, RHI_Implementation_FormatHelpers);
-

@@ -635,6 +635,22 @@ struct EZ_RHI_DLL RHIPixelFormat // : byte
     /// This is an sRGB format.
     /// </summary>
     BC7_UNorm_SRgb,
+    /// <summary>
+    /// The BC6H format provides high-quality compression for images that use three HDR color channels,
+    /// with a 16-bit value for each color channel of the value (16:16:16).
+    /// There is no support for an alpha channel.
+    /// </summary>
+    BC6_H_UFloat, // ez
+    /// <summary>
+    /// The BC6H format provides high-quality compression for images that use three HDR color channels,
+    /// with a 16-bit value for each color channel of the value (16:16:16).
+    /// There is no support for an alpha channel.
+    /// </summary>
+    BC6_H_SFloat, // ez
+    /// <summary>
+    /// A three-component, 96-bit floating-point format that supports 32 bits per color channel.
+    /// </summary>
+    R32_G32_B32_Float, // ez
     Default = R8_G8_B8_A8_UNorm_SRgb
   };
 };

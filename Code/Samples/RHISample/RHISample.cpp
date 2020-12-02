@@ -111,11 +111,11 @@ RHIPixelFormat::Enum ImageFormatToRHIPixelFormat(ezImageFormat::Enum format, boo
       return RHIPixelFormat::BC5_SNorm;
 
       //  // case ezImageFormat::BC6H_TYPELESS:
-      //case ezImageFormat::BC6H_UF16:
-      //  return RHIPixelFormat::BC6UFloat;
+      case ezImageFormat::BC6H_UF16:
+        return RHIPixelFormat::BC6_H_UFloat;
 
-      //case ezImageFormat::BC6H_SF16:
-      //  return RHIPixelFormat::BC6Float;
+      case ezImageFormat::BC6H_SF16:
+        return RHIPixelFormat::BC6_H_SFloat;
 
       // case ezImageFormat::BC7_TYPELESS:
     case ezImageFormat::BC7_UNORM:
@@ -142,8 +142,8 @@ RHIPixelFormat::Enum ImageFormatToRHIPixelFormat(ezImageFormat::Enum format, boo
     case ezImageFormat::R32G32_FLOAT:
       return RHIPixelFormat::R32_G32_Float;
 
-      //case ezImageFormat::R32G32B32_FLOAT:
-      //  return RHIPixelFormat::RGBFloat;
+      case ezImageFormat::R32G32B32_FLOAT:
+      return RHIPixelFormat::R32_G32_B32_Float;
 
     case ezImageFormat::R16G16B16A16_FLOAT:
       return RHIPixelFormat::R16_G16_B16_A16_Float;
