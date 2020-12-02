@@ -651,6 +651,14 @@ struct EZ_RHI_DLL RHIPixelFormat // : byte
     /// A three-component, 96-bit floating-point format that supports 32 bits per color channel.
     /// </summary>
     R32_G32_B32_Float, // ez
+    /// <summary>
+    /// A three-component, 96-bit unsigned-integer format that supports 32 bits per color channel.
+    /// </summary>
+    R32_G32_B32_UInt, // ez
+    /// <summary>
+    /// A three-component, 96-bit signed-integer format that supports 32 bits per color channel.
+    /// </summary>
+    R32_G32_B32_SInt, // ez
     Default = R8_G8_B8_A8_UNorm_SRgb
   };
 };

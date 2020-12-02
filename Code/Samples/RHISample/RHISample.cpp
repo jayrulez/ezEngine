@@ -110,12 +110,12 @@ RHIPixelFormat::Enum ImageFormatToRHIPixelFormat(ezImageFormat::Enum format, boo
     case ezImageFormat::BC5_SNORM:
       return RHIPixelFormat::BC5_SNorm;
 
-      //  // case ezImageFormat::BC6H_TYPELESS:
-      case ezImageFormat::BC6H_UF16:
-        return RHIPixelFormat::BC6_H_UFloat;
+    //  // case ezImageFormat::BC6H_TYPELESS:
+    case ezImageFormat::BC6H_UF16:
+      return RHIPixelFormat::BC6_H_UFloat;
 
-      case ezImageFormat::BC6H_SF16:
-        return RHIPixelFormat::BC6_H_SFloat;
+    case ezImageFormat::BC6H_SF16:
+      return RHIPixelFormat::BC6_H_SFloat;
 
       // case ezImageFormat::BC7_TYPELESS:
     case ezImageFormat::BC7_UNORM:
@@ -127,8 +127,8 @@ RHIPixelFormat::Enum ImageFormatToRHIPixelFormat(ezImageFormat::Enum format, boo
     case ezImageFormat::BC7_UNORM_SRGB:
       return RHIPixelFormat::BC7_UNorm_SRgb;
 
-      //case ezImageFormat::B5G6R5_UNORM:
-      //  return RHIPixelFormat::B5G6R5UNormalized; /// \todo Not supported by some GPUs ?
+    //case ezImageFormat::B5G6R5_UNORM:
+    //  return RHIPixelFormat::B5_G6_R5_UNorm; /// \todo Not supported by some GPUs ?
 
     case ezImageFormat::R16_FLOAT:
       return RHIPixelFormat::R16_Float;
@@ -142,7 +142,7 @@ RHIPixelFormat::Enum ImageFormatToRHIPixelFormat(ezImageFormat::Enum format, boo
     case ezImageFormat::R32G32_FLOAT:
       return RHIPixelFormat::R32_G32_Float;
 
-      case ezImageFormat::R32G32B32_FLOAT:
+    case ezImageFormat::R32G32B32_FLOAT:
       return RHIPixelFormat::R32_G32_B32_Float;
 
     case ezImageFormat::R16G16B16A16_FLOAT:
@@ -397,8 +397,7 @@ void RHISample::CreatePipelineState()
     8, 10, 9, 8, 11, 10,
     12, 14, 13, 12, 15, 14,
     16, 18, 17, 16, 19, 18,
-    20, 21, 22, 20, 22, 23
-  };
+    20, 21, 22, 20, 22, 23};
 
   {
     RHIGraphicsPipelineDescription pipelineDesc;

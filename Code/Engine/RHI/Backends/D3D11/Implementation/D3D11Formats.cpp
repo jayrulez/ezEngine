@@ -60,6 +60,10 @@ namespace D3D11Formats
       case RHIPixelFormat::R32_G32_Float:
         return DXGI_FORMAT_R32G32_FLOAT;
 
+      case RHIPixelFormat::R32_G32_B32_UInt: // ez
+        return DXGI_FORMAT_R32G32B32_UINT;
+      case RHIPixelFormat::R32_G32_B32_SInt: // ez
+        return DXGI_FORMAT_R32G32B32_SINT;
       case RHIPixelFormat::R32_G32_B32_Float: // ez
         return DXGI_FORMAT_R32G32B32_FLOAT;
 
@@ -253,6 +257,9 @@ namespace D3D11Formats
       case DXGI_FORMAT_B8G8R8A8_UNORM:
       case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
         return DXGI_FORMAT_B8G8R8A8_TYPELESS;
+      case DXGI_FORMAT_BC6H_UF16:
+      case DXGI_FORMAT_BC6H_SF16:
+        return DXGI_FORMAT_BC6H_TYPELESS;
       case DXGI_FORMAT_BC7_TYPELESS:
       case DXGI_FORMAT_BC7_UNORM:
       case DXGI_FORMAT_BC7_UNORM_SRGB:
@@ -492,6 +499,11 @@ namespace D3D11Formats
       case DXGI_FORMAT_R32G32_FLOAT:
         return RHIPixelFormat::R32_G32_Float;
 
+        
+      case DXGI_FORMAT_R32G32B32_UINT: // ez
+        return RHIPixelFormat::R32_G32_B32_UInt;
+      case DXGI_FORMAT_R32G32B32_SINT: // ez
+        return RHIPixelFormat::R32_G32_B32_SInt;
       case DXGI_FORMAT_R32G32B32_FLOAT: // ez
         return RHIPixelFormat::R32_G32_B32_Float;
 

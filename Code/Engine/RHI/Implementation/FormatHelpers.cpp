@@ -57,6 +57,8 @@ namespace FormatHelpers
       case RHIPixelFormat::R32_G32_Float:
         return 8;
 
+      case RHIPixelFormat::R32_G32_B32_UInt: // ez
+      case RHIPixelFormat::R32_G32_B32_SInt: // ez
       case RHIPixelFormat::R32_G32_B32_Float: // ez
         return 12;
 
@@ -397,6 +399,8 @@ namespace FormatHelpers
   {
     switch (format)
     {
+      case RHIPixelFormat::R32_G32_B32_UInt: // ez
+      case RHIPixelFormat::R32_G32_B32_SInt: // ez
       case RHIPixelFormat::R32_G32_B32_Float: // ez
         return RHIPixelFormat::R32_G32_B32_Float;
       case RHIPixelFormat::R32_G32_B32_A32_Float:
