@@ -1798,44 +1798,31 @@ bool GraphicsDevice_DX12::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQuer
   internal_state->allocationhandler = allocationhandler;
   pQuery->internal_state = internal_state;
 
-  HRESULT hr = E_FAIL;
-
   pQuery->desc = *pDesc;
   internal_state->query_type = pQuery->desc.Type;
 
   switch (pDesc->Type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
-      if (allocationhandler->free_timestampqueries.pop_front(internal_state->query_index))
-      {
-        hr = S_OK;
-      }
-      else
+      if (!allocationhandler->free_timestampqueries.pop_front(internal_state->query_index))
       {
         internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
-        assert(0);
+        return false;
       }
       break;
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
-      hr = S_OK;
       break;
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
-      if (allocationhandler->free_occlusionqueries.pop_front(internal_state->query_index))
-      {
-        hr = S_OK;
-      }
-      else
+      if (!allocationhandler->free_occlusionqueries.pop_front(internal_state->query_index))
       {
         internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
-        assert(0);
+        return false;
       }
       break;
   }
 
-  assert(SUCCEEDED(hr));
-
-  return SUCCEEDED(hr);
+  return true;
 }
 
 bool GraphicsDevice_DX12::CreatePipelineState(const PipelineStateDesc* pDesc, PipelineState* pso)
@@ -3329,7 +3316,7 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
   D3D12_RANGE nullrange = {};
   void* data = nullptr;
 
-  switch (query->desc.Type)
+  switch (internal_state->query_type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT:
       assert(0); // not implemented yet
@@ -3356,6 +3343,8 @@ bool GraphicsDevice_DX12::QueryRead(const GPUQuery* query, GPUQueryResult* resul
       result->result_passed_sample_count = *(ezUInt64*)((size_t)data + range.Begin);
       querypool_occlusion_readback->Unmap(0, &nullrange);
       break;
+    default:
+      false;
   }
 
   return true;
@@ -4134,7 +4123,7 @@ void GraphicsDevice_DX12::UpdateBuffer(const GPUBuffer* buffer, const void* data
     // Contents will be transferred to device memory:
     //auto internal_state_src = std::static_pointer_cast<Resource_DX12>(GetFrameResources().resourceBuffer[cmd].buffer.internal_state);
     auto internal_state_src = GetFrameResources().resourceBuffer[cmd].buffer.internal_state.Downcast<Resource_DX12>();
-    
+
     auto internal_state_dst = to_internal(buffer);
 
     D3D12_RESOURCE_BARRIER barrier = {};
@@ -4170,7 +4159,7 @@ void GraphicsDevice_DX12::QueryBegin(const GPUQuery* query, CommandList cmd)
 {
   auto internal_state = to_internal(query);
 
-  switch (query->desc.Type)
+  switch (internal_state->query_type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       GetDirectCommandList(cmd)->BeginQuery(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, internal_state->query_index);
@@ -4187,7 +4176,7 @@ void GraphicsDevice_DX12::QueryEnd(const GPUQuery* query, CommandList cmd)
 {
   auto internal_state = to_internal(query);
 
-  switch (query->desc.Type)
+  switch (internal_state->query_type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       GetDirectCommandList(cmd)->EndQuery(querypool_timestamp.Get(), D3D12_QUERY_TYPE_TIMESTAMP, internal_state->query_index);
@@ -4200,9 +4189,13 @@ void GraphicsDevice_DX12::QueryEnd(const GPUQuery* query, CommandList cmd)
       break;
   }
 
-  Query_Resolve& resolver = query_resolves[cmd].ExpandAndGetRef();
-  resolver.type = query->desc.Type;
-  resolver.index = internal_state->query_index;
+  if (internal_state->query_type != ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID)
+  {
+
+    Query_Resolve& resolver = query_resolves[cmd].ExpandAndGetRef();
+    resolver.type = query->desc.Type;
+    resolver.index = internal_state->query_index;
+  }
 }
 void GraphicsDevice_DX12::Barrier(const GPUBarrier* barriers, ezUInt32 numBarriers, CommandList cmd)
 {

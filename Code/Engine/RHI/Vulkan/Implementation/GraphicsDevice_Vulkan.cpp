@@ -2707,6 +2707,9 @@ bool GraphicsDevice_Vulkan::CreateShader(ezEnum<ezRHIShaderStage> stage, const v
         case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
           layoutBindings.PeekBack().descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
           break;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+          layoutBindings.PeekBack().descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+          break;
       }
     }
 
@@ -2970,44 +2973,31 @@ bool GraphicsDevice_Vulkan::CreateQuery(const GPUQueryDesc* pDesc, GPUQuery* pQu
   internal_state->allocationhandler = allocationhandler;
   pQuery->internal_state = internal_state;
 
-  bool hr = false;
-
   pQuery->desc = *pDesc;
   internal_state->query_type = pQuery->desc.Type;
 
   switch (pDesc->Type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
-      if (allocationhandler->free_timestampqueries.pop_front(internal_state->query_index))
-      {
-        hr = true;
-      }
-      else
+      if (!allocationhandler->free_timestampqueries.pop_front(internal_state->query_index))
       {
         internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
-        assert(0);
+        return false;
       }
       break;
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP_DISJOINT:
-      hr = true;
       break;
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION:
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
-      if (allocationhandler->free_occlusionqueries.pop_front(internal_state->query_index))
-      {
-        hr = true;
-      }
-      else
+      if (!allocationhandler->free_occlusionqueries.pop_front(internal_state->query_index))
       {
         internal_state->query_type = ezRHIGPUQueryType::GPU_QUERY_TYPE_INVALID;
-        assert(0);
+        return false;
       }
       break;
   }
 
-  assert(hr);
-
-  return hr;
+  return true;
 }
 bool GraphicsDevice_Vulkan::CreatePipelineState(const PipelineStateDesc* pDesc, PipelineState* pso)
 {
@@ -4404,7 +4394,7 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
 
   VkResult res = VK_SUCCESS;
 
-  switch (query->desc.Type)
+  switch (internal_state->query_type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_EVENT:
       assert(0); // not implemented yet
@@ -4428,6 +4418,9 @@ bool GraphicsDevice_Vulkan::QueryRead(const GPUQuery* query, GPUQueryResult* res
       {
         occlusions_to_reset.PushBack((ezUInt32)internal_state->query_index);
       }
+      break;
+    default:
+      return false;
       break;
   }
 
@@ -5255,7 +5248,7 @@ void GraphicsDevice_Vulkan::QueryBegin(const GPUQuery* query, CommandList cmd)
 {
   auto internal_state = to_internal(query);
 
-  switch (query->desc.Type)
+  switch (internal_state->query_type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_OCCLUSION_PREDICATE:
       vkCmdBeginQuery(GetDirectCommandList(cmd), querypool_occlusion, (ezUInt32)internal_state->query_index, 0);
@@ -5269,7 +5262,7 @@ void GraphicsDevice_Vulkan::QueryEnd(const GPUQuery* query, CommandList cmd)
 {
   auto internal_state = to_internal(query);
 
-  switch (query->desc.Type)
+  switch (internal_state->query_type)
   {
     case ezRHIGPUQueryType::GPU_QUERY_TYPE_TIMESTAMP:
       vkCmdWriteTimestamp(GetDirectCommandList(cmd), VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, querypool_timestamp, internal_state->query_index);
