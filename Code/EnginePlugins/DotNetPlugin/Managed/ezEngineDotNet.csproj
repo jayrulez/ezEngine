@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFramework>net5.0</TargetFramework>
+	<RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
+	<SelfContained>true</SelfContained>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Update="ezEngineDotNet.runtimeconfig.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="5.0.0" />
+  </ItemGroup>
+
+  <!-- DO NOT REMOVE: Used by CMakeLists to identify project outputs -->
+  <Target Name="GetCMakeOutputAssembly">
+    <Message Importance="High" Text="$(TargetFileName)" />
+  </Target>
+
+  <!-- DO NOT REMOVE: Used by CMakeLists to identify project outputs -->
+  <Target Name="GetCMakeOutputByproducts" DependsOnTargets="ComputeFilesToPublish">
+    <Message Importance="High" Text="@(ResolvedFileToPublish->'$(PublishDir)%(RelativePath)')" />
+  </Target>
+
+</Project>
