@@ -34,6 +34,9 @@ ezDotNetHost::ezDotNetHost()
   : m_SingletonRegistrar(this)
 {
   m_bInitialized = false;
+  m_hHostFxr = nullptr;
+  m_hHostContext = nullptr;
+  m_LoadAssemblyAndGetFuncPtr = nullptr;
 }
 
 ezDotNetHost::~ezDotNetHost()
@@ -45,9 +48,10 @@ void ezDotNetHost::Startup()
   if (m_bInitialized)
     return;
 
-  AssemblyConfig config{"ezEngineDotNet", "ezEngineDotNet.Main"};
+  ezStringBuilder configPathSb = ezOSFile::GetApplicationDirectory();
+  configPathSb.Append("ezEngineDotNet.runtimeconfig.json");
 
-  m_bInitialized = Initialize(config);
+  m_bInitialized = Initialize(configPathSb.GetData());
 }
 
 void ezDotNetHost::Shutdown()
@@ -55,10 +59,22 @@ void ezDotNetHost::Shutdown()
   if (!m_bInitialized)
     return;
 
+  if (m_hHostContext)
+  {
+    CloseFuncPtr(m_hHostContext);
+    m_hHostContext = nullptr;
+  }
+
+  if (m_hHostFxr)
+  {
+    CloseFuncPtr(m_hHostFxr);
+    m_hHostFxr = nullptr;
+  }
+
   m_bInitialized = false;
 }
 
-bool ezDotNetHost::Initialize(const AssemblyConfig& config)
+bool ezDotNetHost::Initialize(const char* runtimeConfigPath)
 {
   // Step 1: Load HostFxr and get exported functions
   if (!LoadHostFxr())
@@ -68,18 +84,34 @@ bool ezDotNetHost::Initialize(const AssemblyConfig& config)
   }
 
   // Step 2: Initialize and start .NET Core runtime
-  ezStringBuilder configPathSb = ezOSFile::GetApplicationDirectory();
-  configPathSb.AppendFormat("{}.runtimeconfig.json", config.m_Assembly);
-
-  load_assembly_and_get_function_pointer_fn loadAssemblyAndGetFunctionPointer = nullptr;
-  loadAssemblyAndGetFunctionPointer = GetDotNetLoadAssembly(configPathSb.GetData());
-  if (loadAssemblyAndGetFunctionPointer == nullptr)
+  m_LoadAssemblyAndGetFuncPtr = GetDotNetLoadAssembly(runtimeConfigPath);
+  if (m_LoadAssemblyAndGetFuncPtr == nullptr)
   {
     EZ_REPORT_FAILURE("Failure: ezDotNetHost::GetDotNetLoadAssembly()");
     return false;
   }
 
   return true;
+}
+
+component_entry_point_fn ezDotNetHost::LoadAssemblyInternal(const char* dll, const char* className, const char* classNamespace, const char* method)
+{
+  component_entry_point_fn function = nullptr;
+
+  ezStringBuilder dllPathSb = ezOSFile::GetApplicationDirectory();
+  dllPathSb.Append(dll);
+
+  ezStringBuilder dotnetTypeSb(className, ", ", classNamespace);
+
+  int result = m_LoadAssemblyAndGetFuncPtr(ezStringWChar(dllPathSb.GetData()).GetData(), ezStringWChar(dotnetTypeSb.GetData()).GetData(), ezStringWChar(method).GetData(), nullptr, nullptr, (void**)&function);
+
+  if (result != 0 || function == nullptr)
+  {
+    EZ_REPORT_FAILURE("Failure: m_LoadAssemblyAndGetFuncPtr()");
+    return nullptr;
+  }
+
+  return function;
 }
 
 void* ezDotNetHost::LoadNativeLibrary(const char* path)
@@ -92,6 +124,17 @@ void* ezDotNetHost::LoadNativeLibrary(const char* path)
   void* handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
   EZ_ASSERT_DEBUG(handle != nullptr, "Failed to load library: {}", path);
   return handle;
+#endif
+}
+
+void ezDotNetHost::CloseNativeLibrary(void* handle)
+{
+#if EZ_ENABLED(EZ_PLATFORM_WINDOWS)
+  BOOL result = FreeLibrary(static_cast<HMODULE>(handle));
+  EZ_ASSERT_DEBUG(result != false, "Failed to free native library.");
+#else
+  int result = dlclose(handle);
+  EZ_ASSERT_DEBUG(result == 0, "Failed to free native library.");
 #endif
 }
 
@@ -119,10 +162,10 @@ bool ezDotNetHost::LoadHostFxr()
     return false;
 
   // Load hostfxr and get desired exports
-  void* lib = LoadNativeLibrary(ezString(buffer));
-  ezDotNetHost::InitFuncPtr = (hostfxr_initialize_for_runtime_config_fn)GetNativeExport(lib, "hostfxr_initialize_for_runtime_config");
-  ezDotNetHost::GetDelegateFuncPtr = (hostfxr_get_runtime_delegate_fn)GetNativeExport(lib, "hostfxr_get_runtime_delegate");
-  ezDotNetHost::CloseFuncPtr = (hostfxr_close_fn)GetNativeExport(lib, "hostfxr_close");
+  m_hHostFxr = LoadNativeLibrary(ezString(buffer));
+  ezDotNetHost::InitFuncPtr = (hostfxr_initialize_for_runtime_config_fn)GetNativeExport(m_hHostFxr, "hostfxr_initialize_for_runtime_config");
+  ezDotNetHost::GetDelegateFuncPtr = (hostfxr_get_runtime_delegate_fn)GetNativeExport(m_hHostFxr, "hostfxr_get_runtime_delegate");
+  ezDotNetHost::CloseFuncPtr = (hostfxr_close_fn)GetNativeExport(m_hHostFxr, "hostfxr_close");
 
   return (InitFuncPtr && GetDelegateFuncPtr && CloseFuncPtr);
 }
@@ -131,23 +174,22 @@ bool ezDotNetHost::LoadHostFxr()
 load_assembly_and_get_function_pointer_fn ezDotNetHost::GetDotNetLoadAssembly(const char* configPath)
 {
   // Load .NET Core
-  void* load_assembly_and_get_function_pointer = nullptr;
-  hostfxr_handle cxt = nullptr;
-  int rc = InitFuncPtr(ezStringWChar(configPath).GetData(), nullptr, &cxt);
-  if (rc != 0 || cxt == nullptr)
+  void* loadAssemblyAndGetFuncPtr = nullptr;
+  int rc = InitFuncPtr(ezStringWChar(configPath).GetData(), nullptr, &m_hHostContext);
+  if (rc != 0 || m_hHostContext == nullptr)
   {
     ezLog::Error("Init failed: {}", rc); // todo: std::hex << std::showbase << rc
-    CloseFuncPtr(cxt);
+    CloseFuncPtr(m_hHostContext);
     return nullptr;
   }
 
   // Get the load assembly function pointer
-  rc = GetDelegateFuncPtr(cxt, hdt_load_assembly_and_get_function_pointer, &load_assembly_and_get_function_pointer);
-  if (rc != 0 || load_assembly_and_get_function_pointer == nullptr)
+  rc = GetDelegateFuncPtr(m_hHostContext, hdt_load_assembly_and_get_function_pointer, &loadAssemblyAndGetFuncPtr);
+  if (rc != 0 || loadAssemblyAndGetFuncPtr == nullptr)
     ezLog::Error("Get delegate failed: {}", rc); // todo: std::hex << std::showbase << rc
 
-  CloseFuncPtr(cxt);
-  return (load_assembly_and_get_function_pointer_fn)load_assembly_and_get_function_pointer;
+  //CloseFuncPtr(m_hHostContext);
+  return (load_assembly_and_get_function_pointer_fn)loadAssemblyAndGetFuncPtr;
 }
 
 void ezDotNetHost::LoadAssembly(const char* path)

@@ -2,15 +2,32 @@ ez_cmake_init()
 
 ez_build_filter_renderer()
 
+# Get the name of this folder as the project name
+get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME_WE)
+
 find_package(Dotnet 5.0.100 REQUIRED)
 
 set(CSPROJ ${CMAKE_CURRENT_LIST_DIR}/Managed/ezEngineDotNet.csproj)
+
+set(SUB_DIR "")
+
+if (EZ_CMAKE_PLATFORM_WINDOWS_UWP)
+  # UWP has deployment problems if all applications output to the same path.
+  set(SUB_DIR "/${TARGET_NAME}")
+endif()
+
+set(TARGET_DIR_NAME ${EZ_CMAKE_PLATFORM_PREFIX}${EZ_CMAKE_GENERATOR_PREFIX}${EZ_CMAKE_COMPILER_POSTFIX}${CMAKE_BUILD_TYPE}${EZ_CMAKE_ARCHITECTURE_POSTFIX}${SUB_DIR})
+set(DOTNET_OUTPUT_DIRECTORY_BIN ${EZ_OUTPUT_DIRECTORY_DLL}/${TARGET_DIR_NAME})
+set(DOTNET_OUTPUT_DIRECTORY_LIB ${EZ_OUTPUT_DIRECTORY_LIB}/${TARGET_DIR_NAME})
+
+message(${DOTNET_OUTPUT_DIRECTORY_BIN})
+message(${DOTNET_OUTPUT_DIRECTORY_LIB})
 
 set(OPTIONS
   /nologo
   /p:IntermediateOutputPath=${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/Dotnet_Build.dir/
   /p:MSBuildProjectExtensionsPath=${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/Dotnet_Build.dir/
-  /p:OutDir=${CMAKE_CURRENT_BINARY_DIR}/
+  /p:OutDir=${DOTNET_OUTPUT_DIRECTORY_BIN}/
   /p:PublishDir=${CMAKE_CURRENT_BINARY_DIR}/publish/
 )
 
@@ -36,7 +53,7 @@ string(STRIP "${OUTPUT_BYPRODUCTS}" OUTPUT_BYPRODUCTS)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/publish)
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_ASSEMBLY}
+  OUTPUT ${DOTNET_OUTPUT_DIRECTORY_BIN}/${OUTPUT_ASSEMBLY}
   BYPRODUCTS ${OUTPUT_BYPRODUCTS}
   COMMAND ${Dotnet_PROGRAM} msbuild ${CSPROJ} ${OPTIONS}
     /t:Build,Publish
@@ -44,7 +61,7 @@ add_custom_command(
 )
 
 add_custom_target(Dotnet_Build
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_ASSEMBLY}
+  DEPENDS ${DOTNET_OUTPUT_DIRECTORY_BIN}/${OUTPUT_ASSEMBLY}
 )
 
 add_executable(Dotnet IMPORTED GLOBAL)
@@ -63,6 +80,19 @@ elseif(EZ_CMAKE_PLATFORM_LINUX)
 endif()
 
 add_library(CoreCLR::nethost SHARED IMPORTED GLOBAL)
+
+add_custom_command(TARGET Dotnet_Build POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_CURRENT_BINARY_DIR}/publish/${nethost_lib}
+  ${DOTNET_OUTPUT_DIRECTORY_BIN}
+)
+
+add_custom_command(TARGET Dotnet_Build POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_CURRENT_BINARY_DIR}/publish/nethost.lib
+  ${DOTNET_OUTPUT_DIRECTORY_LIB}
+)
+
 set_target_properties(CoreCLR::nethost
   PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}/publish"
@@ -82,9 +112,6 @@ elseif(EZ_CMAKE_PLATFORM_LINUX)
   )
 endif()
 
-# Get the name of this folder as the project name
-get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME_WE)
-
 ez_create_target(LIBRARY ${PROJECT_NAME})
 
 add_dependencies(${PROJECT_NAME} Dotnet)
@@ -96,6 +123,3 @@ target_link_libraries(${PROJECT_NAME}
   RendererCore
   GameEngine
 )
-
-#find_library(NETHOST_LIBRARY NAMES libnethost nethost)
-#target_link_libraries(${PROJECT_NAME} PRIVATE ${NETHOST_LIBRARY})
