@@ -1,0 +1,136 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0/",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {},
+    ".NETCoreApp,Version=v6.0/": {
+      "System.Private.CoreLib/6.0.0-dev": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.CSharp.CodeStyle": "3.8.0-4.20503.2",
+          "Microsoft.CodeAnalysis.NetAnalyzers": "6.0.0-preview1.20513.4",
+          "Microsoft.DotNet.CodeAnalysis": "6.0.0-beta.20621.12",
+          "Microsoft.NET.ILLink.Tasks": "6.0.0-alpha.1.20628.2",
+          "Microsoft.Net.Compilers.Toolset": "3.8.0-5.20604.10",
+          "Microsoft.SourceLink.AzureRepos.Git": "1.1.0-beta-20206-02",
+          "Microsoft.SourceLink.GitHub": "1.1.0-beta-20206-02",
+          "StyleCop.Analyzers": "1.2.0-beta.304"
+        },
+        "runtime": {
+          "System.Private.CoreLib.dll": {}
+        }
+      },
+      "Microsoft.Build.Tasks.Git/1.1.0-beta-20206-02": {},
+      "Microsoft.CodeAnalysis.CSharp.CodeStyle/3.8.0-4.20503.2": {},
+      "Microsoft.CodeAnalysis.NetAnalyzers/6.0.0-preview1.20513.4": {},
+      "Microsoft.DotNet.CodeAnalysis/6.0.0-beta.20621.12": {},
+      "Microsoft.Net.Compilers.Toolset/3.8.0-5.20604.10": {},
+      "Microsoft.NET.ILLink.Tasks/6.0.0-alpha.1.20628.2": {},
+      "Microsoft.SourceLink.AzureRepos.Git/1.1.0-beta-20206-02": {
+        "dependencies": {
+          "Microsoft.Build.Tasks.Git": "1.1.0-beta-20206-02",
+          "Microsoft.SourceLink.Common": "1.1.0-beta-20206-02"
+        }
+      },
+      "Microsoft.SourceLink.Common/1.1.0-beta-20206-02": {},
+      "Microsoft.SourceLink.GitHub/1.1.0-beta-20206-02": {
+        "dependencies": {
+          "Microsoft.Build.Tasks.Git": "1.1.0-beta-20206-02",
+          "Microsoft.SourceLink.Common": "1.1.0-beta-20206-02"
+        }
+      },
+      "StyleCop.Analyzers/1.2.0-beta.304": {
+        "dependencies": {
+          "StyleCop.Analyzers.Unstable": "1.2.0.304"
+        }
+      },
+      "StyleCop.Analyzers.Unstable/1.2.0.304": {}
+    }
+  },
+  "libraries": {
+    "System.Private.CoreLib/6.0.0-dev": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Build.Tasks.Git/1.1.0-beta-20206-02": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hZ9leS9Yd9MHpqvviMftSJFDcLYu2h1DrapW1TDm1s1fgOy71c8HvArNMd3fseVkXmp3VTfGnkgcw0FR+TI6xw==",
+      "path": "microsoft.build.tasks.git/1.1.0-beta-20206-02",
+      "hashPath": "microsoft.build.tasks.git.1.1.0-beta-20206-02.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.CSharp.CodeStyle/3.8.0-4.20503.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-lICl1bHmSvHBD3i5thQ2wzGmntINarIY15xS0ioJ+HMVAFygz4WBpG9ot/epAwzicvqB4J1f+f/VTtZ9kLK1eQ==",
+      "path": "microsoft.codeanalysis.csharp.codestyle/3.8.0-4.20503.2",
+      "hashPath": "microsoft.codeanalysis.csharp.codestyle.3.8.0-4.20503.2.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.NetAnalyzers/6.0.0-preview1.20513.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4BPYobjwrLRfLOXIkRbTauF8wCRJMtbAMM5g0oD9oGQPPaJU+82RMxwmD1TyXwnNaOdDHb7UKgTO+RfvkUudlg==",
+      "path": "microsoft.codeanalysis.netanalyzers/6.0.0-preview1.20513.4",
+      "hashPath": "microsoft.codeanalysis.netanalyzers.6.0.0-preview1.20513.4.nupkg.sha512"
+    },
+    "Microsoft.DotNet.CodeAnalysis/6.0.0-beta.20621.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-k6lYx7pNZARqFx/+dTATF4K30+cCGSEaoehRkiI78NA3KS5ovyuefajneTaS1959NtN6MpoLkoZbRcmOhXS98A==",
+      "path": "microsoft.dotnet.codeanalysis/6.0.0-beta.20621.12",
+      "hashPath": "microsoft.dotnet.codeanalysis.6.0.0-beta.20621.12.nupkg.sha512"
+    },
+    "Microsoft.Net.Compilers.Toolset/3.8.0-5.20604.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-L9eMnLKTTqOU30J8h8B6yQBRI4NzRJEup2IgSSL3DktiYKzpRTrs0SYqm2VIgsoMQgo2Nxdy7/jZUKO5IQyA/g==",
+      "path": "microsoft.net.compilers.toolset/3.8.0-5.20604.10",
+      "hashPath": "microsoft.net.compilers.toolset.3.8.0-5.20604.10.nupkg.sha512"
+    },
+    "Microsoft.NET.ILLink.Tasks/6.0.0-alpha.1.20628.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pFi8Fj6Fxj9F3oaST3A9atAwNN7Yy1G/LejUlMfxGyJ5W2cBsYKx9/hSjCV2FhE+lVKy3EY+rAnD0XrhPfP98g==",
+      "path": "microsoft.net.illink.tasks/6.0.0-alpha.1.20628.2",
+      "hashPath": "microsoft.net.illink.tasks.6.0.0-alpha.1.20628.2.nupkg.sha512"
+    },
+    "Microsoft.SourceLink.AzureRepos.Git/1.1.0-beta-20206-02": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vVYhSds9TfraTQkGHHMDMVWnr3kCkTZ7vmqUmrXQBDJFXiWTuMoP5RRa9s1M/KmgB4szi5TOb7sOaHWKDT9qDA==",
+      "path": "microsoft.sourcelink.azurerepos.git/1.1.0-beta-20206-02",
+      "hashPath": "microsoft.sourcelink.azurerepos.git.1.1.0-beta-20206-02.nupkg.sha512"
+    },
+    "Microsoft.SourceLink.Common/1.1.0-beta-20206-02": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-aek0RTQ+4Bf11WvqaXajwYoaBWkX2edBjAr5XJOvhAsHX6/9vPOb7IpHAiE/NyCse7IcpGWslJZHNkv4UBEFqw==",
+      "path": "microsoft.sourcelink.common/1.1.0-beta-20206-02",
+      "hashPath": "microsoft.sourcelink.common.1.1.0-beta-20206-02.nupkg.sha512"
+    },
+    "Microsoft.SourceLink.GitHub/1.1.0-beta-20206-02": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7A7P0EwL+lypaI/CEvG4IcpAlQeAt04uPPw1SO6Q9Jwz2nE9309pQXJ4TfP/RLL8IOObACidN66+gVR+bJDZHw==",
+      "path": "microsoft.sourcelink.github/1.1.0-beta-20206-02",
+      "hashPath": "microsoft.sourcelink.github.1.1.0-beta-20206-02.nupkg.sha512"
+    },
+    "StyleCop.Analyzers/1.2.0-beta.304": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bCa4t2BtRP4aZy3xXG/u1FKq/2j7E8F3uRjDoHpzg2BLvxOsrESivKnKGTbJy7e+X/86KlHZdMY2ihoY17rCXA==",
+      "path": "stylecop.analyzers/1.2.0-beta.304",
+      "hashPath": "stylecop.analyzers.1.2.0-beta.304.nupkg.sha512"
+    },
+    "StyleCop.Analyzers.Unstable/1.2.0.304": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qMBIxXiDa7QyAbZf3VkAl/aeFt3sUJIIgAQ/H0b4dtHWeHQdEcVfmCEDFuwMs6YVpQAs1p0grKEAay9OkkIjqA==",
+      "path": "stylecop.analyzers.unstable/1.2.0.304",
+      "hashPath": "stylecop.analyzers.unstable.1.2.0.304.nupkg.sha512"
+    }
+  }
+}

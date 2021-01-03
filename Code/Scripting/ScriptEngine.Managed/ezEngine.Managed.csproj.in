@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Release\</OutputPath>
+  </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Release\</OutputPath>
+  </PropertyGroup>
+  
+  <ItemGroup>
+${EZ_MANAGED_ASSEMBLY_EXCLUDE_FILES}
+  </ItemGroup>
+</Project>

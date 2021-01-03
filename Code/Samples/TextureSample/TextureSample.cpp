@@ -109,6 +109,7 @@ public:
 
     ezTelemetry::CreateServer();
     ezPlugin::LoadPlugin("ezInspectorPlugin").IgnoreResult();
+    ezPlugin::LoadPlugin("ezMonoPlugin").IgnoreResult();
 
 
 #ifdef BUILDSYSTEM_ENABLE_VULKAN_SUPPORT

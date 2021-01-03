@@ -17,6 +17,7 @@ include("ezUtilsSubmodule")
 include("ezUtilsVulkan")
 include("ezUtilsDependency")
 include("ezUtilsKraut")
+include("ezUtilsMono")
 
 ######################################
 ### ez_set_target_output_dirs(<target> <lib-output-dir> <dll-output-dir>)
