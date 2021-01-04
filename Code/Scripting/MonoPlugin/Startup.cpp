@@ -17,9 +17,15 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(Scripting, MonoPlugin)
 
   ON_CORESYSTEMS_STARTUP
   {
+    const char* appDir = ezOSFile::GetApplicationDirectory();
+    const ezStringView assembliesDir = ezPathUtils::GetFileDirectory(appDir);
+
     s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager);
-    ezMonoManager::GetSingleton()->Startup();
-    ezMonoManager::GetSingleton()->LoadAssembly("ezEngine.Managed.dll", "ezEngine.Managed");
+    ezArrayMap<ezString, ezString> trustedPlatformAssemblies;
+    trustedPlatformAssemblies.Insert("ezEngine.Managed", "ezEngine.Managed.dll");
+
+    ezMonoManager::GetSingleton()->Startup(trustedPlatformAssemblies);
+    //ezMonoManager::GetSingleton()->LoadAssembly("", "");
   }
 
   ON_CORESYSTEMS_SHUTDOWN

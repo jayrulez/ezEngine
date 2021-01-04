@@ -126,10 +126,13 @@ ezStringView ezPathUtils::GetFileDirectory(const char* szPath, const char* szPat
 
 #if EZ_ENABLED(EZ_PLATFORM_WINDOWS)
 const char ezPathUtils::OsSpecificPathSeparator = '\\';
+const char ezPathUtils::OsSpecificPathStringSeparator = ';';
 #elif EZ_ENABLED(EZ_PLATFORM_LINUX) || EZ_ENABLED(EZ_PLATFORM_ANDROID)
 const char ezPathUtils::OsSpecificPathSeparator = '/';
+const char ezPathUtils::OsSpecificPathStringSeparator = ':';
 #elif EZ_ENABLED(EZ_PLATFORM_OSX)
 const char ezPathUtils::OsSpecificPathSeparator = '/';
+const char ezPathUtils::OsSpecificPathStringSeparator = ':';
 #else
 #  error "Unknown platform."
 #endif

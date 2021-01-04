@@ -17,6 +17,9 @@ public:
   /// \brief The path separator used by this operating system.
   static const char OsSpecificPathSeparator;
 
+  /// \brief The path string separator used by this operating system.
+  static const char OsSpecificPathStringSeparator;
+
   /// \brief Returns whether c is any known path separator.
   static bool IsPathSeparator(ezUInt32 c); // [tested]
 

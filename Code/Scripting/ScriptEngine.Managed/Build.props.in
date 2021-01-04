@@ -1,0 +1,26 @@
+<Project>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT_DEBUG}</OutputPath>
+	<PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT_DEBUG}</OutputPath>
+	<PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT_RELEASE}</OutputPath>
+	<PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT_RELEASE}</OutputPath>
+	<PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Checked|x64'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT_CHECKED}</OutputPath>
+	<PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Checked|x86'">
+    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT_CHECKED}</OutputPath>
+	<PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+</Project>

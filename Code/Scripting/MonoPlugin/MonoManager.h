@@ -11,13 +11,12 @@ class EZ_MONOPLUGIN_DLL ezMonoManager
 public:
   ezMonoManager();
   ~ezMonoManager();
-  void Startup();
+  void Startup(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies);
   void Shutdown();
   ezMonoAssembly* LoadAssembly(const ezString& path, const ezString& name);
 
 private:
   bool m_bIsInitialized;
   MonoDomain* m_pRootDomain;
-  MonoDomain* m_pEngineDomain;
   ezArrayMap<ezString, ezMonoAssembly*> m_Assemblies;
 };

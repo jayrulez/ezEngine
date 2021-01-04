@@ -1,22 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <Configuration Condition=" '$(Configuration)' == '' ">${EZ_MANAGED_PROJECT_CONFIG}</Configuration>
+    <PlatformTarget Condition=" '$(Platform)' == '' ">${EZ_MANAGED_PROJECT_PLATFORMTARGET}</PlatformTarget>
     <TargetFramework>net5.0</TargetFramework>
+	<Configurations>Debug;Release;Checked</Configurations>
+    <Platforms>x64;x86;arm;arm64</Platforms>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Release\</OutputPath>
-  </PropertyGroup>
-   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutputPath>${EZ_MANAGED_ASSEMBLY_OUTPUT}\Release\</OutputPath>
-  </PropertyGroup>
+  <Import Project="Build.props" /> 
+  
+  <ItemGroup>
+${EZ_MANAGED_ASSEMBLY_COMPILE_FILES}
+  </ItemGroup>
   
   <ItemGroup>
 ${EZ_MANAGED_ASSEMBLY_EXCLUDE_FILES}

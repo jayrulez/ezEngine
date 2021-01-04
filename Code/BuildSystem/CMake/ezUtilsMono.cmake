@@ -35,7 +35,6 @@ function(ez_link_target_mono TARGET_NAME)
 	  )
 	  
 	  foreach(CORELIB_FILE ${EZ_MONO_CORELIB_FILES})
-		  message(${CORELIB_FILE})
 	    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
 		  COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${CORELIB_FILE} $<TARGET_FILE_DIR:${TARGET_NAME}>
 	    )

@@ -1,7 +1,4 @@
 // https://www.mono-project.com/docs/advanced/embedding/
-
-#include <Foundation/IO/FileSystem/FileSystem.h>
-#include <Foundation/IO/OSFile.h>
 #include <MonoPlugin/Mono/MonoAssembly.h>
 #include <MonoPlugin/MonoManager.h>
 #include <MonoPluginPCH.h>
@@ -19,7 +16,6 @@ ezMonoManager::ezMonoManager()
   : m_SingletonRegistrar(this)
   , m_bIsInitialized(false)
   , m_pRootDomain(nullptr)
-  , m_pEngineDomain(nullptr)
 {
 }
 
@@ -27,13 +23,19 @@ ezMonoManager::~ezMonoManager()
 {
 }
 
-void ezMonoManager::Startup()
+void ezMonoManager::Startup(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies)
 {
   if (m_bIsInitialized)
     return;
 
   ezStringBuilder tpaList(ezOSFile::GetApplicationDirectory(), "System.Private.CoreLib.dll");
   tpaList.MakePathSeparatorsNative();
+
+  for (auto& tpa : trustedPlatformAssemblies)
+  {
+    tpaList.Append(ezPathUtils::OsSpecificPathStringSeparator);
+    tpaList.Append(tpa.value.GetData());
+  }
 
   const char* propertyKeys[] = {"TRUSTED_PLATFORM_ASSEMBLIES"};
   const char* propertyValues[] = {tpaList.GetData()};
@@ -42,7 +44,7 @@ void ezMonoManager::Startup()
   monovm_initialize(propertyCount, (const char**)&propertyKeys, (const char**)&propertyValues);
 
   const char* monoVersion = "v4.0.30319";
-  const char* rootDomainName = "ezMonoRoot";
+  const char* rootDomainName = "ezMono";
 
   m_pRootDomain = mono_jit_init_version(rootDomainName, monoVersion);
   if (!m_pRootDomain)
@@ -71,12 +73,6 @@ void ezMonoManager::Shutdown()
 
     m_Assemblies.Clear();
 
-    //if (m_pEngineDomain)
-    //{
-    //  mono_jit_cleanup(m_pEngineDomain);
-    //  m_pEngineDomain = nullptr;
-    //}
-
     if (m_pRootDomain)
     {
       mono_jit_cleanup(m_pRootDomain);
@@ -88,22 +84,6 @@ void ezMonoManager::Shutdown()
 ezMonoAssembly* ezMonoManager::LoadAssembly(const ezString& path, const ezString& name)
 {
   ezMonoAssembly* assembly = nullptr;
-
-  if (m_pEngineDomain == nullptr)
-  {
-    m_pEngineDomain = mono_domain_create();
-    if (!m_pEngineDomain)
-    {
-      EZ_REPORT_FAILURE("Failed to create domain.");
-      return nullptr;
-    }
-
-    if (!mono_domain_set(m_pEngineDomain, true))
-    {
-      EZ_REPORT_FAILURE("Failed to set domain.");
-      return nullptr;
-    }
-  }
 
   ezUInt32 index = m_Assemblies.Find(name);
   if (index != ezInvalidIndex)
