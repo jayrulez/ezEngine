@@ -22,7 +22,7 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(Scripting, MonoPlugin)
 
     s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager);
     ezArrayMap<ezString, ezString> trustedPlatformAssemblies;
-    trustedPlatformAssemblies.Insert("ezEngine.Managed", "ezEngine.Managed.dll");
+    trustedPlatformAssemblies["ezEngine.Managed"] = "ezEngine.Managed.dll";
 
     ezMonoManager::GetSingleton()->Startup(trustedPlatformAssemblies);
     //ezMonoManager::GetSingleton()->LoadAssembly("", "");

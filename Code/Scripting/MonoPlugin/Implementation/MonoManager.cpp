@@ -9,6 +9,7 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/threads.h>
+#include "..\MonoManager.h"
 
 EZ_IMPLEMENT_SINGLETON(ezMonoManager);
 
@@ -57,7 +58,9 @@ void ezMonoManager::Startup(const ezArrayMap<ezString, ezString>& trustedPlatfor
 
   mono_thread_set_main(mono_thread_current());
 
-  m_Assemblies.Insert("System.Private.CoreLib", EZ_DEFAULT_NEW(ezMonoAssembly, mono_get_corlib()));
+  m_pCoreLibAssembly = EZ_DEFAULT_NEW(ezMonoAssembly, "", "System.Private.CoreLib");
+  m_pCoreLibAssembly->LoadFromImage(mono_get_corlib());
+  m_Assemblies[m_pCoreLibAssembly->GetName()] = m_pCoreLibAssembly;
 
   m_bIsInitialized = true;
 }
@@ -81,6 +84,16 @@ void ezMonoManager::Shutdown()
   }
 }
 
+ezMonoAssembly* ezMonoManager::GetAssembly(const ezString& name) const
+{
+  ezUInt32 assemblyIndex = m_Assemblies.Find(name);
+  if (assemblyIndex != ezInvalidIndex)
+  {
+    return m_Assemblies.GetValue(assemblyIndex);
+  }
+  return nullptr;
+}
+
 ezMonoAssembly* ezMonoManager::LoadAssembly(const ezString& path, const ezString& name)
 {
   ezMonoAssembly* assembly = nullptr;
@@ -93,7 +106,7 @@ ezMonoAssembly* ezMonoManager::LoadAssembly(const ezString& path, const ezString
   else
   {
     assembly = EZ_DEFAULT_NEW(ezMonoAssembly, path, name);
-    m_Assemblies.Insert(name, assembly);
+    m_Assemblies[name] = assembly;
   }
 
   if (!assembly->m_bIsLoaded)

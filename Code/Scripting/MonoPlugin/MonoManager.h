@@ -13,10 +13,12 @@ public:
   ~ezMonoManager();
   void Startup(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies);
   void Shutdown();
+  ezMonoAssembly* GetAssembly(const ezString& name) const;
   ezMonoAssembly* LoadAssembly(const ezString& path, const ezString& name);
 
 private:
   bool m_bIsInitialized;
   MonoDomain* m_pRootDomain;
+  ezMonoAssembly* m_pCoreLibAssembly;
   ezArrayMap<ezString, ezMonoAssembly*> m_Assemblies;
 };
