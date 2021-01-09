@@ -46,14 +46,14 @@ public:
   bool IsIndexed() const;
 
   /// \brief 	Returns the data type the property holds.
-  MonoClass* GetReturnType() const;
+  ezMonoClass* GetReturnType() const;
 
   /// \brief 	Checks if property has an attribute of the specified type.
   bool HasAttribute(ezMonoClass* monoClass);
 
   /// \brief Returns an instance of an attribute of the specified type.
   ///Returns null if the property doesn't have such an attribute.
-  MonoObject* GetAttribute(MonoClass* monoClass);
+  MonoObject* GetAttribute(ezMonoClass* monoClass);
 
   /// \brief Returns property visibility in the class.
   /// If getter/setter methods have different visibility, the more restrictive one is returned.

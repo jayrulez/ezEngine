@@ -1,30 +1,26 @@
+//************************************ bs::framework - Copyright 2018 Marko Pintera **************************************//
+//*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
+
 // https://www.mono-project.com/docs/advanced/embedding/
 #include <MonoPlugin/Mono/MonoAssembly.h>
-#include <MonoPlugin/MonoManager.h>
+#include <MonoPlugin/Mono/MonoManager.h>
 #include <MonoPluginPCH.h>
 
+#include "..\MonoManager.h"
 #include <mono/jit/jit.h>
 #include <mono/jit/mono-private-unstable.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/class.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/threads.h>
-#include "..\MonoManager.h"
 
 EZ_IMPLEMENT_SINGLETON(ezMonoManager);
 
-ezMonoManager::ezMonoManager()
+ezMonoManager::ezMonoManager(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies)
   : m_SingletonRegistrar(this)
   , m_bIsInitialized(false)
   , m_pRootDomain(nullptr)
-{
-}
-
-ezMonoManager::~ezMonoManager()
-{
-}
-
-void ezMonoManager::Startup(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies)
+  , m_pCoreLibAssembly(nullptr)
 {
   if (m_bIsInitialized)
     return;
@@ -63,6 +59,11 @@ void ezMonoManager::Startup(const ezArrayMap<ezString, ezString>& trustedPlatfor
   m_Assemblies[m_pCoreLibAssembly->GetName()] = m_pCoreLibAssembly;
 
   m_bIsInitialized = true;
+}
+
+ezMonoManager::~ezMonoManager()
+{
+  Shutdown();
 }
 
 void ezMonoManager::Shutdown()
@@ -115,6 +116,32 @@ ezMonoAssembly* ezMonoManager::LoadAssembly(const ezString& path, const ezString
   }
 
   return assembly;
+}
+
+ezMonoClass* ezMonoManager::FindClass(const ezString& classNamespace, const ezString& typeName)
+{
+  ezMonoClass* monoClass = nullptr;
+  for (auto& assembly : m_Assemblies)
+  {
+    monoClass = assembly.value->GetClass(classNamespace, typeName);
+    if (monoClass != nullptr)
+      return monoClass;
+  }
+
+  return nullptr;
+}
+
+ezMonoClass* ezMonoManager::FindClass(MonoClass* monoClass)
+{
+  ezMonoClass* ezMonoClass = nullptr;
+  for (auto& assembly : m_Assemblies)
+  {
+    ezMonoClass = assembly.value->GetClass(monoClass);
+    if (ezMonoClass != nullptr)
+      return ezMonoClass;
+  }
+
+  return nullptr;
 }
 
 

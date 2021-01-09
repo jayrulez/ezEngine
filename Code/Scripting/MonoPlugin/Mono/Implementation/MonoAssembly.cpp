@@ -1,9 +1,10 @@
-#include "..\MonoAssembly.h"
+//************************************ bs::framework - Copyright 2018 Marko Pintera **************************************//
+//*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #include <Foundation/IO/FileSystem/FileReader.h>
 #include <MonoPlugin/Mono/MonoAssembly.h>
 #include <MonoPlugin/Mono/MonoClass.h>
 #include <MonoPlugin/Mono/MonoUtil.h>
-#include <MonoPlugin/MonoManager.h>
+#include <MonoPlugin/Mono/MonoManager.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/mono-debug.h>
@@ -340,9 +341,7 @@ bool ezMonoAssembly::IsGenericClass(const ezString& name) const
 {
   // By CIL convention generic classes have ` separating their name and
   // number of generic parameters
-  auto iterFind = std::find(rbegin(name), rend(name), '`');
-
-  return iterFind != rend(name);
+  return name.FindSubString("`") != nullptr;
 }
 
 EZ_STATICLINK_FILE(MonoPlugin, MonoPlugin_Mono_Implementation_MonoAssembly);

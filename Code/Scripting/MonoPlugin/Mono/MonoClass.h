@@ -1,3 +1,5 @@
+//************************************ bs::framework - Copyright 2018 Marko Pintera **************************************//
+//*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
 #include <MonoPlugin/MonoPluginDLL.h>
@@ -20,9 +22,9 @@ public:
     {
     }
 
-    bool operator==(const ezMonoClass::MethodId& other) const;
-    bool operator!=(const ezMonoClass::MethodId& other) const;
-    bool operator<(const ezMonoClass::MethodId& other) const;
+    bool operator==(const MethodId& other) const;
+    bool operator!=(const MethodId& other) const;
+    bool operator<(const MethodId& other) const;
     ezUInt32 GetHashCode() const;
   };
 
@@ -85,7 +87,7 @@ private:
   ezString m_TypeName;
   ezString m_FullName;
 
-  mutable ezArrayMap<ezString, ezMonoMethod*> m_Methods;
+  mutable ezArrayMap<MethodId, ezMonoMethod*> m_Methods;
   mutable ezArrayMap<ezString, ezMonoField*> m_Fields;
   mutable ezArrayMap<ezString, ezMonoProperty*> m_Properties;
 

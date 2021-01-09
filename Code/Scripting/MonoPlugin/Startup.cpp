@@ -4,7 +4,7 @@
 #include <Foundation/Configuration/Plugin.h>
 #include <Foundation/Configuration/Startup.h>
 #include <Foundation/Types/UniquePtr.h>
-#include <MonoPlugin/MonoManager.h>
+#include <MonoPlugin/Mono/MonoManager.h>
 
 static ezUniquePtr<ezMonoManager> s_MonoManager;
 
@@ -20,11 +20,10 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(Scripting, MonoPlugin)
     const char* appDir = ezOSFile::GetApplicationDirectory();
     const ezStringView assembliesDir = ezPathUtils::GetFileDirectory(appDir);
 
-    s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager);
     ezArrayMap<ezString, ezString> trustedPlatformAssemblies;
     trustedPlatformAssemblies["ezEngine.Managed"] = "ezEngine.Managed.dll";
-
-    ezMonoManager::GetSingleton()->Startup(trustedPlatformAssemblies);
+    
+    s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager, trustedPlatformAssemblies);
     //ezMonoManager::GetSingleton()->LoadAssembly("", "");
   }
 
