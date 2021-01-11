@@ -69,11 +69,21 @@ void OnMonoPrintErrorCallback(const char* string, mono_bool isStdout)
   ezLog::Error("Mono error: {0}", string);
 }
 
-ezMonoManager::ezMonoManager(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies)
+ezMonoManager::ezMonoManager()
   : m_SingletonRegistrar(this)
   , m_bIsInitialized(false)
   , m_pRootDomain(nullptr)
+  //, m_pScriptDomain(nullptr)
   , m_pCoreLibAssembly(nullptr)
+{
+}
+
+ezMonoManager::~ezMonoManager()
+{
+  UnloadAll();
+}
+
+void ezMonoManager::Initialize(const ezArrayMap<ezString, ezString>& trustedPlatformAssemblies)
 {
   if (m_bIsInitialized)
     return;
@@ -144,27 +154,30 @@ ezMonoManager::ezMonoManager(const ezArrayMap<ezString, ezString>& trustedPlatfo
   m_bIsInitialized = true;
 }
 
-ezMonoManager::~ezMonoManager()
-{
-  Shutdown();
-}
-
-void ezMonoManager::Shutdown()
+void ezMonoManager::UnloadAll()
 {
   if (m_bIsInitialized)
   {
     for (auto& assembly : m_Assemblies)
     {
+      assembly.value->Unload();
       EZ_DEFAULT_DELETE(assembly.value);
     }
 
     m_Assemblies.Clear();
+
+    UnloadScriptDomain();
 
     if (m_pRootDomain)
     {
       mono_jit_cleanup(m_pRootDomain);
       m_pRootDomain = nullptr;
     }
+
+    // Make sure to explicitly clear this meta-data, as it contains structures allocated from other dynamic libraries,
+    // which will likely get unloaded right after shutdown
+    m_ScriptMetaData.Clear();
+
     m_bIsInitialized = false;
   }
 }
@@ -183,6 +196,22 @@ ezMonoAssembly* ezMonoManager::LoadAssembly(const ezString& path, const ezString
 {
   ezMonoAssembly* assembly = nullptr;
 
+  //if (m_pScriptDomain == nullptr)
+  //{
+  //  m_pScriptDomain = mono_domain_create();
+  //  if (m_pScriptDomain == nullptr)
+  //  {
+  //    EZ_REPORT_FAILURE("Failed to create script domain.");
+  //    return nullptr;
+  //  }
+
+  //  if (!mono_domain_set(m_pScriptDomain, true))
+  //  {
+  //    EZ_REPORT_FAILURE("Failed to set script domain.");
+  //    return nullptr;
+  //  }
+  //}
+
   ezUInt32 index = m_Assemblies.Find(name);
   if (index != ezInvalidIndex)
   {
@@ -197,6 +226,7 @@ ezMonoAssembly* ezMonoManager::LoadAssembly(const ezString& path, const ezString
   if (!assembly->m_bIsLoaded)
   {
     assembly->Load();
+    InitializeScriptTypes(*assembly);
   }
 
   return assembly;
@@ -226,6 +256,81 @@ ezMonoClass* ezMonoManager::FindClass(MonoClass* monoClass)
   }
 
   return nullptr;
+}
+
+void ezMonoManager::UnloadScriptDomain()
+{
+  //if (m_pScriptDomain != nullptr)
+  //{
+  //  mono_domain_set(mono_get_root_domain(), true);
+
+  //  MonoObject* exception = nullptr;
+  //  mono_domain_unload(m_pScriptDomain/*, &exception*/);
+
+  //  if (exception != nullptr)
+  //    ezMonoUtil::ThrowIfException(exception);
+
+  //  m_pScriptDomain = nullptr;
+  //}
+
+  for (auto& assemblyEntry : m_Assemblies)
+  {
+    assemblyEntry.value->Unload();
+
+    // CoreLib assembly persists domain unload since it's in the root domain. However we make sure to clear its
+    // class list as it could contain generic instances that use types from other assemblies.
+
+    //if (ezStringUtils::IsEqual(assemblyEntry.key, m_pCoreLibAssembly->GetName()) != 0)
+    //  EZ_DEFAULT_DELETE(assemblyEntry.value);
+
+    // Metas hold references to various assembly objects that were just deleted, so clear them
+    ezDynamicArray<ScriptMetaInfo>& typeMetas = m_ScriptMetaData[assemblyEntry.key];
+    for (auto& entry : typeMetas)
+    {
+      entry.m_MetaData->m_ScriptClass = nullptr;
+      entry.m_MetaData->m_ScriptClass = nullptr;
+    }
+  }
+
+  m_Assemblies.Clear();
+  //m_Assemblies[m_pCoreLibAssembly->GetName()] = m_pCoreLibAssembly;
+}
+
+void ezMonoManager::RegisterScriptType(ezScriptMeta* metaData, const ezScriptMeta& localMetaData)
+{
+  if (m_bIsInitialized)
+  {
+    EZ_REPORT_FAILURE("RegisterScriptType cannot be called after the runtime is already initialized.");
+    return;
+  }
+
+  ezDynamicArray<ScriptMetaInfo>& mMetas = m_ScriptMetaData[localMetaData.m_Assembly];
+  mMetas.PushBack({metaData, localMetaData});
+}
+
+void ezMonoManager::InitializeScriptTypes(ezMonoAssembly& assembly)
+{
+  // Fully initialize all types that use this assembly
+  ezDynamicArray<ScriptMetaInfo>& typeMetas = m_ScriptMetaData[assembly.m_Name];
+  for (auto& entry : typeMetas)
+  {
+    ezScriptMeta* meta = entry.m_MetaData;
+    *meta = entry.m_LocalMetaData;
+
+    meta->m_ScriptClass = assembly.GetClass(meta->m_Namespace, meta->m_Name);
+    if (meta->m_ScriptClass == nullptr)
+    {
+      EZ_REPORT_FAILURE("Unable to find class of type: '{0}::{1}'", meta->m_Namespace, meta->m_Name);
+      return;
+    }
+
+    if (meta->m_ScriptClass->HasField("mNativeInstance"))
+      meta->m_NativeInstance = meta->m_ScriptClass->GetField("mNativeInstance");
+    else
+      meta->m_NativeInstance = nullptr;
+
+    meta->m_InitCallback();
+  }
 }
 
 

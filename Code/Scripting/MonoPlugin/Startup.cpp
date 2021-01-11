@@ -4,10 +4,10 @@
 #include <Foundation/Configuration/Plugin.h>
 #include <Foundation/Configuration/Startup.h>
 #include <Foundation/Types/UniquePtr.h>
-#include <MonoPlugin/Mono/MonoManager.h>
 #include <MonoPlugin/Mono/MonoAssembly.h>
 #include <MonoPlugin/Mono/MonoClass.h>
 #include <MonoPlugin/Mono/MonoField.h>
+#include <MonoPlugin/Mono/MonoManager.h>
 #include <MonoPlugin/Mono/MonoProperty.h>
 
 static ezUniquePtr<ezMonoManager> s_MonoManager;
@@ -21,14 +21,19 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(Scripting, MonoPlugin)
 
   ON_CORESYSTEMS_STARTUP
   {
+    s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager);
+
     const char* appDir = ezOSFile::GetApplicationDirectory();
-    const ezStringView assembliesDir = ezPathUtils::GetFileDirectory(appDir);
+    //ezStringBuilder assembliesDir = ezPathUtils::GetFileDirectory(appDir);
+    ezStringBuilder assembliesDir(appDir, "Assemblies/net5.0/");
 
     ezArrayMap<ezString, ezString> trustedPlatformAssemblies;
-    trustedPlatformAssemblies["ezEngine.Managed"] = "E:\\dev\\ez2\\Output\\Bin\\WinVs2019Debug64\\Assemblies\\net5.0\\ezEngine.Managed.dll";
-    
-    s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager, trustedPlatformAssemblies);
-    auto assembly = ezMonoManager::GetSingleton()->LoadAssembly("E:\\dev\\ez2\\Output\\Bin\\WinVs2019Debug64\\Assemblies\\net5.0\\ezEngine.Managed.dll", "ezEngine.Managed");
+    ezStringBuilder engineAssemblyPath = ezStringBuilder(assembliesDir, "ezEngine.Managed.dll");
+    engineAssemblyPath.MakePathSeparatorsNative();
+    trustedPlatformAssemblies["ezEngine.Managed"] = engineAssemblyPath;
+    ezMonoManager::GetSingleton()->Initialize(trustedPlatformAssemblies);
+
+    auto assembly = ezMonoManager::GetSingleton()->LoadAssembly(engineAssemblyPath, "ezEngine.Managed");
     auto classes = assembly->GetAllClasses();
     auto klass = assembly->GetClass("ezEngine.Managed", "Class1");
     auto fields = klass->GetAllFields();
@@ -41,7 +46,7 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(Scripting, MonoPlugin)
 
   ON_CORESYSTEMS_SHUTDOWN
   {
-    ezMonoManager::GetSingleton()->Shutdown();
+    //ezMonoManager::GetSingleton()->UnloadAll();
     s_MonoManager.Clear();
   }
 
