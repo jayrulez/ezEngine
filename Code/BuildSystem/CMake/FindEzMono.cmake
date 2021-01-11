@@ -15,6 +15,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(MONO_BIN_PATH "${EZ_MONO_DIR}/bin")
   set(MONO_LIB_PATH "${EZ_MONO_DIR}/lib")
   set(MONO_CORELIB_PATH "${EZ_MONO_DIR}/System.Private.CoreLib")
+  set(MONO_RUNTIME_PATH "${EZ_MONO_DIR}/runtime")
 else()
   find_path(EZ_MONO_DIR "include/mono-2.0/mono/jit/mono-private-unstable.h"
     PATHS
@@ -23,6 +24,7 @@ else()
   set(MONO_BIN_PATH "${EZ_MONO_DIR}/bin")
   set(MONO_LIB_PATH "${EZ_MONO_DIR}/lib")
   set(MONO_CORELIB_PATH "${EZ_MONO_DIR}/System.Private.CoreLib")
+  set(MONO_RUNTIME_PATH "${EZ_MONO_DIR}/runtime")
 endif()
 
 include(FindPackageHandleStandardArgs)
@@ -34,12 +36,11 @@ if (EZMONO_FOUND)
 	set_target_properties(EzMono::EzMono PROPERTIES IMPORTED_IMPLIB "${MONO_LIB_PATH}/monosgen-2.0.import.lib")
 	set_target_properties(EzMono::EzMono PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${EZ_MONO_DIR}/include/mono-2.0/")
 	
-	set(EZ_MONO_CORELIB_FILES
-	  ${MONO_CORELIB_PATH}/System.Private.CoreLib.deps.json
-	  ${MONO_CORELIB_PATH}/System.Private.CoreLib.dll
-	  ${MONO_CORELIB_PATH}/System.Private.CoreLib.pdb
-	  ${MONO_CORELIB_PATH}/System.Private.CoreLib.xml
-	)
+	file(GLOB EZ_MONO_RUNTIME_DIR ${MONO_RUNTIME_PATH})
+	file(GLOB EZ_MONO_CORELIB_DIR ${MONO_CORELIB_PATH})
+	
+	file(GLOB EZ_MONO_RUNTIME_FILES ${MONO_RUNTIME_PATH}/*.*)
+	file(GLOB EZ_MONO_CORELIB_FILES ${MONO_CORELIB_PATH}/*.*)
 endif()
 
 mark_as_advanced(FORCE EZ_MONO_DIR)
@@ -47,3 +48,4 @@ mark_as_advanced(FORCE EZ_MONO_DIR)
 unset (MONO_BIN_PATH)
 unset (MONO_LIB_PATH)
 unset (MONO_CORELIB_PATH)
+unset (MONO_RUNTIME_PATH)

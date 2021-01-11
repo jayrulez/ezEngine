@@ -16,11 +16,12 @@ foreach(EXCLUDE_FILE ${EXCLUDE_FILES})
 endforeach()
 
 
-set(EZ_MANAGED_ASSEMBLY_COMPILE_FILES "")
-file(GLOB_RECURSE CSHARP_FILES "*.cs")
-foreach(CSHARP_FILE ${CSHARP_FILES})
-  string(APPEND EZ_MANAGED_ASSEMBLY_COMPILE_FILES "    <Compile Include=\"${CSHARP_FILE}\" />\n")
-endforeach()
+#set(EZ_MANAGED_ASSEMBLY_COMPILE_FILES "")
+#file(GLOB_RECURSE CSHARP_FILES "*.cs")
+#foreach(CSHARP_FILE ${CSHARP_FILES})
+#  string(APPEND EZ_MANAGED_ASSEMBLY_COMPILE_FILES "    <Compile Include=\"${CSHARP_FILE}\" />\n")
+#endforeach()
+set(EZ_MANAGED_ASSEMBLY_COMPILE_FILES "    <Compile Include=\"${CMAKE_CURRENT_SOURCE_DIR}/**/*.cs\" />")
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	set(EZ_MANAGED_PROJECT_CONFIG Debug)

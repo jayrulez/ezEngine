@@ -5,6 +5,7 @@
 
 #include <MonoPlugin/MonoPluginDLL.h>
 #include <MonoPlugin/MonoPluginPCH.h>
+#include <MonoPlugin/Mono/Declarations.h>
 
 class EZ_MONOPLUGIN_DLL ezMonoField
 {

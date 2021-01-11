@@ -4,6 +4,7 @@
 
 #include <MonoPlugin/MonoPluginDLL.h>
 #include <MonoPlugin/MonoPluginPCH.h>
+#include <MonoPlugin/Mono/Declarations.h>
 
 class EZ_MONOPLUGIN_DLL ezMonoAssembly
 {
@@ -22,7 +23,6 @@ public:
       , Name(name)
       , GenericInstance(genericInstance)
     {
-
     }
 
     bool operator==(const ClassId& other) const;
@@ -52,20 +52,22 @@ private:
   bool IsGenericClass(const ezString& name) const;
 
 private:
-  MonoAssembly* m_pMonoAssembly;
+
+
+
+  ezString m_Name;
+  const char* m_Path;
   MonoImage* m_pMonoImage;
+  MonoAssembly* m_pMonoAssembly;
+  ezDynamicArray<ezUInt8> m_DebugData;
+  bool m_bIsLoaded;
+  bool m_bIsDependency;
 
   mutable ezArrayMap<ClassId, ezMonoClass*> m_Classes;
   mutable ezArrayMap<MonoClass*, ezMonoClass*> m_ClassesByMonoClass;
 
   mutable bool m_bHasCachedClasses;
   mutable ezDynamicArray<ezMonoClass*> m_CachedClasses;
-
-  ezString m_Name;
-  const char* m_Path;
-  bool m_bIsLoaded;
-  bool m_bIsDependency;
-  ezDynamicArray<ezUInt8> m_DebugData;
 };
 
 template <>

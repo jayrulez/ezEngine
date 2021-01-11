@@ -5,6 +5,7 @@
 #include <Foundation/Configuration/Singleton.h>
 #include <Foundation/Containers/ArrayMap.h>
 #include <MonoPlugin/MonoPluginDLL.h>
+#include <MonoPlugin/Mono/Declarations.h>
 
 class EZ_MONOPLUGIN_DLL ezMonoManager
 {

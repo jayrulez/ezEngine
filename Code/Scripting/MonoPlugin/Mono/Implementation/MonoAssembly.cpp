@@ -3,8 +3,8 @@
 #include <Foundation/IO/FileSystem/FileReader.h>
 #include <MonoPlugin/Mono/MonoAssembly.h>
 #include <MonoPlugin/Mono/MonoClass.h>
-#include <MonoPlugin/Mono/MonoUtil.h>
 #include <MonoPlugin/Mono/MonoManager.h>
+#include <MonoPlugin/Mono/MonoUtil.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/mono-debug.h>
@@ -32,7 +32,8 @@ ezUInt32 ezMonoAssembly::ClassId::GetHashCode() const
 
   hash = ezHashingUtils::xxHash32String(Namespace, hash);
   hash = ezHashingUtils::xxHash32String(Name, hash);
-  hash = ezHashingUtils::xxHash32(GenericInstance, sizeof(GenericInstance), hash);
+  if (GenericInstance)
+    hash = ezHashingUtils::xxHash32(GenericInstance, sizeof(GenericInstance), hash);
 
   return hash;
 }
@@ -69,6 +70,7 @@ void ezMonoAssembly::Load()
   ezDynamicArray<char> assemblyData;
   assemblyData.SetCountUninitialized(assemblySize);
   assemblyStream.ReadBytes(assemblyData.GetData(), assemblyStream.GetFileSize());
+  assemblyStream.Close();
 
   ezString imageName = ezPathUtils::GetFileName(m_Path);
 
@@ -83,18 +85,19 @@ void ezMonoAssembly::Load()
   }
 
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEBUG)
-  ezStringBuilder mdbPath = m_Path;
-  mdbPath.Append(".mdb");
+  ezStringBuilder pdbPath = m_Path;
+  pdbPath.ReplaceLast(".dll", ".pdb");
 
-  if (ezOSFile::ExistsFile(mdbPath))
+  if (ezOSFile::ExistsFile(pdbPath))
   {
-    ezFileReader mdbStream;
-    if (mdbStream.Open(m_Path).Succeeded())
+    ezFileReader pdbStream;
+    if (pdbStream.Open(m_Path).Succeeded())
     {
-      ezUInt32 mdbSize = (ezUInt32)mdbStream.GetFileSize();
-      m_DebugData.SetCountUninitialized(mdbSize);
-      mdbStream.ReadBytes(m_DebugData.GetData(), mdbStream.GetFileSize());
-      mono_debug_open_image_from_memory(image, m_DebugData.GetData(), mdbSize);
+      ezUInt32 pdbSize = (ezUInt32)pdbStream.GetFileSize();
+      m_DebugData.SetCountUninitialized(pdbSize);
+      pdbStream.ReadBytes(m_DebugData.GetData(), pdbStream.GetFileSize());
+      mono_debug_open_image_from_memory(image, m_DebugData.GetData(), pdbSize);
+      pdbStream.Close();
     }
   }
 #endif
@@ -120,7 +123,7 @@ void ezMonoAssembly::Load()
 void ezMonoAssembly::LoadFromImage(MonoImage* image)
 {
   MonoAssembly* monoAssembly = mono_image_get_assembly(image);
-  if (!m_pMonoAssembly)
+  if (!monoAssembly)
   {
     EZ_REPORT_FAILURE("Unable to get assembly from image.");
     return;
@@ -181,6 +184,8 @@ void ezMonoAssembly::Invoke(const ezString& methodName)
 
       ezMonoUtil::ThrowIfException(exception);
     }
+
+    mono_method_desc_free(methodDesc);
   }
 }
 
@@ -280,11 +285,13 @@ const ezDynamicArray<ezMonoClass*>& ezMonoAssembly::GetAllClasses() const
   ezMonoAssembly* coreLib = ezMonoManager::GetSingleton()->GetAssembly("System.Private.CoreLib");
   ezMonoClass* compilerGeneratedAttrib = coreLib->GetClass("System.Runtime.CompilerServices", "CompilerGeneratedAttribute");
 
-  ezInt32 numRows = mono_image_get_table_rows(m_pMonoImage, MONO_TABLE_TYPEDEF);
+  const MonoTableInfo* pTableInfo = mono_image_get_table_info(m_pMonoImage, MONO_TABLE_TYPEDEF);
+  //ezInt32 numRows = mono_image_get_table_rows(m_pMonoImage, MONO_TABLE_TYPEDEF);
+  ezInt32 numRows = mono_table_info_get_rows(pTableInfo);
 
   for (ezInt32 i = 1; i < numRows; i++) // Skip Module
   {
-    MonoClass* monoClass = mono_class_get(m_pMonoImage, (i + 1) | MONO_TOKEN_TYPE_DEF);
+    MonoClass* monoClass = mono_class_get(m_pMonoImage, MONO_TOKEN_TYPE_DEF | (i + 1));
 
     ezString classNamespace;
     ezString type;
@@ -302,7 +309,6 @@ const ezDynamicArray<ezMonoClass*>& ezMonoAssembly::GetAllClasses() const
       while (!todo.IsEmpty())
       {
         ezMonoClass* curNestedClass = todo.PeekBack();
-        todo.PopBack(); //todo:  verify that this is correct
         todo.PopBack();
 
         void* iter = nullptr;

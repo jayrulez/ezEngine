@@ -5,6 +5,10 @@
 #include <Foundation/Configuration/Startup.h>
 #include <Foundation/Types/UniquePtr.h>
 #include <MonoPlugin/Mono/MonoManager.h>
+#include <MonoPlugin/Mono/MonoAssembly.h>
+#include <MonoPlugin/Mono/MonoClass.h>
+#include <MonoPlugin/Mono/MonoField.h>
+#include <MonoPlugin/Mono/MonoProperty.h>
 
 static ezUniquePtr<ezMonoManager> s_MonoManager;
 
@@ -21,10 +25,18 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(Scripting, MonoPlugin)
     const ezStringView assembliesDir = ezPathUtils::GetFileDirectory(appDir);
 
     ezArrayMap<ezString, ezString> trustedPlatformAssemblies;
-    trustedPlatformAssemblies["ezEngine.Managed"] = "ezEngine.Managed.dll";
+    trustedPlatformAssemblies["ezEngine.Managed"] = "E:\\dev\\ez2\\Output\\Bin\\WinVs2019Debug64\\Assemblies\\net5.0\\ezEngine.Managed.dll";
     
     s_MonoManager = EZ_DEFAULT_NEW(ezMonoManager, trustedPlatformAssemblies);
-    //ezMonoManager::GetSingleton()->LoadAssembly("", "");
+    auto assembly = ezMonoManager::GetSingleton()->LoadAssembly("E:\\dev\\ez2\\Output\\Bin\\WinVs2019Debug64\\Assemblies\\net5.0\\ezEngine.Managed.dll", "ezEngine.Managed");
+    auto classes = assembly->GetAllClasses();
+    auto klass = assembly->GetClass("ezEngine.Managed", "Class1");
+    auto fields = klass->GetAllFields();
+    auto properties = klass->GetAllProperties();
+    auto methods = klass->GetAllMethods();
+    auto attributes = klass->GetAllAttributes();
+
+    assembly->Invoke("Class1::HelloWorld");
   }
 
   ON_CORESYSTEMS_SHUTDOWN

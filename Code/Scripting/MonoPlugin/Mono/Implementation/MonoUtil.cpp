@@ -109,6 +109,7 @@ void ezMonoUtil::ThrowIfException(MonoObject* exception)
     MonoString* exceptionStackTrace = (MonoString*)mono_runtime_invoke(exceptionStackGetter, exception, nullptr, nullptr);
 
     // Note: If you modify this format make sure to also modify Log.ParseExceptionMessage in managed code.
+    // Todo: parse error and attribute it to mono
     ezLog::Error("Managed exception: {0}\n{1}", MonoToString(exceptionMsg), MonoToString(exceptionStackTrace));
   }
 }
