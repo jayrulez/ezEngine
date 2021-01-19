@@ -74,14 +74,32 @@ ez_create_target(LIBRARY ${PROJECT_NAME} NO_EZ_PREFIX SOURCE_FILES
     src/module.c
 	  src/profile.c
     ${std_srcs}
-    )
+)
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT)
+#set_target_properties(${PROJECT_NAME}
+#    PROPERTIES
+#    VERSION ${HL_VERSION}
+#    SOVERSION ${HL_VERSION_MAJOR}
+#    COMPILE_DEFINITIONS "_USRDLL;LIBHL_EXPORTS"
+#)
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/include/pcre")
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src")
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/std")
+target_compile_definitions(${PROJECT_NAME}
+  PUBLIC
+    BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
+    _USRDLL
+    LIBHL_EXPORTS
+    VERSION=${HL_VERSION}
+    SOVERSION=${HL_VERSION_MAJOR}
+)
+
+target_include_directories(${PROJECT_NAME}
+  PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/include/pcre"
+  PUBLIC
+    "${CMAKE_CURRENT_LIST_DIR}/include"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+    "${CMAKE_CURRENT_LIST_DIR}/src/std"
+)
 
 # force Unicode over Multi-byte
 if(MSVC)
@@ -94,13 +112,6 @@ endif()
 #    include
 #    include/pcre
 #)
-
-set_target_properties(${PROJECT_NAME}
-    PROPERTIES
-    VERSION ${HL_VERSION}
-    SOVERSION ${HL_VERSION_MAJOR}
-    COMPILE_DEFINITIONS "_USRDLL;LIBHL_EXPORTS"
-)
 
 if(EZ_CMAKE_PLATFORM_WINDOWS)
     target_link_libraries(${PROJECT_NAME} ws2_32 user32)
