@@ -1,0 +1,13 @@
+{
+  "Registrations": [
+    {
+      "component": {
+        "type": "git",
+        "git": {
+          "repositoryUrl": "https://github.com/HaxeFoundation/hashlink",
+          "commitHash": "7bc2785aabfd7439e5036055cb2276c596e66735"
+        }
+      }
+    } 
+  ]
+}

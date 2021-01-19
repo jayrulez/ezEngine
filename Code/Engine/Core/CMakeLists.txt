@@ -37,3 +37,9 @@ if (EZ_3RDPARTY_DUKTAPE_SUPPORT)
   )
 
 endif()
+
+if (EZ_3RDPARTY_HASHLINK_SUPPORT)
+
+  ez_link_target_hashlink(${PROJECT_NAME})
+
+endif()
