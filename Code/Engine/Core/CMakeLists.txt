@@ -40,6 +40,9 @@ endif()
 
 if (EZ_3RDPARTY_HASHLINK_SUPPORT)
 
-  ez_link_target_hashlink(${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    HashLink
+  )
 
 endif()

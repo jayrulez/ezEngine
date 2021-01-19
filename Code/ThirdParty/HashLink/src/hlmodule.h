@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#include <hl.h>
+#include <HashLink/src/hl.h>
 #include "opcodes.h"
 
 typedef struct {

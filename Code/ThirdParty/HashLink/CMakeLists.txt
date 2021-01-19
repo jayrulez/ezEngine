@@ -1,0 +1,109 @@
+ez_cmake_init()
+
+ez_build_filter_runtime()
+
+ez_requires(EZ_3RDPARTY_HASHLINK_SUPPORT)
+
+set(HL_VERSION_MAJOR 1)
+set(HL_VERSION_MINOR 12)
+set(HL_VERSION_PATCH 0)
+set(HL_VERSION ${HL_VERSION_MAJOR}.${HL_VERSION_MINOR}.${HL_VERSION_PATCH})
+
+# Get the name of this folder as the project name
+get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME_WE)
+
+file(GLOB hl_headers
+    src/*.h
+)
+
+file(GLOB pcre_srcs
+    include/pcre/*.c
+)
+file(GLOB std_srcs
+    src/std/*.h
+    src/std/array.c
+    src/std/buffer.c
+    src/std/bytes.c
+    src/std/cast.c
+    src/std/date.c
+    src/std/error.c
+    src/std/file.c
+    src/std/fun.c
+    src/std/maps.c
+    src/std/math.c
+    src/std/obj.c
+    src/std/random.c
+    src/std/regexp.c
+    src/std/socket.c
+    src/std/string.c
+    src/std/sys.c
+    src/std/track.c
+    src/std/types.c
+    src/std/ucs2.c
+    src/std/thread.c
+    src/std/process.c
+)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    list(APPEND std_srcs
+        include/mdbg/mdbg.c
+        include/mdbg/mach_excServer.c
+        include/mdbg/mach_excUser.c
+    )
+endif()
+
+if(ANDROID)
+    list(APPEND std_srcs
+        src/std/sys_android.c
+    )
+endif()
+
+if(IOS_PLATFORM)
+    list(APPEND std_srcs
+        src/std/sys_ios.m
+   )
+endif()
+
+ez_create_target(LIBRARY ${PROJECT_NAME} NO_EZ_PREFIX SOURCE_FILES
+    ${pcre_srcs}
+    ${hl_headers}
+    src/code.c
+    src/debugger.c
+    src/gc.c
+    src/jit.c
+    src/module.c
+	  src/profile.c
+    ${std_srcs}
+    )
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT)
+
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/include/pcre")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/std")
+
+# force Unicode over Multi-byte
+if(MSVC)
+  add_definitions(-DUNICODE -D_UNICODE)
+	target_compile_options(${PROJECT_NAME} PRIVATE /W0 /WX-)
+endif()
+
+#include_directories(
+#    src
+#    include
+#    include/pcre
+#)
+
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+    VERSION ${HL_VERSION}
+    SOVERSION ${HL_VERSION_MAJOR}
+    COMPILE_DEFINITIONS "_USRDLL;LIBHL_EXPORTS"
+)
+
+if(EZ_CMAKE_PLATFORM_WINDOWS)
+    target_link_libraries(${PROJECT_NAME} ws2_32 user32)
+else()
+    target_link_libraries(${PROJECT_NAME} m dl pthread)
+endif()
