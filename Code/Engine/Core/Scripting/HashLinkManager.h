@@ -5,22 +5,14 @@
 #include <Foundation/Logging/Log.h>
 #include <Foundation/Strings/String.h>
 #include <Foundation/Time/Timestamp.h>
+
 #include <HashLink/src/hl.h>
+extern "C"
+{
 #include <HashLink/src/hlmodule.h>
+}
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
-
-
-struct ezHLContext
-{
-  EZ_DECLARE_POD_TYPE();
-
-  hl_code* code;
-  hl_module* module;
-  vdynamic* ret;
-  const char* filePath;
-  ezTimestamp fileModifiedTime;
-};
 
 class EZ_CORE_DLL ezHashLinkManager
 {
@@ -29,13 +21,22 @@ class EZ_CORE_DLL ezHashLinkManager
 public:
   ezHashLinkManager();
   ~ezHashLinkManager();
-  void Startup();
+  void Startup(ezString file, bool debugWait = false);
   void Shutdown();
-  ezResult RunModule(const char* modulePath, bool hotReload = false, bool debug = false);
+  ezResult Run();
+  void Test();
+
+private:
+  friend static bool CheckReload(ezHashLinkManager* pHashLinkManager);
 
 private:
   bool m_Initialized;
-  ezDynamicArray<ezHLContext> m_pContexts;
+  hl_code* m_pCode;
+  hl_module* m_pModule;
+  ezString m_File;
+  ezTimestamp m_FileModifiedTime;
+  ezInt32 m_DebugPort;
+  bool m_bEnableHotReload;
 };
 
 #endif

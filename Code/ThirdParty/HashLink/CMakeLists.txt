@@ -4,13 +4,15 @@ ez_build_filter_runtime()
 
 ez_requires(EZ_3RDPARTY_HASHLINK_SUPPORT)
 
+#set(DEFAULT_CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ${CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS})
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 set(HL_VERSION_MAJOR 1)
 set(HL_VERSION_MINOR 12)
 set(HL_VERSION_PATCH 0)
 set(HL_VERSION ${HL_VERSION_MAJOR}.${HL_VERSION_MINOR}.${HL_VERSION_PATCH})
 
-# Get the name of this folder as the project name
-get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME_WE)
+set (PROJECT_NAME "libhl")
 
 file(GLOB hl_headers
     src/*.h
@@ -67,13 +69,21 @@ endif()
 ez_create_target(LIBRARY ${PROJECT_NAME} NO_EZ_PREFIX SOURCE_FILES
     ${pcre_srcs}
     ${hl_headers}
+    src/gc.c
     src/code.c
     src/debugger.c
-    src/gc.c
     src/jit.c
     src/module.c
 	  src/profile.c
     ${std_srcs}
+)
+
+set(EZ_HASHLINK_IMP_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/code.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/debugger.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/jit.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module.c
+	  ${CMAKE_CURRENT_SOURCE_DIR}/src/profile.c
 )
 
 #set_target_properties(${PROJECT_NAME}
@@ -96,7 +106,6 @@ target_include_directories(${PROJECT_NAME}
   PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/include/pcre"
   PUBLIC
-    "${CMAKE_CURRENT_LIST_DIR}/include"
     "${CMAKE_CURRENT_LIST_DIR}/src"
     "${CMAKE_CURRENT_LIST_DIR}/src/std"
 )
@@ -118,3 +127,5 @@ if(EZ_CMAKE_PLATFORM_WINDOWS)
 else()
     target_link_libraries(${PROJECT_NAME} m dl pthread)
 endif()
+
+#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ${DEFAULT_CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS})

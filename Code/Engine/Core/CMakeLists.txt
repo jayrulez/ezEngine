@@ -42,7 +42,7 @@ if (EZ_3RDPARTY_HASHLINK_SUPPORT)
 
   target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    HashLink
+    libhl
   )
 
 endif()

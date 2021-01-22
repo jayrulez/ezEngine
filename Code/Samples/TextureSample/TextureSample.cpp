@@ -32,6 +32,8 @@
 #include <RendererFoundation/Device/SwapChain.h>
 #include <Texture/Image/ImageConversion.h>
 
+#include <Core/Scripting/HashLinkManager.h>
+
 // Constant buffer definition is shared between shader code and C++
 #include <RendererCore/../../../Data/Samples/TextureSample/Shaders/SampleConstantBuffer.h>
 
@@ -182,6 +184,10 @@ public:
       EZ_VERIFY(m_pDevice->Init() == EZ_SUCCESS, "Device init failed!");
 
       ezGALDevice::SetDefaultDevice(m_pDevice);
+
+      m_pHashLink = EZ_DEFAULT_NEW(ezHashLinkManager);
+      ezHashLinkManager::GetSingleton()->Startup("E:\\dev\\HaxeProjects\\test2\\New Project\\bin\\NewProject.hl");
+      ezHashLinkManager::GetSingleton()->Run().IgnoreResult();
     }
 
     // now that we have a window and device, tell the engine to initialize the rendering infrastructure
@@ -274,6 +280,7 @@ public:
 
   Execution Run() override
   {
+    ezHashLinkManager::GetSingleton()->Test();
     m_pWindow->ProcessWindowMessages();
 
     if (m_pWindow->m_bCloseRequested || ezInputManager::GetInputActionState("Main", "CloseApp") == ezKeyState::Pressed)
@@ -482,6 +489,7 @@ private:
   ezMeshBufferResourceHandle m_hQuadMeshBuffer;
 
   ezVec2 m_vCameraPosition;
+  ezUniquePtr<ezHashLinkManager> m_pHashLink;
 };
 
 ezResourceLoadData CustomTextureResourceLoader::OpenDataStream(const ezResource* pResource)
