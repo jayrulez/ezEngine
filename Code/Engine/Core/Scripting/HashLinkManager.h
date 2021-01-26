@@ -25,6 +25,7 @@ public:
   void Shutdown();
   ezResult Run();
   void Test();
+  void Test2();
 
 private:
   friend static bool CheckReload(ezHashLinkManager* pHashLinkManager);

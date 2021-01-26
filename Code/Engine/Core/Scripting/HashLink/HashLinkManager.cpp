@@ -213,7 +213,7 @@ void ezHashLinkManager::Test()
 {
   for (ezInt32 i = 0; i < m_pModule->code->ntypes; i++)
   {
-    hl_type* type = m_pModule->code->types+i;
+    hl_type* type = m_pModule->code->types + i;
 
     if (type->kind != HOBJ)
       continue;
@@ -285,6 +285,47 @@ void ezHashLinkManager::Test()
       //{
       //  void* method = rt->methods+j;
       //}
+    }
+  }
+}
+
+void ezHashLinkManager::Test2()
+{
+  for (ezInt32 i = 0; i < m_pModule->code->ntypes; i++)
+  {
+    hl_type* type = m_pModule->code->types + i;
+
+    if (type->kind != HOBJ)
+      continue;
+
+    auto testClass = USTR("test2x.TestClass");
+    if (ucmp(type->obj->name, testClass) == 0)
+    {
+      vdynamic* global = *(vdynamic**)type->obj->global_value;
+      vdynamic* globalObj = hl_alloc_obj(global->t);
+      vdynamic* obj = hl_alloc_obj(type);
+
+      int ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
+      hl_field_lookup* ctorField = obj_resolve_field(globalObj->t->obj, ctorHash);
+      if (ctorField)
+      {
+        vdynamic* c = (vdynamic*)hl_dyn_getp(globalObj, ctorField->hashed_name, &hlt_dyn);
+
+        vclosure* cl = (vclosure*)c;
+
+        //vdynamic* vargs[1] = {obj};
+        //hl_dyn_call(cl, vargs, 1);
+
+        ((void (*)(vdynamic*))cl->fun)(obj); // this calls the constructor
+      }
+
+      int hfield = hl_hash_gen(USTR("execute"), false);
+      hl_field_lookup* f = hl_lookup_find(type->obj->rt->lookup, type->obj->rt->nlookup, hfield);
+      if (f)
+      {
+        vdynamic* ret = nullptr;
+        hl_dyn_call_obj(obj, f->t, hfield, nullptr, ret);
+      }
     }
   }
 }
