@@ -1,0 +1,13 @@
+{
+  "Registrations": [
+    {
+      "component": {
+        "type": "git",
+        "git": {
+          "repositoryUrl": "https://github.com/codecat/angelscript-mirror",
+          "commitHash": "b81c48fd7b15f90218677eb4d8f8a1ce862c80b8"
+        }
+      }
+    } 
+  ]
+}
