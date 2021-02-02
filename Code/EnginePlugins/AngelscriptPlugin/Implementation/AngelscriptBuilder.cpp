@@ -86,7 +86,7 @@ ezInt32 ezAngelscriptBuilder::AddSectionFromFile(const char* filename)
 
   if (IncludeIfNotAlreadyIncluded(fullpath.GetData()))
   {
-    int r = LoadScriptSection(fullpath.GetData());
+    ezInt32 r = LoadScriptSection(fullpath.GetData());
     if (r < 0)
       return r;
     else
@@ -100,7 +100,7 @@ ezInt32 ezAngelscriptBuilder::AddSectionFromMemory(const char* sectionName, cons
 {
   if (IncludeIfNotAlreadyIncluded(sectionName))
   {
-    int r = ProcessScriptSection(scriptCode, scriptLength, sectionName, lineOffset);
+    ezInt32 r = ProcessScriptSection(scriptCode, scriptLength, sectionName, lineOffset);
     if (r < 0)
       return r;
     else
@@ -511,7 +511,7 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
         }
 
         // Include the script section
-        int r = AddSectionFromFile(includes[n].GetData());
+        ezInt32 r = AddSectionFromFile(includes[n].GetData());
         if (r < 0)
           return r;
       }

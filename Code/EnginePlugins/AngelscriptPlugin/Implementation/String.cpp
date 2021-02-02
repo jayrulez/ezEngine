@@ -8,9 +8,7 @@ static void ConstructString(ezString* thisPointer)
 
 static void CopyConstructString(const ezString& other, ezString* thisPointer)
 {
-  const char* str = reinterpret_cast<const char*>(&other);
-
-  new (thisPointer) ezString(str);
+  new (thisPointer) ezString(other);
 }
 
 static void DestructString(ezString* thisPointer)
@@ -27,7 +25,6 @@ static ezString& CopyAssignString(const ezString& source, ezString& dest)
 void ezAngelscriptManager::RegisterString(asIScriptEngine* scriptEngine)
 {
   ezInt32 result = 0;
-
 
   // register the string type
   result = scriptEngine->RegisterObjectType("string", sizeof(ezString), asOBJ_VALUE | asGetTypeTraits<ezString>());

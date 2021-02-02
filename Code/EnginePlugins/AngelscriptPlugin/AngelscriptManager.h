@@ -26,10 +26,10 @@ public:
 private:
   static void RegisterString(asIScriptEngine* scriptEngine);
   static void RegisterArray(asIScriptEngine* scriptEngine);
-  static void RegisterCore(asIScriptEngine* scriptEngine);
+  static ezResult RegisterCore(asIScriptEngine* scriptEngine);
 
 private:
-  ezStringFactory* GetStringFactory() const;
+  ezStringFactory* GetStringFactory() const { return m_pStringFactory; }
 
 private:
   bool m_Initialized;
