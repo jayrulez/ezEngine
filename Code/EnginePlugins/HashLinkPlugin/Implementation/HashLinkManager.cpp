@@ -5,9 +5,8 @@
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
 
-
-// Helper functions
-static ezString GetAbsolutePath(const ezString& path);
+#  define HL_MAX_ARGS 9
+#  define HL_MAX_FIELD_LEN 128
 
 HL_PRIM hl_type hlt_array = {HARRAY};
 HL_PRIM hl_type hlt_bytes = {HBYTES};
@@ -21,16 +20,106 @@ HL_PRIM hl_type hlt_void = {HVOID};
 HL_PRIM hl_type hlt_bool = {HBOOL};
 HL_PRIM hl_type hlt_abstract = {HABSTRACT, {USTR("<abstract>")}};
 
-static ezTimestamp GetFileModifiedTime(const char* filePath)
+HL_PRIM vdynamic* hl_obj_get_field(vdynamic* obj, int hfield);
+HL_PRIM vdynamic* hl_call_method(vdynamic* c, varray* args);
+
+// Helper functions
+static ezString GetAbsolutePath(const ezString& path);
+
+static ezTimestamp GetFileModifiedTime(const char* filePath);
+
+// hl helper functions
+
+static hl_field_lookup* obj_resolve_field(hl_type_obj* o, int hfield)
 {
-  ezFileStats stats;
-
-  ezOSFile::GetFileStats(filePath, stats).IgnoreResult();
-
-  return stats.m_LastModificationTime;
+  hl_runtime_obj* rt = o->rt;
+  do
+  {
+    hl_field_lookup* f = hl_lookup_find(rt->lookup, rt->nlookup, hfield);
+    if (f)
+      return f;
+    rt = rt->parent;
+  } while (rt);
+  return NULL;
 }
 
-static hl_code* LoadCode(const char* filePath, char** errorMessage, bool printErrors)
+static vdynamic* dyn_call_constructor(vclosure* c, vdynamic* ctor, vdynamic** args, int nargs)
+{
+  struct
+  {
+    varray a;
+    vdynamic* args[HL_MAX_ARGS + 1];
+  } tmp;
+  vclosure ctmp;
+  int i = 0;
+  if (nargs > HL_MAX_ARGS)
+    hl_error("Too many arguments");
+  tmp.a.t = &hlt_array;
+  tmp.a.at = &hlt_dyn;
+  tmp.a.size = nargs;
+  if (c->hasValue && c->t->fun->nargs >= 0)
+  {
+    ctmp.t = c->t->fun->parent;
+    ctmp.hasValue = 0;
+    ctmp.fun = c->fun;
+    //tmp.args[0] = hl_make_dyn(&c->value, ctmp.t->fun->args[0]);
+    tmp.args[0] = ctor;
+    tmp.a.size++;
+    for (i = 0; i < nargs; i++)
+      tmp.args[i + 1] = args[i];
+    c = &ctmp;
+  }
+  else
+  {
+    for (i = 0; i < nargs; i++)
+      tmp.args[i] = args[i];
+  }
+  return hl_call_method((vdynamic*)c, &tmp.a);
+}
+
+static vdynamic* create_instance(hl_type* type, ...)
+{
+  vdynamic* instMain = hl_alloc_obj(type);
+  if (instMain == nullptr)
+  {
+    ezLog::Error("Failed to allocate instance.");
+    return nullptr;
+  }
+
+  vdynamic* global = *(vdynamic**)type->obj->global_value;
+  vdynamic* instGlobal = hl_alloc_obj(global->t);
+  if (instGlobal == nullptr)
+  {
+    ezLog::Error("Failed to allocate global instance.");
+    return nullptr;
+  }
+
+  ezInt32 ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
+  hl_field_lookup* ctorField = obj_resolve_field(instGlobal->t->obj, ctorHash);
+  if (ctorField == nullptr)
+  {
+    ezLog::Error("Type does not have a constructor.");
+    return nullptr;
+  }
+
+  vclosure* ctor = (vclosure*)hl_obj_get_field(instGlobal, ctorHash);
+
+  ezUInt32 nargs = (ezUInt32)ctor->t->fun->nargs;
+  va_list argPtr;
+  va_start(argPtr, type);
+  vdynamic* args[HL_MAX_ARGS + 1];
+  for (ezUInt32 i = 0; i < nargs; i++)
+  {
+    args[i] = va_arg(argPtr, vdynamic*);
+  }
+  va_end(argPtr);
+
+  dyn_call_constructor((vclosure*)ctor, instMain, args, nargs);
+
+  return instMain;
+}
+
+static hl_code* load_code(const char* filePath, char** errorMessage, bool printErrors)
 {
   hl_code* code = nullptr;
 
@@ -54,7 +143,7 @@ static hl_code* LoadCode(const char* filePath, char** errorMessage, bool printEr
   return code;
 }
 
-static bool CheckReload(ezHashLinkManager* pHashLinkManager)
+static bool check_reload(ezHashLinkManager* pHashLinkManager)
 {
   ezTimestamp time = GetFileModifiedTime(pHashLinkManager->m_File);
   if (time.Compare(pHashLinkManager->m_FileModifiedTime, ezTimestamp::CompareMode::Identical))
@@ -62,7 +151,7 @@ static bool CheckReload(ezHashLinkManager* pHashLinkManager)
 
   char* errorMessage = nullptr;
 
-  hl_code* code = LoadCode(pHashLinkManager->m_File, &errorMessage, false);
+  hl_code* code = load_code(pHashLinkManager->m_File, &errorMessage, false);
   if (code == nullptr)
     return false;
 
@@ -108,7 +197,7 @@ void ezHashLinkManager::Startup(ezString file, bool debugWait)
 
   char* errorMessage = nullptr;
 
-  m_pCode = LoadCode(m_File, &errorMessage, true);
+  m_pCode = load_code(m_File, &errorMessage, true);
   if (m_pCode == nullptr)
   {
     if (errorMessage)
@@ -128,7 +217,7 @@ void ezHashLinkManager::Startup(ezString file, bool debugWait)
   if (m_bEnableHotReload)
   {
     m_FileModifiedTime = GetFileModifiedTime(m_File);
-    hl_setup_reload_check(CheckReload, this);
+    hl_setup_reload_check(check_reload, this);
   }
 
   hl_code_free(m_pCode);
@@ -203,19 +292,6 @@ ezResult ezHashLinkManager::Run()
 //  ezDynamicArray<ezHLField*> m_Fields;
 //  ezDynamicArray<ezHLMethod*> m_Methods;
 //};
-
-static hl_field_lookup* obj_resolve_field(hl_type_obj* o, int hfield)
-{
-  hl_runtime_obj* rt = o->rt;
-  do
-  {
-    hl_field_lookup* f = hl_lookup_find(rt->lookup, rt->nlookup, hfield);
-    if (f)
-      return f;
-    rt = rt->parent;
-  } while (rt);
-  return NULL;
-}
 
 void ezHashLinkManager::Test()
 {
@@ -309,25 +385,9 @@ void ezHashLinkManager::Test2()
     auto testClass = USTR("test2x.TestClass");
     if (ucmp(type->obj->name, testClass) == 0)
     {
-      vdynamic* global = *(vdynamic**)type->obj->global_value;
-      vdynamic* globalObj = hl_alloc_obj(global->t);
-      vdynamic* obj = hl_alloc_obj(type);
+      vdynamic* obj = create_instance(type);
 
-      int ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
-      hl_field_lookup* ctorField = obj_resolve_field(globalObj->t->obj, ctorHash);
-      if (ctorField)
-      {
-        vdynamic* c = (vdynamic*)hl_dyn_getp(globalObj, ctorField->hashed_name, &hlt_dyn);
-
-        vclosure* cl = (vclosure*)c;
-
-        //vdynamic* vargs[1] = {obj};
-        //hl_dyn_call(cl, vargs, 1);
-
-        ((void (*)(vdynamic*))cl->fun)(obj); // this calls the constructor
-      }
-
-      int hfield = hl_hash_gen(USTR("execute"), false);
+      ezInt32 hfield = hl_hash_gen(USTR("execute"), false);
       hl_field_lookup* f = hl_lookup_find(type->obj->rt->lookup, type->obj->rt->nlookup, hfield);
       if (f)
       {
@@ -366,6 +426,15 @@ ezString GetAbsolutePath(const ezString& file)
 
   path.MakeCleanPath();
   return path;
+}
+
+ezTimestamp GetFileModifiedTime(const char* filePath)
+{
+  ezFileStats stats;
+
+  ezOSFile::GetFileStats(filePath, stats).IgnoreResult();
+
+  return stats.m_LastModificationTime;
 }
 
 #endif

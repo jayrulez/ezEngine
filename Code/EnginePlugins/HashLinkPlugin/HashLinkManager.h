@@ -6,11 +6,7 @@
 #include <Foundation/Strings/String.h>
 #include <Foundation/Time/Timestamp.h>
 
-#include <HashLink/src/hl.h>
-extern "C"
-{
-#include <HashLink/src/hlmodule.h>
-}
+#include <Core/Scripting/HashLinkHelper.h>
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
 
@@ -28,7 +24,7 @@ public:
   void Test2();
 
 private:
-  friend static bool CheckReload(ezHashLinkManager* pHashLinkManager);
+  friend static bool check_reload(ezHashLinkManager* pHashLinkManager);
 
 private:
   bool m_Initialized;
