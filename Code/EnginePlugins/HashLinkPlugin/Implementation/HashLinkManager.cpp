@@ -1,9 +1,13 @@
 #include <Core/Scripting/HashLinkHelper.h>
-#include <Core/Scripting/HashLinkManager.h>
+#include <HashLinkPlugin/HashLinkManager.h>
 #include <Foundation/IO/FileSystem/FileReader.h>
 #include <Foundation/IO/OSFile.h>
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
+
+
+// Helper functions
+static ezString GetAbsolutePath(const ezString& path);
 
 HL_PRIM hl_type hlt_array = {HARRAY};
 HL_PRIM hl_type hlt_bytes = {HBYTES};
@@ -31,6 +35,7 @@ static hl_code* LoadCode(const char* filePath, char** errorMessage, bool printEr
   hl_code* code = nullptr;
 
   ezFileReader codeStream;
+
   if (!codeStream.Open(filePath).Succeeded())
   {
     if (printErrors)
@@ -99,7 +104,7 @@ void ezHashLinkManager::Startup(ezString file, bool debugWait)
 
   hl_sys_init((void**)args, 0, (void*)file.GetData());
   hl_register_thread(this);
-  m_File = file;
+  m_File = GetAbsolutePath(file);
 
   char* errorMessage = nullptr;
 
@@ -151,30 +156,33 @@ void ezHashLinkManager::Shutdown()
 
 ezResult ezHashLinkManager::Run()
 {
-  vclosure closure;
-
-  closure.t = m_pCode->functions[m_pModule->functions_indexes[m_pModule->code->entrypoint]].type;
-  closure.fun = m_pModule->functions_ptrs[m_pModule->code->entrypoint];
-  closure.hasValue = 0;
-
-  SetupHandler();
-
-  bool exceptionThrown = false;
-  //hl_profile_setup(1);
-  vdynamic* ret = hl_dyn_call_safe(&closure, nullptr, 0, &exceptionThrown);
-  //hl_profile_end();
-
-  if (exceptionThrown)
+  if (m_Initialized)
   {
-    varray* stack = hl_exception_stack();
-    ezLog::Info("Uncaught exception: {}", hl_to_string(ret));
-    for (ezInt32 index = 0; index < stack->size; index++)
+    vclosure closure;
+
+    closure.t = m_pCode->functions[m_pModule->functions_indexes[m_pModule->code->entrypoint]].type;
+    closure.fun = m_pModule->functions_ptrs[m_pModule->code->entrypoint];
+    closure.hasValue = 0;
+
+    SetupHandler();
+
+    bool exceptionThrown = false;
+    //hl_profile_setup(1);
+    vdynamic* ret = hl_dyn_call_safe(&closure, nullptr, 0, &exceptionThrown);
+    //hl_profile_end();
+
+    if (exceptionThrown)
     {
-      ezLog::Info("Called from {}", hl_aptr(stack, uchar*)[index]);
+      varray* stack = hl_exception_stack();
+      ezLog::Info("Uncaught exception: {}", hl_to_string(ret));
+      for (ezInt32 index = 0; index < stack->size; index++)
+      {
+        ezLog::Info("Called from {}", hl_aptr(stack, uchar*)[index]);
+      }
+      hl_debug_break();
+      hl_global_free();
+      return EZ_FAILURE;
     }
-    hl_debug_break();
-    hl_global_free();
-    return EZ_FAILURE;
   }
 
   return EZ_SUCCESS;
@@ -328,6 +336,36 @@ void ezHashLinkManager::Test2()
       }
     }
   }
+}
+
+ezString GetAbsolutePath(const ezString& file)
+{
+  ezStringBuilder path;
+
+  if (!ezPathUtils::IsAbsolutePath(file))
+  {
+    if (ezFileSystem::ResolveSpecialDirectory(">project", path).Succeeded())
+    {
+      path.Append("/", file.GetData());
+      if (ezFileSystem::ExistsFile(path))
+      {
+        path.MakeCleanPath();
+        return path;
+      }
+    }
+
+    path = ezOSFile::GetApplicationDirectory();
+    path.Append(file.GetData());
+
+    // todo: verify that file exists
+  }
+  else
+  {
+    path = file;
+  }
+
+  path.MakeCleanPath();
+  return path;
 }
 
 #endif

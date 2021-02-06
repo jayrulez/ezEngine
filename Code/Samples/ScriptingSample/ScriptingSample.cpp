@@ -33,11 +33,12 @@
 #include <Texture/Image/ImageConversion.h>
 
 #include <AngelscriptPlugin/AngelscriptManager.h>
+#include <HashLinkPlugin/HashLinkManager.h>
 
-class AngelscriptSampleWindow : public ezWindow
+class ScriptingSampleWindow : public ezWindow
 {
 public:
-  AngelscriptSampleWindow()
+  ScriptingSampleWindow()
     : ezWindow()
   {
     m_bCloseRequested = false;
@@ -55,19 +56,19 @@ const ezInt32 g_iMaxHalfExtent = 20;
 const bool g_bForceImmediateLoading = false;
 const bool g_bPreloadAllTextures = false;
 
-class AngelscriptSample : public ezApplication
+class ScriptingSample : public ezApplication
 {
 public:
   typedef ezApplication SUPER;
 
-  AngelscriptSample()
+  ScriptingSample()
     : ezApplication("Angelscript Sample")
   {
   }
 
   void AfterCoreSystemsStartup() override
   {
-    ezStringBuilder sProjectDir = ">sdk/Data/Samples/AngelscriptSample";
+    ezStringBuilder sProjectDir = ">sdk/Data/Samples/ScriptingSample";
     ezStringBuilder sProjectDirResolved;
     ezFileSystem::ResolveSpecialDirectory(sProjectDir, sProjectDirResolved).IgnoreResult();
 
@@ -84,7 +85,7 @@ public:
     ezFileSystem::AddDataDirectory("", "", ":", ezFileSystem::AllowWrites).IgnoreResult();
     ezFileSystem::AddDataDirectory(">appdir/", "AppBin", "bin", ezFileSystem::AllowWrites).IgnoreResult();              // writing to the binary directory
     ezFileSystem::AddDataDirectory(">appdir/", "ShaderCache", "shadercache", ezFileSystem::AllowWrites).IgnoreResult(); // for shader files
-    ezFileSystem::AddDataDirectory(">user/ezEngine Project/AngelscriptSample", "AppData", "appdata",
+    ezFileSystem::AddDataDirectory(">user/ezEngine Project/ScriptingSample", "AppData", "appdata",
       ezFileSystem::AllowWrites)
       .IgnoreResult(); // app user data
 
@@ -128,7 +129,7 @@ public:
       ezWindowCreationDesc WindowCreationDesc;
       WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
       WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
-      m_pWindow = EZ_DEFAULT_NEW(AngelscriptSampleWindow);
+      m_pWindow = EZ_DEFAULT_NEW(ScriptingSampleWindow);
       m_pWindow->Initialize(WindowCreationDesc).IgnoreResult();
     }
 
@@ -208,6 +209,12 @@ public:
     // make sure telemetry is sent out regularly
     ezTelemetry::PerFrameUpdate();
 
+    {
+      static int run = 1;
+      ezLog::Info("Run: {0}", run++);
+      ezHashLinkManager::GetSingleton()->Test2();
+    }
+
     // do the rendering
     {
       // Before starting to render in a frame call this function
@@ -272,7 +279,7 @@ public:
   }
 
 private:
-  AngelscriptSampleWindow* m_pWindow;
+  ScriptingSampleWindow* m_pWindow;
   ezGALDevice* m_pDevice;
 
   ezGALRenderTargetViewHandle m_hBBRTV;
@@ -283,4 +290,4 @@ private:
   ezGALDepthStencilStateHandle m_hDepthStencilState;
 };
 
-EZ_CONSOLEAPP_ENTRY_POINT(AngelscriptSample);
+EZ_CONSOLEAPP_ENTRY_POINT(ScriptingSample);

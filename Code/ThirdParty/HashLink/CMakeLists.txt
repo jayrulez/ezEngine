@@ -66,7 +66,7 @@ if(IOS_PLATFORM)
    )
 endif()
 
-ez_create_target(LIBRARY ${PROJECT_NAME} NO_EZ_PREFIX SOURCE_FILES
+ez_create_target(LIBRARY ${PROJECT_NAME} NO_EZ_PREFIX MANUAL_SOURCE_FILES
     ${pcre_srcs}
     ${hl_headers}
     src/gc.c

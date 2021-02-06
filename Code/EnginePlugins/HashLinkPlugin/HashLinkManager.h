@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/CoreDLL.h>
+#include <HashLinkPlugin/HashLinkPluginDLL.h>
 #include <Foundation/Configuration/Singleton.h>
 #include <Foundation/Logging/Log.h>
 #include <Foundation/Strings/String.h>
@@ -14,7 +14,7 @@ extern "C"
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
 
-class EZ_CORE_DLL ezHashLinkManager
+class EZ_HASHLINKPLUGIN_DLL ezHashLinkManager
 {
   EZ_DECLARE_SINGLETON(ezHashLinkManager);
 
