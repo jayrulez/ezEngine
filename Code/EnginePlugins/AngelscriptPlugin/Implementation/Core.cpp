@@ -1,5 +1,6 @@
 #include <AngelscriptPlugin/AngelscriptManager.h>
 ezResult RegisterLog(asIScriptEngine* scriptEngine);
+ezResult RegisterHashedString(asIScriptEngine* scriptEngine);
 ezResult RegisterMath(asIScriptEngine* scriptEngine);
 ezResult RegisterWorld(asIScriptEngine* scriptEngine);
 ezResult RegisterGameObject(asIScriptEngine* scriptEngine);
@@ -13,7 +14,8 @@ ezResult RegisterPhysics(asIScriptEngine* scriptEngine);
 ezResult ezAngelscriptManager::RegisterCore(asIScriptEngine* scriptEngine)
 {
   EZ_SUCCEED_OR_RETURN(RegisterLog(scriptEngine));
-  //EZ_SUCCEED_OR_RETURN(RegisterMath(scriptEngine));
+  EZ_SUCCEED_OR_RETURN(RegisterHashedString(scriptEngine));
+  EZ_SUCCEED_OR_RETURN(RegisterMath(scriptEngine));
   EZ_SUCCEED_OR_RETURN(RegisterWorld(scriptEngine));
   //EZ_SUCCEED_OR_RETURN(RegisterGameObject(scriptEngine));
   //EZ_SUCCEED_OR_RETURN(RegisterPhysics(scriptEngine));

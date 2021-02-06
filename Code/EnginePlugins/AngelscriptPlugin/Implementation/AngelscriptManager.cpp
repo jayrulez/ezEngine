@@ -201,6 +201,7 @@ void ezAngelscriptManager::Test()
   }
 
   asIScriptModule* mod = m_pScriptEngine->GetModule("test");
+
   asIScriptFunction* func = mod->GetFunctionByDecl("void main()");
 
   if (func == nullptr)

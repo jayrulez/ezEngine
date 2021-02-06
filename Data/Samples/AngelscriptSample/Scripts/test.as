@@ -1,3 +1,5 @@
+#include "utils.as"
+
 void main(){
 	Log::Debug("Debug");
 	Log::Info("Info");
@@ -8,4 +10,5 @@ void main(){
 	
 	string myLog("Hello world!");
 	Log::Debug(myLog);
+	Log::Debug(GetString());
 }
