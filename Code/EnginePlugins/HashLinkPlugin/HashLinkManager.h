@@ -5,7 +5,6 @@
 #include <Foundation/Logging/Log.h>
 #include <Foundation/Strings/String.h>
 #include <Foundation/Time/Timestamp.h>
-
 #include <Core/Scripting/HashLinkHelper.h>
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
@@ -17,11 +16,12 @@ class EZ_HASHLINKPLUGIN_DLL ezHashLinkManager
 public:
   ezHashLinkManager();
   ~ezHashLinkManager();
-  void Startup(ezString file, bool debugWait = false);
+  void Startup(const ezString& file, void* threadStackTop, bool debugWait = false);
   void Shutdown();
   ezResult Run();
   void Test();
   void Test2();
+  void Test3();
 
 private:
   friend static bool check_reload(ezHashLinkManager* pHashLinkManager);

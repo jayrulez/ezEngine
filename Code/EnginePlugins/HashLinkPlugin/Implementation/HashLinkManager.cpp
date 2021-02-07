@@ -1,27 +1,16 @@
+#include "..\HashLinkManager.h"
 #include <Core/Scripting/HashLinkHelper.h>
-#include <HashLinkPlugin/HashLinkManager.h>
 #include <Foundation/IO/FileSystem/FileReader.h>
 #include <Foundation/IO/OSFile.h>
+#include <HashLinkPlugin/HashLinkManager.h>
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
 
-#  define HL_MAX_ARGS 9
-#  define HL_MAX_FIELD_LEN 128
-
-HL_PRIM hl_type hlt_array = {HARRAY};
-HL_PRIM hl_type hlt_bytes = {HBYTES};
-HL_PRIM hl_type hlt_dynobj = {HDYNOBJ};
-HL_PRIM hl_type hlt_dyn = {HDYN};
-HL_PRIM hl_type hlt_i32 = {HI32};
-HL_PRIM hl_type hlt_i64 = {HI64};
-HL_PRIM hl_type hlt_f32 = {HF32};
-HL_PRIM hl_type hlt_f64 = {HF64};
-HL_PRIM hl_type hlt_void = {HVOID};
-HL_PRIM hl_type hlt_bool = {HBOOL};
-HL_PRIM hl_type hlt_abstract = {HABSTRACT, {USTR("<abstract>")}};
-
-HL_PRIM vdynamic* hl_obj_get_field(vdynamic* obj, int hfield);
-HL_PRIM vdynamic* hl_call_method(vdynamic* c, varray* args);
+extern "C"
+{
+  HL_PRIM vdynamic* hl_obj_get_field(vdynamic* obj, int hfield);
+  HL_PRIM vdynamic* hl_call_method(vdynamic* c, varray* args);
+}
 
 // Helper functions
 static ezString GetAbsolutePath(const ezString& path);
@@ -102,9 +91,9 @@ static vdynamic* create_instance(hl_type* type, ...)
     return nullptr;
   }
 
-  vclosure* ctor = (vclosure*)hl_obj_get_field(instGlobal, ctorHash);
+  vclosure* ctorClosure = (vclosure*)hl_obj_get_field(instGlobal, ctorHash);
 
-  ezUInt32 nargs = (ezUInt32)ctor->t->fun->nargs;
+  ezUInt32 nargs = (ezUInt32)ctorClosure->t->fun->nargs;
   va_list argPtr;
   va_start(argPtr, type);
   vdynamic* args[HL_MAX_ARGS + 1];
@@ -114,9 +103,172 @@ static vdynamic* create_instance(hl_type* type, ...)
   }
   va_end(argPtr);
 
-  dyn_call_constructor((vclosure*)ctor, instMain, args, nargs);
+  dyn_call_constructor((vclosure*)ctorClosure, instMain, args, nargs);
 
   return instMain;
+}
+
+static vdynamic* create_instance2(hl_type* type, vdynamic*...)
+{
+  vdynamic* global = *(vdynamic**)type->obj->global_value;
+  if (global == nullptr)
+  {
+    ezLog::Error("Cannot instantiate class from type.");
+    return nullptr;
+  }
+  vdynamic* globalObj = hl_alloc_obj(global->t);
+  if (globalObj == nullptr)
+  {
+    ezLog::Error("Failed to allocate global instance.");
+    return nullptr;
+  }
+  vdynamic* obj = hl_alloc_obj(type);
+  if (obj == nullptr)
+  {
+    ezLog::Error("Failed to allocate instance.");
+    return nullptr;
+  }
+
+  ezInt32 ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
+  hl_field_lookup* ctorField = obj_resolve_field(globalObj->t->obj, ctorHash);
+  if (ctorField == nullptr)
+  {
+    ezLog::Error("Type does not have a constructor.");
+    return nullptr;
+  }
+  vdynamic* c = (vdynamic*)hl_dyn_getp(globalObj, ctorField->hashed_name, &hlt_dyn);
+
+  vclosure* ctorClosure = (vclosure*)c;
+
+  //vdynamic* vargs[1] = {obj};
+  //hl_dyn_call(cl, vargs, 1);
+
+  ezUInt32 nargs = (ezUInt32)ctorClosure->t->fun->nargs;
+  auto ctorArgs = ctorClosure->t->fun->args;
+
+  va_list argPtr;
+  va_start(argPtr, type);
+  vdynamic* args[HL_MAX_ARGS + 1];
+  args[0] = obj;
+  for (ezUInt32 i = 0; i < nargs; i++)
+  {
+    args[i + 1] = va_arg(argPtr, vdynamic*);
+  }
+  va_end(argPtr);
+
+  //vdynamic arg1;
+  //arg1.t = &hlt_i32;
+  //arg1.v.i = 15;
+  //vdynamic* args[1] = {&arg1};
+
+  ctorClosure->value = obj;
+  hl_dyn_call(ctorClosure, args, 1);
+  //((void (*)(vdynamic*, vdynamic**, ezInt32))ctorClosure->fun)(obj, args, nargs); // this calls the constructor
+
+
+  return obj;
+}
+
+static vdynamic* create_instance3(hl_type* type, ...)
+{
+  vdynamic* global = *(vdynamic**)type->obj->global_value;
+  if (global == nullptr)
+  {
+    ezLog::Error("Cannot instantiate class from type.");
+    return nullptr;
+  }
+
+  vdynamic* globalObj = hl_alloc_obj(global->t);
+  if (globalObj == nullptr)
+  {
+    ezLog::Error("Failed to allocate global instance.");
+    return nullptr;
+  }
+
+  vdynamic* obj = hl_alloc_obj(type);
+  if (obj == nullptr)
+  {
+    ezLog::Error("Failed to allocate instance.");
+    return nullptr;
+  }
+
+  ezInt32 ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
+  hl_field_lookup* ctorField = obj_resolve_field(globalObj->t->obj, ctorHash);
+  if (ctorField == nullptr)
+  {
+    ezLog::Error("Type does not have a constructor.");
+    return nullptr;
+  }
+
+  vclosure* ctorClosure = (vclosure*)hl_dyn_getp(globalObj, ctorField->hashed_name, &hlt_dyn);
+
+  ezUInt32 nargs = (ezUInt32)ctorClosure->t->fun->nargs;
+
+  va_list argPtr;
+  va_start(argPtr, type);
+  vdynamic* args[HL_MAX_ARGS + 1];
+  for (ezUInt32 i = 0; i < nargs; i++)
+  {
+    args[i] = va_arg(argPtr, vdynamic*);
+  }
+  va_end(argPtr);
+
+  ctorClosure->value = obj;
+  hl_dyn_call(ctorClosure, args, nargs);
+  //((void (*)(vdynamic*, vdynamic**, ezInt32))ctorClosure->fun)(obj, args, nargs); // this calls the constructor
+
+  return obj;
+}
+
+static vdynamic* create_instance4(hl_type* type, vdynamic* outObject, ...)
+{
+  vdynamic* global = *(vdynamic**)type->obj->global_value;
+  if (global == nullptr)
+  {
+    ezLog::Error("Cannot instantiate class from type.");
+    return nullptr;
+  }
+
+  vdynamic* globalObj = hl_alloc_obj(global->t);
+  if (globalObj == nullptr)
+  {
+    ezLog::Error("Failed to allocate global instance.");
+    return nullptr;
+  }
+
+  outObject = hl_alloc_obj(type);
+  if (outObject == nullptr)
+  {
+    ezLog::Error("Failed to allocate instance.");
+    return nullptr;
+  }
+
+  ezInt32 ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
+  hl_field_lookup* ctorField = obj_resolve_field(globalObj->t->obj, ctorHash);
+  if (ctorField == nullptr)
+  {
+    ezLog::Error("Type does not have a constructor.");
+    return nullptr;
+  }
+
+  vclosure* ctorClosure = (vclosure*)hl_dyn_getp(globalObj, ctorField->hashed_name, &hlt_dyn);
+
+  ezUInt32 nargs = (ezUInt32)ctorClosure->t->fun->nargs;
+
+  va_list argPtr;
+  va_start(argPtr, type);
+  vdynamic* args[HL_MAX_ARGS + 1];
+  for (ezUInt32 i = 0; i < nargs; i++)
+  {
+    args[i] = va_arg(argPtr, vdynamic*);
+  }
+  va_end(argPtr);
+
+  ctorClosure->value = outObject;
+  hl_dyn_call(ctorClosure, args, nargs);
+  //((void (*)(vdynamic*, vdynamic**, ezInt32))ctorClosure->fun)(obj, args, nargs); // this calls the constructor
+
+  return outObject;
 }
 
 static hl_code* load_code(const char* filePath, char** errorMessage, bool printErrors)
@@ -182,18 +334,27 @@ ezHashLinkManager::~ezHashLinkManager()
 {
 }
 
-void ezHashLinkManager::Startup(ezString file, bool debugWait)
+struct pTest
+{
+  int i = 0;
+};
+
+void ezHashLinkManager::Startup(const ezString& file, void* threadStackTop, bool debugWait)
 {
   if (m_Initialized)
     return;
 
+  ezInt32 profileCount = -1;
+
   hl_global_init();
 
   char* args[] = {0};
-
-  hl_sys_init((void**)args, 0, (void*)file.GetData());
-  hl_register_thread(this);
   m_File = GetAbsolutePath(file);
+
+  hl_sys_init((void**)NULL, 0, (void*)m_File.GetData());
+  pTest p;
+
+  hl_register_thread(&p);
 
   char* errorMessage = nullptr;
 
@@ -228,7 +389,48 @@ void ezHashLinkManager::Startup(ezString file, bool debugWait)
     return;
   }
 
-  m_Initialized = true;
+
+  vclosure closure;
+
+  closure.t = m_pCode->functions[m_pModule->functions_indexes[m_pModule->code->entrypoint]].type;
+  closure.fun = m_pModule->functions_ptrs[m_pModule->code->entrypoint];
+  closure.hasValue = 0;
+
+  SetupHandler();
+
+  bool exceptionThrown = false;
+  hl_profile_setup(profileCount);
+  vdynamic* ret = hl_dyn_call_safe(&closure, nullptr, 0, &exceptionThrown);
+  hl_profile_end();
+
+  if (exceptionThrown)
+  {
+    varray* stack = hl_exception_stack();
+    ezLog::Info("Uncaught exception: {}", hl_to_string(ret));
+    for (ezInt32 index = 0; index < stack->size; index++)
+    {
+      ezLog::Info("Called from {}", hl_aptr(stack, uchar*)[index]);
+    }
+    hl_debug_break();
+    hl_global_free();
+  }
+  else
+  {
+
+
+
+
+    for (int i = 0; i < 1000; i++)
+    {
+      ezLog::Info("Run {}", i + 1);
+      Test3();
+    }
+
+
+
+
+    m_Initialized = true;
+  }
 }
 
 void ezHashLinkManager::Shutdown()
@@ -245,34 +447,34 @@ void ezHashLinkManager::Shutdown()
 
 ezResult ezHashLinkManager::Run()
 {
-  if (m_Initialized)
-  {
-    vclosure closure;
+  //if (m_Initialized)
+  //{
+  //  vclosure closure;
 
-    closure.t = m_pCode->functions[m_pModule->functions_indexes[m_pModule->code->entrypoint]].type;
-    closure.fun = m_pModule->functions_ptrs[m_pModule->code->entrypoint];
-    closure.hasValue = 0;
+  //  closure.t = m_pCode->functions[m_pModule->functions_indexes[m_pModule->code->entrypoint]].type;
+  //  closure.fun = m_pModule->functions_ptrs[m_pModule->code->entrypoint];
+  //  closure.hasValue = 0;
 
-    SetupHandler();
+  //  SetupHandler();
 
-    bool exceptionThrown = false;
-    //hl_profile_setup(1);
-    vdynamic* ret = hl_dyn_call_safe(&closure, nullptr, 0, &exceptionThrown);
-    //hl_profile_end();
+  //  bool exceptionThrown = false;
+  //  //hl_profile_setup(1);
+  //  vdynamic* ret = hl_dyn_call_safe(&closure, nullptr, 0, &exceptionThrown);
+  //  //hl_profile_end();
 
-    if (exceptionThrown)
-    {
-      varray* stack = hl_exception_stack();
-      ezLog::Info("Uncaught exception: {}", hl_to_string(ret));
-      for (ezInt32 index = 0; index < stack->size; index++)
-      {
-        ezLog::Info("Called from {}", hl_aptr(stack, uchar*)[index]);
-      }
-      hl_debug_break();
-      hl_global_free();
-      return EZ_FAILURE;
-    }
-  }
+  //  if (exceptionThrown)
+  //  {
+  //    varray* stack = hl_exception_stack();
+  //    ezLog::Info("Uncaught exception: {}", hl_to_string(ret));
+  //    for (ezInt32 index = 0; index < stack->size; index++)
+  //    {
+  //      ezLog::Info("Called from {}", hl_aptr(stack, uchar*)[index]);
+  //    }
+  //    hl_debug_break();
+  //    hl_global_free();
+  //    return EZ_FAILURE;
+  //  }
+  //}
 
   return EZ_SUCCESS;
 }
@@ -388,6 +590,36 @@ void ezHashLinkManager::Test2()
       vdynamic* obj = create_instance(type);
 
       ezInt32 hfield = hl_hash_gen(USTR("execute"), false);
+      hl_field_lookup* f = hl_lookup_find(type->obj->rt->lookup, type->obj->rt->nlookup, hfield);
+      if (f)
+      {
+        vdynamic* ret = nullptr;
+        hl_dyn_call_obj(obj, f->t, hfield, nullptr, ret);
+      }
+    }
+  }
+}
+
+void ezHashLinkManager::Test3()
+{
+  for (ezInt32 i = 0; i < m_pModule->code->ntypes; i++)
+  {
+    hl_type* type = m_pModule->code->types + i;
+
+    if (type->kind != HOBJ)
+      continue;
+
+    auto testClass = USTR("test2x.TestClass");
+    if (ucmp(type->obj->name, testClass) == 0)
+    {
+      
+      vdynamic* arg1 = hl_alloc_dynamic(&hlt_i32);
+      arg1->v.i = 15;
+      vdynamic* arg2 = hl_alloc_dynamic(&hlt_i32);
+      arg2->v.i = 134;
+      vdynamic* obj = create_instance3(type, arg1, arg2);
+
+      ezInt32 hfield = hl_hash((vbyte*)USTR("execute"));
       hl_field_lookup* f = hl_lookup_find(type->obj->rt->lookup, type->obj->rt->nlookup, hfield);
       if (f)
       {

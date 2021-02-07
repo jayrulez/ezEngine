@@ -35,6 +35,9 @@
 #include <AngelscriptPlugin/AngelscriptManager.h>
 #include <HashLinkPlugin/HashLinkManager.h>
 
+
+static ezUniquePtr<ezHashLinkManager> s_HashLinkManager;
+
 class ScriptingSampleWindow : public ezWindow
 {
 public:
@@ -129,6 +132,9 @@ public:
       ezWindowCreationDesc WindowCreationDesc;
       WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
       WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
+      WindowCreationDesc.m_bClipMouseCursor = false;
+      WindowCreationDesc.m_bShowMouseCursor = true;
+
       m_pWindow = EZ_DEFAULT_NEW(ScriptingSampleWindow);
       m_pWindow->Initialize(WindowCreationDesc).IgnoreResult();
     }
@@ -190,6 +196,9 @@ public:
     }
 
     ezAngelscriptManager::GetSingleton()->Test();
+    s_HashLinkManager = EZ_DEFAULT_NEW(ezHashLinkManager);
+    
+    s_HashLinkManager->Startup("E:\\dev\\HaxeProjects\\test2\\New Project\\bin\\NewProject.hl", &s_HashLinkManager);
   }
 
 
@@ -212,7 +221,11 @@ public:
     {
       static int run = 1;
       ezLog::Info("Run: {0}", run++);
-      ezHashLinkManager::GetSingleton()->Test2();
+      if (run == 33)
+      {
+        auto g = run;
+      }
+      ezHashLinkManager::GetSingleton()->Test3();
     }
 
     // do the rendering
@@ -253,6 +266,8 @@ public:
 
   void BeforeCoreSystemsShutdown() override
   {
+    s_HashLinkManager->Shutdown();
+
     // make sure that no textures are continue to be streamed in while the engine shuts down
     ezResourceManager::EngineAboutToShutdown();
 

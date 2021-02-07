@@ -4,7 +4,7 @@
 #include <Foundation/Types/UniquePtr.h>
 #include <HashLinkPlugin/HashLinkManager.h>
 
-static ezUniquePtr<ezHashLinkManager> s_HashLinkManager;
+//static ezUniquePtr<ezHashLinkManager> s_HashLinkManager;
 
 // clang-format off
 EZ_BEGIN_SUBSYSTEM_DECLARATION(HashLink, HashLinkPlugin)
@@ -16,18 +16,18 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(HashLink, HashLinkPlugin)
 
   ON_CORESYSTEMS_STARTUP
   {
-    s_HashLinkManager = EZ_DEFAULT_NEW(ezHashLinkManager);
+    //s_HashLinkManager = EZ_DEFAULT_NEW(ezHashLinkManager);
   }
 
   ON_CORESYSTEMS_SHUTDOWN
   {
-    s_HashLinkManager->Shutdown();
+    //s_HashLinkManager->Shutdown();
   }
 
   ON_HIGHLEVELSYSTEMS_STARTUP
   {
-    s_HashLinkManager->Startup("E:\\dev\\HaxeProjects\\test2\\New Project\\bin\\NewProject.hl");
-    s_HashLinkManager->Run().IgnoreResult();
+    //s_HashLinkManager->Startup("E:\\dev\\HaxeProjects\\test2\\New Project\\bin\\NewProject.hl");
+    //s_HashLinkManager->Run().IgnoreResult();
   }
 
   ON_HIGHLEVELSYSTEMS_SHUTDOWN
