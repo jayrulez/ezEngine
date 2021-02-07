@@ -35,9 +35,6 @@
 #include <AngelscriptPlugin/AngelscriptManager.h>
 #include <HashLinkPlugin/HashLinkManager.h>
 
-
-static ezUniquePtr<ezHashLinkManager> s_HashLinkManager;
-
 class ScriptingSampleWindow : public ezWindow
 {
 public:
@@ -65,7 +62,7 @@ public:
   typedef ezApplication SUPER;
 
   ScriptingSample()
-    : ezApplication("Angelscript Sample")
+    : ezApplication("Scripting Sample")
   {
   }
 
@@ -196,9 +193,6 @@ public:
     }
 
     ezAngelscriptManager::GetSingleton()->Test();
-    s_HashLinkManager = EZ_DEFAULT_NEW(ezHashLinkManager);
-    
-    s_HashLinkManager->Startup("E:\\dev\\HaxeProjects\\test2\\New Project\\bin\\NewProject.hl", &s_HashLinkManager);
   }
 
 
@@ -225,7 +219,7 @@ public:
       {
         auto g = run;
       }
-      ezHashLinkManager::GetSingleton()->Test3();
+      ezHashLinkManager::GetSingleton()->Test();
     }
 
     // do the rendering
@@ -266,8 +260,6 @@ public:
 
   void BeforeCoreSystemsShutdown() override
   {
-    s_HashLinkManager->Shutdown();
-
     // make sure that no textures are continue to be streamed in while the engine shuts down
     ezResourceManager::EngineAboutToShutdown();
 

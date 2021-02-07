@@ -16,24 +16,12 @@ class EZ_HASHLINKPLUGIN_DLL ezHashLinkManager
 public:
   ezHashLinkManager();
   ~ezHashLinkManager();
-  void Startup(const ezString& file, void* threadStackTop, bool debugWait = false);
+  void Startup(const ezString& file);
   void Shutdown();
-  ezResult Run();
   void Test();
-  void Test2();
-  void Test3();
 
 private:
-  friend static bool check_reload(ezHashLinkManager* pHashLinkManager);
-
-private:
-  bool m_Initialized;
-  hl_code* m_pCode;
-  hl_module* m_pModule;
-  ezString m_File;
-  ezTimestamp m_FileModifiedTime;
-  ezInt32 m_DebugPort;
-  bool m_bEnableHotReload;
+  ezHashLinkHelper* m_pHelper;
 };
 
 #endif

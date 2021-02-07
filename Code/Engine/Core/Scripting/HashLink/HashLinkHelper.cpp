@@ -4,6 +4,18 @@
 
 #ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
 
+HL_PRIM hl_type hlt_array = {HARRAY};
+HL_PRIM hl_type hlt_bytes = {HBYTES};
+HL_PRIM hl_type hlt_dynobj = {HDYNOBJ};
+HL_PRIM hl_type hlt_dyn = {HDYN};
+HL_PRIM hl_type hlt_i32 = {HI32};
+HL_PRIM hl_type hlt_i64 = {HI64};
+HL_PRIM hl_type hlt_f32 = {HF32};
+HL_PRIM hl_type hlt_f64 = {HF64};
+HL_PRIM hl_type hlt_void = {HVOID};
+HL_PRIM hl_type hlt_bool = {HBOOL};
+HL_PRIM hl_type hlt_abstract = {HABSTRACT, {USTR("<abstract>")}};
+
 static bool ez_hl_initialized;
 
 static ezTimestamp get_file_modified_time(const char* filePath)
@@ -26,7 +38,7 @@ static hl_field_lookup* ez_hl_obj_resolve_field(hl_type_obj* o, int hfield)
   return NULL;
 }
 
-static vdynamic* ez_hl_create_instance(hl_type* type, ...)
+static vdynamic* ez_hl_create_instance(hl_type* type, const ezDynamicArray<vdynamic*>& ctorArgs)
 {
   vdynamic* global = *(vdynamic**)type->obj->global_value;
   if (global == nullptr)
@@ -61,14 +73,11 @@ static vdynamic* ez_hl_create_instance(hl_type* type, ...)
 
   ezUInt32 nargs = (ezUInt32)ctorClosure->t->fun->nargs;
 
-  va_list argPtr;
-  va_start(argPtr, type);
   vdynamic* args[HL_MAX_ARGS + 1];
-  for (ezUInt32 i = 0; i < nargs; i++)
+  for (ezUInt32 i = 0; i < ctorArgs.GetCount(); i++)
   {
-    args[i] = va_arg(argPtr, vdynamic*);
+    args[i] = ctorArgs[i];
   }
-  va_end(argPtr);
 
   ctorClosure->value = obj;
   hl_dyn_call(ctorClosure, args, nargs);
@@ -242,12 +251,17 @@ void ezHashLinkHelper::Shutdown()
     ez_hl_shutdown(&m_Context);
 }
 
+bool ezHashLinkHelper::IsInitialized() const
+{
+  return m_bInitialized;
+}
+
 const ezHashLinkContext& ezHashLinkHelper::GetContext() const
 {
   return m_Context;
 }
 
-vdynamic* ezHashLinkHelper::CreateInstance(const ezString& className, va_list args)
+vdynamic* ezHashLinkHelper::CreateInstance(const ezString& className, const ezDynamicArray<vdynamic*>& ctorArgs)
 {
   if (!m_bInitialized)
   {
@@ -265,7 +279,7 @@ vdynamic* ezHashLinkHelper::CreateInstance(const ezString& className, va_list ar
     // todo: cache this
     if (ucmp(type->obj->name, ezStringWChar(className.GetData())) == 0)
     {
-      vdynamic* obj = ez_hl_create_instance(type, args);
+      vdynamic* obj = ez_hl_create_instance(type, ctorArgs);
       return obj;
     }
   }
@@ -288,7 +302,7 @@ vdynamic* ezHashLinkHelper::CallMethod(vdynamic* object, const ezString& method,
   hl_field_lookup* f = hl_lookup_find(object->t->obj->rt->lookup, object->t->obj->rt->nlookup, hfield);
   if (f)
   {
-    if (f->t->kind == HMETHOD)
+    if (f->t->kind == HFUN)
     {
       ezInt32 nargs = f->t->fun->nargs;
       va_list argPtr;

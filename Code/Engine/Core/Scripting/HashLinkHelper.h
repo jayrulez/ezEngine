@@ -17,17 +17,19 @@ extern "C"
 #  define HL_MAX_ARGS 9
 #  define HL_MAX_FIELD_LEN 128
 
-HL_PRIM hl_type hlt_array = {HARRAY};
-HL_PRIM hl_type hlt_bytes = {HBYTES};
-HL_PRIM hl_type hlt_dynobj = {HDYNOBJ};
-HL_PRIM hl_type hlt_dyn = {HDYN};
-HL_PRIM hl_type hlt_i32 = {HI32};
-HL_PRIM hl_type hlt_i64 = {HI64};
-HL_PRIM hl_type hlt_f32 = {HF32};
-HL_PRIM hl_type hlt_f64 = {HF64};
-HL_PRIM hl_type hlt_void = {HVOID};
-HL_PRIM hl_type hlt_bool = {HBOOL};
-HL_PRIM hl_type hlt_abstract = {HABSTRACT, {USTR("<abstract>")}};
+
+
+extern HL_PRIM hl_type hlt_array;
+extern HL_PRIM hl_type hlt_bytes;
+extern HL_PRIM hl_type hlt_dynobj;
+extern HL_PRIM hl_type hlt_dyn;
+extern HL_PRIM hl_type hlt_i32;
+extern HL_PRIM hl_type hlt_i64;
+extern HL_PRIM hl_type hlt_f32;
+extern HL_PRIM hl_type hlt_f64;
+extern HL_PRIM hl_type hlt_void;
+extern HL_PRIM hl_type hlt_bool;
+extern HL_PRIM hl_type hlt_abstract;
 
 struct EZ_CORE_DLL ezHashLinkContext
 {
@@ -44,9 +46,10 @@ public:
   ezHashLinkHelper();
   void Initialize(const ezString& hlFile);
   void Shutdown();
+  bool IsInitialized() const;
   const ezHashLinkContext& GetContext() const;
 
-  vdynamic* CreateInstance(const ezString& className, va_list args);
+  vdynamic* CreateInstance(const ezString& className, const ezDynamicArray<vdynamic*>& ctorArgs);
   vdynamic* CallMethod(vdynamic* object, const ezString& method, ...);
 
 private:
