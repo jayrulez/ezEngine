@@ -55,3 +55,12 @@ if (EZ_3RDPARTY_ANGELSCRIPT_SUPPORT)
   )
 
 endif()
+
+if (EZ_3RDPARTY_DAO_SUPPORT)
+
+  target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    Dao
+  )
+
+endif()

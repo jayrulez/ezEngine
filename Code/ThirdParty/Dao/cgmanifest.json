@@ -1,0 +1,13 @@
+{
+  "Registrations": [
+    {
+      "component": {
+        "type": "git",
+        "git": {
+          "repositoryUrl": "https://github.com/daokoder/dao",
+          "commitHash": "a2e53f7ebe409d85e2ccd68b30f1faeed2cd6a24"
+        }
+      }
+    } 
+  ]
+}

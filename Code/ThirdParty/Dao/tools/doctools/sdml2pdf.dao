@@ -1,0 +1,15 @@
+load os
+
+routine main( input : string, cjk='' )
+{
+	output = input;
+	if( output.find( "_utf8" ) >=0 ){
+		output.replace( "_utf8", "" );
+		io.writeln( output );
+		os.run( "iconv -f utf8 -t gb2312 -o " + output + " " + input );
+	}
+	std.load( "sdml2tex.dao " + output + " " + cjk );
+	output.replace( ".sdml", ".tex" );
+	os.run( "pdflatex " + output );
+	return 0;
+}

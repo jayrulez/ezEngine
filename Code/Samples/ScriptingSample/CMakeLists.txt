@@ -12,10 +12,12 @@ target_link_libraries(${PROJECT_NAME}
   RendererCore
   AngelscriptPlugin
   HashLinkPlugin
+  DaoPlugin
 )
 
 add_dependencies(${PROJECT_NAME}
   InspectorPlugin
   AngelscriptPlugin
   HashLinkPlugin
+  DaoPlugin
 )

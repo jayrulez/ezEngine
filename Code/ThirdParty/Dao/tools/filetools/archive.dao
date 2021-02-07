@@ -1,0 +1,91 @@
+load stream
+
+routine DaoDecodeUInt16( data : string, i = 0 )
+{
+	return (data[i]<<8) + data[i+1];
+}
+routine DaoDecodeUInt32( data : string, i = 0 )
+{
+	return (data[i]<<24) + (data[i+1]<<16) + (data[i+2]<<8) + data[i+3];
+}
+routine CharToNumber( source : string )
+{
+	var numbers = "\t";
+	var count = 0;
+	for(var char in source ){
+		if( %numbers - count > 58 ){
+			numbers += "\n\t";
+			count = %numbers;
+		}
+		numbers += (string)char + ",";
+		if( %numbers - count > 60 ){
+			numbers += "\n\t";
+			count = %numbers;
+		}
+	}
+	numbers += "0";
+	return numbers;
+}
+
+routine ArchiveToCSource( archive : string )
+{
+	var onloads = '';
+	var sources = '';
+	var modules = '';
+	var finders = '';
+
+	var size = archive.size();
+	if( size < 8 ) return '', '';
+
+	var pos = 4
+	var files = DaoDecodeUInt32( archive, pos );
+	pos += 4;
+
+	for(var i=0; i<files; ++i){
+		if( (pos + 2) >= size ) break;
+		var m = DaoDecodeUInt16( archive, pos );
+		if( (pos + 2 + m + 4) >= size ) break;
+		var n = DaoDecodeUInt32( archive, pos + 2 + m );
+
+		var name = archive[pos+2 : pos+2+m];
+		var source = archive[pos+2+m+4 : pos+2+m+4+n];
+		if( name.match( '%.(dll|so|dylib)$' ) != none ){
+			onloads += 'extern int ' + source + '( DaoVmSpace *vms, DaoNamespace *ns );\n';
+			modules += '  { "' + name + '", 0, NULL, ' + source + ' },\n';
+
+			var stlib = name.change( '%.(dll|so|dylib)$', '.a' )
+			var name = name.change( 'lib [^/\\]* %.(dll|so|dylib)$', '' )
+			var source = source.change( '_OnLoad$', '' );
+			finders += source + '\t' + name + 'Find' + source + '.dao\t' + stlib + '\n';
+		}else{
+			var variable = 'source' + (string)i;
+			sources += 'unsigned char ' + variable + '[] =\n{\n';
+			sources += CharToNumber( source ) + '\n};\n';
+			modules += '  { "' + name + '", ';
+			modules += (string)source.size() + ', ' + variable + ', NULL },\n';
+		}
+		pos += 2 + m + 4 + n;
+	}
+	modules = 'DaoVirtualModule dao_virtual_modules[] =\n{\n' + modules;
+	modules += '  { NULL, 0, NULL, NULL }\n};\n';
+	return onloads + sources + modules, finders;
+}
+
+routine main( file : string )
+{
+	var archive = io.read( file )
+	if( archive[0:2] != '\33\33' ){
+		io.writeln( 'ERROR: input is not a Dao archive file!' );
+		return 1;
+	}
+	#archive = archive.collect{ (X+256)%256 }
+	var (source, finders) = ArchiveToCSource( archive )
+	var fout = io.open( file + '.c', 'w+' );
+	var fout2 = io.open( file + '.finders', 'w+' );
+	fout.writeln( '#include "dao.h"' )
+	fout.writeln( source )
+	fout2.writeln( finders )
+	fout.close()
+	fout2.close()
+	return 0;
+}

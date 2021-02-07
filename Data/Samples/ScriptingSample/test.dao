@@ -1,0 +1,6 @@
+load ezEngine;
+std.load("test2.dao");
+
+io.writeln( "Hello world from Dao!" );
+
+Log.Debug("Hello log from Dao");

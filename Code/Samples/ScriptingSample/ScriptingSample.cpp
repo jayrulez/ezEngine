@@ -34,6 +34,7 @@
 
 #include <AngelscriptPlugin/AngelscriptManager.h>
 #include <HashLinkPlugin/HashLinkManager.h>
+#include <DaoPlugin/Runtime/DaoManager.h>
 
 class ScriptingSampleWindow : public ezWindow
 {
@@ -193,6 +194,7 @@ public:
     }
 
     ezAngelscriptManager::GetSingleton()->Test();
+    ezDaoManager::GetSingleton()->Test();
   }
 
 
@@ -213,13 +215,13 @@ public:
     ezTelemetry::PerFrameUpdate();
 
     {
-      static int run = 1;
-      ezLog::Info("Run: {0}", run++);
-      if (run == 33)
-      {
-        auto g = run;
-      }
-      ezHashLinkManager::GetSingleton()->Test();
+      //static int run = 1;
+      //ezLog::Info("Run: {0}", run++);
+      //if (run == 33)
+      //{
+      //  auto g = run;
+      //}
+      //ezHashLinkManager::GetSingleton()->Test();
     }
 
     // do the rendering
