@@ -3,8 +3,40 @@
 #include <Foundation/Configuration/Startup.h>
 #include <Foundation/Types/UniquePtr.h>
 #include <HashLinkPlugin/HashLinkManager.h>
+#include <Foundation/IO/OSFile.h>
+#include <Foundation/IO/FileSystem/FileSystem.h>
 
 static ezUniquePtr<ezHashLinkManager> s_HashLinkManager;
+
+static ezString GetAbsolutePath(const ezString& file)
+{
+  ezStringBuilder path;
+
+  if (!ezPathUtils::IsAbsolutePath(file))
+  {
+    if (ezFileSystem::ResolveSpecialDirectory(">project", path).Succeeded())
+    {
+      path.Append("/", file.GetData());
+      if (ezFileSystem::ExistsFile(path))
+      {
+        path.MakeCleanPath();
+        return path;
+      }
+    }
+
+    path = ezOSFile::GetApplicationDirectory();
+    path.Append(file.GetData());
+
+    // todo: verify that file exists
+  }
+  else
+  {
+    path = file;
+  }
+
+  path.MakeCleanPath();
+  return path;
+}
 
 // clang-format off
 EZ_BEGIN_SUBSYSTEM_DECLARATION(HashLink, HashLinkPlugin)
@@ -26,7 +58,7 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(HashLink, HashLinkPlugin)
 
   ON_HIGHLEVELSYSTEMS_STARTUP
   {
-    s_HashLinkManager->Startup("E:\\dev\\HaxeProjects\\test2\\New Project\\bin\\NewProject.hl");
+    s_HashLinkManager->Startup(GetAbsolutePath("NewProject.hl"));
   }
 
   ON_HIGHLEVELSYSTEMS_SHUTDOWN
