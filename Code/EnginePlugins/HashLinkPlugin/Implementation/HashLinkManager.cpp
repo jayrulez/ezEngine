@@ -50,7 +50,6 @@ void ezHashLinkManager::Test()
     args.PushBack(arg1);
     args.PushBack(arg2);
     vdynamic* obj = m_pHelper->CreateInstance("test2x.TestClass", args);
-
     if (obj != nullptr)
     {
       vdynamic* ret = m_pHelper->CallMethod(obj, "execute");

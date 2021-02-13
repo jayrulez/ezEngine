@@ -50,7 +50,7 @@ public:
   const ezHashLinkContext& GetContext() const;
 
   vdynamic* CreateInstance(const ezString& className, const ezDynamicArray<vdynamic*>& ctorArgs);
-  vdynamic* CallMethod(vdynamic* object, const ezString& method, ...);
+  vdynamic* CallMethod(vdynamic* object, const char* method, ...);
 
 private:
   bool m_bInitialized;

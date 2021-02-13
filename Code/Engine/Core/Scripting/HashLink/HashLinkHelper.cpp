@@ -47,40 +47,37 @@ static vdynamic* ez_hl_create_instance(hl_type* type, const ezDynamicArray<vdyna
     return nullptr;
   }
 
-  vdynamic* globalObj = hl_alloc_obj(global->t);
-  if (globalObj == nullptr)
-  {
-    ezLog::Error("Failed to allocate global instance.");
-    return nullptr;
-  }
-
   vdynamic* obj = hl_alloc_obj(type);
   if (obj == nullptr)
   {
     ezLog::Error("Failed to allocate instance.");
     return nullptr;
   }
+  hl_add_root(&obj);
 
   ezInt32 ctorHash = hl_hash((vbyte*)USTR("__constructor__"));
-  hl_field_lookup* ctorField = ez_hl_obj_resolve_field(globalObj->t->obj, ctorHash);
+  hl_field_lookup* ctorField = ez_hl_obj_resolve_field(global->t->obj, ctorHash);
   if (ctorField == nullptr)
   {
     ezLog::Error("Type does not have a constructor.");
     return nullptr;
   }
 
-  vclosure* ctorClosure = (vclosure*)hl_dyn_getp(globalObj, ctorField->hashed_name, &hlt_dyn);
+  vclosure* ctorClosure = (vclosure*)hl_dyn_getp(global, ctorField->hashed_name, &hlt_dyn);
 
   ezUInt32 nargs = (ezUInt32)ctorClosure->t->fun->nargs;
 
   vdynamic* args[HL_MAX_ARGS + 1];
+  //args[0] = obj;
   for (ezUInt32 i = 0; i < ctorArgs.GetCount(); i++)
   {
     args[i] = ctorArgs[i];
   }
 
   ctorClosure->value = obj;
-  hl_dyn_call(ctorClosure, args, nargs);
+  hl_dyn_call((vclosure*)ctorClosure, args, nargs);
+
+  //((vdynamic* (*)(vdynamic*, vdynamic**, ezInt32))ctorClosure->fun)(obj, args, nargs); // this calls the constructor
 
   return obj;
 }
@@ -150,8 +147,7 @@ static ezResult ez_hl_startup(ezHashLinkContext* pContext, HlOptions options = d
   hl_global_init();
 
   hl_sys_init((void**)NULL, 0, (void*)pContext->m_File.GetData());
-
-  hl_register_thread(pContext);
+  hl_register_thread(&profileCount);
 
   char* errorMessage = nullptr;
 
@@ -288,7 +284,7 @@ vdynamic* ezHashLinkHelper::CreateInstance(const ezString& className, const ezDy
 }
 
 // todo: create abstraction that caches classes and methods
-vdynamic* ezHashLinkHelper::CallMethod(vdynamic* object, const ezString& method, ...)
+vdynamic* ezHashLinkHelper::CallMethod(vdynamic* object, const char* method, ...)
 {
   if (!m_bInitialized)
   {
@@ -296,7 +292,7 @@ vdynamic* ezHashLinkHelper::CallMethod(vdynamic* object, const ezString& method,
     return nullptr;
   }
 
-  ezStringWChar methodName = ezStringWChar(method.GetData());
+  ezStringWChar methodName = ezStringWChar(method);
   ezInt32 hfield = hl_hash((vbyte*)methodName.GetData());
   
   hl_field_lookup* f = hl_lookup_find(object->t->obj->rt->lookup, object->t->obj->rt->nlookup, hfield);
@@ -307,7 +303,7 @@ vdynamic* ezHashLinkHelper::CallMethod(vdynamic* object, const ezString& method,
       ezInt32 nargs = f->t->fun->nargs;
       va_list argPtr;
       vdynamic* args[HL_MAX_ARGS + 1];
-      va_start(argPtr, object->t);
+      va_start(argPtr, method);
       for (ezInt32 i = 0; i < nargs; i++)
       {
         args[i] = va_arg(argPtr, vdynamic*);

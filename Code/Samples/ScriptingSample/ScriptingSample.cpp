@@ -215,13 +215,13 @@ public:
     ezTelemetry::PerFrameUpdate();
 
     {
-      //static int run = 1;
-      //ezLog::Info("Run: {0}", run++);
-      //if (run == 33)
-      //{
-      //  auto g = run;
-      //}
-      //ezHashLinkManager::GetSingleton()->Test();
+      static int run = 1;
+      ezLog::Info("Run: {0}", run++);
+      if (run == 33)
+      {
+        auto g = run;
+      }
+      ezHashLinkManager::GetSingleton()->Test();
     }
 
     // do the rendering
