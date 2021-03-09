@@ -274,7 +274,7 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
   declaration.Reserve(100);
 #endif
 
-  // Then check for meta data and #include directives
+  // Then check for meta data and pre-processor directives
   pos = 0;
   while (pos < modifiedScript.GetCharacterCount())
   {
@@ -286,9 +286,17 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
       continue;
     }
 
+    ezString token(modifiedScript.GetSubString(pos, len));
 #if AS_PROCESS_METADATA == 1
-    // Check if class
-    if (currentClass == "" && modifiedScript.GetSubString(pos, len) == "class")
+    // Skip possible decorators before class and interface declarations
+    if (token == "shared" || token == "abstract" || token == "mixin" || token == "external")
+    {
+      pos += len;
+      continue;
+    }
+
+    // Check if class or interface so the metadata for members can be gathered
+    if (currentClass == "" && (token == "class" || token == "interface"))
     {
       // Get the identifier after "class"
       do
@@ -334,15 +342,15 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
     }
 
     // Check if end of class
-    if (currentClass != "" && modifiedScript[pos] == '}')
+    if (currentClass != "" && token == "}")
     {
       currentClass = "";
       pos += len;
       continue;
     }
 
-    // Check if namespace
-    if (modifiedScript.GetSubString(pos, len) == "namespace")
+    // Check if namespace so the metadata for members can be gathered
+    if (token == "namespace")
     {
       // Get the identifier after "namespace"
       do
@@ -375,7 +383,7 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
     }
 
     // Check if end of namespace
-    if (currentNamespace != "" && modifiedScript[pos] == '}')
+    if (currentNamespace != "" && token == "}")
     {
       const char* found = currentNamespace.FindLastSubString("::");
       if (found != nullptr)
@@ -391,7 +399,7 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
     }
 
     // Is this the start of metadata?
-    if (modifiedScript[pos] == '[')
+    if (token == "[")
     {
       // Get the metadata string
       pos = ExtractMetadata(pos, metadata);
@@ -410,14 +418,14 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
     else
 #endif
       // Is this a preprocessor directive?
-      if (modifiedScript[pos] == '#' && (pos + 1 < modifiedScript.GetCharacterCount()))
+      if (token == "#" && (pos + 1 < modifiedScript.GetCharacterCount()))
     {
       int start = pos++;
 
       t = engine->ParseToken(&modifiedScript[pos], modifiedScript.GetCharacterCount() - pos, &len);
       if (t == asTC_IDENTIFIER)
       {
-        ezString token(modifiedScript.GetSubString(pos, len));
+        token = modifiedScript.GetSubString(pos, len);
         if (token == "include")
         {
           pos += len;
@@ -755,7 +763,7 @@ ezInt32 ezAngelscriptBuilder::SkipStatement(ezInt32 pos)
 
 ezInt32 ezAngelscriptBuilder::ExcludeCode(ezInt32 pos)
 {
-    asUINT len = 0;
+  asUINT len = 0;
   int nested = 0;
   while (pos < (ezInt32)modifiedScript.GetCharacterCount())
   {
