@@ -2696,7 +2696,6 @@ bool asCCompiler::CompileAutoType(asCDataType &type, asCExprContext &compiledCtx
 				
 			// For types that support handles auto should prefer handle 
 			// as it is more efficient than making a copy
-			// TODO: 'auto a = ...;' and 'auto @a = ...;' works the same in this case. Is this what we want?
 			if( newType.SupportHandles() )
 				newType.MakeHandle(true);
 
@@ -8928,6 +8927,9 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 					// Release the old temporary variable
 					ReleaseTemporaryVariable(le.type, &ctx->bc);
 
+					// Process any deferred arguments in the expressions as these must not survive until after the condition returns
+					ProcessDeferredParams(ctx);
+
 					ctx->bc.InstrINT(asBC_JMP, afterLabel);
 
 					// Start of the right expression
@@ -8949,6 +8951,9 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 
 					// Release the old temporary variable
 					ReleaseTemporaryVariable(re.type, &ctx->bc);
+
+					// Process any deferred arguments in the expressions as these must not survive until after the condition returns
+					ProcessDeferredParams(ctx);
 
 					ctx->bc.Label((short)afterLabel);
 
@@ -9366,7 +9371,7 @@ asCCompiler::SYMBOLTYPE asCCompiler::SymbolLookup(const asCString &name, const a
 		// TODO: child funcdef: A scope can include a template type, e.g. array<ns::type>
 		int n = currScope.FindLast("::");
 		asCString typeName = n >= 0 ? currScope.SubString(n + 2) : currScope;
-		asCString nsName = n >= 0 ? currScope.SubString(0, n) : "";
+		asCString nsName = n >= 0 ? currScope.SubString(0, n) : asCString("");
 
 		// If the scope represents a type that the current class inherits
 		// from then that should be used instead of going through the namespaces

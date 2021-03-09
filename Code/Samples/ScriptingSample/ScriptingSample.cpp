@@ -32,9 +32,17 @@
 #include <RendererFoundation/Device/SwapChain.h>
 #include <Texture/Image/ImageConversion.h>
 
-#include <AngelscriptPlugin/AngelscriptManager.h>
-#include <HashLinkPlugin/HashLinkManager.h>
-#include <DaoPlugin/Runtime/DaoManager.h>
+#ifdef BUILDSYSTEM_ENABLE_ANGELSCRIPT_SUPPORT
+#  include <AngelscriptPlugin/AngelscriptManager.h>
+#endif
+
+#ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
+#  include <HashLinkPlugin/HashLinkManager.h>
+#endif
+
+#ifdef BUILDSYSTEM_ENABLE_DAO_SUPPORT
+#  include <DaoPlugin/Runtime/DaoManager.h>
+#endif
 
 class ScriptingSampleWindow : public ezWindow
 {
@@ -193,8 +201,13 @@ public:
       EZ_ASSERT_DEV(!m_hDepthStencilState.IsInvalidated(), "Couldn't create depth-stencil state!");
     }
 
+#ifdef BUILDSYSTEM_ENABLE_ANGELSCRIPT_SUPPORT
     ezAngelscriptManager::GetSingleton()->Test();
+#endif
+
+#ifdef BUILDSYSTEM_ENABLE_DAO_SUPPORT
     ezDaoManager::GetSingleton()->Test();
+#endif
   }
 
 
@@ -214,6 +227,8 @@ public:
     // make sure telemetry is sent out regularly
     ezTelemetry::PerFrameUpdate();
 
+
+#ifdef BUILDSYSTEM_ENABLE_HASHLINK_SUPPORT
     {
       static int run = 1;
       ezLog::Info("Run: {0}", run++);
@@ -223,6 +238,7 @@ public:
       }
       ezHashLinkManager::GetSingleton()->Test();
     }
+#endif
 
     // do the rendering
     {
