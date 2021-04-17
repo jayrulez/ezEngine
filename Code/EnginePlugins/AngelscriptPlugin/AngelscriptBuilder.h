@@ -37,7 +37,7 @@ class EZ_ANGELSCRIPTPLUGIN_DLL ezAngelscriptBuilder
 {
 public:
   ezAngelscriptBuilder();
-  ~ezAngelscriptBuilder();
+  ~ezAngelscriptBuilder() = default;
 
   // Start a new module
   ezInt32 StartNewModule(asIScriptEngine* engine, const char* moduleName);

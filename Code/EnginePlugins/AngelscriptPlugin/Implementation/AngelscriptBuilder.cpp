@@ -18,10 +18,6 @@ ezAngelscriptBuilder::ezAngelscriptBuilder()
   pragmaParam = nullptr;
 }
 
-ezAngelscriptBuilder::~ezAngelscriptBuilder()
-{
-}
-
 void ezAngelscriptBuilder::SetIncludeCallback(INCLUDECALLBACK_t callback, void* userParam)
 {
   includeCallback = callback;
@@ -78,6 +74,9 @@ ezString ezAngelscriptBuilder::GetSectionName(ezUInt32 index) const
   return *it;
 }
 
+// Returns 1 if the section was included
+// Returns 0 if the section was not included because it had already been included before
+// Returns <0 if there was an error
 ezInt32 ezAngelscriptBuilder::AddSectionFromFile(const char* filename)
 {
   // The file name stored in the set should be the fully resolved name because
@@ -96,6 +95,9 @@ ezInt32 ezAngelscriptBuilder::AddSectionFromFile(const char* filename)
   return 0;
 }
 
+// Returns 1 if the section was included
+// Returns 0 if the section was not included because it had already been included before
+// Returns <0 if there was an error
 ezInt32 ezAngelscriptBuilder::AddSectionFromMemory(const char* sectionName, const char* scriptCode, ezUInt32 scriptLength, ezInt32 lineOffset)
 {
   if (IncludeIfNotAlreadyIncluded(sectionName))
