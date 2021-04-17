@@ -1276,7 +1276,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 					for (i = 0; i < length; ++i)
 					{
 						func->scriptData->objVariableInfo[i].programPos = SanityCheck(ReadEncodedUInt(), 1000000);
-						func->scriptData->objVariableInfo[i].variableOffset = SanityCheck(ReadEncodedUInt(), 10000);
+						func->scriptData->objVariableInfo[i].variableOffset = SanityCheck(ReadEncodedInt(), 10000);
 						asEObjVarInfoOption option = (asEObjVarInfoOption)ReadEncodedUInt();
 						func->scriptData->objVariableInfo[i].option = option;
 						if (option != asOBJ_INIT && 
@@ -1360,7 +1360,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 						func->scriptData->variables.PushLast(var);
 
 						var->declaredAtProgramPos = ReadEncodedUInt();
-						var->stackOffset = ReadEncodedUInt();
+						var->stackOffset = SanityCheck(ReadEncodedInt(),10000);
 						ReadString(&var->name);
 						ReadDataType(&var->type);
 
@@ -2033,10 +2033,15 @@ asUINT asCReader::ReadEncodedUInt()
 	return asUINT(qw & 0xFFFFFFFFu);
 }
 
+int asCReader::ReadEncodedInt()
+{
+	return int(ReadEncodedUInt());
+}
+
 asQWORD asCReader::ReadEncodedUInt64()
 {
 	asQWORD i = 0;
-	asBYTE b;
+	asBYTE b = 0xFF; // set to 0xFF to better catch if the stream doesn't update the value
 	ReadData(&b, 1);
 	bool isNegative = ( b & 0x80 ) ? true : false;
 	b &= 0x7F;
@@ -2110,6 +2115,19 @@ asQWORD asCReader::ReadEncodedUInt64()
 asUINT asCReader::SanityCheck(asUINT val, asUINT max)
 {
 	if (val > max)
+	{
+		Error(TXT_INVALID_BYTECODE_d);
+
+		// Return 0 as default value
+		return 0;
+	}
+
+	return val;
+}
+
+int asCReader::SanityCheck(int val, asUINT max)
+{
+	if (val > int(max) || val < -int(max))
 	{
 		Error(TXT_INVALID_BYTECODE_d);
 

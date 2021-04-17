@@ -418,7 +418,7 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
     else
 #endif
       // Is this a preprocessor directive?
-      if (token == "#" && (pos + 1 < modifiedScript.GetCharacterCount()))
+    if (token == "#" && (pos + 1 < modifiedScript.GetCharacterCount()))
     {
       int start = pos++;
 
@@ -467,6 +467,20 @@ ezInt32 ezAngelscriptBuilder::ProcessScriptSection(const char* script, ezUInt32 
           }
 
           // Overwrite the pragma directive with space characters to avoid compiler error
+          OverwriteCode(start, pos - start);
+        }
+      }
+      else
+      {
+        // Check for lines starting with #!, e.g. shebang interpreter directive. These will be treated as comments and removed by the preprocessor
+        if (modifiedScript[pos] == '!')
+        {
+          // Read until the end of the line
+          pos += len;
+          for (; pos < modifiedScript.GetCharacterCount() && modifiedScript[pos] != '\n'; pos++)
+            ;
+
+          // Overwrite the directive with space characters to avoid compiler error
           OverwriteCode(start, pos - start);
         }
       }

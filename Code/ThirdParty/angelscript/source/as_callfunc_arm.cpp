@@ -659,7 +659,3 @@ END_AS_NAMESPACE
 
 #endif // AS_ARM
 #endif // AS_MAX_PORTABILITY
-
-
-
-

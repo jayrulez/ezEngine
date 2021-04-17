@@ -5,7 +5,7 @@
         "type": "git",
         "git": {
           "repositoryUrl": "https://github.com/codecat/angelscript-mirror",
-          "commitHash": "1dc5cd183a60a92c36a4a51f6b0ceb3e9044540e"
+          "commitHash": "19bcb5ccb3702c4353002f73389597615a961a2a"
         }
       }
     } 

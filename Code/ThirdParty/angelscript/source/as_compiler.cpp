@@ -5272,7 +5272,7 @@ int asCCompiler::AllocateVariable(const asCDataType &type, bool isTemporary, boo
 
 	bool isOnHeap = true;
 	if( t.IsPrimitive() ||
-		(t.GetTypeInfo() && (t.GetTypeInfo()->GetFlags() & asOBJ_VALUE) && !forceOnHeap) )
+		(t.GetTypeInfo() && (t.GetTypeInfo()->GetFlags() & asOBJ_VALUE) && !forceOnHeap && !asReference) )
 	{
 		// Primitives and value types (unless overridden) are allocated on the stack
 		isOnHeap = false;
@@ -6105,7 +6105,7 @@ asUINT asCCompiler::ImplicitConvPrimitiveToPrimitive(asCExprContext *ctx, const 
 	// Start by implicitly converting constant values
 	if( ctx->type.isConstant )
 	{
-		ImplicitConversionConstant(ctx, to, node, convType);
+		ImplicitConversionConstant(ctx, to, generateCode ? node : 0, convType);
 		ctx->type.dataType.MakeReadOnly(to.IsReadOnly());
 		return cost;
 	}
@@ -8048,17 +8048,28 @@ void asCCompiler::ImplicitConversionConstant(asCExprContext *from, const asCData
 			// Verify if it is possible
 			if( to.GetSizeInMemoryBytes() == 1 )
 			{
-				if( asBYTE(from->type.GetConstantDW()) != from->type.GetConstantDW() )
+				if( (from->type.dataType.GetSizeInMemoryBytes() == 2 && asBYTE(from->type.GetConstantW()) != from->type.GetConstantW()) ||
+					(from->type.dataType.GetSizeInMemoryBytes() == 4 && asBYTE(from->type.GetConstantDW()) != from->type.GetConstantDW()) ||
+					(from->type.dataType.GetSizeInMemoryBytes() == 8 && asBYTE(from->type.GetConstantQW()) != from->type.GetConstantQW()) )
 					if( convType != asIC_EXPLICIT_VAL_CAST && node ) Warning(TXT_VALUE_TOO_LARGE_FOR_TYPE, node);
 
-				from->type.SetConstantB(asCDataType::CreatePrimitive(to.GetTokenType(), true), asBYTE(from->type.GetConstantDW()));
+				if( from->type.dataType.GetSizeInMemoryBytes() == 2 )
+					from->type.SetConstantB(asCDataType::CreatePrimitive(to.GetTokenType(), true), asBYTE(from->type.GetConstantW()));
+				else if (from->type.dataType.GetSizeInMemoryBytes() == 4)
+					from->type.SetConstantB(asCDataType::CreatePrimitive(to.GetTokenType(), true), asBYTE(from->type.GetConstantDW()));
+				else if (from->type.dataType.GetSizeInMemoryBytes() == 8)
+					from->type.SetConstantB(asCDataType::CreatePrimitive(to.GetTokenType(), true), asBYTE(from->type.GetConstantQW()));
 			}
 			else if( to.GetSizeInMemoryBytes() == 2 )
 			{
-				if( asWORD(from->type.GetConstantDW()) != from->type.GetConstantDW())
+				if( (from->type.dataType.GetSizeInMemoryBytes() == 4 && asWORD(from->type.GetConstantDW()) != from->type.GetConstantDW()) ||
+					(from->type.dataType.GetSizeInMemoryBytes() == 8 && asWORD(from->type.GetConstantQW()) != from->type.GetConstantQW()) )
 					if( convType != asIC_EXPLICIT_VAL_CAST && node ) Warning(TXT_VALUE_TOO_LARGE_FOR_TYPE, node);
 
-				from->type.SetConstantW(asCDataType::CreatePrimitive(to.GetTokenType(), true), asWORD(from->type.GetConstantDW()));
+				if (from->type.dataType.GetSizeInMemoryBytes() == 4)
+					from->type.SetConstantW(asCDataType::CreatePrimitive(to.GetTokenType(), true), asWORD(from->type.GetConstantDW()));
+				else if (from->type.dataType.GetSizeInMemoryBytes() == 8)
+					from->type.SetConstantW(asCDataType::CreatePrimitive(to.GetTokenType(), true), asWORD(from->type.GetConstantQW()));
 			}
 			else if (to.GetSizeInMemoryBytes() == 4)
 			{
@@ -8649,7 +8660,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 		{
 			Error(TXT_EXPR_MUST_BE_BOOL, cexpr);
 			e.type.SetConstantB(asCDataType::CreatePrimitive(ttBool, true), true);
-		}
+		} 
 		ctype = e.type;
 
 		if( ProcessPropertyGetAccessor(&e, cexpr) < 0)
@@ -8672,43 +8683,21 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 		int rr = CompileAssignment(cexpr->next->next, &re);
 		DetermineSingleFunc(&re, cexpr->next->next);
 
-		if( lr >= 0 && rr >= 0 )
+		if (lr >= 0 && rr >= 0)
 		{
 			// Don't allow any operators on expressions that take address of class method
-			if( le.IsClassMethod() || re.IsClassMethod() )
+			if (le.IsClassMethod() || re.IsClassMethod())
 			{
 				Error(TXT_INVALID_OP_ON_METHOD, expr);
 				return -1;
 			}
 
-			if( ProcessPropertyGetAccessor(&le, cexpr->next) < 0 )
+			if (ProcessPropertyGetAccessor(&le, cexpr->next) < 0)
 				return -1;
-			if( ProcessPropertyGetAccessor(&re, cexpr->next->next) < 0 )
+			if (ProcessPropertyGetAccessor(&re, cexpr->next->next) < 0)
 				return -1;
 
 			bool isExplicitHandle = le.type.isExplicitHandle || re.type.isExplicitHandle;
-
-			// Allow a 0 or null in the first case to be implicitly converted to the second type
-			if( le.type.isConstant && le.type.GetConstantData() == 0 && le.type.dataType.IsIntegerType() )
-			{
-				asCDataType to = re.type.dataType;
-				to.MakeReference(false);
-				to.MakeReadOnly(true);
-				ImplicitConversionConstant(&le, to, cexpr->next, asIC_IMPLICIT_CONV);
-			}
-			else if( le.type.IsNullConstant() )
-			{
-				asCDataType to = re.type.dataType;
-				to.MakeHandle(true);
-				ImplicitConversion(&le, to, cexpr->next, asIC_IMPLICIT_CONV);
-			}
-
-			// Allow either case to be converted to const @ if the other is const @
-			if( (le.type.dataType.IsHandleToConst() && !le.type.IsNullConstant()) || (re.type.dataType.IsHandleToConst() && !re.type.dataType.IsNullHandle()) )
-			{
-				le.type.dataType.MakeHandleToConst(true);
-				re.type.dataType.MakeHandleToConst(true);
-			}
 
 			// Allow an anonymous initialization list to be converted to the type in the other condition
 			if (le.IsAnonymousInitList() && re.type.dataType.GetBehaviour() && re.type.dataType.GetBehaviour()->listFactory)
@@ -8726,7 +8715,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 				ImplicitConversion(&re, to, cexpr->next->next, asIC_IMPLICIT_CONV);
 			}
 
-			if (le.IsAnonymousInitList() )
+			if (le.IsAnonymousInitList())
 			{
 				Error(TXT_CANNOT_RESOLVE_AUTO, cexpr->next);
 				return -1;
@@ -8734,6 +8723,81 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 			else if (re.IsAnonymousInitList())
 			{
 				Error(TXT_CANNOT_RESOLVE_AUTO, cexpr->next->next);
+				return -1;
+			}
+
+			// Try to perform an implicit cast to make the two operands of the same type
+			// Choose the conversion that is the least costly
+			if (le.type.dataType != re.type.dataType)
+			{
+				asCExprContext tmp(engine);
+				tmp.type = le.type;
+				tmp.type.dataType.MakeReference(false);
+				asUINT costAtoB = ImplicitConversion(&tmp, re.type.dataType, cexpr->next, asIC_IMPLICIT_CONV, false);
+				if (!tmp.type.dataType.IsEqualExceptRef(re.type.dataType))
+					costAtoB = 0xFFFFFFFF;
+				tmp.type = re.type;
+				tmp.type.dataType.MakeReference(false);
+				asUINT costBtoA = ImplicitConversion(&tmp, le.type.dataType, cexpr->next->next, asIC_IMPLICIT_CONV, false);
+				if (!tmp.type.dataType.IsEqualExceptRef(le.type.dataType))
+					costBtoA = 0xFFFFFFFF;
+
+				if (costAtoB < costBtoA && costAtoB != 0xFFFFFFFF)
+				{
+					Dereference(&le, true);
+					ImplicitConversion(&le, re.type.dataType, cexpr->next, asIC_IMPLICIT_CONV, true);
+				}
+				else if (costAtoB > costBtoA && costBtoA != 0xFFFFFFFF)
+				{
+					Dereference(&re, true);
+					ImplicitConversion(&re, le.type.dataType, cexpr->next->next, asIC_IMPLICIT_CONV, true);
+				}
+
+				// If the cost for conversion is the same in both directions we have an ambigious situation, 
+				// which we do not resolve. In that case the script need to perform an explicit conversion
+			}
+
+			// Allow a 0 to be implicitly converted to the other type
+			if (le.type.isConstant && le.type.GetConstantData() == 0 && le.type.dataType.IsIntegerType())
+			{
+				asCDataType to = re.type.dataType;
+				to.MakeReference(false);
+				to.MakeReadOnly(true);
+				ImplicitConversionConstant(&le, to, cexpr->next, asIC_IMPLICIT_CONV);
+			}
+			else if( re.type.isConstant && re.type.GetConstantData() == 0 && re.type.dataType.IsIntegerType())
+			{
+				asCDataType to = le.type.dataType;
+				to.MakeReference(false);
+				to.MakeReadOnly(true);
+				ImplicitConversionConstant(&re, to, cexpr->next->next, asIC_IMPLICIT_CONV);
+			}
+
+			// Allow expression to be converted to handle if the other is handle
+			if (!le.type.dataType.IsObjectHandle() && re.type.dataType.IsObjectHandle() && le.type.dataType.GetTypeInfo() == re.type.dataType.GetTypeInfo() )
+			{
+				asCDataType dt = le.type.dataType;
+				dt.MakeHandle(true);
+				ImplicitConversion(&le, dt, cexpr->next, asIC_IMPLICIT_CONV);
+			}
+			if (!re.type.dataType.IsObjectHandle() && le.type.dataType.IsObjectHandle() && le.type.dataType.GetTypeInfo() == re.type.dataType.GetTypeInfo())
+			{
+				asCDataType dt = re.type.dataType;
+				dt.MakeHandle(true);
+				ImplicitConversion(&re, dt, cexpr->next->next, asIC_IMPLICIT_CONV);
+			}
+
+			// Allow either case to be converted to const @ if the other is const @
+			if( (le.type.dataType.IsHandleToConst() && !le.type.IsNullConstant()) || (re.type.dataType.IsHandleToConst() && !re.type.dataType.IsNullHandle()) )
+			{
+				le.type.dataType.MakeHandleToConst(true);
+				re.type.dataType.MakeHandleToConst(true);
+			}
+
+			// Make sure both expressions have the same type
+			if (!le.type.dataType.IsEqualExceptRefAndConst(re.type.dataType))
+			{
+				Error(TXT_BOTH_MUST_BE_SAME, expr);
 				return -1;
 			}
 
@@ -8764,10 +8828,6 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 				ctx->bc.Label((short)elseLabel);
 				MergeExprBytecode(ctx, &re);
 				ctx->bc.Label((short)afterLabel);
-
-				// Make sure both expressions have the same type
-				if( le.type.dataType != re.type.dataType )
-					Error(TXT_BOTH_MUST_BE_SAME, expr);
 
 				// Set the type of the result
 				ctx->type = le.type;
@@ -8809,7 +8869,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 				// with a stack offset (i.e. it will not be allowed to use asBC_VAR)
 
 				if( le.type.isLValue && re.type.isLValue &&
-					le.deferredParams.GetLength() == 0 && re.deferredParams.GetLength() ==0 &&
+					le.deferredParams.GetLength() == 0 && re.deferredParams.GetLength() == 0 &&
 					!le.type.isTemporary && !re.type.isTemporary &&
 					le.type.dataType == re.type.dataType )
 				{
@@ -8956,10 +9016,6 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 					ProcessDeferredParams(ctx);
 
 					ctx->bc.Label((short)afterLabel);
-
-					// Make sure both expressions have the same type
-					if( !le.type.dataType.IsEqualExceptConst(re.type.dataType) )
-						Error(TXT_BOTH_MUST_BE_SAME, expr);
 
 					// Set the temporary variable as output
 					ctx->type = rtemp;
