@@ -19,7 +19,7 @@ EZ_BEGIN_COMPONENT_TYPE(ezAngelscriptComponent, 4, ezComponentMode::Static)
 {
   EZ_BEGIN_PROPERTIES
   {
-    EZ_ACCESSOR_PROPERTY("Script", GetAngelscriptComponentClassName, SetAngelscriptComponentClassName)->AddAttributes(new ezAssetBrowserAttribute("TypeScript")),
+    EZ_ACCESSOR_PROPERTY("Script", GetAngelscriptComponentClassName, SetAngelscriptComponentClassName)->AddAttributes(new ezAssetBrowserAttribute("Angelscript")),
   }
   EZ_END_PROPERTIES;
   EZ_BEGIN_ATTRIBUTES
