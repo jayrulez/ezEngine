@@ -1,0 +1,21 @@
+#include <RendererVkPCH.h>
+
+EZ_STATICLINK_LIBRARY(RendererVk)
+{
+  if (bReturn)
+    return;
+
+  EZ_STATICLINK_REFERENCE(RendererVk_Context_Implementation_ContextVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Device_Implementation_DeviceVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Device_Implementation_SwapChainVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_BufferVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_FenceVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_QueryVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_RenderTargetViewVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_ResourceViewVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_TextureVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_UnorderedAccessViewVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Shader_Implementation_ShaderVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Shader_Implementation_VertexDeclarationVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_State_Implementation_StateVk);
+}
