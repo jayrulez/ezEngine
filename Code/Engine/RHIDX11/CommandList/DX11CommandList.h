@@ -9,10 +9,15 @@
 
 class EZ_RHIDX11_DLL ezRHIDX11CommantList : public ezRHICommandList
 {
-public:
+private:
   ///////////////Thread-sensitive////////////////////////
 
-  ~ezRHIDX11CommantList();
+  friend class ezMemoryUtils;
+  friend class ezRHIDX11Device;
+  ezRHIDX11CommantList();
+
+public:
+  virtual ~ezRHIDX11CommantList();
 
   void RenderPassBegin(const ezRHISwapChain* swapchain) override;
   void RenderPassBegin(const ezRHIRenderPass* renderpass) override;
@@ -43,8 +48,8 @@ public:
   void DispatchIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) override;
   void CopyResource(const ezRHIResourceBase* pDst, const ezRHIResourceBase* pSrc) override;
   void UpdateBuffer(const ezRHIGPUBuffer* buffer, const void* data, ezInt32 dataSize = -1) override;
-  void QueryBegin(const ezRHIGPUQueryHeap* heap, ezUInt32 index) override;
-  void QueryEnd(const ezRHIGPUQueryHeap* heap, ezUInt32 index) override;
+  void QueryBegin(const ezRHIQueryHeap* heap, ezUInt32 index) override;
+  void QueryEnd(const ezRHIQueryHeap* heap, ezUInt32 index) override;
   void Barrier(const ezRHIGPUBarrierDesc* barriers, ezUInt32 numBarriers) override {}
 
   GPUAllocation AllocateGPU(ezUInt64 dataSize) override;
@@ -52,4 +57,13 @@ public:
   void EventBegin(const char* name) override;
   void EventEnd() override;
   void SetMarker(const char* name) override;
+
+  ///////////////////////////////////////
+
+  inline virtual void DispatchMesh(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ) {}
+  inline virtual void DispatchMeshIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) {}
+  inline virtual void WaitCommandList(ezRHICommandList* wait_for) {}
+  inline virtual void BindShadingRate(ezRHIShadingRate::Enum rate) {}
+  inline virtual void QueryResolve(const ezRHIQueryHeap* heap, ezUInt32 index, ezUInt32 count) {}
+  inline virtual void PushConstants(const void* data, ezUInt32 size) {}
 };

@@ -7,13 +7,15 @@ class EZ_RHI_DLL ezRHICommandList
 {
   EZ_DISALLOW_COPY_AND_ASSIGN(ezRHICommandList);
 
-public:
-  EZ_ALWAYS_INLINE ezRHICommandList() {}
-  EZ_ALWAYS_INLINE virtual ~ezRHICommandList() {}
+protected:
+  inline ezRHICommandList() {}
+  inline virtual ~ezRHICommandList() {}
 
+public:
   ///////////////Thread-sensitive////////////////////////
 
-  EZ_ALWAYS_INLINE virtual void WaitCommandList(ezRHICommandList* wait_for) {}
+
+  virtual void WaitCommandList(ezRHICommandList* wait_for) {}
   virtual void RenderPassBegin(const ezRHISwapChain* swapchain) = 0;
   virtual void RenderPassBegin(const ezRHIRenderPass* renderpass) = 0;
   virtual void RenderPassEnd() = 0;
@@ -31,7 +33,7 @@ public:
   virtual void BindIndexBuffer(const ezRHIGPUBuffer* indexBuffer, const ezRHIIndexType::Enum format, ezUInt32 offset) = 0;
   virtual void BindStencilRef(ezUInt32 value) = 0;
   virtual void BindBlendFactor(float r, float g, float b, float a) = 0;
-  EZ_ALWAYS_INLINE virtual void BindShadingRate(ezRHIShadingRate::Enum rate) {}
+  virtual void BindShadingRate(ezRHIShadingRate::Enum rate) {}
   virtual void BindPipelineState(const ezRHIPipelineState* pso) = 0;
   virtual void BindComputeShader(const ezRHIShader* cs) = 0;
   virtual void Draw(ezUInt32 vertexCount, ezUInt32 startVertexLocation) = 0;
@@ -42,17 +44,15 @@ public:
   virtual void DrawIndexedInstancedIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) = 0;
   virtual void Dispatch(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ) = 0;
   virtual void DispatchIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) = 0;
-  EZ_ALWAYS_INLINE virtual void DispatchMesh(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ) {}
-  EZ_ALWAYS_INLINE virtual void DispatchMeshIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) {}
+  virtual void DispatchMesh(ezUInt32 threadGroupCountX, ezUInt32 threadGroupCountY, ezUInt32 threadGroupCountZ) {}
+  virtual void DispatchMeshIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) {}
   virtual void CopyResource(const ezRHIResourceBase* pDst, const ezRHIResourceBase* pSrc) = 0;
   virtual void UpdateBuffer(const ezRHIGPUBuffer* buffer, const void* data, ezInt32 dataSize = -1) = 0;
   virtual void QueryBegin(const ezRHIQueryHeap* heap, ezUInt32 index) = 0;
   virtual void QueryEnd(const ezRHIQueryHeap* heap, ezUInt32 index) = 0;
-  EZ_ALWAYS_INLINE virtual void QueryResolve(const ezRHIQueryHeap* heap, ezUInt32 index, ezUInt32 count) {}
+  virtual void QueryResolve(const ezRHIQueryHeap* heap, ezUInt32 index, ezUInt32 count) {}
   virtual void Barrier(const ezRHIGPUBarrierDesc* barriers, ezUInt32 numBarriers) = 0;
-  EZ_ALWAYS_INLINE virtual void BuildRaytracingAccelerationStructure(const ezRHIRaytracingAccelerationStructure* dst, const ezRHIRaytracingAccelerationStructure* src = nullptr) {}
-  EZ_ALWAYS_INLINE virtual void BindRaytracingPipelineState(const ezRHIRaytracingPipelineState* rtpso) {}
-  EZ_ALWAYS_INLINE virtual void PushConstants(const void* data, ezUInt32 size) {}
+  virtual void PushConstants(const void* data, ezUInt32 size) {}
 
   struct GPUAllocation
   {

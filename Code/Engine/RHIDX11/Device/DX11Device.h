@@ -9,16 +9,19 @@
 
 class EZ_RHIDX11_DLL ezRHIDX11Device : public ezRHIDevice
 {
-public:
+private:
   friend ezInternal::NewInstance<ezRHIDevice> CreateDX11Device(ezAllocatorBase* pAllocator, const ezRHIDeviceDesc& desc);
   ezRHIDX11Device(const ezRHIDeviceDesc& desc);
 
-  bool CreateSwapChain(const ezRHISwapChainDesc*, ezRHISwapChain* swapChain) const override;
+public:
+  virtual ~ezRHIDX11Device();
+
+  ezRHISwapChain* CreateSwapChain(const ezRHISwapChainDesc& desc) override;
   bool CreateBuffer(const ezRHIGPUBufferDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHIGPUBuffer* pBuffer) const override;
   bool CreateTexture(const ezRHITextureDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHITexture* pTexture) const override;
   bool CreateShader(ezRHIShaderStage::Enum stage, const void* pShaderBytecode, ezUInt64 BytecodeLength, ezRHIShader* pShader) const override;
   bool CreateSampler(const ezRHISamplerStateDesc* pSamplerDesc, ezRHISamplerState* pSamplerState) const override;
-  bool CreateQueryHeap(const ezRHIGPUQueryHeapDesc* pDesc, ezRHIGPUQueryHeap* pQueryHeap) const override;
+  bool CreateQueryHeap(const ezRHIQueryHeapDesc* pDesc, ezRHIQueryHeap* pQueryHeap) const override;
   bool CreatePipelineState(const ezRHIPipelineStateDesc* pDesc, ezRHIPipelineState* pso) const override;
   bool CreateRenderPass(const ezRHIRenderPassDesc* pDesc, ezRHIRenderPass* renderpass) const override;
 
@@ -27,7 +30,7 @@ public:
 
   void Map(const ezRHIResourceBase* resource, ezRHIMapping* mapping) const override;
   void Unmap(const ezRHIResourceBase* resource) const override;
-  void QueryRead(const ezRHIGPUQueryHeap* resource, ezUInt32 index, ezUInt32 count, ezUInt64* results) const override;
+  void QueryRead(const ezRHIQueryHeap* resource, ezUInt32 index, ezUInt32 count, ezUInt64* results) const override;
 
   void SetCommonSampler(const ezRHIStaticSampler* samplerState) override;
 

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <RHIDX11/RHIDX11DLL.h>
 #include <RHI/Descriptors/Descriptors.h>
 #include <RHI/Device/SwapChain.h>
-#include <RHIDX11/RHIDX11DLL.h>
 
 class ezRHIDX11SwapChain : public ezRHISwapChain
 {

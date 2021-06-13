@@ -1,9 +1,9 @@
 #pragma once
 
-#include <RHI/RHIDLL.h>
-
-#include <RHI/Descriptors/Descriptors.h>
 #include <Foundation/Memory/CommonAllocators.h>
+#include <RHI/Descriptors/Descriptors.h>
+
+#include <RHI/RHIDLL.h>
 
 struct ezRHIQueueType
 {
@@ -22,11 +22,10 @@ protected:
   friend class ezMemoryUtils;
 
   ezRHIDevice(const ezRHIDeviceDesc& desc);
-  virtual ~ezRHIDevice() = default;
+  virtual ~ezRHIDevice();
 
 public:
-
-  virtual bool CreateSwapChain(const ezRHISwapChainDesc* pDesc, ezRHISwapChain* swapChain) const = 0;
+  virtual ezRHISwapChain* CreateSwapChain(const ezRHISwapChainDesc& desc) = 0;
   virtual bool CreateBuffer(const ezRHIGPUBufferDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHIGPUBuffer* pBuffer) const = 0;
   virtual bool CreateTexture(const ezRHITextureDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHITexture* pTexture) const = 0;
   virtual bool CreateShader(ezRHIShaderStage::Enum stage, const void* pShaderBytecode, ezUInt64 BytecodeLength, ezRHIShader* pShader) const = 0;
@@ -70,7 +69,6 @@ public:
   constexpr bool IsDebugDevice() const { return m_DebugDevice; }
 
   constexpr ezUInt64 GetShaderIdentifierSize() const { return m_ShaderIdentifierSize; }
-  constexpr ezUInt64 GetTopLevelAccelerationStructureInstanceSize() const { return m_TopLevelAccelerationStructureInstanceSize; }
   constexpr ezUInt32 GetVariableRateShadingTileSize() const { return m_VariableRateShadingTileSize; }
   constexpr ezUInt64 GetTimestampFrequency() const { return m_TimestampFrequency; }
 
@@ -84,13 +82,22 @@ protected:
   bool m_DebugDevice = false;
   ezBitflags<ezRHIDeviceCapabilityFlags> m_Capabilities;
   ezUInt64 m_ShaderIdentifierSize = 0;
-  ezUInt64 m_TopLevelAccelerationStructureInstanceSize = 0;
   ezUInt32 m_VariableRateShadingTileSize = 0;
   ezUInt64 m_TimestampFrequency = 0;
 
   ezProxyAllocator m_Allocator;
   ezLocalAllocatorWrapper m_AllocatorWrapper;
+  ezRHIDeviceDesc m_Desc;
 
 private:
-  ezRHIDeviceDesc m_Desc;
+
+  private:
+  static ezRHIDevice* s_pDefaultDevice;
+
+  public:
+  static void SetDefaultDevice(ezRHIDevice* pDefaultDevice);
+    static ezRHIDevice* GetDefaultDevice();
+  static bool HasDefaultDevice();
 };
+
+#include <RHI/Device/Implementation/Device_inl.h>

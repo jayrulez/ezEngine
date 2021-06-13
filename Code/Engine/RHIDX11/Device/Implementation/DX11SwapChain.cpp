@@ -1,4 +1,7 @@
+#include <RHIDX11PCH.h>
+
 #include <RHIDX11/Device/DX11SwapChain.h>
+#include <RHIDX11/Device/DX11Device.h>
 #include <RHIDX11/RHIDX11Utils.h>
 #include <Core/System/Window.h>
 #include <Foundation/Basics/Platform/Win/IncludeWindows.h>
@@ -59,10 +62,10 @@ ezResult ezRHIDX11SwapChain::InitPlatform(ezRHIDevice* pDevice)
     nullptr,
     &m_pSwapChain);
 #endif
-  return ezResult();
+  return EZ_SUCCESS;
 }
 
 ezResult ezRHIDX11SwapChain::DeInitPlatform(ezRHIDevice* pDevice)
 {
-  return ezResult();
+  return EZ_SUCCESS;
 }

@@ -1,3 +1,8 @@
+#include <RHIDX11PCH.h>
+
+#include <Core/System/Window.h>
+#include <Foundation/Basics/Platform/Win/IncludeWindows.h>
+#include <Foundation/Configuration/Startup.h>
 #include <RHIDX11/Device/DX11Device.h>
 #include <RHIDX11/Device/DX11SwapChain.h>
 
@@ -12,16 +17,26 @@ ezInternal::NewInstance<ezRHIDevice> CreateDX11Device(ezAllocatorBase* pAllocato
   return EZ_NEW(pAllocator, ezRHIDX11Device, desc);
 }
 
-
 ezRHIDX11Device::ezRHIDX11Device(const ezRHIDeviceDesc& desc)
   : ezRHIDevice(desc)
 {
 }
 
-bool ezRHIDX11Device::CreateSwapChain(const ezRHISwapChainDesc* desc, ezRHISwapChain* swapChain) const
+ezRHIDX11Device::~ezRHIDX11Device()
 {
-  swapChain = EZ_NEW(m_Allocator, ezRHIDX11SwapChain, *desc);
-  return false;
+}
+
+ezRHISwapChain* ezRHIDX11Device::CreateSwapChain(const ezRHISwapChainDesc& desc)
+{
+  ezRHIDX11SwapChain* pSwapChain = EZ_NEW(&m_Allocator, ezRHIDX11SwapChain, desc);
+
+  if (!pSwapChain->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pSwapChain);
+    return nullptr;
+  }
+
+  return pSwapChain;
 }
 
 bool ezRHIDX11Device::CreateBuffer(const ezRHIGPUBufferDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHIGPUBuffer* pBuffer) const
@@ -44,7 +59,7 @@ bool ezRHIDX11Device::CreateSampler(const ezRHISamplerStateDesc* pSamplerDesc, e
   return false;
 }
 
-bool ezRHIDX11Device::CreateQueryHeap(const ezRHIGPUQueryHeapDesc* pDesc, ezRHIGPUQueryHeap* pQueryHeap) const
+bool ezRHIDX11Device::CreateQueryHeap(const ezRHIQueryHeapDesc* pDesc, ezRHIQueryHeap* pQueryHeap) const
 {
   return false;
 }
@@ -77,7 +92,7 @@ void ezRHIDX11Device::Unmap(const ezRHIResourceBase* resource) const
 {
 }
 
-void ezRHIDX11Device::QueryRead(const ezRHIGPUQueryHeap* resource, ezUInt32 index, ezUInt32 count, ezUInt64* results) const
+void ezRHIDX11Device::QueryRead(const ezRHIQueryHeap* resource, ezUInt32 index, ezUInt32 count, ezUInt64* results) const
 {
 }
 

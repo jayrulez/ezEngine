@@ -1,5 +1,10 @@
 #include <RHIDX11/CommandList/DX11CommandList.h>
 
+ezRHIDX11CommantList::ezRHIDX11CommantList()
+  : ezRHICommandList()
+{
+}
+
 ezRHIDX11CommantList::~ezRHIDX11CommantList()
 {
 }
@@ -120,11 +125,11 @@ void ezRHIDX11CommantList::UpdateBuffer(const ezRHIGPUBuffer* buffer, const void
 {
 }
 
-void ezRHIDX11CommantList::QueryBegin(const ezRHIGPUQueryHeap* heap, ezUInt32 index)
+void ezRHIDX11CommantList::QueryBegin(const ezRHIQueryHeap* heap, ezUInt32 index)
 {
 }
 
-void ezRHIDX11CommantList::QueryEnd(const ezRHIGPUQueryHeap* heap, ezUInt32 index)
+void ezRHIDX11CommantList::QueryEnd(const ezRHIQueryHeap* heap, ezUInt32 index)
 {
 }
 
