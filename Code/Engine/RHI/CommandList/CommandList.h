@@ -46,13 +46,12 @@ public:
   EZ_ALWAYS_INLINE virtual void DispatchMeshIndirect(const ezRHIGPUBuffer* args, ezUInt32 argsOffset) {}
   virtual void CopyResource(const ezRHIResourceBase* pDst, const ezRHIResourceBase* pSrc) = 0;
   virtual void UpdateBuffer(const ezRHIGPUBuffer* buffer, const void* data, ezInt32 dataSize = -1) = 0;
-  virtual void QueryBegin(const ezRHIGPUQueryHeap* heap, ezUInt32 index) = 0;
-  virtual void QueryEnd(const ezRHIGPUQueryHeap* heap, ezUInt32 index) = 0;
-  EZ_ALWAYS_INLINE virtual void QueryResolve(const ezRHIGPUQueryHeap* heap, ezUInt32 index, ezUInt32 count) {}
+  virtual void QueryBegin(const ezRHIQueryHeap* heap, ezUInt32 index) = 0;
+  virtual void QueryEnd(const ezRHIQueryHeap* heap, ezUInt32 index) = 0;
+  EZ_ALWAYS_INLINE virtual void QueryResolve(const ezRHIQueryHeap* heap, ezUInt32 index, ezUInt32 count) {}
   virtual void Barrier(const ezRHIGPUBarrierDesc* barriers, ezUInt32 numBarriers) = 0;
   EZ_ALWAYS_INLINE virtual void BuildRaytracingAccelerationStructure(const ezRHIRaytracingAccelerationStructure* dst, const ezRHIRaytracingAccelerationStructure* src = nullptr) {}
   EZ_ALWAYS_INLINE virtual void BindRaytracingPipelineState(const ezRHIRaytracingPipelineState* rtpso) {}
-  EZ_ALWAYS_INLINE virtual void DispatchRays(const ezRHIDispatchRaysDesc* desc) {}
   EZ_ALWAYS_INLINE virtual void PushConstants(const void* data, ezUInt32 size) {}
 
   struct GPUAllocation

@@ -19,21 +19,21 @@ struct ezRHIQueueType
 class EZ_RHI_DLL ezRHIDevice
 {
 protected:
+  friend class ezMemoryUtils;
+
   ezRHIDevice(const ezRHIDeviceDesc& desc);
+  virtual ~ezRHIDevice() = default;
 
 public:
-  virtual ~ezRHIDevice() = default;
 
   virtual bool CreateSwapChain(const ezRHISwapChainDesc* pDesc, ezRHISwapChain* swapChain) const = 0;
   virtual bool CreateBuffer(const ezRHIGPUBufferDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHIGPUBuffer* pBuffer) const = 0;
   virtual bool CreateTexture(const ezRHITextureDesc* pDesc, const ezRHISubresourceData* pInitialData, ezRHITexture* pTexture) const = 0;
   virtual bool CreateShader(ezRHIShaderStage::Enum stage, const void* pShaderBytecode, ezUInt64 BytecodeLength, ezRHIShader* pShader) const = 0;
   virtual bool CreateSampler(const ezRHISamplerStateDesc* pSamplerDesc, ezRHISamplerState* pSamplerState) const = 0;
-  virtual bool CreateQueryHeap(const ezRHIGPUQueryHeapDesc* pDesc, ezRHIGPUQueryHeap* pQueryHeap) const = 0;
+  virtual bool CreateQueryHeap(const ezRHIQueryHeapDesc* pDesc, ezRHIQueryHeap* pQueryHeap) const = 0;
   virtual bool CreatePipelineState(const ezRHIPipelineStateDesc* pDesc, ezRHIPipelineState* pso) const = 0;
   virtual bool CreateRenderPass(const ezRHIRenderPassDesc* pDesc, ezRHIRenderPass* renderpass) const = 0;
-  virtual bool CreateRaytracingAccelerationStructure(const ezRHIRaytracingAccelerationStructureDesc* pDesc, ezRHIRaytracingAccelerationStructure* bvh) const { return false; }
-  virtual bool CreateRaytracingPipelineState(const ezRHIRaytracingPipelineStateDesc* pDesc, ezRHIRaytracingPipelineState* rtpso) const { return false; }
 
   virtual ezInt32 CreateSubresource(ezRHITexture* texture, ezRHISubresourceType::Enum type, ezUInt32 firstSlice, ezUInt32 sliceCount, ezUInt32 firstMip, ezUInt32 mipCount) const = 0;
   virtual ezInt32 CreateSubresource(ezRHIGPUBuffer* buffer, ezRHISubresourceType::Enum type, ezUInt64 offset, ezUInt64 size = ~0) const = 0;
@@ -42,12 +42,10 @@ public:
   virtual ezInt32 GetDescriptorIndex(const ezRHISamplerState* sampler) const { return -1; };
 
   virtual void WriteShadingRateValue(ezRHIShadingRate::Enum rate, void* dest) const {};
-  virtual void WriteTopLevelAccelerationStructureInstance(const ezRHITopLevelASInstanceDesc* instance, void* dest) const {}
-  virtual void WriteShaderIdentifier(const ezRHIRaytracingPipelineState* rtpso, ezUInt32 group_index, void* dest) const {}
 
   virtual void Map(const ezRHIResourceBase* resource, ezRHIMapping* mapping) const = 0;
   virtual void Unmap(const ezRHIResourceBase* resource) const = 0;
-  virtual void QueryRead(const ezRHIGPUQueryHeap* heap, ezUInt32 index, ezUInt32 count, ezUInt64* results) const = 0;
+  virtual void QueryRead(const ezRHIQueryHeap* heap, ezUInt32 index, ezUInt32 count, ezUInt64* results) const = 0;
 
   virtual void SetCommonSampler(const ezRHIStaticSampler* sam) = 0;
 

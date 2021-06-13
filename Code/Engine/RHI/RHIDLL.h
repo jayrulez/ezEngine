@@ -102,7 +102,7 @@ class ezRHIGPUBuffer;
 class ezRHIDepthStencilState;
 class ezRHIBlendState;
 class ezRHIRasterizerState;
-class ezRHIGPUQueryHeap;
+class ezRHIQueryHeap;
 class ezRHISamplerState;
 class ezRHIStaticSampler;
 class ezRHIResourceView;
@@ -112,8 +112,6 @@ class ezRHIDevice;
 class ezRHIRenderPass;
 class ezRHICommandList;
 class ezRHIPipelineState;
-class ezRHIRaytracingPipelineState;
-class ezRHIRaytracingAccelerationStructure;
 
 // Basic enums
 struct ezRHIPrimitiveTopology
