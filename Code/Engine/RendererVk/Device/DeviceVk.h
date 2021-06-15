@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <Foundation/Types/Bitflags.h>
@@ -6,10 +5,11 @@
 #include <RendererVk/RendererVkDLL.h>
 #include <RendererFoundation/Device/Device.h>
 
-// TODO: This should not be included in a header, it exposes Windows.h to the outside
-#include <Foundation/Basics/Platform/Win/IncludeWindows.h>
+#include <vulkan/vulkan.h>
 
 class ezGALPassVk;
+
+EZ_DEFINE_AS_POD_TYPE(VkQueue);
 
 /// \brief The Vk device implementation of the graphics abstraction layer.
 class EZ_RENDERERVK_DLL ezGALDeviceVk : public ezGALDevice
@@ -116,9 +116,37 @@ protected:
 
   /// \endcond
 
+
+  // Internal
+public:
+  EZ_ALWAYS_INLINE VkDevice GetVkDevice() const;
+  EZ_ALWAYS_INLINE VkInstance GetVkInstance() const;
+  EZ_ALWAYS_INLINE VkPhysicalDevice GetVkPhysicalDevice() const;
+  EZ_ALWAYS_INLINE const ezStaticArray<ezInt32, ezInternal::Vk::QueueType::Count>& GetVkQueueFamilyIndices() const;
+  EZ_ALWAYS_INLINE ezInt32 GetVkPresentQueueFamilyIndex() const;
+
+  static PFN_vkDebugUtilsMessengerCallbackEXT s_VkDebugCallback;
+
+private:
+
+  ezResult CreateInstance();
+  ezResult SetupDebugMessenger();
+  ezResult SetupPhysicalDevice();
+  ezResult CreateLogicalDevice();
+
 private:
   friend class ezGALCommandEncoderImplVk;
 
+  VkInstance m_VkInstance;
+  VkPhysicalDevice m_VkPhysicalDevice;
+  VkDevice m_VkDevice;
+
+  VkDebugUtilsMessengerEXT m_VkDebugMessenger;
+
+  ezStaticArray<VkQueue, ezInternal::Vk::QueueType::Count> m_VkQueues;
+  ezStaticArray<ezInt32, ezInternal::Vk::QueueType::Count> m_QueueFamilyIndices;
+  ezInt32 m_VkPresentQueueFamilyIndex;
+  VkQueue m_VkPresentQueue;
 };
 
 #include <RendererVk/Device/Implementation/DeviceVk_inl.h>

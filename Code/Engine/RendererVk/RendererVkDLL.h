@@ -13,3 +13,38 @@
 #else
 #  define EZ_RENDERERVK_DLL
 #endif
+
+#define VK_USE_PLATFORM_WIN32_KHR
+
+namespace ezInternal::Vk
+{
+  enum QueueType
+  {
+    Graphics,
+    Compute,
+    Copy,
+    Count
+  };
+
+  struct CommandQueue
+  {
+    EZ_DECLARE_POD_TYPE();
+
+    QueueType Type;
+    VkQueue Queue;
+  };
+
+  struct CommandPool
+  {
+
+  };
+
+  struct CommandList
+  {
+  };
+
+  struct CopyAllocator
+  {
+
+  };
+}
