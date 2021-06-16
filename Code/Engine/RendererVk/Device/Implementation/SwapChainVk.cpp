@@ -14,6 +14,8 @@ ezGALSwapChainVk::ezGALSwapChainVk(const ezGALSwapChainCreationDescription& Desc
   , m_VkSurface{VK_NULL_HANDLE}
   , m_VkSurfaceCapabilities{VK_NULL_HANDLE}
   , m_VkSwapChain{VK_NULL_HANDLE}
+  , m_VkSwapChainImageFormat{}
+  , m_VkSwapChainExtent{}
   , m_pDeviceVk{nullptr}
 {
 }
@@ -172,6 +174,40 @@ ezResult ezGALSwapChainVk::InitPlatform(ezGALDevice* pDevice)
     return EZ_FAILURE;
   }
 
+  vkGetSwapchainImagesKHR(m_pDeviceVk->GetVkDevice(), m_VkSwapChain, &imageCount, nullptr);
+  m_VkSwapChainImages.SetCountUninitialized(imageCount);
+  vkGetSwapchainImagesKHR(m_pDeviceVk->GetVkDevice(), m_VkSwapChain, &imageCount, m_VkSwapChainImages.GetData());
+
+  m_VkSwapChainImageFormat = surfaceFormat.format;
+  m_VkSwapChainExtent = extent;
+
+  m_VkSwapChainImageViews.SetCountUninitialized(m_VkSwapChainImages.GetCount());
+  for (ezUInt32 i = 0; i < m_VkSwapChainImages.GetCount(); i++)
+  {
+    VkImageViewCreateInfo imageViewCreateInfo{};
+    imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    imageViewCreateInfo.image = m_VkSwapChainImages[i];
+    imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    imageViewCreateInfo.format = m_VkSwapChainImageFormat;
+
+    imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+    imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+    imageViewCreateInfo.subresourceRange.levelCount = 1;
+    imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+    if (vkCreateImageView(m_pDeviceVk->GetVkDevice(), &imageViewCreateInfo, nullptr, &m_VkSwapChainImageViews[i]) != VK_SUCCESS)
+    {
+      ezLog::Error("Failed to create image views.");
+      return EZ_FAILURE;
+    }
+  }
+
   return EZ_SUCCESS;
 }
 
@@ -179,6 +215,11 @@ ezResult ezGALSwapChainVk::DeInitPlatform(ezGALDevice* pDevice)
 {
   if (m_pDeviceVk)
   {
+    for (auto imageView : m_VkSwapChainImageViews)
+    {
+      vkDestroyImageView(m_pDeviceVk->GetVkDevice(), imageView, nullptr);
+    }
+
     vkDestroySwapchainKHR(m_pDeviceVk->GetVkDevice(), m_VkSwapChain, nullptr);
     vkDestroySurfaceKHR(m_pDeviceVk->GetVkInstance(), m_VkSurface, nullptr);
   }

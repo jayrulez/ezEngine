@@ -2,6 +2,7 @@
 
 #include <Foundation/Basics.h>
 #include <RendererFoundation/RendererFoundationDLL.h>
+#include <RendererFoundation/Descriptors/Descriptors.h>
 
 // Configure the DLL Import/Export Define
 #if EZ_ENABLED(EZ_COMPILE_ENGINE_AS_DLL)
@@ -16,8 +17,24 @@
 
 #define VK_USE_PLATFORM_WIN32_KHR
 
+
+EZ_DEFINE_AS_POD_TYPE(VkExtensionProperties);
+EZ_DEFINE_AS_POD_TYPE(VkLayerProperties);
+EZ_DEFINE_AS_POD_TYPE(VkPhysicalDevice);
+EZ_DEFINE_AS_POD_TYPE(VkQueueFamilyProperties);
+EZ_DEFINE_AS_POD_TYPE(VkDeviceQueueCreateInfo);
+EZ_DEFINE_AS_POD_TYPE(VkSurfaceFormatKHR);
+EZ_DEFINE_AS_POD_TYPE(VkPresentModeKHR);
+EZ_DEFINE_AS_POD_TYPE(VkImage);
+EZ_DEFINE_AS_POD_TYPE(VkImageView);
+EZ_DEFINE_AS_POD_TYPE(VkQueue);
+EZ_DEFINE_AS_POD_TYPE(VkPipelineShaderStageCreateInfo);
+
 namespace ezInternal::Vk
 {
+  struct PipelineStateDesc;
+  class Pipeline;
+
   enum QueueType
   {
     Graphics,
@@ -26,25 +43,23 @@ namespace ezInternal::Vk
     Count
   };
 
-  struct CommandQueue
+  enum class PipelineType
   {
-    EZ_DECLARE_POD_TYPE();
-
-    QueueType Type;
-    VkQueue Queue;
+    Graphics,
+    Compute
   };
 
-  struct CommandPool
+  struct PipelineStateDesc
   {
-
-  };
-
-  struct CommandList
-  {
-  };
-
-  struct CopyAllocator
-  {
-
+    PipelineType Type = PipelineType::Graphics;
+    ezGALPrimitiveTopology::Enum PrimitiveTopology = ezGALPrimitiveTopology::Triangles;
+    ezGALShaderCreationDescription VertexShader;
+    ezGALShaderCreationDescription FragmentShader;
+    ezGALShaderCreationDescription HullShader;
+    ezGALShaderCreationDescription DomainShader;
+    ezGALShaderCreationDescription GeometryShader;
+    ezGALBlendStateCreationDescription BlendState;
+    ezGALRasterizerStateCreationDescription RasterizerState;
+    ezGALDepthStencilStateCreationDescription DepthStencilState;
   };
 }

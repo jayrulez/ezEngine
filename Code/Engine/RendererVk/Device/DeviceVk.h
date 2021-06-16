@@ -2,14 +2,10 @@
 
 #include <Foundation/Types/Bitflags.h>
 #include <Foundation/Types/UniquePtr.h>
-#include <RendererVk/RendererVkDLL.h>
 #include <RendererFoundation/Device/Device.h>
-
-#include <vulkan/vulkan.h>
+#include <RendererVk/RendererVkDLL.h>
 
 class ezGALPassVk;
-
-EZ_DEFINE_AS_POD_TYPE(VkQueue);
 
 /// \brief The Vk device implementation of the graphics abstraction layer.
 class EZ_RENDERERVK_DLL ezGALDeviceVk : public ezGALDevice
@@ -22,7 +18,6 @@ public:
   virtual ~ezGALDeviceVk();
 
 public:
-
   void ReportLiveGpuObjects();
 
   // These functions need to be implemented by a render API abstraction
@@ -125,10 +120,12 @@ public:
   EZ_ALWAYS_INLINE const ezStaticArray<ezInt32, ezInternal::Vk::QueueType::Count>& GetVkQueueFamilyIndices() const;
   EZ_ALWAYS_INLINE ezInt32 GetVkPresentQueueFamilyIndex() const;
 
+  ezInternal::Vk::Pipeline* CreatePipeline(const ezInternal::Vk::PipelineStateDesc& desc);
+  void DestroyPipeline(ezInternal::Vk::Pipeline* pPipeline);
+
   static PFN_vkDebugUtilsMessengerCallbackEXT s_VkDebugCallback;
 
 private:
-
   ezResult CreateInstance();
   ezResult SetupDebugMessenger();
   ezResult SetupPhysicalDevice();
@@ -147,6 +144,8 @@ private:
   ezStaticArray<ezInt32, ezInternal::Vk::QueueType::Count> m_QueueFamilyIndices;
   ezInt32 m_VkPresentQueueFamilyIndex;
   VkQueue m_VkPresentQueue;
+
+  ezUniquePtr<ezGALPassVk> m_pDefaultPass;
 };
 
 #include <RendererVk/Device/Implementation/DeviceVk_inl.h>

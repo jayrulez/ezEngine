@@ -8,6 +8,7 @@ EZ_STATICLINK_LIBRARY(RendererVk)
   EZ_STATICLINK_REFERENCE(RendererVk_Context_Implementation_ContextVk);
   EZ_STATICLINK_REFERENCE(RendererVk_Device_Implementation_DeviceVk);
   EZ_STATICLINK_REFERENCE(RendererVk_Device_Implementation_SwapChainVk);
+  EZ_STATICLINK_REFERENCE(RendererVk_Implementation_VulkanHelpers);
   EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_BufferVk);
   EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_FenceVk);
   EZ_STATICLINK_REFERENCE(RendererVk_Resources_Implementation_QueryVk);

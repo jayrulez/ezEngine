@@ -19,271 +19,9 @@
 #include <RendererVk/Shader/ShaderVk.h>
 #include <RendererVk/Shader/VertexDeclarationVk.h>
 #include <RendererVk/State/StateVk.h>
+#include <RendererVk/Device/Pipeline.h>
 
-EZ_DEFINE_AS_POD_TYPE(VkExtensionProperties);
-EZ_DEFINE_AS_POD_TYPE(VkLayerProperties);
-EZ_DEFINE_AS_POD_TYPE(VkPhysicalDevice);
-EZ_DEFINE_AS_POD_TYPE(VkQueueFamilyProperties);
-EZ_DEFINE_AS_POD_TYPE(VkDeviceQueueCreateInfo);
-
-using QueueType = ezInternal::Vk::QueueType;
-
-constexpr const char* win32SurfaceExtension = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
-
-const ezDynamicArray<const char*> GetValidationLayers()
-{
-  ezDynamicArray<const char*> validationLayers;
-
-  validationLayers.PushBack("VK_LAYER_KHRONOS_validation");
-
-  return validationLayers;
-}
-
-const ezDynamicArray<const char*> GetRequiredExtensions(bool debug)
-{
-  ezDynamicArray<const char*> extensions;
-
-  if (debug)
-    extensions.PushBack(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-
-  extensions.PushBack(VK_KHR_SURFACE_EXTENSION_NAME);
-
-  extensions.PushBack(win32SurfaceExtension); // todo: cross platform
-
-  return extensions;
-}
-
-const ezDynamicArray<const char*> GetRequiredDeviceExtensions()
-{
-  ezDynamicArray<const char*> extensions;
-
-  extensions.PushBack(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-
-  return extensions;
-}
-
-bool CheckValidationLayerSupport()
-{
-  ezUInt32 layerCount = 0;
-  vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-  ezDynamicArray<VkLayerProperties> availableLayers;
-  availableLayers.SetCountUninitialized(layerCount);
-
-  vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.GetData());
-
-  for (const char* validationLayer : GetValidationLayers())
-  {
-    bool layerFound = false;
-
-    for (const VkLayerProperties& layerProperties : availableLayers)
-    {
-      if (ezStringUtils::Compare(validationLayer, layerProperties.layerName) == 0)
-      {
-        layerFound = true;
-        break;
-      }
-    }
-
-    if (!layerFound)
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool SupportsRequiredExtensions(bool debug)
-{
-  ezUInt32 extensionCount = 0;
-  vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-  ezDynamicArray<VkExtensionProperties> availableExtensions;
-  availableExtensions.SetCountUninitialized(extensionCount);
-
-  vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.GetData());
-
-  for (const char* extension : GetRequiredExtensions(debug))
-  {
-    bool extensionFound = false;
-    for (const VkExtensionProperties& extensionProperties : availableExtensions)
-    {
-      if (ezStringUtils::Compare(extension, extensionProperties.extensionName) == 0)
-      {
-        extensionFound = true;
-        break;
-      }
-    }
-
-    if (!extensionFound)
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-bool SupportsRequiredDeviceExtensions(VkPhysicalDevice device)
-{
-  ezUInt32 extensionCount = 0;
-  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
-
-  ezDynamicArray<VkExtensionProperties> availableExtensions;
-  availableExtensions.SetCount(extensionCount);
-
-  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.GetData());
-
-  for (const char* extension : GetRequiredDeviceExtensions())
-  {
-    bool extensionFound = false;
-    for (const VkExtensionProperties& extensionProperties : availableExtensions)
-    {
-      if (ezStringUtils::Compare(extension, extensionProperties.extensionName) == 0)
-      {
-        extensionFound = true;
-        break;
-      }
-    }
-
-    if (!extensionFound)
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
-{
-  if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) != 0)
-  {
-    //ezLog::Debug(pCallbackData->pMessage);
-  }
-  else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) != 0)
-  {
-    //ezLog::Info(pCallbackData->pMessage);
-  }
-  else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) != 0)
-  {
-    ezLog::Warning(pCallbackData->pMessage);
-  }
-  else if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) != 0)
-  {
-    ezLog::Error(pCallbackData->pMessage);
-  }
-
-  return VK_FALSE;
-}
-
-void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
-{
-  createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-
-  createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-  createInfo.pfnUserCallback = DebugCallback;
-  createInfo.pUserData = nullptr;
-}
-
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-  auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-  if (func != nullptr)
-  {
-    return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-  }
-  else
-  {
-    return VK_ERROR_EXTENSION_NOT_PRESENT;
-  }
-}
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
-{
-  auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-  if (func != nullptr)
-  {
-    func(instance, debugMessenger, pAllocator);
-  }
-}
-
-const ezStaticArray<ezInt32, QueueType::Count> FindQueueFamilyIndices(VkPhysicalDevice device)
-{
-  ezStaticArray<ezInt32, QueueType::Count> indices;
-  indices.SetCount(QueueType::Count);
-  for (ezUInt32 i = 0; i < indices.GetCount(); i++)
-  {
-    indices[i] = -1;
-  }
-
-  ezUInt32 queueFamilyCount = 0;
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-  ezDynamicArray<VkQueueFamilyProperties> queueFamilies;
-  queueFamilies.SetCount(queueFamilyCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.GetData());
-
-  for (ezUInt32 i = 0; i < queueFamilies.GetCount(); i++)
-  {
-    if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-    {
-      indices[QueueType::Graphics] = i;
-    }
-    if (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
-    {
-      indices[QueueType::Compute] = i;
-    }
-    if (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
-    {
-      indices[QueueType::Copy] = i;
-    }
-  }
-
-  return indices;
-}
-
-ezInt32 FindPresentQueueFamilyIndex(VkPhysicalDevice device)
-{
-  ezUInt32 queueFamilyCount = 0;
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-  ezDynamicArray<VkQueueFamilyProperties> queueFamilies;
-  queueFamilies.SetCountUninitialized(queueFamilyCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.GetData());
-
-  // todo: make this work cross platform
-  for (ezUInt32 i = 0; i < queueFamilies.GetCount(); i++)
-  {
-    if (vkGetPhysicalDeviceWin32PresentationSupportKHR(device, i) == VK_TRUE)
-      return i;
-  }
-
-  return -1;
-}
-
-bool CheckPhysicalDevice(VkPhysicalDevice device)
-{
-  VkPhysicalDeviceProperties deviceProperties;
-  vkGetPhysicalDeviceProperties(device, &deviceProperties);
-
-  VkPhysicalDeviceFeatures deviceFeatures;
-  vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-
-  const ezStaticArray<ezInt32, QueueType::Count> queueFamilyIndices = FindQueueFamilyIndices(device);
-
-  if (queueFamilyIndices[QueueType::Graphics] == -1 || queueFamilyIndices[QueueType::Compute] == -1 || queueFamilyIndices[QueueType::Copy] == -1)
-  {
-    return false;
-  }
-
-  if (!SupportsRequiredDeviceExtensions(device))
-  {
-    return false;
-  }
-
-  return true;
-}
+using namespace ezInternal::Vk;
 
 ezInternal::NewInstance<ezGALDevice> CreateVkDevice(ezAllocatorBase* pAllocator, const ezGALDeviceCreationDescription& Description)
 {
@@ -315,7 +53,7 @@ ezGALDeviceVk::ezGALDeviceVk(const ezGALDeviceCreationDescription& Description)
   , m_VkPresentQueueFamilyIndex{-1}
   , m_VkPresentQueue{VK_NULL_HANDLE}
 {
-  for (ezUInt32 i = 0; i < m_VkQueues.GetCount(); i ++)
+  for (ezUInt32 i = 0; i < m_VkQueues.GetCount(); i++)
   {
     m_VkQueues[i] = VK_NULL_HANDLE;
   }
@@ -552,6 +290,8 @@ ezResult ezGALDeviceVk::ShutdownPlatform()
 
   vkDestroyInstance(m_VkInstance, nullptr);
 
+  ReportLiveGpuObjects();
+
   return EZ_SUCCESS;
 }
 
@@ -559,57 +299,116 @@ ezResult ezGALDeviceVk::ShutdownPlatform()
 
 void ezGALDeviceVk::BeginPipelinePlatform(const char* szName)
 {
+  m_pDefaultPass->m_pRenderCommandEncoder->PushMarker(szName);
 }
 
 void ezGALDeviceVk::EndPipelinePlatform()
 {
+  m_pDefaultPass->m_pRenderCommandEncoder->PopMarker();
 }
 
 ezGALPass* ezGALDeviceVk::BeginPassPlatform(const char* szName)
 {
-  return nullptr;
+  m_pDefaultPass->BeginPass(szName);
+
+  return m_pDefaultPass.Borrow();
 }
 
 void ezGALDeviceVk::EndPassPlatform(ezGALPass* pPass)
 {
+  EZ_ASSERT_DEV(m_pDefaultPass.Borrow() == pPass, "Invalid pass");
+
+  m_pDefaultPass->EndPass();
 }
 
 // State creation functions
 
 ezGALBlendState* ezGALDeviceVk::CreateBlendStatePlatform(const ezGALBlendStateCreationDescription& Description)
 {
-  return nullptr;
+  ezGALBlendStateVk* pState = EZ_NEW(&m_Allocator, ezGALBlendStateVk, Description);
+
+  if (pState->InitPlatform(this).Succeeded())
+  {
+    return pState;
+  }
+  else
+  {
+    EZ_DELETE(&m_Allocator, pState);
+    return nullptr;
+  }
 }
 
 void ezGALDeviceVk::DestroyBlendStatePlatform(ezGALBlendState* pBlendState)
 {
+  ezGALBlendStateVk* pState = static_cast<ezGALBlendStateVk*>(pBlendState);
+  pState->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pState);
 }
 
 ezGALDepthStencilState* ezGALDeviceVk::CreateDepthStencilStatePlatform(const ezGALDepthStencilStateCreationDescription& Description)
 {
-  return nullptr;
+  ezGALDepthStencilStateVk* pVkDepthStencilState = EZ_NEW(&m_Allocator, ezGALDepthStencilStateVk, Description);
+
+  if (pVkDepthStencilState->InitPlatform(this).Succeeded())
+  {
+    return pVkDepthStencilState;
+  }
+  else
+  {
+    EZ_DELETE(&m_Allocator, pVkDepthStencilState);
+    return nullptr;
+  }
 }
 
 void ezGALDeviceVk::DestroyDepthStencilStatePlatform(ezGALDepthStencilState* pDepthStencilState)
 {
+  ezGALDepthStencilStateVk* pVkDepthStencilState = static_cast<ezGALDepthStencilStateVk*>(pDepthStencilState);
+  pVkDepthStencilState->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkDepthStencilState);
 }
 
 ezGALRasterizerState* ezGALDeviceVk::CreateRasterizerStatePlatform(const ezGALRasterizerStateCreationDescription& Description)
 {
-  return nullptr;
+  ezGALRasterizerStateVk* pVkRasterizerState = EZ_NEW(&m_Allocator, ezGALRasterizerStateVk, Description);
+
+  if (pVkRasterizerState->InitPlatform(this).Succeeded())
+  {
+    return pVkRasterizerState;
+  }
+  else
+  {
+    EZ_DELETE(&m_Allocator, pVkRasterizerState);
+    return nullptr;
+  }
 }
 
 void ezGALDeviceVk::DestroyRasterizerStatePlatform(ezGALRasterizerState* pRasterizerState)
 {
+  ezGALRasterizerStateVk* pVkRasterizerState = static_cast<ezGALRasterizerStateVk*>(pRasterizerState);
+  pVkRasterizerState->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkRasterizerState);
 }
 
 ezGALSamplerState* ezGALDeviceVk::CreateSamplerStatePlatform(const ezGALSamplerStateCreationDescription& Description)
 {
-  return nullptr;
+  ezGALSamplerStateVk* pVkSamplerState = EZ_NEW(&m_Allocator, ezGALSamplerStateVk, Description);
+
+  if (pVkSamplerState->InitPlatform(this).Succeeded())
+  {
+    return pVkSamplerState;
+  }
+  else
+  {
+    EZ_DELETE(&m_Allocator, pVkSamplerState);
+    return nullptr;
+  }
 }
 
 void ezGALDeviceVk::DestroySamplerStatePlatform(ezGALSamplerState* pSamplerState)
 {
+  ezGALSamplerStateVk* pVkSamplerState = static_cast<ezGALSamplerStateVk*>(pSamplerState);
+  pVkSamplerState->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkSamplerState);
 }
 
 
@@ -617,56 +416,122 @@ void ezGALDeviceVk::DestroySamplerStatePlatform(ezGALSamplerState* pSamplerState
 
 ezGALShader* ezGALDeviceVk::CreateShaderPlatform(const ezGALShaderCreationDescription& Description)
 {
-  return nullptr;
+  ezGALShaderVk* pShader = EZ_NEW(&m_Allocator, ezGALShaderVk, Description);
+
+  if (!pShader->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pShader);
+    return nullptr;
+  }
+
+  return pShader;
 }
 
 void ezGALDeviceVk::DestroyShaderPlatform(ezGALShader* pShader)
 {
+  ezGALShaderVk* pVkShader = static_cast<ezGALShaderVk*>(pShader);
+  pVkShader->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkShader);
 }
 
 ezGALBuffer* ezGALDeviceVk::CreateBufferPlatform(const ezGALBufferCreationDescription& Description, ezArrayPtr<const ezUInt8> pInitialData)
 {
-  return nullptr;
+  ezGALBufferVk* pBuffer = EZ_NEW(&m_Allocator, ezGALBufferVk, Description);
+
+  if (!pBuffer->InitPlatform(this, pInitialData).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pBuffer);
+    return nullptr;
+  }
+
+  return pBuffer;
 }
 
 void ezGALDeviceVk::DestroyBufferPlatform(ezGALBuffer* pBuffer)
 {
+  ezGALBufferVk* pVkBuffer = static_cast<ezGALBufferVk*>(pBuffer);
+  pVkBuffer->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkBuffer);
 }
 
 ezGALTexture* ezGALDeviceVk::CreateTexturePlatform(const ezGALTextureCreationDescription& Description, ezArrayPtr<ezGALSystemMemoryDescription> pInitialData)
 {
-  return nullptr;
+  ezGALTextureVk* pTexture = EZ_NEW(&m_Allocator, ezGALTextureVk, Description);
+
+  if (!pTexture->InitPlatform(this, pInitialData).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pTexture);
+    return nullptr;
+  }
+
+  return pTexture;
 }
 
 void ezGALDeviceVk::DestroyTexturePlatform(ezGALTexture* pTexture)
 {
+  ezGALTextureVk* pVkTexture = static_cast<ezGALTextureVk*>(pTexture);
+  pVkTexture->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkTexture);
 }
 
 ezGALResourceView* ezGALDeviceVk::CreateResourceViewPlatform(ezGALResourceBase* pResource, const ezGALResourceViewCreationDescription& Description)
 {
-  return nullptr;
+  ezGALResourceViewVk* pResourceView = EZ_NEW(&m_Allocator, ezGALResourceViewVk, pResource, Description);
+
+  if (!pResourceView->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pResourceView);
+    return nullptr;
+  }
+
+  return pResourceView;
 }
 
 void ezGALDeviceVk::DestroyResourceViewPlatform(ezGALResourceView* pResourceView)
 {
+  ezGALResourceViewVk* pVkResourceView = static_cast<ezGALResourceViewVk*>(pResourceView);
+  pVkResourceView->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkResourceView);
 }
 
 ezGALRenderTargetView* ezGALDeviceVk::CreateRenderTargetViewPlatform(ezGALTexture* pTexture, const ezGALRenderTargetViewCreationDescription& Description)
 {
-  return nullptr;
+  ezGALRenderTargetViewVk* pRTView = EZ_NEW(&m_Allocator, ezGALRenderTargetViewVk, pTexture, Description);
+
+  if (!pRTView->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pRTView);
+    return nullptr;
+  }
+
+  return pRTView;
 }
 
 void ezGALDeviceVk::DestroyRenderTargetViewPlatform(ezGALRenderTargetView* pRenderTargetView)
 {
+  ezGALRenderTargetViewVk* pVkRenderTargetView = static_cast<ezGALRenderTargetViewVk*>(pRenderTargetView);
+  pVkRenderTargetView->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVkRenderTargetView);
 }
 
 ezGALUnorderedAccessView* ezGALDeviceVk::CreateUnorderedAccessViewPlatform(ezGALResourceBase* pTextureOfBuffer, const ezGALUnorderedAccessViewCreationDescription& Description)
 {
-  return nullptr;
+  ezGALUnorderedAccessViewVk* pUnorderedAccessView = EZ_NEW(&m_Allocator, ezGALUnorderedAccessViewVk, pTextureOfBuffer, Description);
+
+  if (!pUnorderedAccessView->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pUnorderedAccessView);
+    return nullptr;
+  }
+
+  return pUnorderedAccessView;
 }
 
 void ezGALDeviceVk::DestroyUnorderedAccessViewPlatform(ezGALUnorderedAccessView* pUnorderedAccessView)
 {
+  ezGALUnorderedAccessViewVk* pUnorderedAccessViewVk = static_cast<ezGALUnorderedAccessViewVk*>(pUnorderedAccessView);
+  pUnorderedAccessViewVk->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pUnorderedAccessViewVk);
 }
 
 
@@ -687,33 +552,71 @@ ezGALSwapChain* ezGALDeviceVk::CreateSwapChainPlatform(const ezGALSwapChainCreat
 
 void ezGALDeviceVk::DestroySwapChainPlatform(ezGALSwapChain* pSwapChain)
 {
+  ezGALSwapChainVk* pSwapChainVk = static_cast<ezGALSwapChainVk*>(pSwapChain);
+  pSwapChainVk->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pSwapChainVk);
 }
 
 ezGALFence* ezGALDeviceVk::CreateFencePlatform()
 {
-  return nullptr;
+  ezGALFenceVk* pFence = EZ_NEW(&m_Allocator, ezGALFenceVk);
+
+  if (!pFence->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pFence);
+    return nullptr;
+  }
+
+  return pFence;
 }
 
 void ezGALDeviceVk::DestroyFencePlatform(ezGALFence* pFence)
 {
+  ezGALFenceVk* pFenceVk = static_cast<ezGALFenceVk*>(pFence);
+  pFenceVk->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pFenceVk);
 }
 
 ezGALQuery* ezGALDeviceVk::CreateQueryPlatform(const ezGALQueryCreationDescription& Description)
 {
-  return nullptr;
+  ezGALQueryVk* pQuery = EZ_NEW(&m_Allocator, ezGALQueryVk, Description);
+
+  if (!pQuery->InitPlatform(this).Succeeded())
+  {
+    EZ_DELETE(&m_Allocator, pQuery);
+    return nullptr;
+  }
+
+  return pQuery;
 }
 
 void ezGALDeviceVk::DestroyQueryPlatform(ezGALQuery* pQuery)
 {
+  ezGALQueryVk* pQueryVk = static_cast<ezGALQueryVk*>(pQuery);
+  pQueryVk->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pQueryVk);
 }
 
 ezGALVertexDeclaration* ezGALDeviceVk::CreateVertexDeclarationPlatform(const ezGALVertexDeclarationCreationDescription& Description)
 {
-  return nullptr;
+  ezGALVertexDeclarationVk* pVertexDeclaration = EZ_NEW(&m_Allocator, ezGALVertexDeclarationVk, Description);
+
+  if (pVertexDeclaration->InitPlatform(this).Succeeded())
+  {
+    return pVertexDeclaration;
+  }
+  else
+  {
+    EZ_DELETE(&m_Allocator, pVertexDeclaration);
+    return nullptr;
+  }
 }
 
 void ezGALDeviceVk::DestroyVertexDeclarationPlatform(ezGALVertexDeclaration* pVertexDeclaration)
 {
+  ezGALVertexDeclarationVk* pVertexDeclarationVk = static_cast<ezGALVertexDeclarationVk*>(pVertexDeclaration);
+  pVertexDeclarationVk->DeInitPlatform(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pVertexDeclarationVk);
 }
 
 ezGALTimestampHandle ezGALDeviceVk::GetTimestampPlatform()
@@ -749,6 +652,27 @@ void ezGALDeviceVk::SetPrimarySwapChainPlatform(ezGALSwapChain* pSwapChain)
 
 void ezGALDeviceVk::FillCapabilitiesPlatform()
 {
+}
+
+Pipeline* ezGALDeviceVk::CreatePipeline(const PipelineStateDesc& desc)
+{
+  Pipeline* pPipeline = EZ_NEW(&m_Allocator, Pipeline, desc);
+
+  if (pPipeline->Init(this).Succeeded())
+  {
+    return pPipeline;
+  }
+  else
+  {
+    EZ_DELETE(&m_Allocator, pPipeline);
+    return nullptr;
+  }
+}
+
+void ezGALDeviceVk::DestroyPipeline(Pipeline* pPipeline)
+{
+  pPipeline->Destroy(this).IgnoreResult();
+  EZ_DELETE(&m_Allocator, pPipeline);
 }
 
 EZ_STATICLINK_FILE(RendererVk, RendererVk_Device_Implementation_DeviceVk);
