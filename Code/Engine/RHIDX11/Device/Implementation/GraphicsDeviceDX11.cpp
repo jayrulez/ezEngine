@@ -164,12 +164,15 @@ ezRHIGraphicsDeviceDX11::ezRHIGraphicsDeviceDX11(bool debuglayer)
 
 ezRHIGraphicsDeviceDX11::~ezRHIGraphicsDeviceDX11()
 {
+  SubmitCommandLists();
+  /*
   for (auto& commandList : m_CommandLists)
   {
     commandList->Destroy(this);
     EZ_DEFAULT_DELETE(commandList);
   }
   m_CommandLists.Clear();
+  */
 }
 
 void ezRHIGraphicsDeviceDX11::CreateBackBufferResources()
@@ -1319,6 +1322,7 @@ void ezRHIGraphicsDeviceDX11::SubmitCommandLists()
   
   for (auto& commandList : m_CommandLists)
   {
+    commandList->Destroy(this);
     EZ_DEFAULT_DELETE(commandList);
   }
   m_CommandLists.Clear();
