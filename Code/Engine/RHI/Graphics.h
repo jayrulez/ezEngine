@@ -752,7 +752,7 @@ struct EZ_RHI_DLL SwapChainDesc
   FORMAT format = FORMAT_R10G10B10A2_UNORM;
   bool fullscreen = false;
   bool vsync = true;
-  float clearcolor[4] = {0, 0, 0, 1};
+  ezColor clearcolor = ezColor::Black;
 };
 struct EZ_RHI_DLL IndirectDrawArgsInstanced
 {

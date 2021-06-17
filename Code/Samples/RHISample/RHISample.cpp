@@ -169,6 +169,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     SwapChainDesc desc;
     desc.buffercount = 3;
     desc.format = FORMAT_R10G10B10A2_UNORM;
+    desc.clearcolor = ezColor::CornflowerBlue;
     desc.m_pWindow = m_pWindow;
 
     m_pSwapChain = EZ_DEFAULT_NEW(SwapChain);
@@ -231,6 +232,8 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     psDesc.bs = &m_BlendState;
 
     psDesc.rs = &m_RasterizerState;
+
+    psDesc.dss = &m_DepthStencilState;
 
     m_pDevice->CreatePipelineState(&psDesc, &m_Pipeline);
   }

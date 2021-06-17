@@ -2743,7 +2743,7 @@ void ezRHIGraphicsDeviceDX11::RenderPassBegin(const SwapChain* swapchain, Comman
 
   ID3D11RenderTargetView* RTV = internal_state->renderTargetView.Get();
   deviceContexts[cmd]->OMSetRenderTargets(1, &RTV, 0);
-  deviceContexts[cmd]->ClearRenderTargetView(RTV, swapchain->desc.clearcolor);
+  deviceContexts[cmd]->ClearRenderTargetView(RTV, swapchain->desc.clearcolor.GetData());
 }
 void ezRHIGraphicsDeviceDX11::RenderPassBegin(const RenderPass* renderpass, CommandList cmd)
 {
