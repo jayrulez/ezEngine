@@ -39,8 +39,6 @@ public:
   virtual bool CreateQueryHeap(const GPUQueryHeapDesc* pDesc, GPUQueryHeap* pQueryHeap) const = 0;
   virtual bool CreatePipelineState(const PipelineStateDesc* pDesc, PipelineState* pso) const = 0;
   virtual bool CreateRenderPass(const RenderPassDesc* pDesc, RenderPass* renderpass) const = 0;
-  virtual bool CreateRaytracingAccelerationStructure(const RaytracingAccelerationStructureDesc* pDesc, RaytracingAccelerationStructure* bvh) const { return false; }
-  virtual bool CreateRaytracingPipelineState(const RaytracingPipelineStateDesc* pDesc, RaytracingPipelineState* rtpso) const { return false; }
 
   virtual int CreateSubresource(Texture* texture, SUBRESOURCE_TYPE type, uint32_t firstSlice, uint32_t sliceCount, uint32_t firstMip, uint32_t mipCount) const = 0;
   virtual int CreateSubresource(GPUBuffer* buffer, SUBRESOURCE_TYPE type, uint64_t offset, uint64_t size = ~0) const = 0;
@@ -49,8 +47,6 @@ public:
   virtual int GetDescriptorIndex(const Sampler* sampler) const { return -1; };
 
   virtual void WriteShadingRateValue(SHADING_RATE rate, void* dest) const {};
-  virtual void WriteTopLevelAccelerationStructureInstance(const RaytracingAccelerationStructureDesc::TopLevel::Instance* instance, void* dest) const {}
-  virtual void WriteShaderIdentifier(const RaytracingPipelineState* rtpso, uint32_t group_index, void* dest) const {}
 
   virtual void Map(const GPUResource* resource, Mapping* mapping) const = 0;
   virtual void Unmap(const GPUResource* resource) const = 0;
@@ -131,9 +127,6 @@ public:
   virtual void QueryEnd(const GPUQueryHeap* heap, uint32_t index, CommandList cmd) = 0;
   virtual void QueryResolve(const GPUQueryHeap* heap, uint32_t index, uint32_t count, CommandList cmd) {}
   virtual void Barrier(const GPUBarrier* barriers, uint32_t numBarriers, CommandList cmd) = 0;
-  virtual void BuildRaytracingAccelerationStructure(const RaytracingAccelerationStructure* dst, CommandList cmd, const RaytracingAccelerationStructure* src = nullptr) {}
-  virtual void BindRaytracingPipelineState(const RaytracingPipelineState* rtpso, CommandList cmd) {}
-  virtual void DispatchRays(const DispatchRaysDesc* desc, CommandList cmd) {}
   virtual void PushConstants(const void* data, uint32_t size, CommandList cmd) {}
 
   struct GPUAllocation

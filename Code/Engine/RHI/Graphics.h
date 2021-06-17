@@ -85,7 +85,6 @@ enum SHADERSTAGE
   GS,
   PS,
   CS,
-  LIB,
   SHADERSTAGE_COUNT,
 };
 enum SHADERFORMAT
@@ -371,7 +370,6 @@ enum BUFFER_STATE
   BUFFER_STATE_UNORDERED_ACCESS,        // shader resource, write enabled
   BUFFER_STATE_COPY_SRC,                // copy from
   BUFFER_STATE_COPY_DST,                // copy to
-  BUFFER_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
 };
 enum SHADING_RATE
 {
@@ -411,7 +409,6 @@ enum RESOURCE_MISC_FLAG
   RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS = 1 << 3,
   RESOURCE_MISC_BUFFER_STRUCTURED = 1 << 4,
   RESOURCE_MISC_TILED = 1 << 5,
-  RESOURCE_MISC_RAY_TRACING = 1 << 6,
 };
 enum GRAPHICSDEVICE_CAPABILITY
 {
@@ -421,12 +418,10 @@ enum GRAPHICSDEVICE_CAPABILITY
   GRAPHICSDEVICE_CAPABILITY_UAV_LOAD_FORMAT_COMMON = 1 << 3, // eg: R16G16B16A16_FLOAT, R8G8B8A8_UNORM and more common ones
   GRAPHICSDEVICE_CAPABILITY_UAV_LOAD_FORMAT_R11G11B10_FLOAT = 1 << 4,
   GRAPHICSDEVICE_CAPABILITY_RENDERTARGET_AND_VIEWPORT_ARRAYINDEX_WITHOUT_GS = 1 << 5,
-  GRAPHICSDEVICE_CAPABILITY_RAYTRACING = 1 << 6,
-  GRAPHICSDEVICE_CAPABILITY_RAYTRACING_INLINE = 1 << 7,
-  GRAPHICSDEVICE_CAPABILITY_VARIABLE_RATE_SHADING = 1 << 9,
-  GRAPHICSDEVICE_CAPABILITY_VARIABLE_RATE_SHADING_TIER2 = 1 << 10,
-  GRAPHICSDEVICE_CAPABILITY_MESH_SHADER = 1 << 11,
-  GRAPHICSDEVICE_CAPABILITY_BINDLESS_DESCRIPTORS = 1 << 12,
+  GRAPHICSDEVICE_CAPABILITY_VARIABLE_RATE_SHADING = 1 << 6,
+  GRAPHICSDEVICE_CAPABILITY_VARIABLE_RATE_SHADING_TIER2 = 1 << 7,
+  GRAPHICSDEVICE_CAPABILITY_MESH_SHADER = 1 << 8,
+  GRAPHICSDEVICE_CAPABILITY_BINDLESS_DESCRIPTORS = 1 << 9,
 };
 
 // Descriptor structs:
@@ -836,12 +831,10 @@ struct EZ_RHI_DLL GPUResource : public GraphicsDeviceChild
   {
     BUFFER,
     TEXTURE,
-    RAYTRACING_ACCELERATION_STRUCTURE,
     UNKNOWN_TYPE,
   } type = GPU_RESOURCE_TYPE::UNKNOWN_TYPE;
   inline bool IsTexture() const { return type == GPU_RESOURCE_TYPE::TEXTURE; }
   inline bool IsBuffer() const { return type == GPU_RESOURCE_TYPE::BUFFER; }
-  inline bool IsAccelerationStructure() const { return type == GPU_RESOURCE_TYPE::RAYTRACING_ACCELERATION_STRUCTURE; }
 };
 
 struct EZ_RHI_DLL GPUBuffer : public GPUResource
@@ -886,159 +879,4 @@ struct EZ_RHI_DLL SwapChain : public GraphicsDeviceChild
   SwapChainDesc desc;
 
   const SwapChainDesc& GetDesc() const { return desc; }
-};
-
-
-struct EZ_RHI_DLL RaytracingAccelerationStructureDesc
-{
-  enum FLAGS
-  {
-    FLAG_EMPTY = 0,
-    FLAG_ALLOW_UPDATE = 1 << 0,
-    FLAG_ALLOW_COMPACTION = 1 << 1,
-    FLAG_PREFER_FAST_TRACE = 1 << 2,
-    FLAG_PREFER_FAST_BUILD = 1 << 3,
-    FLAG_MINIMIZE_MEMORY = 1 << 4,
-  };
-  uint32_t _flags = FLAG_EMPTY;
-
-  enum TYPE
-  {
-    BOTTOMLEVEL,
-    TOPLEVEL,
-  } type = BOTTOMLEVEL;
-
-  struct BottomLevel
-  {
-    struct Geometry
-    {
-      enum FLAGS
-      {
-        FLAG_EMPTY = 0,
-        FLAG_OPAQUE = 1 << 0,
-        FLAG_NO_DUPLICATE_ANYHIT_INVOCATION = 1 << 1,
-        FLAG_USE_TRANSFORM = 1 << 2,
-      };
-      uint32_t _flags = FLAG_EMPTY;
-
-      enum TYPE
-      {
-        TRIANGLES,
-        PROCEDURAL_AABBS,
-      } type = TRIANGLES;
-
-      struct Triangles
-      {
-        GPUBuffer vertexBuffer;
-        GPUBuffer indexBuffer;
-        uint32_t indexCount = 0;
-        uint32_t indexOffset = 0;
-        uint32_t vertexCount = 0;
-        uint32_t vertexByteOffset = 0;
-        uint32_t vertexStride = 0;
-        INDEXBUFFER_FORMAT indexFormat = INDEXFORMAT_32BIT;
-        FORMAT vertexFormat = FORMAT_R32G32B32_FLOAT;
-        GPUBuffer transform3x4Buffer;
-        uint32_t transform3x4BufferOffset = 0;
-      } triangles;
-      struct Procedural_AABBs
-      {
-        GPUBuffer aabbBuffer;
-        uint32_t offset = 0;
-        uint32_t count = 0;
-        uint32_t stride = 0;
-      } aabbs;
-    };
-    ezDynamicArray<Geometry> geometries;
-  } bottomlevel;
-
-  struct TopLevel
-  {
-    struct Instance
-    {
-      enum FLAGS
-      {
-        FLAG_EMPTY = 0,
-        FLAG_TRIANGLE_CULL_DISABLE = 1 << 0,
-        FLAG_TRIANGLE_FRONT_COUNTERCLOCKWISE = 1 << 1,
-        FLAG_FORCE_OPAQUE = 1 << 2,
-        FLAG_FORCE_NON_OPAQUE = 1 << 3,
-      };
-      ezRHIFloat3X4 transform;
-      uint32_t InstanceID : 24;
-      uint32_t InstanceMask : 8;
-      uint32_t InstanceContributionToHitGroupIndex : 24;
-      uint32_t Flags : 8;
-      GPUResource bottomlevel;
-    };
-    GPUBuffer instanceBuffer;
-    uint32_t offset = 0;
-    uint32_t count = 0;
-  } toplevel;
-};
-struct EZ_RHI_DLL RaytracingAccelerationStructure : public GPUResource
-{
-  RaytracingAccelerationStructureDesc desc;
-
-  const RaytracingAccelerationStructureDesc& GetDesc() const { return desc; }
-};
-
-struct EZ_RHI_DLL ShaderLibrary
-{
-  enum TYPE
-  {
-    RAYGENERATION,
-    MISS,
-    CLOSESTHIT,
-    ANYHIT,
-    INTERSECTION,
-  } type = RAYGENERATION;
-  const Shader* shader = nullptr;
-  std::string function_name;
-};
-struct EZ_RHI_DLL ShaderHitGroup
-{
-  enum TYPE
-  {
-    GENERAL, // raygen or miss
-    TRIANGLES,
-    PROCEDURAL,
-  } type = TRIANGLES;
-  std::string name;
-  uint32_t general_shader = ~0;
-  uint32_t closesthit_shader = ~0;
-  uint32_t anyhit_shader = ~0;
-  uint32_t intersection_shader = ~0;
-};
-struct EZ_RHI_DLL RaytracingPipelineStateDesc
-{
-  ezDynamicArray<ShaderLibrary> shaderlibraries;
-  ezDynamicArray<ShaderHitGroup> hitgroups;
-  uint32_t max_trace_recursion_depth = 1;
-  uint32_t max_attribute_size_in_bytes = 0;
-  uint32_t max_payload_size_in_bytes = 0;
-};
-struct EZ_RHI_DLL RaytracingPipelineState : public GraphicsDeviceChild
-{
-  RaytracingPipelineStateDesc desc;
-
-  const RaytracingPipelineStateDesc& GetDesc() const { return desc; }
-};
-
-struct EZ_RHI_DLL ShaderTable
-{
-  const GPUBuffer* buffer = nullptr;
-  uint64_t offset = 0;
-  uint64_t size = 0;
-  uint64_t stride = 0;
-};
-struct EZ_RHI_DLL DispatchRaysDesc
-{
-  ShaderTable raygeneration;
-  ShaderTable miss;
-  ShaderTable hitgroup;
-  ShaderTable callable;
-  uint32_t Width = 1;
-  uint32_t Height = 1;
-  uint32_t Depth = 1;
 };
