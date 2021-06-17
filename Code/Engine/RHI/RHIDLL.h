@@ -5,6 +5,8 @@
 #include <Foundation/Reflection/Reflection.h>
 #include <Foundation/Types/Id.h>
 #include <Foundation/Types/RefCounted.h>
+#include <Foundation/Types/UniquePtr.h>
+#include <Foundation/Types/SharedPtr.h>
 
 // Configure the DLL Import/Export Define
 #if EZ_ENABLED(EZ_COMPILE_ENGINE_AS_DLL)

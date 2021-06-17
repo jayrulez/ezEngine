@@ -1,9 +1,9 @@
-#include "wiGraphicsDevice.h"
-#include "wiEvent.h"
+#include <RHIPCH.h>
 
-using namespace wiGraphics;
+#include <RHI/Device/GraphicsDevice.h>
 
-uint32_t GraphicsDevice::GetFormatStride(FORMAT value) const
+
+uint32_t ezRHIGraphicsDevice::GetFormatStride(FORMAT value) const
 {
 	switch (value)
 	{
@@ -91,14 +91,14 @@ uint32_t GraphicsDevice::GetFormatStride(FORMAT value) const
 
 
 	default:
-		assert(0); // didn't catch format!
+		EZ_ASSERT_ALWAYS(false, "Unknown format."); // didn't catch format!
 		break;
 	}
 
 	return 16;
 }
 
-bool GraphicsDevice::IsFormatUnorm(FORMAT value) const
+bool ezRHIGraphicsDevice::IsFormatUnorm(FORMAT value) const
 {
 	switch (value)
 	{
@@ -120,7 +120,7 @@ bool GraphicsDevice::IsFormatUnorm(FORMAT value) const
 	return false;
 }
 
-bool GraphicsDevice::IsFormatBlockCompressed(FORMAT value) const
+bool ezRHIGraphicsDevice::IsFormatBlockCompressed(FORMAT value) const
 {
 	switch (value)
 	{
@@ -144,7 +144,7 @@ bool GraphicsDevice::IsFormatBlockCompressed(FORMAT value) const
 	return false;
 }
 
-bool GraphicsDevice::IsFormatStencilSupport(FORMAT value) const
+bool ezRHIGraphicsDevice::IsFormatStencilSupport(FORMAT value) const
 {
 	switch (value)
 	{
