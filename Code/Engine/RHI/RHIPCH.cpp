@@ -6,5 +6,6 @@ EZ_STATICLINK_LIBRARY(RHI)
     return;
 
   EZ_STATICLINK_REFERENCE(RHI_Device_Implementation_GraphicsDevice);
+  EZ_STATICLINK_REFERENCE(RHI_Device_Implementation_CommandList);
 
 }

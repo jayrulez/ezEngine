@@ -13,6 +13,7 @@
 #include <Foundation/Utilities/GraphicsUtils.h>
 
 #include <RHIDX11/Device/GraphicsDeviceDX11.h>
+#include <RHI/Device/CommandList.h>
 
 static ezUInt32 g_uiWindowWidth = 640;
 static ezUInt32 g_uiWindowHeight = 480;
@@ -57,12 +58,12 @@ ezApplication::Execution ezRHISampleApp::Run()
 
   // do the rendering
   {
-    CommandList commandList = m_pDevice->BeginCommandList();
-    m_pDevice->RenderPassBegin(m_pSwapChain, commandList);
+    ezRHICommandList* m_pCommandList = m_pDevice->BeginCommandList();
+    m_pCommandList->RenderPassBegin(m_pSwapChain);
     Viewport viewport;
     viewport.Width = (float)m_pSwapChain->desc.m_pWindow->GetClientAreaSize().width;
     viewport.Height = (float)m_pSwapChain->desc.m_pWindow->GetClientAreaSize().height;
-    m_pDevice->BindViewports(1, &viewport, commandList);
+    m_pCommandList->BindViewports(1, &viewport);
 
     {
       static float time = 0.0f;
@@ -88,23 +89,23 @@ ezApplication::Execution ezRHISampleApp::Run()
 
       ezMat4 worldViewProjection = viewProj;
 
-      m_pDevice->UpdateBuffer(&m_ConstantBuffer, &worldViewProjection, commandList);
+      m_pCommandList->UpdateBuffer(&m_ConstantBuffer, &worldViewProjection);
 
       const GPUBuffer* vbs[] = {
         &m_VertexBuffer,
       };
 
       uint32_t stride = sizeof(Vertex);
-      m_pDevice->BindVertexBuffers(vbs, 0, 1, &stride, nullptr, commandList);
-      m_pDevice->BindIndexBuffer(&m_IndexBuffer, INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT, 0, commandList);
-      m_pDevice->BindPipelineState(&m_Pipeline, commandList);
-      m_pDevice->BindConstantBuffer(SHADERSTAGE::VS, &m_ConstantBuffer, 0, commandList);
-      m_pDevice->DrawIndexed(36, 0, 0, commandList);
+      m_pCommandList->BindVertexBuffers(vbs, 0, 1, &stride, nullptr);
+      m_pCommandList->BindIndexBuffer(&m_IndexBuffer, INDEXBUFFER_FORMAT::INDEXFORMAT_16BIT, 0);
+      m_pCommandList->BindPipelineState(&m_Pipeline);
+      m_pCommandList->BindConstantBuffer(SHADERSTAGE::VS, &m_ConstantBuffer, 0);
+      m_pCommandList->DrawIndexed(36, 0, 0);
 
       time += 0.01f;
     }
 
-    m_pDevice->RenderPassEnd(commandList);
+    m_pCommandList->RenderPassEnd();
     m_pDevice->SubmitCommandLists();
   }
 
@@ -316,6 +317,8 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
 
     m_pDevice->CreateBuffer(&bd, nullptr, &m_ConstantBuffer);
   }
+
+  //m_pCommandList = m_pDevice->BeginCommandList();
 }
 
 void ezRHISampleApp::BeforeHighLevelSystemsShutdown()

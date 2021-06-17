@@ -6,4 +6,5 @@ EZ_STATICLINK_LIBRARY(RHIDX11)
     return;
 
   EZ_STATICLINK_REFERENCE(RHIDX11_Device_Implementation_GraphicsDeviceDX11);
+  EZ_STATICLINK_REFERENCE(RHIDX11_Device_Implementation_CommandListDX11);
 }

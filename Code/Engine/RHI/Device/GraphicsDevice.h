@@ -4,9 +4,11 @@
 
 #include <RHI/Graphics.h>
 
+/*
 typedef ezInt32 CommandList;
 static const CommandList COMMANDLIST_COUNT = 32;
 static const CommandList INVALID_COMMANDLIST = COMMANDLIST_COUNT;
+*/
 
 enum QUEUE_TYPE
 {
@@ -15,6 +17,8 @@ enum QUEUE_TYPE
 
   QUEUE_COUNT,
 };
+
+class ezRHICommandList;
 
 class EZ_RHI_DLL ezRHIGraphicsDevice
 {
@@ -58,7 +62,7 @@ public:
 
   // Begin a new command list for GPU command recording.
   //	This will be valid until SubmitCommandLists() is called.
-  virtual CommandList BeginCommandList(QUEUE_TYPE queue = QUEUE_GRAPHICS) = 0;
+  virtual ezRHICommandList* BeginCommandList(QUEUE_TYPE queue = QUEUE_GRAPHICS) = 0;
   // Submit all command list that were used with BeginCommandList before this call.
   //	This will make every command list to be in "available" state and restarts them
   virtual void SubmitCommandLists() = 0;
@@ -87,66 +91,6 @@ public:
   virtual SHADERFORMAT GetShaderFormat() const { return SHADERFORMAT_NONE; }
 
   virtual Texture GetBackBuffer(const SwapChain* swapchain) const = 0;
-
-  ///////////////Thread-sensitive////////////////////////
-
-  virtual void WaitCommandList(CommandList cmd, CommandList wait_for) {}
-  virtual void RenderPassBegin(const SwapChain* swapchain, CommandList cmd) = 0;
-  virtual void RenderPassBegin(const RenderPass* renderpass, CommandList cmd) = 0;
-  virtual void RenderPassEnd(CommandList cmd) = 0;
-  virtual void BindScissorRects(uint32_t numRects, const Rect* rects, CommandList cmd) = 0;
-  virtual void BindViewports(uint32_t NumViewports, const Viewport* pViewports, CommandList cmd) = 0;
-  virtual void BindResource(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource = -1) = 0;
-  virtual void BindResources(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd) = 0;
-  virtual void BindUAV(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource = -1) = 0;
-  virtual void BindUAVs(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd) = 0;
-  virtual void UnbindResources(uint32_t slot, uint32_t num, CommandList cmd) = 0;
-  virtual void UnbindUAVs(uint32_t slot, uint32_t num, CommandList cmd) = 0;
-  virtual void BindSampler(SHADERSTAGE stage, const Sampler* sampler, uint32_t slot, CommandList cmd) = 0;
-  virtual void BindConstantBuffer(SHADERSTAGE stage, const GPUBuffer* buffer, uint32_t slot, CommandList cmd) = 0;
-  virtual void BindVertexBuffers(const GPUBuffer* const* vertexBuffers, uint32_t slot, uint32_t count, const uint32_t* strides, const uint32_t* offsets, CommandList cmd) = 0;
-  virtual void BindIndexBuffer(const GPUBuffer* indexBuffer, const INDEXBUFFER_FORMAT format, uint32_t offset, CommandList cmd) = 0;
-  virtual void BindStencilRef(uint32_t value, CommandList cmd) = 0;
-  virtual void BindBlendFactor(float r, float g, float b, float a, CommandList cmd) = 0;
-  virtual void BindShadingRate(SHADING_RATE rate, CommandList cmd) {}
-  virtual void BindPipelineState(const PipelineState* pso, CommandList cmd) = 0;
-  virtual void BindComputeShader(const Shader* cs, CommandList cmd) = 0;
-  virtual void Draw(uint32_t vertexCount, uint32_t startVertexLocation, CommandList cmd) = 0;
-  virtual void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, CommandList cmd) = 0;
-  virtual void DrawInstanced(uint32_t vertexCount, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation, CommandList cmd) = 0;
-  virtual void DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation, CommandList cmd) = 0;
-  virtual void DrawInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) = 0;
-  virtual void DrawIndexedInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) = 0;
-  virtual void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ, CommandList cmd) = 0;
-  virtual void DispatchIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) = 0;
-  virtual void DispatchMesh(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ, CommandList cmd) {}
-  virtual void DispatchMeshIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) {}
-  virtual void CopyResource(const GPUResource* pDst, const GPUResource* pSrc, CommandList cmd) = 0;
-  virtual void UpdateBuffer(const GPUBuffer* buffer, const void* data, CommandList cmd, int dataSize = -1) = 0;
-  virtual void QueryBegin(const GPUQueryHeap* heap, uint32_t index, CommandList cmd) = 0;
-  virtual void QueryEnd(const GPUQueryHeap* heap, uint32_t index, CommandList cmd) = 0;
-  virtual void QueryResolve(const GPUQueryHeap* heap, uint32_t index, uint32_t count, CommandList cmd) {}
-  virtual void Barrier(const GPUBarrier* barriers, uint32_t numBarriers, CommandList cmd) = 0;
-  virtual void PushConstants(const void* data, uint32_t size, CommandList cmd) {}
-
-  struct GPUAllocation
-  {
-    void* data = nullptr;              // application can write to this. Reads might be not supported or slow. The offset is already applied
-    const GPUBuffer* buffer = nullptr; // application can bind it to the GPU
-    uint32_t offset = 0;               // allocation's offset from the GPUbuffer's beginning
-
-    // Returns true if the allocation was successful
-    inline bool IsValid() const { return data != nullptr && buffer != nullptr; }
-  };
-  // Allocates temporary memory that the CPU can write and GPU can read.
-  //	It is only alive for one frame and automatically invalidated after that.
-  //	The CPU pointer gets invalidated as soon as there is a Draw() or Dispatch() event on the same thread
-  //	This allocation can be used to provide temporary vertex buffer, index buffer or raw buffer data to shaders
-  virtual GPUAllocation AllocateGPU(size_t dataSize, CommandList cmd) = 0;
-
-  virtual void EventBegin(const char* name, CommandList cmd) = 0;
-  virtual void EventEnd(CommandList cmd) = 0;
-  virtual void SetMarker(const char* name, CommandList cmd) = 0;
 };
 
 #include <RHI/Device/Implementation/GraphicsDevice_inl.h>

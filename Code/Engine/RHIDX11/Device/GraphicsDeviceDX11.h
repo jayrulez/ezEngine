@@ -3,18 +3,10 @@
 #include <RHI/Device/GraphicsDevice.h>
 #include <RHIDX11/RHIDX11DLL.h>
 
-#include <DXGI1_3.h>
-#include <d3d11_3.h>
-#include <wrl/client.h> // ComPtr
-
-#if EZ_ENABLED(EZ_PLATFORM_WINDOWS_UWP)
-#  include <d3d11_1.h>
-#  include <Foundation/Basics/Platform/uwp/UWPUtils.h>
-#  include <dxgi1_3.h>
-#endif
-
 EZ_DEFINE_AS_POD_TYPE(D3D11_SUBRESOURCE_DATA);
 EZ_DEFINE_AS_POD_TYPE(D3D11_INPUT_ELEMENT_DESC);
+
+class ezRHICommandListDX11;
 
 class EZ_RHIDX11_DLL ezRHIGraphicsDeviceDX11 : public ezRHIGraphicsDevice
 {
@@ -24,55 +16,12 @@ protected:
   Microsoft::WRL::ComPtr<IDXGIFactory2> DXGIFactory;
   Microsoft::WRL::ComPtr<ID3D11Device> device;
   Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
-  Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContexts[COMMANDLIST_COUNT];
-  Microsoft::WRL::ComPtr<ID3D11CommandList> commandLists[COMMANDLIST_COUNT];
-  Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation> userDefinedAnnotations[COMMANDLIST_COUNT];
 
   Microsoft::WRL::ComPtr<ID3D11Query> disjointQueries[BUFFERCOUNT + 3];
+  ezDynamicArray<ezRHICommandListDX11*> m_CommandLists;
 
-  uint32_t stencilRef[COMMANDLIST_COUNT];
-  ezColor blendFactor[COMMANDLIST_COUNT];
-
-  ID3D11VertexShader* prev_vs[COMMANDLIST_COUNT] = {};
-  ID3D11PixelShader* prev_ps[COMMANDLIST_COUNT] = {};
-  ID3D11HullShader* prev_hs[COMMANDLIST_COUNT] = {};
-  ID3D11DomainShader* prev_ds[COMMANDLIST_COUNT] = {};
-  ID3D11GeometryShader* prev_gs[COMMANDLIST_COUNT] = {};
-  ID3D11ComputeShader* prev_cs[COMMANDLIST_COUNT] = {};
-  ezColor prev_blendfactor[COMMANDLIST_COUNT] = {};
-  uint32_t prev_samplemask[COMMANDLIST_COUNT] = {};
-  const BlendState* prev_bs[COMMANDLIST_COUNT] = {};
-  const RasterizerState* prev_rs[COMMANDLIST_COUNT] = {};
-  uint32_t prev_stencilRef[COMMANDLIST_COUNT] = {};
-  const DepthStencilState* prev_dss[COMMANDLIST_COUNT] = {};
-  const InputLayout* prev_il[COMMANDLIST_COUNT] = {};
-  PRIMITIVETOPOLOGY prev_pt[COMMANDLIST_COUNT] = {};
-  ezDynamicArray<const SwapChain*> swapchains[COMMANDLIST_COUNT];
-
-  const PipelineState* active_pso[COMMANDLIST_COUNT] = {};
-  bool dirty_pso[COMMANDLIST_COUNT] = {};
-  void pso_validate(CommandList cmd);
-
-  const RenderPass* active_renderpass[COMMANDLIST_COUNT] = {};
-  RenderPass dummyrenderpass;
-
-  ID3D11UnorderedAccessView* raster_uavs[COMMANDLIST_COUNT][8] = {};
-  uint8_t raster_uavs_slot[COMMANDLIST_COUNT] = {};
-  uint8_t raster_uavs_count[COMMANDLIST_COUNT] = {};
-  void validate_raster_uavs(CommandList cmd);
-
-  struct GPUAllocator
-  {
-    GPUBuffer buffer;
-    size_t byteOffset = 0;
-    uint64_t residentFrame = 0;
-    bool dirty = false;
-  } frame_allocators[COMMANDLIST_COUNT];
-  void commit_allocations(CommandList cmd);
 
   void CreateBackBufferResources();
-
-  ezAtomicInteger<CommandList> cmd_count{0};
 
   ezDynamicArray<StaticSampler> common_samplers;
 
@@ -83,6 +32,7 @@ protected:
 
 public:
   ezRHIGraphicsDeviceDX11(bool debuglayer = false);
+  virtual ~ezRHIGraphicsDeviceDX11() override;
 
   bool CreateSwapChain(const SwapChainDesc* pDesc, SwapChain* swapChain) const override;
   bool CreateBuffer(const GPUBufferDesc* pDesc, const SubresourceData* pInitialData, GPUBuffer* pBuffer) const override;
@@ -106,51 +56,14 @@ public:
 
   void WaitForGPU() const override;
 
-  CommandList BeginCommandList(QUEUE_TYPE queue = QUEUE_GRAPHICS) override;
+  ezRHICommandList* BeginCommandList(QUEUE_TYPE queue = QUEUE_GRAPHICS) override;
   void SubmitCommandLists() override;
 
   SHADERFORMAT GetShaderFormat() const override { return SHADERFORMAT_HLSL5; }
 
   Texture GetBackBuffer(const SwapChain* swapchain) const override;
+  inline Microsoft::WRL::ComPtr<ID3D11Device> GetD3D11Device() const { return device; }
+  const ezDynamicArray<StaticSampler>& GetCommonSamplers() const { return common_samplers; }
+  inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetD3D11ImmediateContext() const { return immediateContext; }
 
-  ///////////////Thread-sensitive////////////////////////
-
-  void RenderPassBegin(const SwapChain* swapchain, CommandList cmd) override;
-  void RenderPassBegin(const RenderPass* renderpass, CommandList cmd) override;
-  void RenderPassEnd(CommandList cmd) override;
-  void BindScissorRects(uint32_t numRects, const Rect* rects, CommandList cmd) override;
-  void BindViewports(uint32_t NumViewports, const Viewport* pViewports, CommandList cmd) override;
-  void BindResource(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource = -1) override;
-  void BindResources(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd) override;
-  void BindUAV(SHADERSTAGE stage, const GPUResource* resource, uint32_t slot, CommandList cmd, int subresource = -1) override;
-  void BindUAVs(SHADERSTAGE stage, const GPUResource* const* resources, uint32_t slot, uint32_t count, CommandList cmd) override;
-  void UnbindResources(uint32_t slot, uint32_t num, CommandList cmd) override;
-  void UnbindUAVs(uint32_t slot, uint32_t num, CommandList cmd) override;
-  void BindSampler(SHADERSTAGE stage, const Sampler* sampler, uint32_t slot, CommandList cmd) override;
-  void BindConstantBuffer(SHADERSTAGE stage, const GPUBuffer* buffer, uint32_t slot, CommandList cmd) override;
-  void BindVertexBuffers(const GPUBuffer* const* vertexBuffers, uint32_t slot, uint32_t count, const uint32_t* strides, const uint32_t* offsets, CommandList cmd) override;
-  void BindIndexBuffer(const GPUBuffer* indexBuffer, const INDEXBUFFER_FORMAT format, uint32_t offset, CommandList cmd) override;
-  void BindStencilRef(uint32_t value, CommandList cmd) override;
-  void BindBlendFactor(float r, float g, float b, float a, CommandList cmd) override;
-  void BindPipelineState(const PipelineState* pso, CommandList cmd) override;
-  void BindComputeShader(const Shader* cs, CommandList cmd) override;
-  void Draw(uint32_t vertexCount, uint32_t startVertexLocation, CommandList cmd) override;
-  void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, CommandList cmd) override;
-  void DrawInstanced(uint32_t vertexCount, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation, CommandList cmd) override;
-  void DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation, CommandList cmd) override;
-  void DrawInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) override;
-  void DrawIndexedInstancedIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) override;
-  void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ, CommandList cmd) override;
-  void DispatchIndirect(const GPUBuffer* args, uint32_t args_offset, CommandList cmd) override;
-  void CopyResource(const GPUResource* pDst, const GPUResource* pSrc, CommandList cmd) override;
-  void UpdateBuffer(const GPUBuffer* buffer, const void* data, CommandList cmd, int dataSize = -1) override;
-  void QueryBegin(const GPUQueryHeap* heap, uint32_t index, CommandList cmd) override;
-  void QueryEnd(const GPUQueryHeap* heap, uint32_t index, CommandList cmd) override;
-  void Barrier(const GPUBarrier* barriers, uint32_t numBarriers, CommandList cmd) override {}
-
-  GPUAllocation AllocateGPU(size_t dataSize, CommandList cmd) override;
-
-  void EventBegin(const char* name, CommandList cmd) override;
-  void EventEnd(CommandList cmd) override;
-  void SetMarker(const char* name, CommandList cmd) override;
 };
