@@ -9,17 +9,15 @@
 
 std::shared_ptr<ShaderReflection> CreateShaderReflection(ShaderBlobType type, const void* data, size_t size)
 {
-    switch (type)
-    {
+
 #ifdef DIRECTX_SUPPORT
-    case ShaderBlobType::kDXIL:
+    if(type == ShaderBlobType::kDXIL)
         return std::make_shared<DXILReflection>(data, size);
 #endif
 #ifdef VULKAN_SUPPORT
-    case ShaderBlobType::kSPIRV:
+    if(type == case ShaderBlobType::kSPIRV)
         return std::make_shared<SPIRVReflection>(data, size);
 #endif
-    }
-    assert(false);
+
     return nullptr;
 }

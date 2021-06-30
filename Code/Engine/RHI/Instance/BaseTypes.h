@@ -306,12 +306,13 @@ struct ShaderDesc
 {
   std::vector<uint8_t> blob;
   std::shared_ptr<ShaderReflection> reflection;
+  std::string shader_path;
   std::string entrypoint;
   ShaderType type;
   std::string model;
   std::map<std::string, std::string> define;
 
-  ShaderDesc(std::vector<uint8_t> blob, std::shared_ptr<ShaderReflection> reflection, const std::string& entrypoint, ShaderType type, const std::string& model)
+  ShaderDesc(std::vector<uint8_t> blob, std::shared_ptr<ShaderReflection> reflection, const std::string& shader_path, const std::string& entrypoint, ShaderType type, const std::string& model)
     : blob(blob)
     , reflection(reflection)
     , entrypoint(entrypoint)

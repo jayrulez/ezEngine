@@ -423,8 +423,3 @@ const ShaderFeatureInfo& SPIRVReflection::GetShaderFeatureInfo() const
 {
   return m_shader_feature_info;
 }
-
-std::shared_ptr<ShaderReflection> CreateShaderReflection(const void* data, size_t size)
-{
-  return std::make_shared<SPIRVReflection>(data, size);
-}

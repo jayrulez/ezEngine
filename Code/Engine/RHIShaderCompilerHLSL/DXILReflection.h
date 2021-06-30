@@ -30,5 +30,3 @@ private:
     std::vector<OutputParameterDesc> m_output_parameters;
     ShaderFeatureInfo m_shader_feature_info = {};
 };
-
-std::shared_ptr<ShaderReflection> CreateShaderReflection(const void* data, size_t size);
