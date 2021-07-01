@@ -507,9 +507,9 @@ std::shared_ptr<Framebuffer> VKDevice::CreateFramebuffer(const FramebufferDesc& 
     return std::make_shared<VKFramebuffer>(*this, desc);
 }
 
-std::shared_ptr<Shader> VKDevice::CompileShader(const ShaderDesc& desc)
+std::shared_ptr<Shader> VKDevice::CreateShader(const ShaderDesc& desc, std::vector<uint8_t> byteCode, std::shared_ptr<ShaderReflection> reflection)
 {
-    return std::make_shared<ShaderBase>(desc, ShaderBlobType::kSPIRV);
+    return std::make_shared<ShaderBase>(desc, byteCode, reflection, ShaderBlobType::kSPIRV);
 }
 
 std::shared_ptr<Program> VKDevice::CreateProgram(const std::vector<std::shared_ptr<Shader>>& shaders)
@@ -552,7 +552,7 @@ vk::AccelerationStructureGeometryKHR VKDevice::FillRaytracingGeometryTriangles(c
     auto vertex_stride = ezRHIResourceFormat::GetFormatStride(vertex.format);
     geometry_desc.geometry.triangles.vertexData = m_device->getBufferAddress({ vk_vertex_res->buffer.res.get() }) + vertex.offset * vertex_stride;
     geometry_desc.geometry.triangles.vertexStride = vertex_stride;
-    geometry_desc.geometry.triangles.vertexFormat = static_cast<vk::Format>(vertex.format);
+    geometry_desc.geometry.triangles.vertexFormat = VKUtils::ToVkFormat(vertex.format);
     geometry_desc.geometry.triangles.maxVertex = vertex.count;
     if (vk_index_res)
     {

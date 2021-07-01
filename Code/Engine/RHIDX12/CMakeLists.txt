@@ -18,8 +18,9 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
   Foundation
   RHI
-  PRIVATE
   d3d12
   dxgi
   dxguid
+  DirectX-Headers
+  DirectX-Guids
 )

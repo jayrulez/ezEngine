@@ -1,6 +1,7 @@
-#include "RenderPass/VKRenderPass.h"
-#include <Device/VKDevice.h>
-#include <View/VKView.h>
+#include <RHIVulkan/RenderPass/VKRenderPass.h>
+#include <RHIVulkan/Device/VKDevice.h>
+#include <RHIVulkan/View/VKView.h>
+#include <RHIVulkan/Utilities/VKUtility.h>
 
 vk::AttachmentLoadOp Convert(RenderPassLoadOp op)
 {
@@ -47,7 +48,7 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
             return;
         }
         vk::AttachmentDescription2& description = attachment_descriptions.emplace_back();
-        description.format = static_cast<vk::Format>(format);
+        description.format = VKUtils::ToVkFormat(format);
         description.samples = static_cast<vk::SampleCountFlagBits>(m_desc.sample_count);
         description.loadOp = Convert(load_op);
         description.storeOp = Convert(store_op);

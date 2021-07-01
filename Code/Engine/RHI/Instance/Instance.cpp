@@ -20,7 +20,6 @@ CreatorFuncInfo* GetCreatorFuncInfo(ApiType type)
     else
       sPluginName.Append("Vulkan");
 
-
     EZ_VERIFY(ezPlugin::LoadPlugin(sPluginName).Succeeded(), "Renderer plugin '{}' not found", sPluginName);
 
     pFuncInfo = s_CreatorFuncs.GetValue(type);

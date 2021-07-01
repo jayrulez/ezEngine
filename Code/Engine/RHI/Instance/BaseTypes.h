@@ -304,20 +304,22 @@ struct ViewDesc
 class ShaderReflection;
 struct ShaderDesc
 {
-  std::vector<uint8_t> blob;
-  std::shared_ptr<ShaderReflection> reflection;
+  //std::vector<uint8_t> blob;
+  //std::shared_ptr<ShaderReflection> reflection;
+
   std::string shader_path;
   std::string entrypoint;
   ShaderType type;
   std::string model;
   std::map<std::string, std::string> define;
 
-  ShaderDesc(std::vector<uint8_t> blob, std::shared_ptr<ShaderReflection> reflection, const std::string& shader_path, const std::string& entrypoint, ShaderType type, const std::string& model)
-    : blob(blob)
-    , reflection(reflection)
+  ShaderDesc(const std::string& shader_path, const std::string& entrypoint, ShaderType type, const std::string& model)
+    : shader_path(shader_path)
     , entrypoint(entrypoint)
     , type(type)
     , model(model)
+    //, blob{}
+    //, reflection{}
   {
   }
 };

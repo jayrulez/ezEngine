@@ -89,9 +89,9 @@ std::shared_ptr<View> RenderDeviceImpl::CreateView(const std::shared_ptr<Resourc
   return m_device->CreateView(resource, view_desc);
 }
 
-std::shared_ptr<Shader> RenderDeviceImpl::CompileShader(const ShaderDesc& desc)
+std::shared_ptr<Shader> RenderDeviceImpl::CreateShader(const ShaderDesc& desc, std::vector<uint8_t> byteCode, std::shared_ptr<ShaderReflection> reflection)
 {
-  return m_device->CompileShader(desc);
+  return m_device->CreateShader(desc, byteCode, reflection);
 }
 
 std::shared_ptr<Program> RenderDeviceImpl::CreateProgram(const std::vector<std::shared_ptr<Shader>>& shaders)

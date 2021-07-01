@@ -1,6 +1,7 @@
 #include <RHIVulkan/Pipeline/VKGraphicsPipeline.h>
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/Program/VKProgram.h>
+#include <RHIVulkan/Utilities/VKUtility.h>
 #include <map>
 
 vk::CompareOp Convert(ComparisonFunc func)
@@ -225,6 +226,6 @@ void VKGraphicsPipeline::CreateInputLayout(std::vector<vk::VertexInputBindingDes
         attribute.binding = binding.binding = vertex.slot;
         binding.inputRate = vk::VertexInputRate::eVertex;
         binding.stride = vertex.stride;
-        attribute.format = static_cast<vk::Format>(vertex.format);
+        attribute.format = VKUtils::ToVkFormat(vertex.format);
     }
 }

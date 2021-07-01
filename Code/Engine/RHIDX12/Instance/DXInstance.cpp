@@ -20,12 +20,12 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(RHIVulkan, InstanceFactory)
 
 ON_CORESYSTEMS_STARTUP
 {
-  InstanceFactory::RegisterCreatorFunc(ApiType::kVulkan, &CreateDXInstance);
+  InstanceFactory::RegisterCreatorFunc(ApiType::kDX12, &CreateDXInstance);
 }
 
 ON_CORESYSTEMS_SHUTDOWN
 {
-  InstanceFactory::UnregisterCreatorFunc(ApiType::kVulkan);
+  InstanceFactory::UnregisterCreatorFunc(ApiType::kDX12);
 }
 
 EZ_END_SUBSYSTEM_DECLARATION;
@@ -81,7 +81,7 @@ DXInstance::DXInstance()
         0x40f5,
     { 0xb2, 0x97, 0x81, 0xce, 0x9e, 0x18, 0x93, 0x3f }
     };
-    ASSERT_SUCCEEDED(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModelsID, nullptr, nullptr));
+    EZ_ASSERT_ALWAYS(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModelsID, nullptr, nullptr) == S_OK, "");
 #endif
 
   uint32_t flags = 0;

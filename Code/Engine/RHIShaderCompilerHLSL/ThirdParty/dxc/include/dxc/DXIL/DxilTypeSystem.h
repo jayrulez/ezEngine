@@ -27,6 +27,7 @@ class Function;
 class MDNode;
 class Type;
 class StructType;
+class StringRef;
 }
 
 
@@ -94,7 +95,7 @@ private:
   bool m_bCBufferVarUsed; // true if this field represents a top level variable in CB structure, and it is used.
 };
 
-class DxilTemplateArgAnnotation {
+class DxilTemplateArgAnnotation : DxilFieldAnnotation {
 public:
   DxilTemplateArgAnnotation();
 
@@ -125,10 +126,6 @@ public:
   void SetCBufferSize(unsigned size);
   void MarkEmptyStruct();
   bool IsEmptyStruct();
-  // Since resources don't take real space, IsEmptyBesidesResources
-  // determines if the structure is empty or contains only resources.
-  bool IsEmptyBesidesResources();
-  bool ContainsResources() const;
 
   // For template args, GetNumTemplateArgs() will return 0 if not a template
   unsigned GetNumTemplateArgs() const;
@@ -137,15 +134,10 @@ public:
   const DxilTemplateArgAnnotation &GetTemplateArgAnnotation(unsigned argIdx) const;
 
 private:
-  const llvm::StructType *m_pStructType = nullptr;
+  const llvm::StructType *m_pStructType;
   std::vector<DxilFieldAnnotation> m_FieldAnnotations;
-  unsigned m_CBufferSize = 0;  // The size of struct if inside constant buffer.
+  unsigned m_CBufferSize;  // The size of struct if inside constant buffer.
   std::vector<DxilTemplateArgAnnotation> m_TemplateAnnotations;
-
-  // m_ResourcesContained property not stored to metadata
-  void SetContainsResources();
-  // HasResources::Only will be set on MarkEmptyStruct() when HasResources::True
-  enum class HasResources { True, False, Only } m_ResourcesContained = HasResources::False;
 };
 
 
@@ -231,17 +223,10 @@ public:
   const llvm::Function *GetFunction() const;
   DxilParameterAnnotation &GetRetTypeAnnotation();
   const DxilParameterAnnotation &GetRetTypeAnnotation() const;
-
-  bool ContainsResourceArgs() { return m_bContainsResourceArgs; }
-
 private:
   const llvm::Function *m_pFunction;
   std::vector<DxilParameterAnnotation> m_parameterAnnotations;
   DxilParameterAnnotation m_retTypeAnnotation;
-
-  // m_bContainsResourceArgs property not stored to metadata
-  void SetContainsResourceArgs() { m_bContainsResourceArgs = true; }
-  bool m_bContainsResourceArgs = false;
 };
 
 /// Use this class to represent structure type annotations in HL and DXIL.
@@ -254,11 +239,9 @@ public:
   DxilTypeSystem(llvm::Module *pModule);
 
   DxilStructAnnotation *AddStructAnnotation(const llvm::StructType *pStructType, unsigned numTemplateArgs = 0);
-  void FinishStructAnnotation(DxilStructAnnotation &SA);
   DxilStructAnnotation *GetStructAnnotation(const llvm::StructType *pStructType);
   const DxilStructAnnotation *GetStructAnnotation(const llvm::StructType *pStructType) const;
   void EraseStructAnnotation(const llvm::StructType *pStructType);
-  void EraseUnusedStructAnnotations();
 
   StructAnnotationMap &GetStructAnnotationMap();
   const StructAnnotationMap &GetStructAnnotationMap() const;
@@ -272,7 +255,6 @@ public:
   const PayloadAnnotationMap &GetPayloadAnnotationMap() const;
 
   DxilFunctionAnnotation *AddFunctionAnnotation(const llvm::Function *pFunction);
-  void FinishFunctionAnnotation(DxilFunctionAnnotation &FA);
   DxilFunctionAnnotation *GetFunctionAnnotation(const llvm::Function *pFunction);
   const DxilFunctionAnnotation *GetFunctionAnnotation(const llvm::Function *pFunction) const;
   void EraseFunctionAnnotation(const llvm::Function *pFunction);
@@ -292,9 +274,6 @@ public:
 
   bool UseMinPrecision();
   void SetMinPrecision(bool bMinPrecision);
-
-  // Determines whether type is a resource or contains a resource
-  bool IsResourceContained(llvm::Type *Ty);
 
 private:
   llvm::Module *m_pModule;
