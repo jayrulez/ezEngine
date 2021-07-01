@@ -8,7 +8,7 @@
 class EZ_RHI_DLL ShaderBase : public Shader
 {
 public:
-  ShaderBase(const ShaderDesc& desc, ShaderBlobType blob_type);
+  ShaderBase(const ShaderDesc& desc, std::vector<uint8_t> byteCode, std::shared_ptr<ShaderReflection> reflection, ShaderBlobType blob_type);
   ShaderType GetType() const override;
   const std::vector<uint8_t>& GetBlob() const override;
   uint64_t GetId(const std::string& entry_point) const override;

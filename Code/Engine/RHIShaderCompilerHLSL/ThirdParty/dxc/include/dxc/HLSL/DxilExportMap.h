@@ -38,12 +38,9 @@ namespace dxilutil {
     typedef ExportMapByString::iterator iterator;
     typedef ExportMapByString::const_iterator const_iterator;
 
-    ExportMap():m_ExportShadersOnly(false) {}
+    ExportMap() {}
     void clear();
     bool empty() const;
-
-    void setExportShadersOnly(bool v) { m_ExportShadersOnly = v; }
-    bool isExportShadersOnly() const { return m_ExportShadersOnly; }
 
     // Iterate export map by string name
     iterator begin() { return m_ExportMap.begin(); }
@@ -103,7 +100,6 @@ namespace dxilutil {
     NameSet m_ExportNames;
     NameSet m_NameCollisions;
     NameSet m_UnusedExports;
-    bool    m_ExportShadersOnly;
   };
 }
 

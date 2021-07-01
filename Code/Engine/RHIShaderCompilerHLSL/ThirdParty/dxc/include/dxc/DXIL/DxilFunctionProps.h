@@ -21,9 +21,7 @@ class Constant;
 namespace hlsl {
 struct DxilFunctionProps {
   DxilFunctionProps() {
-    memset(&ShaderProps, 0, sizeof(ShaderProps));
-    shaderKind = DXIL::ShaderKind::Invalid;
-    waveSize = 0;
+    memset(this, 0, sizeof(DxilFunctionProps));
   }
   union {
     // Compute shader.
@@ -85,12 +83,7 @@ struct DxilFunctionProps {
   } ShaderProps;
   DXIL::ShaderKind shaderKind;
   // WaveSize is currently allowed only on compute shaders, but could be supported on other shader types in the future
-  unsigned waveSize;
-  // Save root signature for lib profile entry.
-  std::vector<uint8_t> serializedRootSignature;
-  void SetSerializedRootSignature(const uint8_t *pData, unsigned size) {
-    serializedRootSignature.assign(pData, pData+size);
-  }
+  unsigned waveSize; 
 
   // TODO: Should we have an unmangled name here for ray tracing shaders?
   bool IsPS() const     { return shaderKind == DXIL::ShaderKind::Pixel; }

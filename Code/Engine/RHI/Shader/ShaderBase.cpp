@@ -6,12 +6,12 @@ static uint64_t GenId()
   return ++id;
 }
 
-ShaderBase::ShaderBase(const ShaderDesc& desc, ShaderBlobType blob_type)
+ShaderBase::ShaderBase(const ShaderDesc& desc, std::vector<uint8_t> byteCode, std::shared_ptr<ShaderReflection> reflection, ShaderBlobType blob_type)
     : m_shader_type(desc.type)
     , m_blob_type(blob_type)
 {
-  m_blob = desc.blob;
-  m_reflection = desc.reflection;
+  m_blob = byteCode;
+  m_reflection = reflection;
   m_bindings = m_reflection->GetBindings();
   for (uint32_t i = 0; i < m_bindings.size(); ++i)
   {

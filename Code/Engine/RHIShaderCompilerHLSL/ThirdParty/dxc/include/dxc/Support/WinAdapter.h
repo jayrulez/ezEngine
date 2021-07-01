@@ -32,6 +32,7 @@
 #include <typeinfo>
 #include <vector>
 #endif // __cplusplus
+#include <execinfo.h>
 
 //===----------------------------------------------------------------------===//
 //
@@ -193,6 +194,10 @@
 
 #define OutputDebugStringA(msg) fputs(msg, stderr)
 #define OutputDebugFormatA(...) fprintf(stderr, __VA_ARGS__)
+
+#define CaptureStackBackTrace(FramesToSkip, FramesToCapture, BackTrace,        \
+                              BackTraceHash)                                   \
+  backtrace(BackTrace, FramesToCapture)
 
 // Event Tracing for Windows (ETW) provides application programmers the ability
 // to start and stop event tracing sessions, instrument an application to

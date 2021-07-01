@@ -1,7 +1,8 @@
-#include "View/VKView.h"
-#include <Device/VKDevice.h>
-#include <Resource/VKResource.h>
-#include <BindingSetLayout/VKBindingSetLayout.h>
+#include <RHIVulkan/View/VKView.h>
+#include <RHIVulkan/Device/VKDevice.h>
+#include <RHIVulkan/Resource/VKResource.h>
+#include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>
+#include <RHIVulkan/Utilities/VKUtility.h>
 
 VKView::VKView(VKDevice& device, const std::shared_ptr<VKResource>& resource, const ViewDesc& view_desc)
     : m_device(device)
@@ -142,7 +143,7 @@ void VKView::CreateBufferView()
 {
     vk::BufferViewCreateInfo buffer_view_desc = {};
     buffer_view_desc.buffer = m_resource->buffer.res.get();
-    buffer_view_desc.format = static_cast<vk::Format>(m_view_desc.buffer_format);
+    buffer_view_desc.format = VKUtils::ToVkFormat(m_view_desc.buffer_format);
     buffer_view_desc.offset = m_view_desc.offset;
     buffer_view_desc.range = m_view_desc.buffer_size;
     m_buffer_view = m_device.GetDevice().createBufferViewUnique(buffer_view_desc);
