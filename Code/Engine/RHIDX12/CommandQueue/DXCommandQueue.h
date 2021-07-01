@@ -1,6 +1,7 @@
 #pragma once
-#include "CommandQueue/CommandQueue.h"
-#include <directx/d3d12.h>
+#include <RHI/CommandQueue/CommandQueue.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 

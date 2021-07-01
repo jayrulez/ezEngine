@@ -1,0 +1,11 @@
+add_library(dxc INTERFACE)
+target_include_directories(dxc INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/dxc/include")
+target_include_directories(dxc INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/dxc/include/dxc")
+target_compile_definitions(dxc INTERFACE DXC_CUSTOM_LOCATION="${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/dxc/bin")
+set(dxc_default_location "C:/Program Files (x86)/Windows Kits/10/Bin/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/x64")
+target_compile_definitions(dxc INTERFACE DXC_DEFAULT_LOCATION="${dxc_default_location}")
+
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/dxc/cmake/modules")
+find_package(DiaSDK REQUIRED)
+add_library(dia INTERFACE)
+target_include_directories(dia INTERFACE "${DIASDK_INCLUDE_DIRS}")

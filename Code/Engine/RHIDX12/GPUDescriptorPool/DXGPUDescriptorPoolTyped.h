@@ -1,12 +1,13 @@
 #pragma once
-#include "GPUDescriptorPool/DXGPUDescriptorPoolRange.h"
-#include <Instance/BaseTypes.h>
-#include <Utilities/DXUtility.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolRange.h>
+#include <RHI/Instance/BaseTypes.h>
+#include <RHIDX12/Utilities/DXUtility.h>
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <wrl.h>
-#include <directx/d3d12.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 using namespace Microsoft::WRL;
 
 class DXDevice;
@@ -15,21 +16,21 @@ class DXGPUDescriptorPoolTyped
 {
 public:
     DXGPUDescriptorPoolTyped(DXDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type);
-    DXGPUDescriptorPoolRange Allocate(size_t count);
-    void ResizeHeap(size_t req_size);
-    void OnRangeDestroy(size_t offset, size_t size);
+  DXGPUDescriptorPoolRange Allocate(ezUInt32 count);
+    void ResizeHeap(ezUInt32 req_size);
+  void OnRangeDestroy(ezUInt32 offset, ezUInt32 size);
     void ResetHeap();
     ComPtr<ID3D12DescriptorHeap> GetHeap();
 
 private:
     DXDevice& m_device;
     D3D12_DESCRIPTOR_HEAP_TYPE m_type;
-    size_t m_offset;
-    size_t m_size;
+    ezUInt32 m_offset;
+    ezUInt32 m_size;
     ComPtr<ID3D12DescriptorHeap> m_heap;
     D3D12_CPU_DESCRIPTOR_HANDLE m_cpu_handle;
     D3D12_GPU_DESCRIPTOR_HANDLE m_gpu_handle;
     ComPtr<ID3D12DescriptorHeap> m_heap_readable;
     D3D12_CPU_DESCRIPTOR_HANDLE m_cpu_handle_readable;
-    std::multimap<size_t, size_t> m_empty_ranges;
+    std::multimap<ezUInt32, ezUInt32> m_empty_ranges;
 };

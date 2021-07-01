@@ -1,6 +1,7 @@
 #include "CPUDescriptorPool/DXCPUDescriptorHandle.h"
 #include <Device/DXDevice.h>
-#include <directx/d3dx12.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 
 DXCPUDescriptorHandle::DXCPUDescriptorHandle(
     DXDevice& device,

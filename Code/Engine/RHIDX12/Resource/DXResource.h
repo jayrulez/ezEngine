@@ -1,6 +1,7 @@
 #pragma once
-#include "Resource/ResourceBase.h"
-#include <directx/d3d12.h>
+#include <RHI/Resource/ResourceBase.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 
@@ -13,7 +14,7 @@ public:
 
     void CommitMemory(MemoryType memory_type) override;
     void BindMemory(const std::shared_ptr<Memory>& memory, uint64_t offset) override;
-    uint64_t GetWidth() const override;
+    uint32_t GetWidth() const override;
     uint32_t GetHeight() const override;
     uint16_t GetLayerCount() const override;
     uint16_t GetLevelCount() const override;

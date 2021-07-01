@@ -1,7 +1,8 @@
 #pragma once
-#include "Memory/Memory.h"
-#include <Instance/BaseTypes.h>
-#include <directx/d3d12.h>
+#include <RHI/Memory/Memory.h>
+#include <RHI/Instance/BaseTypes.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 

@@ -1,12 +1,13 @@
-#include "Pipeline/DXComputePipeline.h"
-#include "Pipeline/DXStateBuilder.h"
-#include <Device/DXDevice.h>
-#include <Program/DXProgram.h>
-#include <Shader/Shader.h>
-#include <BindingSetLayout/DXBindingSetLayout.h>
-#include <View/DXView.h>
-#include <Utilities/DXGIFormatHelper.h>
-#include <directx/d3dx12.h>
+#include <RHIDX12/Pipeline/DXComputePipeline.h>
+#include <RHIDX12/Pipeline/DXStateBuilder.h>
+#include <RHIDX12/Device/DXDevice.h>
+#include <RHIDX12/Program/DXProgram.h>
+#include <RHI/Shader/Shader.h>
+#include <RHIDX12/BindingSetLayout/DXBindingSetLayout.h>
+#include <RHIDX12/View/DXView.h>
+#include <RHIDX12/Utilities/DXUtility.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 
 DXComputePipeline::DXComputePipeline(DXDevice& device, const ComputePipelineDesc& desc)
     : m_device(device)
@@ -36,7 +37,8 @@ DXComputePipeline::DXComputePipeline(DXDevice& device, const ComputePipelineDesc
 
     ComPtr<ID3D12Device2> device2;
     m_device.GetDevice().As(&device2);
-    ASSERT_SUCCEEDED(device2->CreatePipelineState(&compute_state_builder.GetDesc(), IID_PPV_ARGS(&m_pipeline_state)));
+    auto psDesc = compute_state_builder.GetDesc();
+    EZ_ASSERT_ALWAYS(device2->CreatePipelineState(&psDesc, IID_PPV_ARGS(&m_pipeline_state)) == S_OK, "");
 }
 
 PipelineType DXComputePipeline::GetPipelineType() const

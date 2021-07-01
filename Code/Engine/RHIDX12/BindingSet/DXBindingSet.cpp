@@ -1,9 +1,9 @@
-#include "BindingSet/DXBindingSet.h"
-#include <GPUDescriptorPool/DXGPUDescriptorPoolRange.h>
-#include <Program/DXProgram.h>
-#include <BindingSetLayout/DXBindingSetLayout.h>
-#include <Device/DXDevice.h>
-#include <View/DXView.h>
+#include <RHIDX12/BindingSet/DXBindingSet.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolRange.h>
+#include <RHIDX12/Program/DXProgram.h>
+#include <RHIDX12/BindingSetLayout/DXBindingSetLayout.h>
+#include <RHIDX12/Device/DXDevice.h>
+#include <RHIDX12/View/DXView.h>
 
 DXBindingSet::DXBindingSet(DXDevice& device, const std::shared_ptr<DXBindingSetLayout>& layout)
     : m_device(device)
@@ -82,7 +82,7 @@ std::vector<ComPtr<ID3D12DescriptorHeap>> DXBindingSet::Apply(const ComPtr<ID3D1
     }
     if (descriptor_heaps_ptr.size())
     {
-        command_list->SetDescriptorHeaps(descriptor_heaps_ptr.size(), descriptor_heaps_ptr.data());
+      command_list->SetDescriptorHeaps((ezUInt32)descriptor_heaps_ptr.size(), descriptor_heaps_ptr.data());
     }
 
     for (const auto& table : m_layout->GetDescriptorTables())

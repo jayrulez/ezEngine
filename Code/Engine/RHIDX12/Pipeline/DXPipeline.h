@@ -1,6 +1,7 @@
 #pragma once
-#include "Pipeline/Pipeline.h"
-#include <directx/d3d12.h>
+#include <RHI/Pipeline/Pipeline.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 

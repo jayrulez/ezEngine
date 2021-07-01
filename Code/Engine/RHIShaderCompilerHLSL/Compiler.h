@@ -1,4 +1,5 @@
 #pragma once
+
 #include <RHIShaderCompilerHLSL/RHIShaderCompilerHLSLDLL.h>
 #include <RHI/Instance/BaseTypes.h>
 

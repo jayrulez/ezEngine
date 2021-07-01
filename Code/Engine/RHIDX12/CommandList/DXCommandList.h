@@ -1,7 +1,8 @@
 #pragma once
-#include "CommandList/CommandList.h"
+#include <RHI/CommandList/CommandList.h>
 #include <dxgi.h>
-#include <directx/d3d12.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 
@@ -47,7 +48,7 @@ public:
     void UAVResourceBarrier(const std::shared_ptr<Resource>& resource) override;
     void SetViewport(float x, float y, float width, float height) override;
     void SetScissorRect(int32_t left, int32_t top, uint32_t right, uint32_t bottom) override;
-    void IASetIndexBuffer(const std::shared_ptr<Resource>& resource, gli::format format) override;
+    void IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format) override;
     void IASetVertexBuffer(uint32_t slot, const std::shared_ptr<Resource>& resource) override;
     void RSSetShadingRate(ShadingRate shading_rate, const std::array<ShadingRateCombiner, 2>& combiners) override;
     void BuildBottomLevelAS(

@@ -270,8 +270,8 @@ enum class ShaderType
 
 struct LazyViewDesc
 {
-  size_t level = 0;
-  size_t count = static_cast<size_t>(-1);
+  ezUInt32 level = 0;
+  ezUInt32 count = static_cast<ezUInt32>(-1);
   ezRHIResourceFormat::Enum buffer_format = ezRHIResourceFormat::UNKNOWN;
 
   auto MakeTie() const
@@ -821,3 +821,18 @@ auto operator<(const T& l, const T& r) -> std::enable_if_t<std::is_same_v<declty
 {
   return l.MakeTie() < r.MakeTie();
 }
+
+enum class ApiType
+{
+  kVulkan,
+  kDX12
+};
+
+struct RenderDeviceDesc
+{
+  ApiType api_type = ApiType::kVulkan;
+  bool vsync = true;
+  bool round_fps = false;
+  uint32_t required_gpu_index = 0;
+  uint32_t frame_count = 3;
+};

@@ -1,18 +1,20 @@
-#include "Pipeline/DXRayTracingPipeline.h"
-#include <Device/DXDevice.h>
-#include <Program/DXProgram.h>
-#include <Shader/Shader.h>
-#include <BindingSetLayout/DXBindingSetLayout.h>
-#include <View/DXView.h>
-#include <Utilities/DXGIFormatHelper.h>
-#include <directx/d3d12.h>
-#include <directx/d3dx12.h>
+#include <RHIDX12/Pipeline/DXRayTracingPipeline.h>
+#include <RHIDX12/Device/DXDevice.h>
+#include <RHIDX12/Program/DXProgram.h>
+#include <RHI/Shader/Shader.h>
+#include <RHIDX12/BindingSetLayout/DXBindingSetLayout.h>
+#include <RHIDX12/View/DXView.h>
+#include <RHIDX12/Utilities/DXUtility.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 #include <d3d12shader.h>
-#include <Utilities/FileUtility.h>
-#include <HLSLCompiler/DXCLoader.h>
-#include <dxc/DXIL/DxilConstants.h>
-#include <dxc/DxilContainer/DxilContainer.h>
-#include <dxc/DxilContainer/DxilRuntimeReflection.h>
+
+//#include <HLSLCompiler/DXCLoader.h>
+//#include <dxc/DXIL/DxilConstants.h>
+//#include <dxc/DxilContainer/DxilContainer.h>
+//#include <dxc/DxilContainer/DxilRuntimeReflection.h>
 
 DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPipelineDesc& desc)
     : m_device(device)
@@ -34,7 +36,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
         for (const auto& entry_point : shader->GetReflection()->GetEntryPoints())
         {
             uint64_t shader_id = shader->GetId(entry_point.name);
-            std::wstring shader_name = utf8_to_wstring(entry_point.name);
+            std::wstring shader_name = ezStringWChar(entry_point.name.c_str()).GetData();
             if (m_shader_names.count(shader_name))
             {
                 std::wstring new_shader_name = GenerateUniqueName(shader_name + L"_renamed_" + std::to_wstring(shader_id));
@@ -92,8 +94,8 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
     uint32_t max_attribute_size = 0;
     for (size_t i = 0; i < entry_points.size(); ++i)
     {
-        max_payload_size = std::max(max_payload_size, entry_points[i].payload_size);
-        max_attribute_size = std::max(max_payload_size, entry_points[i].attribute_size);
+        max_payload_size = ezMath::Max(max_payload_size, entry_points[i].payload_size);
+      max_attribute_size = ezMath::Max(max_payload_size, entry_points[i].attribute_size);
     }
     shader_config->Config(max_payload_size, max_attribute_size);
 
@@ -102,7 +104,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
 
     ComPtr<ID3D12Device5> device5;
     m_device.GetDevice().As(&device5);
-    ASSERT_SUCCEEDED(device5->CreateStateObject(subobjects, IID_PPV_ARGS(&m_pipeline_state)));
+    EZ_ASSERT_ALWAYS(device5->CreateStateObject(subobjects, IID_PPV_ARGS(&m_pipeline_state)) == S_OK, "");
     m_pipeline_state.As(&m_state_ojbect_props);
 }
 

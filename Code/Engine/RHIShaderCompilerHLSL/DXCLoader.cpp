@@ -4,58 +4,16 @@
 #include <Foundation/IO/OSFile.h>
 #include <Foundation/System/EnvironmentVariableUtils.h>
 #include <RHIShaderCompilerHLSL/DXCLoader.h>
-//#include <dxc2/include/dxc/Support/Global.h>
-//#include <dxc/Support/Global.h>
+#include <Support/Global.h>
 #include <filesystem>
 #include <string>
 #include <vector>
 #include <wrl.h>
 
-//
-#include <dxc/Support/Global.h>
-#include <dxc/dxcapi.h>
-//#include <dxc/include/dxcapi.h>
-//#include <dxc/include/d3d12shader.h>
-//
-
-#include <deque>
-#include <functional>
-
-/*
-class ScopeGuard
-{
-public:
-  using HandlerType = std::function<void()>;
-
-  ScopeGuard(const HandlerType& fn)
-  {
-    m_deque.push_front(fn);
-  }
-
-  ~ScopeGuard()
-  {
-    for (auto& handler : m_deque)
-    {
-      handler();
-    }
-  }
-
-  ScopeGuard& operator+=(const HandlerType& fn)
-  {
-    m_deque.push_front(fn);
-    return *this;
-  }
-
-private:
-  std::deque<HandlerType> m_deque;
-};
-*/
-
 using namespace Microsoft::WRL;
 
 HRESULT Test(dxc::DxcDllSupport& dll_support, ShaderBlobType target)
 {
-  /*
   std::string test_shader = "[shader(\"pixel\")]void main(){}";
   ComPtr<IDxcLibrary> library;
   IFR(dll_support.CreateInstance(CLSID_DxcLibrary, library.GetAddressOf()));
@@ -85,13 +43,10 @@ HRESULT Test(dxc::DxcDllSupport& dll_support, ShaderBlobType target)
   HRESULT hr = {};
   result->GetStatus(&hr);
   return hr;
-  */
-  return S_OK;
 }
 
 std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType target)
 {
-  /*
   auto dxcompiler_path = std::filesystem::u8path(path) / "dxcompiler.dll";
   if (!std::filesystem::exists(dxcompiler_path))
   {
@@ -107,7 +62,7 @@ std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType
   std::vector<wchar_t> prev_dll_dir(GetDllDirectoryW(0, nullptr));
   GetDllDirectoryW(static_cast<DWORD>(prev_dll_dir.size()), prev_dll_dir.data());
 
-  // ScopeGuard guard = [&] 
+  // ScopeGuard guard = [&]
   {
     SetDllDirectoryW(prev_dll_dir.data());
   };
@@ -125,14 +80,10 @@ std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType
   }
 
   return dll_support;
-  */
-
-  return {};
 }
 
 std::unique_ptr<dxc::DxcDllSupport> GetDxcSupportImpl(ShaderBlobType target)
 {
-  /*
   ezStringBuilder vkBinDir(ezEnvironmentVariableUtils::GetValueString("VULKAN_SDK"), "/Bin");
   vkBinDir.MakeCleanPath();
 
@@ -150,9 +101,6 @@ std::unique_ptr<dxc::DxcDllSupport> GetDxcSupportImpl(ShaderBlobType target)
     }
   }
   assert(false);
-  return {};
-  */
-
   return {};
 }
 

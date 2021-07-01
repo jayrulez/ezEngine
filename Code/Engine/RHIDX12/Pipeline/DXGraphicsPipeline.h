@@ -1,7 +1,8 @@
 #pragma once
-#include "Pipeline/DXPipeline.h"
-#include <Instance/BaseTypes.h>
-#include <directx/d3d12.h>
+#include <RHIDX12/Pipeline/DXPipeline.h>
+#include <RHI/Instance/BaseTypes.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 
@@ -17,7 +18,7 @@ public:
 
     const GraphicsPipelineDesc& GetDesc() const;
     const ComPtr<ID3D12PipelineState>& GetPipeline() const;
-    const std::map<size_t, uint32_t>& GetStrideMap() const;
+    const std::map<ezUInt32, uint32_t>& GetStrideMap() const;
 
 private:
     void ParseInputLayout(const std::shared_ptr<Shader>& shader);
@@ -26,8 +27,8 @@ private:
     DXDevice& m_device;
     GraphicsPipelineDesc m_desc;
     std::vector<D3D12_INPUT_ELEMENT_DESC> m_input_layout_desc;
-    std::map<size_t, std::string> m_input_layout_desc_names;
-    std::map<size_t, uint32_t> m_input_layout_stride;
+    std::map<ezUInt32, std::string> m_input_layout_desc_names;
+    std::map<ezUInt32, uint32_t> m_input_layout_stride;
     ComPtr<ID3D12RootSignature> m_root_signature;
     ComPtr<ID3D12PipelineState> m_pipeline_state;
 };

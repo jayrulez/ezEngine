@@ -113,6 +113,20 @@ struct EZ_RHI_DLL ezRHIResourceFormat
   EZ_ALWAYS_INLINE static bool IsFormatUnorm(ezRHIResourceFormat::Enum value);
   EZ_ALWAYS_INLINE static bool IsFormatBlockCompressed(ezRHIResourceFormat::Enum value);
   EZ_ALWAYS_INLINE static bool IsFormatStencilSupport(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static void GetInfo(ezUInt32 width,
+    ezUInt32 height,
+    ezRHIResourceFormat::Enum format,
+    ezUInt32& num_bytes,
+    ezUInt32& row_bytes,
+    ezUInt32& num_rows,
+    uint32_t alignment);
+  EZ_ALWAYS_INLINE static void GetInfo(ezUInt32 width,
+    ezUInt32 height,
+    ezRHIResourceFormat::Enum format,
+    ezUInt32& num_bytes,
+    ezUInt32& row_bytes);
+
+  EZ_ALWAYS_INLINE static uint32_t Align(uint32_t size, uint32_t alignment);
 };
 
 EZ_DECLARE_REFLECTABLE_TYPE(EZ_RHI_DLL, ezRHIResourceFormat);
@@ -309,6 +323,45 @@ EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatStencilSupport(ezRHIResourceF
   return false;
 }
 
+
+EZ_ALWAYS_INLINE void ezRHIResourceFormat::GetInfo(ezUInt32 width,
+  ezUInt32 height,
+  ezRHIResourceFormat::Enum format,
+  ezUInt32& num_bytes,
+  ezUInt32& row_bytes,
+  ezUInt32& num_rows,
+  uint32_t alignment)
+{
+  if (IsFormatBlockCompressed(format))
+  {
+    row_bytes = GetBlockSize(format) * ((width + GetBlockExtent(format).x - 1) / GetBlockExtent(format).x);
+    row_bytes = Align(row_bytes, alignment);
+    num_rows = ((height + GetBlockExtent(format).y - 1) / GetBlockExtent(format).y);
+  }
+  else
+  {
+    row_bytes = width * GetFormatStride(format);
+    row_bytes = Align(row_bytes, alignment);
+    num_rows = height;
+  }
+  num_bytes = row_bytes * num_rows;
+}
+
+EZ_ALWAYS_INLINE void ezRHIResourceFormat::GetInfo(ezUInt32 width,
+  ezUInt32 height,
+  ezRHIResourceFormat::Enum format,
+  ezUInt32& num_bytes,
+  ezUInt32& row_bytes)
+{
+  ezUInt32 num_rows = 0;
+  uint32_t alignment = 1;
+  return GetInfo(width, height, format, num_bytes, row_bytes, num_rows, alignment);
+}
+
+EZ_ALWAYS_INLINE uint32_t ezRHIResourceFormat::Align(uint32_t size, uint32_t alignment)
+{
+  return (size + (alignment - 1)) & ~(alignment - 1);
+}
 
 struct EZ_RHI_DLL ezRHIFloat3X4
 {

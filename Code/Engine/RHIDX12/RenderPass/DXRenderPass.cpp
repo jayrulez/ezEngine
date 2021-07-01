@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderPass/DXRenderPass.h"
+#include <RHIDX12/RenderPass/DXRenderPass.h>
 
 DXRenderPass::DXRenderPass(DXDevice& device, const RenderPassDesc& desc)
     : m_desc(desc)

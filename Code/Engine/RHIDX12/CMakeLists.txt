@@ -8,18 +8,18 @@ get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME_WE)
 
 ez_create_target(LIBRARY ${PROJECT_NAME})
 
-ez_link_target_dx11(${PROJECT_NAME})
-
 if(MSVC)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
 endif()
 
-target_link_libraries(${PROJECT_NAME}
-  PRIVATE
-)
+target_compile_definitions(${PROJECT_NAME} PRIVATE DIRECTX_SUPPORT=1)
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
   Foundation
   RHI
+  PRIVATE
+  d3d12
+  dxgi
+  dxguid
 )

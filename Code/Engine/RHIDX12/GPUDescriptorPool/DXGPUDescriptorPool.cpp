@@ -1,6 +1,7 @@
-#include "GPUDescriptorPool/DXGPUDescriptorPool.h"
-#include <Device/DXDevice.h>
-#include <directx/d3dx12.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPool.h>
+#include <RHIDX12/Device/DXDevice.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 #include <stdexcept>
 
 DXGPUDescriptorPool::DXGPUDescriptorPool(DXDevice& device)
@@ -10,7 +11,7 @@ DXGPUDescriptorPool::DXGPUDescriptorPool(DXDevice& device)
 {
 }
 
-DXGPUDescriptorPoolRange DXGPUDescriptorPool::Allocate(D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, size_t count)
+DXGPUDescriptorPoolRange DXGPUDescriptorPool::Allocate(D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, ezUInt32 count)
 {
     switch (descriptor_type)
     {

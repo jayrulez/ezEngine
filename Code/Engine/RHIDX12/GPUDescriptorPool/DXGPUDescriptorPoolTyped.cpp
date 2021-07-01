@@ -1,6 +1,7 @@
-#include "GPUDescriptorPool/DXGPUDescriptorPoolTyped.h"
-#include <Device/DXDevice.h>
-#include <directx/d3dx12.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolTyped.h>
+#include <RHIDX12/Device/DXDevice.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 
 DXGPUDescriptorPoolTyped::DXGPUDescriptorPoolTyped(DXDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type)
     : m_device(device)
@@ -10,23 +11,23 @@ DXGPUDescriptorPoolTyped::DXGPUDescriptorPoolTyped(DXDevice& device, D3D12_DESCR
 {
 }
 
-DXGPUDescriptorPoolRange DXGPUDescriptorPoolTyped::Allocate(size_t count)
+DXGPUDescriptorPoolRange DXGPUDescriptorPoolTyped::Allocate(ezUInt32 count)
 {
     auto it = m_empty_ranges.lower_bound(count);
     if (it != m_empty_ranges.end())
     {
-        size_t offset = it->second;
-        size_t size = it->first;
+      ezUInt32 offset = it->second;
+      ezUInt32 size = it->first;
         m_empty_ranges.erase(it);
         return DXGPUDescriptorPoolRange(*this, m_device, m_heap, m_cpu_handle, m_gpu_handle, m_heap_readable, m_cpu_handle_readable, offset, size, m_device.GetDevice()->GetDescriptorHandleIncrementSize(m_type), m_type);
     }
     if (m_offset + count > m_size)
-        ResizeHeap(std::max(m_offset + count, 2 * (m_size + 1)));
+        ResizeHeap(ezMath::Max(m_offset + count, 2 * (m_size + 1)));
     m_offset += count;
     return DXGPUDescriptorPoolRange(*this, m_device, m_heap, m_cpu_handle, m_gpu_handle, m_heap_readable, m_cpu_handle_readable, m_offset - count, count, m_device.GetDevice()->GetDescriptorHandleIncrementSize(m_type), m_type);
 }
 
-void DXGPUDescriptorPoolTyped::ResizeHeap(size_t req_size)
+void DXGPUDescriptorPoolTyped::ResizeHeap(ezUInt32 req_size)
 {
     if (m_size >= req_size)
         return;
@@ -37,10 +38,10 @@ void DXGPUDescriptorPoolTyped::ResizeHeap(size_t req_size)
     heap_desc.NumDescriptors = static_cast<uint32_t>(req_size);
     heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     heap_desc.Type = m_type;
-    ASSERT_SUCCEEDED(m_device.GetDevice()->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&heap)));
+    EZ_ASSERT_ALWAYS(m_device.GetDevice()->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&heap)) == S_OK, "");
 
     heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    ASSERT_SUCCEEDED(m_device.GetDevice()->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&heap_readable)));
+    EZ_ASSERT_ALWAYS(m_device.GetDevice()->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&heap_readable)) == S_OK, "");
 
     if (m_size > 0)
     {
@@ -56,7 +57,7 @@ void DXGPUDescriptorPoolTyped::ResizeHeap(size_t req_size)
     m_cpu_handle_readable = m_heap_readable->GetCPUDescriptorHandleForHeapStart();
 }
 
-void DXGPUDescriptorPoolTyped::OnRangeDestroy(size_t offset, size_t size)
+void DXGPUDescriptorPoolTyped::OnRangeDestroy(ezUInt32 offset, ezUInt32 size)
 {
     m_empty_ranges.emplace(size, offset);
 }
