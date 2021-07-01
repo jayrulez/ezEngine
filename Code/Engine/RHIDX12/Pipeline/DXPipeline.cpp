@@ -1,4 +1,4 @@
-#include "Pipeline/DXPipeline.h"
+#include <RHIDX12/Pipeline/DXPipeline.h>
 
 std::vector<uint8_t> DXPipeline::GetRayTracingShaderGroupHandles(uint32_t first_group, uint32_t group_count) const
 {

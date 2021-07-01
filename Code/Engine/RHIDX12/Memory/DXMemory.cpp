@@ -1,6 +1,7 @@
-#include "Memory/DXMemory.h"
-#include <Device/DXDevice.h>
-#include <directx/d3dx12.h>
+#include <RHIDX12/Memory/DXMemory.h>
+#include <RHIDX12/Device/DXDevice.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 
 DXMemory::DXMemory(DXDevice& device, uint64_t size, MemoryType memory_type, uint32_t memory_type_bits)
     : m_memory_type(memory_type)
@@ -11,7 +12,7 @@ DXMemory::DXMemory(DXDevice& device, uint64_t size, MemoryType memory_type, uint
     desc.Alignment = memory_type_bits;
     if (device.IsCreateNotZeroedAvailable())
         desc.Flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
-    ASSERT_SUCCEEDED(device.GetDevice()->CreateHeap(&desc, IID_PPV_ARGS(&m_heap)));
+    EZ_ASSERT_ALWAYS(device.GetDevice()->CreateHeap(&desc, IID_PPV_ARGS(&m_heap)) == S_OK, "");
 }
 
 MemoryType DXMemory::GetMemoryType() const

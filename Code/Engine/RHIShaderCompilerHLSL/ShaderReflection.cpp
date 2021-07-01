@@ -15,7 +15,7 @@ std::shared_ptr<ShaderReflection> CreateShaderReflection(ShaderBlobType type, co
         return std::make_shared<DXILReflection>(data, size);
 #endif
 #ifdef VULKAN_SUPPORT
-    if(type == case ShaderBlobType::kSPIRV)
+    if(type == ShaderBlobType::kSPIRV)
         return std::make_shared<SPIRVReflection>(data, size);
 #endif
 

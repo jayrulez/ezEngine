@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderPass/RenderPass.h"
+#include <RHI/RenderPass/RenderPass.h>
 
 class DXDevice;
 

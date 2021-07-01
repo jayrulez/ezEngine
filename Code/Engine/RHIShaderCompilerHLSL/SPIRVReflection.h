@@ -1,6 +1,6 @@
 #pragma once
 #include <RHI/ShaderReflection/ShaderReflection.h>
-#include <SPIRV-Cross/spirv_hlsl.hpp>
+#include <spirv_hlsl.hpp>
 #include <string>
 #include <vector>
 

@@ -1,7 +1,8 @@
-#include "GPUDescriptorPool/DXGPUDescriptorPoolRange.h"
-#include "GPUDescriptorPool/DXGPUDescriptorPoolTyped.h"
-#include <Device/DXDevice.h>
-#include <directx/d3dx12.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolRange.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolTyped.h>
+#include <RHIDX12/Device/DXDevice.h>
+//#include <directx/d3dx12.h>
+#include <DirectX-Headers/include/directx/d3dx12.h>
 
 DXGPUDescriptorPoolRange::DXGPUDescriptorPoolRange(
     DXGPUDescriptorPoolTyped& pool,
@@ -11,8 +12,8 @@ DXGPUDescriptorPoolRange::DXGPUDescriptorPoolRange(
     D3D12_GPU_DESCRIPTOR_HANDLE& gpu_handle,
     ComPtr<ID3D12DescriptorHeap>& heap_readable,
     D3D12_CPU_DESCRIPTOR_HANDLE& cpu_handle_readable,
-    size_t offset,
-    size_t size,
+  ezUInt32 offset,
+  ezUInt32 size,
     uint32_t increment_size,
     D3D12_DESCRIPTOR_HEAP_TYPE type)
     : m_pool(pool)
@@ -34,7 +35,7 @@ DXGPUDescriptorPoolRange::DXGPUDescriptorPoolRange(DXGPUDescriptorPoolRange&& ot
 
 DXGPUDescriptorPoolRange::~DXGPUDescriptorPoolRange() = default;
 
-void DXGPUDescriptorPoolRange::CopyCpuHandle(size_t dst_offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+void DXGPUDescriptorPoolRange::CopyCpuHandle(ezUInt32 dst_offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE self = GetCpuHandle(m_cpu_handle, dst_offset);
     m_device.get().GetDevice()->CopyDescriptors(
@@ -48,7 +49,7 @@ void DXGPUDescriptorPoolRange::CopyCpuHandle(size_t dst_offset, D3D12_CPU_DESCRI
         m_type);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DXGPUDescriptorPoolRange::GetCpuHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle, size_t offset) const
+D3D12_CPU_DESCRIPTOR_HANDLE DXGPUDescriptorPoolRange::GetCpuHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle, ezUInt32 offset) const
 {
     return CD3DX12_CPU_DESCRIPTOR_HANDLE(
         handle,
@@ -56,7 +57,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DXGPUDescriptorPoolRange::GetCpuHandle(D3D12_CPU_DES
         m_increment_size);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DXGPUDescriptorPoolRange::GetGpuHandle(size_t offset) const
+D3D12_GPU_DESCRIPTOR_HANDLE DXGPUDescriptorPoolRange::GetGpuHandle(ezUInt32 offset) const
 {
     return CD3DX12_GPU_DESCRIPTOR_HANDLE(
         m_gpu_handle,
@@ -69,12 +70,12 @@ const ComPtr<ID3D12DescriptorHeap>& DXGPUDescriptorPoolRange::GetHeap() const
     return m_heap;
 }
 
-size_t DXGPUDescriptorPoolRange::GetSize() const
+ezUInt32 DXGPUDescriptorPoolRange::GetSize() const
 {
     return m_size;
 }
 
-size_t DXGPUDescriptorPoolRange::GetOffset() const
+ezUInt32 DXGPUDescriptorPoolRange::GetOffset() const
 {
     return m_offset;
 }

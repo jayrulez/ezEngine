@@ -1,7 +1,8 @@
 #pragma once
-#include "Fence/Fence.h"
+#include <RHI/Fence/Fence.h>
 #include <dxgi.h>
-#include <directx/d3d12.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 

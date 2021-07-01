@@ -1,7 +1,8 @@
 #pragma once
-#include "BindingSet/BindingSet.h"
-#include <Program/DXProgram.h>
-#include <directx/d3d12.h>
+#include <RHI/BindingSet/BindingSet.h>
+#include <RHIDX12/Program/DXProgram.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 

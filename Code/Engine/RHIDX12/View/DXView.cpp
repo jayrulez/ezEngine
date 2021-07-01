@@ -1,8 +1,9 @@
-#include "View/DXView.h"
-#include <Device/DXDevice.h>
-#include <Utilities/DXGIFormatHelper.h>
+#include <RHIDX12/View/DXView.h>
+#include <RHIDX12/Device/DXDevice.h>
+#include <RHIDX12/Utilities/DXUtility.h>
 #include <cassert>
-#include <directx/d3d12.h>
+//#include <directx/d3d12.h>
+#include <DirectX-Headers/include/directx/d3d12.h>
 
 DXView::DXView(DXDevice& device, const std::shared_ptr<DXResource>& resource, const ViewDesc& m_view_desc)
     : m_device(device)
@@ -84,15 +85,15 @@ void DXView::CreateSRV()
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srv_desc.Format = m_resource->desc.Format;
 
-    if (IsTypelessDepthStencil(srv_desc.Format))
+    if (DXUtils::IsTypelessDepthStencil(srv_desc.Format))
     {
         if (m_view_desc.plane_slice == 0)
         {
-            srv_desc.Format = DepthReadFromTypeless(srv_desc.Format);
+            srv_desc.Format = DXUtils::DepthReadFromTypeless(srv_desc.Format);
         }
         else
         {
-            srv_desc.Format = StencilReadFromTypeless(srv_desc.Format);
+          srv_desc.Format = DXUtils::StencilReadFromTypeless(srv_desc.Format);
         }
     }
 
@@ -172,8 +173,10 @@ void DXView::CreateSRV()
         uint32_t stride = 0;
         if (m_view_desc.view_type == ViewType::kBuffer)
         {
-            srv_desc.Format = static_cast<DXGI_FORMAT>(gli::dx().translate(m_view_desc.buffer_format).DXGIFormat.DDS);
-            stride = gli::detail::bits_per_pixel(m_view_desc.buffer_format) / 8;
+            //srv_desc.Format = static_cast<DXGI_FORMAT>(gli::dx().translate(m_view_desc.buffer_format).DXGIFormat.DDS);
+          srv_desc.Format = DXUtils::ToDXGIFormat(m_view_desc.buffer_format);
+            //stride = gli::detail::bits_per_pixel(m_view_desc.buffer_format) / 8;
+          stride = ezRHIResourceFormat::GetFormatStride(m_view_desc.buffer_format);
         }
         else
         {
@@ -181,9 +184,9 @@ void DXView::CreateSRV()
             srv_desc.Buffer.StructureByteStride = m_view_desc.structure_stride;
             stride = srv_desc.Buffer.StructureByteStride;
         }
-        uint64_t size = std::min(m_resource->desc.Width, m_view_desc.buffer_size);
+        uint64_t size = ezMath::Min(m_resource->desc.Width, m_view_desc.buffer_size);
         srv_desc.Buffer.FirstElement = m_view_desc.offset / stride;
-        srv_desc.Buffer.NumElements = (size - m_view_desc.offset) / (stride);
+        srv_desc.Buffer.NumElements = (ezUInt32)((size - m_view_desc.offset) / (stride));
         break;
     }
     default:
@@ -254,8 +257,10 @@ void DXView::CreateUAV()
         uint32_t stride = 0;
         if (m_view_desc.view_type == ViewType::kRWBuffer)
         {
-            uav_desc.Format = static_cast<DXGI_FORMAT>(gli::dx().translate(m_view_desc.buffer_format).DXGIFormat.DDS);
-            stride = gli::detail::bits_per_pixel(m_view_desc.buffer_format) / 8;
+            //uav_desc.Format = static_cast<DXGI_FORMAT>(gli::dx().translate(m_view_desc.buffer_format).DXGIFormat.DDS);
+          uav_desc.Format = DXUtils::ToDXGIFormat(m_view_desc.buffer_format);
+            //stride = gli::detail::bits_per_pixel(m_view_desc.buffer_format) / 8;
+          stride = ezRHIResourceFormat::GetFormatStride(m_view_desc.buffer_format);
         }
         else
         {
@@ -263,9 +268,9 @@ void DXView::CreateUAV()
             uav_desc.Buffer.StructureByteStride = m_view_desc.structure_stride;
             stride = uav_desc.Buffer.StructureByteStride;
         }
-        uint64_t size = std::min(m_resource->desc.Width, m_view_desc.buffer_size);
+        uint64_t size = ezMath::Min(m_resource->desc.Width, m_view_desc.buffer_size);
         uav_desc.Buffer.FirstElement = m_view_desc.offset / stride;
-        uav_desc.Buffer.NumElements = (size - m_view_desc.offset) / (stride);
+        uav_desc.Buffer.NumElements = (ezUInt32)((size - m_view_desc.offset) / (stride));
         break;
     }
     default:
@@ -346,7 +351,7 @@ void DXView::CreateRTV()
 void DXView::CreateDSV()
 {
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc = {};
-    dsv_desc.Format = DepthStencilFromTypeless(m_resource->desc.Format);
+    dsv_desc.Format = DXUtils::DepthStencilFromTypeless(m_resource->desc.Format);
 
     switch (m_view_desc.dimension)
     {
@@ -404,7 +409,7 @@ void DXView::CreateCBV()
 {
     D3D12_CONSTANT_BUFFER_VIEW_DESC cvb_desc = {};
     cvb_desc.BufferLocation = m_resource->resource->GetGPUVirtualAddress();
-    cvb_desc.SizeInBytes = std::min(m_resource->desc.Width, m_view_desc.buffer_size);
+    cvb_desc.SizeInBytes = (ezUInt32)ezMath::Min(m_resource->desc.Width, m_view_desc.buffer_size);
     assert(cvb_desc.SizeInBytes % 256 == 0);
     m_device.GetDevice()->CreateConstantBufferView(&cvb_desc, m_handle->GetCpuHandle());
 }

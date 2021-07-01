@@ -51,7 +51,6 @@ public:
     _In_ LPCWSTR pFilename,
     _COM_Outptr_result_maybenull_ IDxcBlob** ppIncludeSource) override
   {
-    /*
     std::wstring path = m_base_path + pFilename;
     ComPtr<IDxcBlobEncoding> source;
     HRESULT hr = m_library->CreateBlobFromFile(
@@ -61,9 +60,6 @@ public:
     if (SUCCEEDED(hr) && ppIncludeSource)
       *ppIncludeSource = source.Detach();
     return hr;
-    */
-
-    return S_OK;
   }
 
 private:
@@ -73,7 +69,6 @@ private:
 
 std::vector<uint8_t> Compile(const ShaderDesc& shader, ShaderBlobType blob_type)
 {
-  /*
   decltype(auto) dxc_support = GetDxcSupport(blob_type);
 
   std::wstring shader_path = ezStringWChar(shader.shader_path.c_str()).GetData();
@@ -154,7 +149,5 @@ std::vector<uint8_t> Compile(const ShaderDesc& shader, ShaderBlobType blob_type)
     OutputDebugStringA(reinterpret_cast<char*>(errors->GetBufferPointer()));
     std::cout << reinterpret_cast<char*>(errors->GetBufferPointer()) << std::endl;
   }
-  return blob;*/
-
-  return {};
+  return blob;
 }

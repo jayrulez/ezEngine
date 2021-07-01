@@ -1,8 +1,8 @@
 #pragma once
-#include "View/View.h"
-#include <Resource/DXResource.h>
-#include <CPUDescriptorPool/DXCPUDescriptorHandle.h>
-#include <GPUDescriptorPool/DXGPUDescriptorPoolRange.h>
+#include <RHI/View/View.h>
+#include <RHIDX12/Resource/DXResource.h>
+#include <RHIDX12/CPUDescriptorPool/DXCPUDescriptorHandle.h>
+#include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolRange.h>
 
 class DXDevice;
 class DXResource;

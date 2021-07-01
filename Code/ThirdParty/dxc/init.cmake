@@ -31,7 +31,7 @@ ez_requires_dxc()
 
 # Necessarz because this is an init.cmake file which has a different 'current_dir'
 get_property(EZ_SUBMODULE_PREFIX_PATH GLOBAL PROPERTY EZ_SUBMODULE_PREFIX_PATH)
-set(EZ_DXC_LIB_PATH ${CMAKE_SOURCE_DIR}/${EZ_SUBMODULE_PREFIX_PATH}/Code/ThirdParty/dxc)
+set(EZ_DXC_LIB_PATH ${CMAKE_SOURCE_DIR}/${EZ_SUBMODULE_PREFIX_PATH}/Code/ThirdParty/_dxc)
 
 # Has to be done in the init.cmake file, because CMake has problems with add_custom_command if the target isn't known yet
 add_library(TargetDXC SHARED IMPORTED)
