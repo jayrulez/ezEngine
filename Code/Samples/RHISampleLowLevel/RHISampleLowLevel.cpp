@@ -6,7 +6,7 @@
 #include <Foundation/Logging/Log.h>
 #include <Foundation/Logging/VisualStudioWriter.h>
 #include <Foundation/Time/Clock.h>
-#include <RHISample/RHISample.h>
+#include <RHISampleLowLevel/RHISampleLowLevel.h>
 
 #include <Core/System/Window.h>
 
@@ -229,7 +229,7 @@ void ezRHISampleApp::OnResize(ezUInt32 width, ezUInt32 height)
   //command_queue->Signal(fence, ++fence_value);
   //fence->Wait(fence_value);
 
-  swapchain.reset();
+  //swapchain.reset();
   swapchain = device->CreateSwapchain(m_pWindow->GetNativeWindowHandle(), width, height, frame_count, renderDeviceDesc.vsync);
   frame_index = 0;
 }
