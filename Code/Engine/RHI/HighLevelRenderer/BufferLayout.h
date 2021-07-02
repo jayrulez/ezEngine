@@ -1,4 +1,5 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/HighLevelRenderer/RenderDevice.h>
 
 struct BufferLayout
@@ -9,7 +10,7 @@ struct BufferLayout
     std::vector<size_t> dst_offset;
 };
 
-class ViewProvider : public DeferredView
+class EZ_RHI_DLL ViewProvider : public DeferredView
 {
 public:
     ViewProvider(RenderDevice& device, const uint8_t* src_data, BufferLayout& layout);

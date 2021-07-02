@@ -24,8 +24,8 @@ public:
         return ps;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : ps(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : ps(device, shaderBlobType)
     {
     }
 };
@@ -44,8 +44,8 @@ public:
         return vs;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : vs(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : vs(device, shaderBlobType)
     {
     }
 };
@@ -64,8 +64,8 @@ public:
         return gs;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : gs(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : gs(device, shaderBlobType)
     {
     }
 };
@@ -84,8 +84,8 @@ public:
         return as;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : as(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : as(device, shaderBlobType)
     {
     }
 };
@@ -104,8 +104,8 @@ public:
         return ms;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : ms(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : ms(device, shaderBlobType)
     {
     }
 };
@@ -124,8 +124,8 @@ public:
         return cs;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : cs(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : cs(device, shaderBlobType)
     {
     }
 };
@@ -144,8 +144,8 @@ public:
         return lib;
     }
 
-    ShaderHolderImpl(RenderDevice& device)
-        : lib(device)
+    ShaderHolderImpl(RenderDevice& device, ShaderBlobType shaderBlobType)
+      : lib(device, shaderBlobType)
     {
     }
 };
@@ -162,16 +162,16 @@ template<typename ... Args>
 class ProgramHolder : public ShaderHolder<Args>...
 {
 public:
-    ProgramHolder(RenderDevice& device)
-        : ShaderHolder<Args>(device)...
+    ProgramHolder(RenderDevice& device, ShaderBlobType shaderBlobType)
+    : ShaderHolder<Args>(device, shaderBlobType)...
         , m_device(device)
     {
         CompileShaders();
     }
 
     template<typename Setup>
-    ProgramHolder(RenderDevice& device, const Setup& setup)
-        : ShaderHolder<Args>(device)...
+    ProgramHolder(RenderDevice& device, ShaderBlobType shaderBlobType, const Setup& setup)
+        : ShaderHolder<Args>(device, shaderBlobType)...
         , m_device(device)
     {
         setup(*this);

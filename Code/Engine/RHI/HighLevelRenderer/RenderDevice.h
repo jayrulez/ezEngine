@@ -1,4 +1,5 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/HighLevelRenderer/RenderCommandList.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
@@ -46,4 +47,4 @@ public:
     virtual void Resize(uint32_t width, uint32_t height) = 0;
 };
 
-std::shared_ptr<RenderDevice> CreateRenderDevice(const RenderDeviceDesc& settings, ezWindowBase* window);
+EZ_RHI_DLL std::shared_ptr<RenderDevice> CreateRenderDevice(const RenderDeviceDesc& settings, ezWindowBase* window);
