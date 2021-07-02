@@ -691,7 +691,7 @@ struct ResourceBarrierDesc
 class RenderCommandList;
 struct ResourceLazyViewDesc;
 
-class DeferredView
+class EZ_RHI_DLL DeferredView
 {
 public:
   virtual std::shared_ptr<ResourceLazyViewDesc> GetView(RenderCommandList& command_list) = 0;
