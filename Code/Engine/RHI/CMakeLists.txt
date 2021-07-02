@@ -1,3 +1,4 @@
+#flycube: 285c509fae18ea1de710676d60cf1a4d6a8a6e7d
 ez_cmake_init()
 
 ez_build_filter_renderer()
