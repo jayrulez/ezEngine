@@ -2,7 +2,6 @@
 #include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
-#include <RHI/ApiType/ApiType.h>
 #include <RHI/Adapter/Adapter.h>
 #include <memory>
 #include <string>
