@@ -10,113 +10,10 @@
 
 #include <Core/System/Window.h>
 
-#include <RHIShaderCompilerHLSL/Compiler.h>
-#include <RHIShaderCompilerHLSL/ShaderReflection.h>
 
 static ezUInt32 g_uiWindowWidth = 640;
 static ezUInt32 g_uiWindowHeight = 480;
 
-std::string GetShaderPath(const std::string& shaderFile)
-{
-  ezStringBuilder projectDirAbsolutePath;
-  if (!ezFileSystem::ResolveSpecialDirectory(">project", projectDirAbsolutePath).Succeeded())
-  {
-    EZ_REPORT_FAILURE("Project directory could not be resolved.");
-    return {};
-  }
-
-  ezStringBuilder shaderPath(projectDirAbsolutePath, shaderFile.data());
-  shaderPath.MakeCleanPath();
-
-  return shaderPath.GetData();
-}
-
-struct VertexShaderDesc
-{
-  static constexpr ShaderType type = ShaderType::kVertex;
-  ShaderDesc desc = {GetShaderPath("/shaders/TriangleVertexShader.hlsl"), "main", type, "6_0"};
-
-  struct IA
-  {
-    static constexpr const uint32_t POSITION = 0;
-  } ia;
-};
-
-class VertexShader : public VertexShaderDesc
-{
-public:
-  VertexShader(RenderDevice& device, ShaderBlobType shaderBlobType)
-    : m_ShaderBlobType{shaderBlobType}
-  {
-  }
-
-  void CompileShader(RenderDevice& device)
-  {
-    auto full_desc = desc;
-    std::vector<uint8_t> byteCode = Compile(full_desc, m_ShaderBlobType);
-    std::shared_ptr<ShaderReflection> reflection = CreateShaderReflection(m_ShaderBlobType, byteCode.data(), byteCode.size());
-    shader = device.CreateShader(full_desc, byteCode, reflection);
-  }
-
-  std::shared_ptr<Shader> shader;
-
-private:
-  ShaderBlobType m_ShaderBlobType;
-};
-
-struct PixelShaderDesc
-{
-  static constexpr ShaderType type = ShaderType::kPixel;
-  ShaderDesc desc = {GetShaderPath("/shaders/TrianglePixelShader.hlsl"), "main", type, "6_0"};
-
-  struct CBV
-  {
-    BindKey Settings;
-  } cbv;
-
-  struct OM
-  {
-    static constexpr const uint32_t rtv0 = 0;
-  } om;
-};
-
-class PixelShader : public PixelShaderDesc
-{
-public:
-  struct Settings
-  {
-    ezColor color;
-  };
-  BufferLayout Settings_layout = { 16, { 16, }, { offsetof(Settings, color), }, { 0, } };
-  struct Cbuffer
-  {
-    Cbuffer(PixelShader& shader, RenderDevice& device)
-      : Settings(device, shader.Settings_layout)
-    {
-    }
-    ConstantBuffer<Settings> Settings;
-  } cbuffer;
-
-  PixelShader(RenderDevice& device, ShaderBlobType shaderBlobType)
-    : cbuffer(*this, device)
-    , m_ShaderBlobType{shaderBlobType}
-  {
-  }
-
-  void CompileShader(RenderDevice& device)
-  {
-    auto full_desc = desc;
-    std::vector<uint8_t> byteCode = Compile(full_desc, m_ShaderBlobType);
-    std::shared_ptr<ShaderReflection> reflection = CreateShaderReflection(m_ShaderBlobType, byteCode.data(), byteCode.size());
-    shader = device.CreateShader(full_desc, byteCode, reflection);
-    cbv.Settings = shader->GetBindKey("Settings");
-  }
-
-  std::shared_ptr<Shader> shader;
-
-private:
-  ShaderBlobType m_ShaderBlobType;
-};
 
 
 class ezRHISampleWindow : public ezWindow
@@ -135,7 +32,8 @@ public:
   {
     if (m_pApp)
     {
-      m_pApp->OnResize(newWindowSize.width, newWindowSize.height);
+      m_CreationDescription.m_Resolution = newWindowSize;
+      m_pApp->OnResize(m_CreationDescription.m_Resolution.width, m_CreationDescription.m_Resolution.height);
     }
   }
 
@@ -207,46 +105,46 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
 
   device = CreateRenderDevice(renderDeviceDesc, m_pWindow);
 
-  upload_command_list = device->CreateRenderCommandList();
+
   std::vector<uint32_t> ibuf = {0, 1, 2};
-  std::shared_ptr<Resource> index = device->CreateBuffer(BindFlag::kIndexBuffer | BindFlag::kCopyDest, (ezUInt32)(sizeof(uint32_t) * ibuf.size()));
-  upload_command_list->UpdateSubresource(index, 0, ibuf.data(), 0, 0);
+  index = device->CreateBuffer(BindFlag::kIndexBuffer | BindFlag::kCopyDest, (ezUInt32)(sizeof(uint32_t) * ibuf.size()));
   std::vector<ezVec3> pbuf = {
     ezVec3(-0.5, -0.5, 0.0),
     ezVec3(0.0, 0.5, 0.0),
     ezVec3(0.5, -0.5, 0.0)};
-  std::shared_ptr<Resource> pos = device->CreateBuffer(BindFlag::kVertexBuffer | BindFlag::kCopyDest, (ezUInt32)(sizeof(ezVec3) * pbuf.size()));
+  pos = device->CreateBuffer(BindFlag::kVertexBuffer | BindFlag::kCopyDest, (ezUInt32)(sizeof(ezVec3) * pbuf.size()));
+
+  upload_command_list = device->CreateRenderCommandList();
+  upload_command_list->UpdateSubresource(index, 0, ibuf.data(), 0, 0);
   upload_command_list->UpdateSubresource(pos, 0, pbuf.data(), 0, 0);
   upload_command_list->Close();
   device->ExecuteCommandLists({upload_command_list});
 
-  ProgramHolder<PixelShader, VertexShader> program(*device, shaderBlobType);
-  program.ps.cbuffer.Settings.color = ezColor(1, 0, 0, 1);
+  m_program = std::make_shared<ProgramHolder<PixelShader, VertexShader>>(*device, shaderBlobType);
+  m_program->ps.cbuffer.Settings.color = ezColor(1, 0, 0, 1);
 
-  for (uint32_t i = 0; i < renderDeviceDesc.frame_count; ++i)
-  {
-    RenderPassBeginDesc render_pass_desc = {};
-    render_pass_desc.colors[program.ps.om.rtv0].texture = device->GetBackBuffer(i);
-    render_pass_desc.colors[program.ps.om.rtv0].clear_color = {0.0f, 0.2f, 0.4f, 1.0f};
+  //for (uint32_t i = 0; i < renderDeviceDesc.frame_count; ++i)
+  //{
+  //  RenderPassBeginDesc render_pass_desc = {};
+  //  render_pass_desc.colors[m_program->ps.om.rtv0].texture = device->GetBackBuffer(i);
+  //  render_pass_desc.colors[m_program->ps.om.rtv0].clear_color = {0.0f, 0.2f, 0.4f, 1.0f};
 
-    decltype(auto) command_list = device->CreateRenderCommandList();
-    command_list->UseProgram(program);
-    command_list->Attach(program.ps.cbv.Settings, program.ps.cbuffer.Settings);
-    command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
-    command_list->IASetIndexBuffer(index, ezRHIResourceFormat::R32_UINT);
-    command_list->IASetVertexBuffer(program.vs.ia.POSITION, pos);
-    command_list->BeginRenderPass(render_pass_desc);
-    command_list->DrawIndexed(3, 1, 0, 0, 0);
-    command_list->EndRenderPass();
-    command_list->Close();
-    command_lists.emplace_back(command_list);
-  }
+  //  decltype(auto) command_list = device->CreateRenderCommandList();
+  //  command_list->UseProgram(*m_program);
+  //  command_list->Attach(m_program->ps.cbv.Settings, m_program->ps.cbuffer.Settings);
+  //  command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
+  //  command_list->IASetIndexBuffer(index, ezRHIResourceFormat::R32_UINT);
+  //  command_list->IASetVertexBuffer(m_program->vs.ia.POSITION, pos);
+  //  command_list->BeginRenderPass(render_pass_desc);
+  //  command_list->DrawIndexed(3, 1, 0, 0, 0);
+  //  command_list->EndRenderPass();
+  //  command_list->Close();
+  //  command_lists.emplace_back(command_list);
+  //}
 }
 
 void ezRHISampleApp::BeforeHighLevelSystemsShutdown()
 {
-  device->WaitForIdle();
-
   // tell the engine that we are about to destroy window and graphics device,
   // and that it therefore needs to cleanup anything that depends on that
   ezStartup::ShutdownHighLevelSystems();
@@ -279,8 +177,29 @@ ezApplication::Execution ezRHISampleApp::Run()
 
   // do the rendering
   {
-    device->ExecuteCommandLists({command_lists[device->GetFrameIndex()]});
+
+    auto width = m_pWindow->GetCreationDescription().m_Resolution.width;
+
+    RenderPassBeginDesc render_pass_desc = {};
+    render_pass_desc.colors[m_program->ps.om.rtv0].texture = device->GetBackBuffer(device->GetFrameIndex());
+    render_pass_desc.colors[m_program->ps.om.rtv0].clear_color = {0.0f, 0.2f, 0.4f, 1.0f};
+
+    decltype(auto) command_list = device->CreateRenderCommandList();
+    command_list->UseProgram(*m_program);
+    command_list->Attach(m_program->ps.cbv.Settings, m_program->ps.cbuffer.Settings);
+    command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
+    command_list->IASetIndexBuffer(index, ezRHIResourceFormat::R32_UINT);
+    command_list->IASetVertexBuffer(m_program->vs.ia.POSITION, pos);
+    command_list->BeginRenderPass(render_pass_desc);
+    command_list->DrawIndexed(3, 1, 0, 0, 0);
+    command_list->EndRenderPass();
+    command_list->Close();
+    //command_lists.emplace_back(command_list);
+
+
+    device->ExecuteCommandLists({command_list});
     device->Present();
+    device->WaitForIdle();
   }
 
   // needs to be called once per frame

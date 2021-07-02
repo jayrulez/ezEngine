@@ -31,10 +31,10 @@ public:
   virtual void OnResize(const ezSizeU32& newWindowSize) override {
     if (m_pApp)
     {
-      m_pApp->OnResize(newWindowSize.width, newWindowSize.height);
+      m_CreationDescription.m_Resolution = newWindowSize;
+      m_pApp->OnResize(m_CreationDescription.m_Resolution.width, m_CreationDescription.m_Resolution.height);
     }
   }
-
 
   bool m_bCloseRequested;
 
