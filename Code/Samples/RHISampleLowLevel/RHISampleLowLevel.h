@@ -38,8 +38,8 @@ private:
   uint64_t fence_value = 0;
   std::shared_ptr<CommandQueue> command_queue = nullptr;
   std::array<uint64_t, frame_count> fence_values = {};
-  std::vector<std::shared_ptr<CommandList>> command_lists;
-  std::vector<std::shared_ptr<Framebuffer>> framebuffers;
+  //std::vector<std::shared_ptr<CommandList>> command_lists;
+  //std::vector<std::shared_ptr<Framebuffer>> framebuffers;
   std::shared_ptr<Pipeline> pipeline;
   std::shared_ptr<RenderPass> render_pass;
   std::shared_ptr<Program> program;

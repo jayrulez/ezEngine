@@ -79,12 +79,30 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     ezInputManager::SetInputActionConfig("Main", "CloseApp", cfg, true);
   }
 
+  ShaderBlobType shaderBlobType = ShaderBlobType::kSPIRV;
+  ApiType apiType = ApiType::kVulkan;
+
+  const char* szRendererName = ezCommandLineUtils::GetGlobalInstance()->GetStringOption("-rhi", 0, "dx");
+  {
+    if (ezStringUtils::Compare(szRendererName,"dx") == 0)
+    {
+      shaderBlobType = ShaderBlobType::kDXIL;
+      apiType = ApiType::kDX12;
+    }
+
+    if (ezStringUtils::Compare(szRendererName, "vk") == 0)
+    {
+      shaderBlobType = ShaderBlobType::kSPIRV;
+      apiType = ApiType::kVulkan;
+    }
+  }
+
   // Create a window for rendering
   {
     ezWindowCreationDesc WindowCreationDesc;
     WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
     WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
-    WindowCreationDesc.m_Title = "RHISample";
+    WindowCreationDesc.m_Title = ezStringBuilder("RHISample ", szRendererName);
     WindowCreationDesc.m_bShowMouseCursor = true;
     WindowCreationDesc.m_bClipMouseCursor = false;
     WindowCreationDesc.m_WindowMode = ezWindowMode::WindowResizable;
@@ -94,9 +112,6 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
 
   // now that we have a window and device, tell the engine to initialize the rendering infrastructure
   ezStartup::StartupHighLevelSystems();
-
-  ShaderBlobType shaderBlobType = ShaderBlobType::kDXIL;
-  ApiType apiType = ApiType::kDX12;
 
   renderDeviceDesc.api_type = apiType;
   renderDeviceDesc.frame_count = frame_count;

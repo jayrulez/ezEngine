@@ -28,7 +28,8 @@ public:
 
   virtual void OnClickClose() override { m_bCloseRequested = true; }
 
-  virtual void OnResize(const ezSizeU32& newWindowSize) override {
+  virtual void OnResize(const ezSizeU32& newWindowSize) override
+  {
     if (m_pApp)
     {
       m_CreationDescription.m_Resolution = newWindowSize;
@@ -82,21 +83,36 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     ezInputManager::SetInputActionConfig("Main", "CloseApp", cfg, true);
   }
 
+  
+  ShaderBlobType shaderBlobType = ShaderBlobType::kSPIRV;
+  ApiType apiType = ApiType::kVulkan;
+
+  const char* szRendererName = ezCommandLineUtils::GetGlobalInstance()->GetStringOption("-rhi", 0, "dx");
+  {
+    if (ezStringUtils::Compare(szRendererName, "dx") == 0)
+    {
+      shaderBlobType = ShaderBlobType::kDXIL;
+      apiType = ApiType::kDX12;
+    }
+
+    if (ezStringUtils::Compare(szRendererName, "vk") == 0)
+    {
+      shaderBlobType = ShaderBlobType::kSPIRV;
+      apiType = ApiType::kVulkan;
+    }
+  }
   // Create a window for rendering
   {
     ezWindowCreationDesc WindowCreationDesc;
     WindowCreationDesc.m_Resolution.width = g_uiWindowWidth;
     WindowCreationDesc.m_Resolution.height = g_uiWindowHeight;
-    WindowCreationDesc.m_Title = "RHISample";
+    WindowCreationDesc.m_Title = ezStringBuilder("RHISample ", szRendererName);
     WindowCreationDesc.m_bShowMouseCursor = true;
     WindowCreationDesc.m_bClipMouseCursor = false;
     WindowCreationDesc.m_WindowMode = ezWindowMode::WindowResizable;
     m_pWindow = EZ_DEFAULT_NEW(ezRHISampleWindow, this);
     m_pWindow->Initialize(WindowCreationDesc).IgnoreResult();
   }
-
-  ShaderBlobType shaderBlobType = ShaderBlobType::kSPIRV;
-  ApiType apiType = ApiType::kVulkan;
 
   renderDeviceDesc.api_type = apiType;
   renderDeviceDesc.frame_count = frame_count;
@@ -170,7 +186,6 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
   };
   render_pass = device->CreateRenderPass(render_pass_desc);
 
-  ClearDesc clear_desc = {{{0.0, 0.2, 0.4, 1.0}}};
 
   GraphicsPipelineDesc pipeline_desc = {
     program,
@@ -179,40 +194,37 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     render_pass};
   pipeline = device->CreateGraphicsPipeline(pipeline_desc);
 
-  for (ezUInt32 i = 0; i < frame_count; ++i)
-  {
-    ViewDesc back_buffer_view_desc = {};
-    back_buffer_view_desc.view_type = ViewType::kRenderTarget;
-    back_buffer_view_desc.dimension = ViewDimension::kTexture2D;
-    std::shared_ptr<Resource> back_buffer = swapchain->GetBackBuffer(i);
-    std::shared_ptr<View> back_buffer_view = device->CreateView(back_buffer, back_buffer_view_desc);
-    FramebufferDesc framebuffer_desc = {};
-    framebuffer_desc.render_pass = render_pass;
-    framebuffer_desc.width = m_pWindow->GetClientAreaSize().width;
-    framebuffer_desc.height = m_pWindow->GetClientAreaSize().height;
-    framebuffer_desc.colors = {back_buffer_view};
-    std::shared_ptr<Framebuffer> framebuffer = framebuffers.emplace_back(device->CreateFramebuffer(framebuffer_desc));
-    std::shared_ptr<CommandList> command_list = command_lists.emplace_back(device->CreateCommandList(CommandListType::kGraphics));
-    command_list->BindPipeline(pipeline);
-    command_list->BindBindingSet(binding_set);
-    command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
-    command_list->SetScissorRect(0, 0, m_pWindow->GetClientAreaSize().width, m_pWindow->GetClientAreaSize().height);
-    command_list->IASetIndexBuffer(index_buffer, ezRHIResourceFormat::R32_UINT);
-    command_list->IASetVertexBuffer(0, vertex_buffer);
-    command_list->ResourceBarrier({{back_buffer, ResourceState::kPresent, ResourceState::kRenderTarget}});
-    command_list->BeginRenderPass(render_pass, framebuffer, clear_desc);
-    command_list->DrawIndexed(3, 1, 0, 0, 0);
-    command_list->EndRenderPass();
-    command_list->ResourceBarrier({{back_buffer, ResourceState::kRenderTarget, ResourceState::kPresent}});
-    command_list->Close();
-  }
+  //for (ezUInt32 i = 0; i < frame_count; ++i)
+  //{
+  //  ViewDesc back_buffer_view_desc = {};
+  //  back_buffer_view_desc.view_type = ViewType::kRenderTarget;
+  //  back_buffer_view_desc.dimension = ViewDimension::kTexture2D;
+  //  std::shared_ptr<Resource> back_buffer = swapchain->GetBackBuffer(i);
+  //  std::shared_ptr<View> back_buffer_view = device->CreateView(back_buffer, back_buffer_view_desc);
+  //  FramebufferDesc framebuffer_desc = {};
+  //  framebuffer_desc.render_pass = render_pass;
+  //  framebuffer_desc.width = m_pWindow->GetClientAreaSize().width;
+  //  framebuffer_desc.height = m_pWindow->GetClientAreaSize().height;
+  //  framebuffer_desc.colors = {back_buffer_view};
+  //  std::shared_ptr<Framebuffer> framebuffer = framebuffers.emplace_back(device->CreateFramebuffer(framebuffer_desc));
+  //  std::shared_ptr<CommandList> command_list = command_lists.emplace_back(device->CreateCommandList(CommandListType::kGraphics));
+  //  command_list->BindPipeline(pipeline);
+  //  command_list->BindBindingSet(binding_set);
+  //  command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
+  //  command_list->SetScissorRect(0, 0, m_pWindow->GetClientAreaSize().width, m_pWindow->GetClientAreaSize().height);
+  //  command_list->IASetIndexBuffer(index_buffer, ezRHIResourceFormat::R32_UINT);
+  //  command_list->IASetVertexBuffer(0, vertex_buffer);
+  //  command_list->ResourceBarrier({{back_buffer, ResourceState::kPresent, ResourceState::kRenderTarget}});
+  //  command_list->BeginRenderPass(render_pass, framebuffer, clear_desc);
+  //  command_list->DrawIndexed(3, 1, 0, 0, 0);
+  //  command_list->EndRenderPass();
+  //  command_list->ResourceBarrier({{back_buffer, ResourceState::kRenderTarget, ResourceState::kPresent}});
+  //  command_list->Close();
+  //}
 }
 
 void ezRHISampleApp::BeforeHighLevelSystemsShutdown()
 {
-  command_queue->Signal(fence, ++fence_value);
-  fence->Wait(fence_value);
-
   // tell the engine that we are about to destroy window and graphics device,
   // and that it therefore needs to cleanup anything that depends on that
   ezStartup::ShutdownHighLevelSystems();
@@ -229,7 +241,7 @@ void ezRHISampleApp::OnResize(ezUInt32 width, ezUInt32 height)
   //command_queue->Signal(fence, ++fence_value);
   //fence->Wait(fence_value);
 
-  //swapchain.reset();
+  swapchain.reset();
   swapchain = device->CreateSwapchain(m_pWindow->GetNativeWindowHandle(), width, height, frame_count, renderDeviceDesc.vsync);
   frame_index = 0;
 }
@@ -251,11 +263,45 @@ ezApplication::Execution ezRHISampleApp::Run()
   // do the rendering
   {
     frame_index = swapchain->NextImage(fence, ++fence_value);
+
+    ClearDesc clear_desc = {{{0.0, 0.2, 0.4, 1.0}}};
+
+    ViewDesc back_buffer_view_desc = {};
+    back_buffer_view_desc.view_type = ViewType::kRenderTarget;
+    back_buffer_view_desc.dimension = ViewDimension::kTexture2D;
+    std::shared_ptr<Resource> back_buffer = swapchain->GetBackBuffer(frame_index);
+    std::shared_ptr<View> back_buffer_view = device->CreateView(back_buffer, back_buffer_view_desc);
+    FramebufferDesc framebuffer_desc = {};
+    framebuffer_desc.render_pass = render_pass;
+    framebuffer_desc.width = m_pWindow->GetClientAreaSize().width;
+    framebuffer_desc.height = m_pWindow->GetClientAreaSize().height;
+    framebuffer_desc.colors = {back_buffer_view};
+    std::shared_ptr<Framebuffer> framebuffer = device->CreateFramebuffer(framebuffer_desc);
+    std::shared_ptr<CommandList> command_list = device->CreateCommandList(CommandListType::kGraphics);
+    command_list->BindPipeline(pipeline);
+    command_list->BindBindingSet(binding_set);
+    command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
+    command_list->SetScissorRect(0, 0, m_pWindow->GetClientAreaSize().width, m_pWindow->GetClientAreaSize().height);
+    command_list->IASetIndexBuffer(index_buffer, ezRHIResourceFormat::R32_UINT);
+    command_list->IASetVertexBuffer(0, vertex_buffer);
+    command_list->ResourceBarrier({{back_buffer, ResourceState::kPresent, ResourceState::kRenderTarget}});
+    command_list->BeginRenderPass(render_pass, framebuffer, clear_desc);
+    command_list->DrawIndexed(3, 1, 0, 0, 0);
+    command_list->EndRenderPass();
+    command_list->ResourceBarrier({{back_buffer, ResourceState::kRenderTarget, ResourceState::kPresent}});
+    command_list->Close();
+
+
+
     command_queue->Wait(fence, fence_value);
     fence->Wait(fence_values[frame_index]);
-    command_queue->ExecuteCommandLists({command_lists[frame_index]});
+    command_queue->ExecuteCommandLists({command_list});
     command_queue->Signal(fence, fence_values[frame_index] = ++fence_value);
     swapchain->Present(fence, fence_values[frame_index]);
+
+
+    command_queue->Signal(fence, ++fence_value);
+    fence->Wait(fence_value);
   }
 
   // needs to be called once per frame
