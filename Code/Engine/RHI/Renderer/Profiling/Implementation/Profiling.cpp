@@ -3,7 +3,7 @@
 #include <Foundation/Configuration/Startup.h>
 #include <Foundation/Profiling/Profiling.h>
 #include <RHI/Renderer/CommandEncoder/CommandEncoder.h>
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDevice.h>
 #include <RHI/Renderer/Profiling/Profiling.h>
 
 #if EZ_ENABLED(EZ_USE_PROFILING)
@@ -20,9 +20,9 @@ struct GPUTimingScope
 class GPUProfilingSystem
 {
 public:
-  static void ProcessTimestamps(const ezRHIDeviceEvent& e)
+  static void ProcessTimestamps(const ezRHIRenderDeviceEvent& e)
   {
-    if (e.m_Type != ezRHIDeviceEvent::AfterEndFrame)
+    if (e.m_Type != ezRHIRenderDeviceEvent::AfterEndFrame)
       return;
 
     while (!m_TimingScopes.IsEmpty())
@@ -54,9 +54,9 @@ public:
   static GPUTimingScope& AllocateScope() { return m_TimingScopes.ExpandAndGetRef(); }
 
 private:
-  static void OnEngineStartup() { ezRHIDevice::GetDefaultDevice()->m_Events.AddEventHandler(&GPUProfilingSystem::ProcessTimestamps); }
+  static void OnEngineStartup() { ezRHIRenderDevice::GetDefaultDevice()->m_Events.AddEventHandler(&GPUProfilingSystem::ProcessTimestamps); }
 
-  static void OnEngineShutdown() { ezRHIDevice::GetDefaultDevice()->m_Events.RemoveEventHandler(&GPUProfilingSystem::ProcessTimestamps); }
+  static void OnEngineShutdown() { ezRHIRenderDevice::GetDefaultDevice()->m_Events.RemoveEventHandler(&GPUProfilingSystem::ProcessTimestamps); }
 
   static ezDeque<GPUTimingScope, ezStaticAllocatorWrapper> m_TimingScopes;
 

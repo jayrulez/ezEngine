@@ -1,6 +1,6 @@
 #include <RHIPCH.h>
 
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDevice.h>
 #include <RHI/Renderer/Device/SwapChain.h>
 
 ezRHISwapChain::ezRHISwapChain(const ezRHISwapChainCreationDescription& Description)
@@ -11,7 +11,7 @@ ezRHISwapChain::ezRHISwapChain(const ezRHISwapChainCreationDescription& Descript
 ezRHISwapChain::~ezRHISwapChain() {}
 
 
-ezResult ezRHISwapChain::DeInitPlatform(ezRHIDevice* pDevice)
+ezResult ezRHISwapChain::DeInitPlatform(ezRHIRenderDevice* pDevice)
 {
   if (!m_hBackBufferTexture.IsInvalidated())
   {

@@ -3,7 +3,7 @@
 #include <RHI/Renderer/Device/DeviceCapabilities.h>
 #include <RHI/Renderer/Shader/Shader.h>
 
-ezRHIDeviceCapabilities::ezRHIDeviceCapabilities()
+ezRHIRenderDeviceCapabilities::ezRHIRenderDeviceCapabilities()
 {
   // General capabilities
   m_bMultithreadedResourceCreation = false;

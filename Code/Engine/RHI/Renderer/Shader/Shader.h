@@ -9,11 +9,11 @@ public:
   virtual void SetDebugName(const char* szName) const = 0;
 
 protected:
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
   ezRHIShader(const ezRHIShaderCreationDescription& Description);
 

@@ -1,8 +1,9 @@
 #include <RHIPCH.h>
 
+#include <Core/System/Window.h>
 #include <Foundation/Logging/Log.h>
 #include <Foundation/Profiling/Profiling.h>
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDeviceImpl.h>
 #include <RHI/Renderer/Device/SwapChain.h>
 #include <RHI/Renderer/Resources/Buffer.h>
 #include <RHI/Renderer/Resources/ProxyTexture.h>
@@ -14,7 +15,7 @@
 
 namespace
 {
-  struct GALObjectType
+  struct RHIObjectType
   {
     enum Enum
     {
@@ -51,21 +52,20 @@ namespace
   EZ_CHECK_AT_COMPILETIME(sizeof(ezRHIVertexDeclarationHandle) == sizeof(ezUInt32));
 } // namespace
 
-ezRHIDevice* ezRHIDevice::s_pDefaultDevice = nullptr;
 
-
-ezRHIDevice::ezRHIDevice(const ezRHIDeviceCreationDescription& desc)
-  : m_Allocator("GALDevice", ezFoundation::GetDefaultAllocator())
+ezRHIRenderDeviceImpl::ezRHIRenderDeviceImpl(const ezRHIRenderDeviceCreationDescription& desc)
+  : m_Allocator("ezRHIRenderDeviceImpl", ezFoundation::GetDefaultAllocator())
   , m_AllocatorWrapper(&m_Allocator)
   , m_Description(desc)
+  , m_uiFrameCount(desc.m_uiFrameCount)
 {
 }
 
-ezRHIDevice::~ezRHIDevice()
+ezRHIRenderDeviceImpl::~ezRHIRenderDeviceImpl()
 {
   // Check for object leaks
   {
-    EZ_LOG_BLOCK("ezRHIDevice object leak report");
+    EZ_LOG_BLOCK("ezRHIRenderDevice object leak report");
 
     if (!m_Shaders.IsEmpty())
       ezLog::Warning("{0} shaders have not been cleaned up", m_Shaders.GetCount());
@@ -108,19 +108,28 @@ ezRHIDevice::~ezRHIDevice()
   }
 }
 
-ezResult ezRHIDevice::Init()
+ezResult ezRHIRenderDeviceImpl::Init()
 {
-  EZ_LOG_BLOCK("ezRHIDevice::Init");
+  EZ_LOG_BLOCK("ezRHIRenderDeviceImpl::Init");
 
-  ezResult PlatformInitResult = InitPlatform();
+  m_pInstance = InstanceFactory::CreateInstance(m_Description.m_eApiType);
+  m_pAdapter = std::move(m_pInstance->EnumerateAdapters()[m_Description.m_uiRequiredGpuIndex]);
+  m_pDevice = m_pAdapter->CreateDevice();
+  m_pCommandQueue = m_pDevice->GetCommandQueue(CommandListType::kGraphics);
 
-  if (PlatformInitResult == EZ_FAILURE)
+  ezWindowBase* window = m_Description.m_PrimarySwapChainDescription.m_pWindow;
+
+  //m_pFence = m_pDevice->CreateFence(m_uiFenceValue);
+  m_hFence = CreateFence();
+
+  for (ezUInt32 i = 0; i < m_uiFrameCount; ++i)
   {
-    return EZ_FAILURE;
+    m_BarrierCommandLists.emplace_back(m_pDevice->CreateCommandList(CommandListType::kGraphics));
+    m_pFrameFenceValues.emplace_back(0);
   }
 
   // Fill the capabilities
-  FillCapabilitiesPlatform();
+  FillCapabilities();
 
   ezLog::Info("Adapter: '{}' - {} VRAM, {} Sys RAM, {} Shared RAM", m_Capabilities.m_sAdapterName, ezArgFileSize(m_Capabilities.m_uiDedicatedVRAM),
     ezArgFileSize(m_Capabilities.m_uiDedicatedSystemRAM), ezArgFileSize(m_Capabilities.m_uiSharedSystemRAM));
@@ -130,11 +139,17 @@ ezResult ezRHIDevice::Init()
     ezLog::Warning("Selected graphics adapter has no hardware acceleration.");
   }
 
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   // Create primary swapchain if requested
   if (m_Description.m_bCreatePrimarySwapChain)
   {
+    //m_pPrimarySwapChain = m_pDevice->CreateSwapchain(window->GetNativeWindowHandle(),
+    //  window->GetClientAreaSize().width,
+    //  window->GetClientAreaSize().height,
+    //  m_uiFrameCount,
+    //  m_Description.m_bVsync);
+
     ezRHISwapChainHandle hSwapChain = CreateSwapChain(m_Description.m_PrimarySwapChainDescription);
 
     if (hSwapChain.IsInvalidated())
@@ -143,32 +158,32 @@ ezResult ezRHIDevice::Init()
       return EZ_FAILURE;
     }
 
-    // And make it the primary swap chain
+    //// And make it the primary swap chain
     SetPrimarySwapChain(hSwapChain);
   }
 
   ezProfilingSystem::InitializeGPUData();
 
   {
-    ezRHIDeviceEvent e;
+    ezRHIRenderDeviceEvent e;
     e.m_pDevice = this;
-    e.m_Type = ezRHIDeviceEvent::AfterInit;
+    e.m_Type = ezRHIRenderDeviceEvent::AfterInit;
     m_Events.Broadcast(e);
   }
 
   return EZ_SUCCESS;
 }
 
-ezResult ezRHIDevice::Shutdown()
+ezResult ezRHIRenderDeviceImpl::Shutdown()
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  EZ_LOG_BLOCK("ezRHIDevice::Shutdown");
+  EZ_LOG_BLOCK("ezRHIRenderDeviceImpl::Shutdown");
 
   {
-    ezRHIDeviceEvent e;
+    ezRHIRenderDeviceEvent e;
     e.m_pDevice = this;
-    e.m_Type = ezRHIDeviceEvent::BeforeShutdown;
+    e.m_Type = ezRHIRenderDeviceEvent::BeforeShutdown;
     m_Events.Broadcast(e);
   }
 
@@ -184,57 +199,61 @@ ezResult ezRHIDevice::Shutdown()
   DestroyDeadObjects();
 
   // make sure we are not listed as the default device anymore
-  if (ezRHIDevice::HasDefaultDevice() && ezRHIDevice::GetDefaultDevice() == this)
+  if (ezRHIRenderDeviceImpl::HasDefaultDevice() && ezRHIRenderDeviceImpl::GetDefaultDevice() == this)
   {
-    ezRHIDevice::SetDefaultDevice(nullptr);
+    ezRHIRenderDeviceImpl::SetDefaultDevice(nullptr);
   }
 
-  return ShutdownPlatform();
+  m_CommandListPool.clear();
+  WaitForIdle();
+
+  return EZ_SUCCESS;
 }
 
-void ezRHIDevice::BeginPipeline(const char* szName)
+void ezRHIRenderDeviceImpl::BeginPipeline(const char* szName)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  EZ_ASSERT_DEV(!m_bBeginPipelineCalled, "Nested Pipelines are not allowed: You must call ezRHIDevice::EndPipeline before you can call ezRHIDevice::BeginPipeline again");
+  EZ_ASSERT_DEV(!m_bBeginPipelineCalled, "Nested Pipelines are not allowed: You must call ezRHIRenderDeviceImpl::EndPipeline before you can call ezRHIRenderDeviceImpl::BeginPipeline again");
   m_bBeginPipelineCalled = true;
 
-  BeginPipelinePlatform(szName);
+  //BeginPipelinePlatform(szName);
 }
 
-void ezRHIDevice::EndPipeline()
+void ezRHIRenderDeviceImpl::EndPipeline()
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  EZ_ASSERT_DEV(m_bBeginPipelineCalled, "You must have called ezRHIDevice::BeginPipeline before you can call ezRHIDevice::EndPipeline");
+  EZ_ASSERT_DEV(m_bBeginPipelineCalled, "You must have called ezRHIRenderDeviceImpl::BeginPipeline before you can call ezRHIRenderDeviceImpl::EndPipeline");
   m_bBeginPipelineCalled = false;
 
-  EndPipelinePlatform();
+  //EndPipelinePlatform();
 }
 
-ezRHIPass* ezRHIDevice::BeginPass(const char* szName)
+ezRHIPass* ezRHIRenderDeviceImpl::BeginPass(const char* szName)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  EZ_ASSERT_DEV(!m_bBeginPassCalled, "Nested Passes are not allowed: You must call ezRHIDevice::EndPass before you can call ezRHIDevice::BeginPass again");
+  EZ_ASSERT_DEV(!m_bBeginPassCalled, "Nested Passes are not allowed: You must call ezRHIRenderDeviceImpl::EndPass before you can call ezRHIRenderDeviceImpl::BeginPass again");
   m_bBeginPassCalled = true;
 
-  return BeginPassPlatform(szName);
+  //return BeginPassPlatform(szName);
+  return nullptr;
 }
 
-void ezRHIDevice::EndPass(ezRHIPass* pPass)
+void ezRHIRenderDeviceImpl::EndPass(ezRHIPass* pPass)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  EZ_ASSERT_DEV(m_bBeginPassCalled, "You must have called ezRHIDevice::BeginPass before you can call ezRHIDevice::EndPass");
+  EZ_ASSERT_DEV(m_bBeginPassCalled, "You must have called ezRHIRenderDeviceImpl::BeginPass before you can call ezRHIRenderDeviceImpl::EndPass");
   m_bBeginPassCalled = false;
 
-  EndPassPlatform(pPass);
+  //EndPassPlatform(pPass);
 }
 
-ezRHIBlendStateHandle ezRHIDevice::CreateBlendState(const ezRHIBlendStateCreationDescription& desc)
+ezRHIBlendStateHandle ezRHIRenderDeviceImpl::CreateBlendState(const ezRHIBlendStateCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   // Hash desc and return potential existing one (including inc. refcount)
   ezUInt32 uiHash = desc.CalculateHash();
@@ -246,7 +265,7 @@ ezRHIBlendStateHandle ezRHIDevice::CreateBlendState(const ezRHIBlendStateCreatio
       ezRHIBlendState* pBlendState = m_BlendStates[hBlendState];
       if (pBlendState->GetRefCount() == 0)
       {
-        ReviveDeadObject(GALObjectType::BlendState, hBlendState);
+        ReviveDeadObject(RHIObjectType::BlendState, hBlendState);
       }
 
       pBlendState->AddRef();
@@ -254,26 +273,26 @@ ezRHIBlendStateHandle ezRHIDevice::CreateBlendState(const ezRHIBlendStateCreatio
     }
   }
 
-  ezRHIBlendState* pBlendState = CreateBlendStatePlatform(desc);
+  //ezRHIBlendState* pBlendState = CreateBlendStatePlatform(desc);
 
-  if (pBlendState != nullptr)
-  {
-    EZ_ASSERT_DEBUG(pBlendState->GetDescription().CalculateHash() == uiHash, "BlendState hash doesn't match");
+  //if (pBlendState != nullptr)
+  //{
+  //  EZ_ASSERT_DEBUG(pBlendState->GetDescription().CalculateHash() == uiHash, "BlendState hash doesn't match");
 
-    pBlendState->AddRef();
+  //  pBlendState->AddRef();
 
-    ezRHIBlendStateHandle hBlendState(m_BlendStates.Insert(pBlendState));
-    m_BlendStateTable.Insert(uiHash, hBlendState);
+  //  ezRHIBlendStateHandle hBlendState(m_BlendStates.Insert(pBlendState));
+  //  m_BlendStateTable.Insert(uiHash, hBlendState);
 
-    return hBlendState;
-  }
+  //  return hBlendState;
+  //}
 
   return ezRHIBlendStateHandle();
 }
 
-void ezRHIDevice::DestroyBlendState(ezRHIBlendStateHandle hBlendState)
+void ezRHIRenderDeviceImpl::DestroyBlendState(ezRHIBlendStateHandle hBlendState)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIBlendState* pBlendState = nullptr;
 
@@ -283,7 +302,7 @@ void ezRHIDevice::DestroyBlendState(ezRHIBlendStateHandle hBlendState)
 
     if (pBlendState->GetRefCount() == 0)
     {
-      AddDeadObject(GALObjectType::BlendState, hBlendState);
+      AddDeadObject(RHIObjectType::BlendState, hBlendState);
     }
   }
   else
@@ -292,9 +311,9 @@ void ezRHIDevice::DestroyBlendState(ezRHIBlendStateHandle hBlendState)
   }
 }
 
-ezRHIDepthStencilStateHandle ezRHIDevice::CreateDepthStencilState(const ezRHIDepthStencilStateCreationDescription& desc)
+ezRHIDepthStencilStateHandle ezRHIRenderDeviceImpl::CreateDepthStencilState(const ezRHIDepthStencilStateCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   // Hash desc and return potential existing one (including inc. refcount)
   ezUInt32 uiHash = desc.CalculateHash();
@@ -306,7 +325,7 @@ ezRHIDepthStencilStateHandle ezRHIDevice::CreateDepthStencilState(const ezRHIDep
       ezRHIDepthStencilState* pDepthStencilState = m_DepthStencilStates[hDepthStencilState];
       if (pDepthStencilState->GetRefCount() == 0)
       {
-        ReviveDeadObject(GALObjectType::DepthStencilState, hDepthStencilState);
+        ReviveDeadObject(RHIObjectType::DepthStencilState, hDepthStencilState);
       }
 
       pDepthStencilState->AddRef();
@@ -314,26 +333,26 @@ ezRHIDepthStencilStateHandle ezRHIDevice::CreateDepthStencilState(const ezRHIDep
     }
   }
 
-  ezRHIDepthStencilState* pDepthStencilState = CreateDepthStencilStatePlatform(desc);
+  //ezRHIDepthStencilState* pDepthStencilState = CreateDepthStencilStatePlatform(desc);
 
-  if (pDepthStencilState != nullptr)
-  {
-    EZ_ASSERT_DEBUG(pDepthStencilState->GetDescription().CalculateHash() == uiHash, "DepthStencilState hash doesn't match");
+  //if (pDepthStencilState != nullptr)
+  //{
+  //  EZ_ASSERT_DEBUG(pDepthStencilState->GetDescription().CalculateHash() == uiHash, "DepthStencilState hash doesn't match");
 
-    pDepthStencilState->AddRef();
+  //  pDepthStencilState->AddRef();
 
-    ezRHIDepthStencilStateHandle hDepthStencilState(m_DepthStencilStates.Insert(pDepthStencilState));
-    m_DepthStencilStateTable.Insert(uiHash, hDepthStencilState);
+  //  ezRHIDepthStencilStateHandle hDepthStencilState(m_DepthStencilStates.Insert(pDepthStencilState));
+  //  m_DepthStencilStateTable.Insert(uiHash, hDepthStencilState);
 
-    return hDepthStencilState;
-  }
+  //  return hDepthStencilState;
+  //}
 
   return ezRHIDepthStencilStateHandle();
 }
 
-void ezRHIDevice::DestroyDepthStencilState(ezRHIDepthStencilStateHandle hDepthStencilState)
+void ezRHIRenderDeviceImpl::DestroyDepthStencilState(ezRHIDepthStencilStateHandle hDepthStencilState)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIDepthStencilState* pDepthStencilState = nullptr;
 
@@ -343,7 +362,7 @@ void ezRHIDevice::DestroyDepthStencilState(ezRHIDepthStencilStateHandle hDepthSt
 
     if (pDepthStencilState->GetRefCount() == 0)
     {
-      AddDeadObject(GALObjectType::DepthStencilState, hDepthStencilState);
+      AddDeadObject(RHIObjectType::DepthStencilState, hDepthStencilState);
     }
   }
   else
@@ -352,9 +371,9 @@ void ezRHIDevice::DestroyDepthStencilState(ezRHIDepthStencilStateHandle hDepthSt
   }
 }
 
-ezRHIRasterizerStateHandle ezRHIDevice::CreateRasterizerState(const ezRHIRasterizerStateCreationDescription& desc)
+ezRHIRasterizerStateHandle ezRHIRenderDeviceImpl::CreateRasterizerState(const ezRHIRasterizerStateCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   // Hash desc and return potential existing one (including inc. refcount)
   ezUInt32 uiHash = desc.CalculateHash();
@@ -366,7 +385,7 @@ ezRHIRasterizerStateHandle ezRHIDevice::CreateRasterizerState(const ezRHIRasteri
       ezRHIRasterizerState* pRasterizerState = m_RasterizerStates[hRasterizerState];
       if (pRasterizerState->GetRefCount() == 0)
       {
-        ReviveDeadObject(GALObjectType::RasterizerState, hRasterizerState);
+        ReviveDeadObject(RHIObjectType::RasterizerState, hRasterizerState);
       }
 
       pRasterizerState->AddRef();
@@ -374,26 +393,26 @@ ezRHIRasterizerStateHandle ezRHIDevice::CreateRasterizerState(const ezRHIRasteri
     }
   }
 
-  ezRHIRasterizerState* pRasterizerState = CreateRasterizerStatePlatform(desc);
+  //ezRHIRasterizerState* pRasterizerState = CreateRasterizerStatePlatform(desc);
 
-  if (pRasterizerState != nullptr)
-  {
-    EZ_ASSERT_DEBUG(pRasterizerState->GetDescription().CalculateHash() == uiHash, "RasterizerState hash doesn't match");
+  //if (pRasterizerState != nullptr)
+  //{
+  //  EZ_ASSERT_DEBUG(pRasterizerState->GetDescription().CalculateHash() == uiHash, "RasterizerState hash doesn't match");
 
-    pRasterizerState->AddRef();
+  //  pRasterizerState->AddRef();
 
-    ezRHIRasterizerStateHandle hRasterizerState(m_RasterizerStates.Insert(pRasterizerState));
-    m_RasterizerStateTable.Insert(uiHash, hRasterizerState);
+  //  ezRHIRasterizerStateHandle hRasterizerState(m_RasterizerStates.Insert(pRasterizerState));
+  //  m_RasterizerStateTable.Insert(uiHash, hRasterizerState);
 
-    return hRasterizerState;
-  }
+  //  return hRasterizerState;
+  //}
 
   return ezRHIRasterizerStateHandle();
 }
 
-void ezRHIDevice::DestroyRasterizerState(ezRHIRasterizerStateHandle hRasterizerState)
+void ezRHIRenderDeviceImpl::DestroyRasterizerState(ezRHIRasterizerStateHandle hRasterizerState)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIRasterizerState* pRasterizerState = nullptr;
 
@@ -403,7 +422,7 @@ void ezRHIDevice::DestroyRasterizerState(ezRHIRasterizerStateHandle hRasterizerS
 
     if (pRasterizerState->GetRefCount() == 0)
     {
-      AddDeadObject(GALObjectType::RasterizerState, hRasterizerState);
+      AddDeadObject(RHIObjectType::RasterizerState, hRasterizerState);
     }
   }
   else
@@ -412,9 +431,9 @@ void ezRHIDevice::DestroyRasterizerState(ezRHIRasterizerStateHandle hRasterizerS
   }
 }
 
-ezRHISamplerStateHandle ezRHIDevice::CreateSamplerState(const ezRHISamplerStateCreationDescription& desc)
+ezRHISamplerStateHandle ezRHIRenderDeviceImpl::CreateSamplerState(const ezRHISamplerStateCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   /// \todo Platform independent validation
 
@@ -428,7 +447,7 @@ ezRHISamplerStateHandle ezRHIDevice::CreateSamplerState(const ezRHISamplerStateC
       ezRHISamplerState* pSamplerState = m_SamplerStates[hSamplerState];
       if (pSamplerState->GetRefCount() == 0)
       {
-        ReviveDeadObject(GALObjectType::SamplerState, hSamplerState);
+        ReviveDeadObject(RHIObjectType::SamplerState, hSamplerState);
       }
 
       pSamplerState->AddRef();
@@ -436,26 +455,26 @@ ezRHISamplerStateHandle ezRHIDevice::CreateSamplerState(const ezRHISamplerStateC
     }
   }
 
-  ezRHISamplerState* pSamplerState = CreateSamplerStatePlatform(desc);
+  //ezRHISamplerState* pSamplerState = CreateSamplerStatePlatform(desc);
 
-  if (pSamplerState != nullptr)
-  {
-    EZ_ASSERT_DEBUG(pSamplerState->GetDescription().CalculateHash() == uiHash, "SamplerState hash doesn't match");
+  //if (pSamplerState != nullptr)
+  //{
+  //  EZ_ASSERT_DEBUG(pSamplerState->GetDescription().CalculateHash() == uiHash, "SamplerState hash doesn't match");
 
-    pSamplerState->AddRef();
+  //  pSamplerState->AddRef();
 
-    ezRHISamplerStateHandle hSamplerState(m_SamplerStates.Insert(pSamplerState));
-    m_SamplerStateTable.Insert(uiHash, hSamplerState);
+  //  ezRHISamplerStateHandle hSamplerState(m_SamplerStates.Insert(pSamplerState));
+  //  m_SamplerStateTable.Insert(uiHash, hSamplerState);
 
-    return hSamplerState;
-  }
+  //  return hSamplerState;
+  //}
 
   return ezRHISamplerStateHandle();
 }
 
-void ezRHIDevice::DestroySamplerState(ezRHISamplerStateHandle hSamplerState)
+void ezRHIRenderDeviceImpl::DestroySamplerState(ezRHISamplerStateHandle hSamplerState)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHISamplerState* pSamplerState = nullptr;
 
@@ -465,7 +484,7 @@ void ezRHIDevice::DestroySamplerState(ezRHISamplerStateHandle hSamplerState)
 
     if (pSamplerState->GetRefCount() == 0)
     {
-      AddDeadObject(GALObjectType::SamplerState, hSamplerState);
+      AddDeadObject(RHIObjectType::SamplerState, hSamplerState);
     }
   }
   else
@@ -476,9 +495,9 @@ void ezRHIDevice::DestroySamplerState(ezRHISamplerStateHandle hSamplerState)
 
 
 
-ezRHIShaderHandle ezRHIDevice::CreateShader(const ezRHIShaderCreationDescription& desc)
+ezRHIShaderHandle ezRHIRenderDeviceImpl::CreateShader(const ezRHIShaderCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   bool bHasByteCodes = false;
 
@@ -497,27 +516,29 @@ ezRHIShaderHandle ezRHIDevice::CreateShader(const ezRHIShaderCreationDescription
     return ezRHIShaderHandle();
   }
 
-  ezRHIShader* pShader = CreateShaderPlatform(desc);
+  //ezRHIShader* pShader = CreateShaderPlatform(desc);
 
-  if (pShader == nullptr)
-  {
-    return ezRHIShaderHandle();
-  }
-  else
-  {
-    return ezRHIShaderHandle(m_Shaders.Insert(pShader));
-  }
+  //if (pShader == nullptr)
+  //{
+  //  return ezRHIShaderHandle();
+  //}
+  //else
+  //{
+  //  return ezRHIShaderHandle(m_Shaders.Insert(pShader));
+  //}
+
+  return ezRHIShaderHandle();
 }
 
-void ezRHIDevice::DestroyShader(ezRHIShaderHandle hShader)
+void ezRHIRenderDeviceImpl::DestroyShader(ezRHIShaderHandle hShader)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIShader* pShader = nullptr;
 
   if (m_Shaders.TryGetValue(hShader, pShader))
   {
-    AddDeadObject(GALObjectType::Shader, hShader);
+    AddDeadObject(RHIObjectType::Shader, hShader);
   }
   else
   {
@@ -526,9 +547,9 @@ void ezRHIDevice::DestroyShader(ezRHIShaderHandle hShader)
 }
 
 
-ezRHIBufferHandle ezRHIDevice::CreateBuffer(const ezRHIBufferCreationDescription& desc, ezArrayPtr<const ezUInt8> pInitialData)
+ezRHIBufferHandle ezRHIRenderDeviceImpl::CreateBuffer(const ezRHIBufferCreationDescription& desc, ezArrayPtr<const ezUInt8> pInitialData)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   if (desc.m_uiTotalSize == 0)
   {
@@ -554,38 +575,38 @@ ezRHIBufferHandle ezRHIDevice::CreateBuffer(const ezRHIBufferCreationDescription
 
   /// \todo Platform independent validation (buffer type supported)
 
-  ezRHIBuffer* pBuffer = CreateBufferPlatform(desc, pInitialData);
+  //ezRHIBuffer* pBuffer = CreateBufferPlatform(desc, pInitialData);
 
-  if (pBuffer != nullptr)
-  {
-    ezRHIBufferHandle hBuffer(m_Buffers.Insert(pBuffer));
+  //if (pBuffer != nullptr)
+  //{
+  //  ezRHIBufferHandle hBuffer(m_Buffers.Insert(pBuffer));
 
-    // Create default resource view
-    if (desc.m_bAllowShaderResourceView && desc.m_BufferType == ezRHIBufferType::Generic)
-    {
-      ezRHIResourceViewCreationDescription viewDesc;
-      viewDesc.m_hBuffer = hBuffer;
-      viewDesc.m_uiFirstElement = 0;
-      viewDesc.m_uiNumElements = (desc.m_uiStructSize != 0) ? (desc.m_uiTotalSize / desc.m_uiStructSize) : desc.m_uiTotalSize;
+  //  // Create default resource view
+  //  if (desc.m_bAllowShaderResourceView && desc.m_BufferType == ezRHIBufferType::Generic)
+  //  {
+  //    ezRHIResourceViewCreationDescription viewDesc;
+  //    viewDesc.m_hBuffer = hBuffer;
+  //    viewDesc.m_uiFirstElement = 0;
+  //    viewDesc.m_uiNumElements = (desc.m_uiStructSize != 0) ? (desc.m_uiTotalSize / desc.m_uiStructSize) : desc.m_uiTotalSize;
 
-      pBuffer->m_hDefaultResourceView = CreateResourceView(viewDesc);
-    }
+  //    pBuffer->m_hDefaultResourceView = CreateResourceView(viewDesc);
+  //  }
 
-    return hBuffer;
-  }
+  //  return hBuffer;
+  //}
 
   return ezRHIBufferHandle();
 }
 
-void ezRHIDevice::DestroyBuffer(ezRHIBufferHandle hBuffer)
+void ezRHIRenderDeviceImpl::DestroyBuffer(ezRHIBufferHandle hBuffer)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIBuffer* pBuffer = nullptr;
 
   if (m_Buffers.TryGetValue(hBuffer, pBuffer))
   {
-    AddDeadObject(GALObjectType::Buffer, hBuffer);
+    AddDeadObject(RHIObjectType::Buffer, hBuffer);
   }
   else
   {
@@ -595,7 +616,7 @@ void ezRHIDevice::DestroyBuffer(ezRHIBufferHandle hBuffer)
 
 
 // Helper functions for buffers (for common, simple use cases)
-ezRHIBufferHandle ezRHIDevice::CreateVertexBuffer(ezUInt32 uiVertexSize, ezUInt32 uiVertexCount, ezArrayPtr<const ezUInt8> pInitialData)
+ezRHIBufferHandle ezRHIRenderDeviceImpl::CreateVertexBuffer(ezUInt32 uiVertexSize, ezUInt32 uiVertexCount, ezArrayPtr<const ezUInt8> pInitialData)
 {
   ezRHIBufferCreationDescription desc;
   desc.m_uiStructSize = uiVertexSize;
@@ -606,7 +627,7 @@ ezRHIBufferHandle ezRHIDevice::CreateVertexBuffer(ezUInt32 uiVertexSize, ezUInt3
   return CreateBuffer(desc, pInitialData);
 }
 
-ezRHIBufferHandle ezRHIDevice::CreateIndexBuffer(ezRHIIndexType::Enum IndexType, ezUInt32 uiIndexCount, ezArrayPtr<const ezUInt8> pInitialData)
+ezRHIBufferHandle ezRHIRenderDeviceImpl::CreateIndexBuffer(ezRHIIndexType::Enum IndexType, ezUInt32 uiIndexCount, ezArrayPtr<const ezUInt8> pInitialData)
 {
   ezRHIBufferCreationDescription desc;
   desc.m_uiStructSize = ezRHIIndexType::GetSize(IndexType);
@@ -617,7 +638,7 @@ ezRHIBufferHandle ezRHIDevice::CreateIndexBuffer(ezRHIIndexType::Enum IndexType,
   return CreateBuffer(desc, pInitialData);
 }
 
-ezRHIBufferHandle ezRHIDevice::CreateConstantBuffer(ezUInt32 uiBufferSize)
+ezRHIBufferHandle ezRHIRenderDeviceImpl::CreateConstantBuffer(ezUInt32 uiBufferSize)
 {
   ezRHIBufferCreationDescription desc;
   desc.m_uiStructSize = 0;
@@ -629,9 +650,9 @@ ezRHIBufferHandle ezRHIDevice::CreateConstantBuffer(ezUInt32 uiBufferSize)
 }
 
 
-ezRHITextureHandle ezRHIDevice::CreateTexture(const ezRHITextureCreationDescription& desc, ezArrayPtr<ezRHISystemMemoryDescription> pInitialData)
+ezRHITextureHandle ezRHIRenderDeviceImpl::CreateTexture(const ezRHITextureCreationDescription& desc, ezArrayPtr<ezRHISystemMemoryDescription> pInitialData)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   /// \todo Platform independent validation (desc width & height < platform maximum, format, etc.)
 
@@ -648,39 +669,39 @@ ezRHITextureHandle ezRHIDevice::CreateTexture(const ezRHITextureCreationDescript
     return ezRHITextureHandle();
   }
 
-  ezRHITexture* pTexture = CreateTexturePlatform(desc, pInitialData);
+  //ezRHITexture* pTexture = CreateTexturePlatform(desc, pInitialData);
 
-  if (pTexture != nullptr)
-  {
-    ezRHITextureHandle hTexture(m_Textures.Insert(pTexture));
+  //if (pTexture != nullptr)
+  //{
+  //  ezRHITextureHandle hTexture(m_Textures.Insert(pTexture));
 
-    // Create default resource view
-    if (desc.m_bAllowShaderResourceView)
-    {
-      ezRHIResourceViewCreationDescription viewDesc;
-      viewDesc.m_hTexture = hTexture;
-      viewDesc.m_uiArraySize = desc.m_uiArraySize;
-      pTexture->m_hDefaultResourceView = CreateResourceView(viewDesc);
-    }
+  //  // Create default resource view
+  //  if (desc.m_bAllowShaderResourceView)
+  //  {
+  //    ezRHIResourceViewCreationDescription viewDesc;
+  //    viewDesc.m_hTexture = hTexture;
+  //    viewDesc.m_uiArraySize = desc.m_uiArraySize;
+  //    pTexture->m_hDefaultResourceView = CreateResourceView(viewDesc);
+  //  }
 
-    // Create default render target view
-    if (desc.m_bCreateRenderTarget)
-    {
-      ezRHIRenderTargetViewCreationDescription rtDesc;
-      rtDesc.m_hTexture = hTexture;
-      rtDesc.m_uiFirstSlice = 0;
-      rtDesc.m_uiSliceCount = desc.m_uiArraySize;
+  //  // Create default render target view
+  //  if (desc.m_bCreateRenderTarget)
+  //  {
+  //    ezRHIRenderTargetViewCreationDescription rtDesc;
+  //    rtDesc.m_hTexture = hTexture;
+  //    rtDesc.m_uiFirstSlice = 0;
+  //    rtDesc.m_uiSliceCount = desc.m_uiArraySize;
 
-      pTexture->m_hDefaultRenderTargetView = CreateRenderTargetView(rtDesc);
-    }
+  //    pTexture->m_hDefaultRenderTargetView = CreateRenderTargetView(rtDesc);
+  //  }
 
-    return hTexture;
-  }
+  //  return hTexture;
+  //}
 
   return ezRHITextureHandle();
 }
 
-ezResult ezRHIDevice::ReplaceExisitingNativeObject(ezRHITextureHandle hTexture, void* pExisitingNativeObject)
+ezResult ezRHIRenderDeviceImpl::ReplaceExisitingNativeObject(ezRHITextureHandle hTexture, void* pExisitingNativeObject)
 {
   ezRHITexture* pTexture = nullptr;
   if (m_Textures.TryGetValue(hTexture, pTexture))
@@ -758,14 +779,14 @@ ezResult ezRHIDevice::ReplaceExisitingNativeObject(ezRHITextureHandle hTexture, 
   }
 }
 
-void ezRHIDevice::DestroyTexture(ezRHITextureHandle hTexture)
+void ezRHIRenderDeviceImpl::DestroyTexture(ezRHITextureHandle hTexture)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHITexture* pTexture = nullptr;
   if (m_Textures.TryGetValue(hTexture, pTexture))
   {
-    AddDeadObject(GALObjectType::Texture, hTexture);
+    AddDeadObject(RHIObjectType::Texture, hTexture);
   }
   else
   {
@@ -773,9 +794,9 @@ void ezRHIDevice::DestroyTexture(ezRHITextureHandle hTexture)
   }
 }
 
-ezRHITextureHandle ezRHIDevice::CreateProxyTexture(ezRHITextureHandle hParentTexture, ezUInt32 uiSlice)
+ezRHITextureHandle ezRHIRenderDeviceImpl::CreateProxyTexture(ezRHITextureHandle hParentTexture, ezUInt32 uiSlice)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHITexture* pParentTexture = nullptr;
 
@@ -825,16 +846,16 @@ ezRHITextureHandle ezRHIDevice::CreateProxyTexture(ezRHITextureHandle hParentTex
   return hProxyTexture;
 }
 
-void ezRHIDevice::DestroyProxyTexture(ezRHITextureHandle hProxyTexture)
+void ezRHIRenderDeviceImpl::DestroyProxyTexture(ezRHITextureHandle hProxyTexture)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHITexture* pTexture = nullptr;
   if (m_Textures.TryGetValue(hProxyTexture, pTexture))
   {
     EZ_ASSERT_DEV(pTexture->GetDescription().m_Type == ezRHITextureType::Texture2DProxy, "Given texture is not a proxy texture");
 
-    AddDeadObject(GALObjectType::Texture, hProxyTexture);
+    AddDeadObject(RHIObjectType::Texture, hProxyTexture);
   }
   else
   {
@@ -842,7 +863,7 @@ void ezRHIDevice::DestroyProxyTexture(ezRHITextureHandle hProxyTexture)
   }
 }
 
-ezRHIResourceViewHandle ezRHIDevice::GetDefaultResourceView(ezRHITextureHandle hTexture)
+ezRHIResourceViewHandle ezRHIRenderDeviceImpl::GetDefaultResourceView(ezRHITextureHandle hTexture)
 {
   if (const ezRHITexture* pTexture = GetTexture(hTexture))
   {
@@ -852,7 +873,7 @@ ezRHIResourceViewHandle ezRHIDevice::GetDefaultResourceView(ezRHITextureHandle h
   return ezRHIResourceViewHandle();
 }
 
-ezRHIResourceViewHandle ezRHIDevice::GetDefaultResourceView(ezRHIBufferHandle hBuffer)
+ezRHIResourceViewHandle ezRHIRenderDeviceImpl::GetDefaultResourceView(ezRHIBufferHandle hBuffer)
 {
   if (const ezRHIBuffer* pBuffer = GetBuffer(hBuffer))
   {
@@ -862,9 +883,9 @@ ezRHIResourceViewHandle ezRHIDevice::GetDefaultResourceView(ezRHIBufferHandle hB
   return ezRHIResourceViewHandle();
 }
 
-ezRHIResourceViewHandle ezRHIDevice::CreateResourceView(const ezRHIResourceViewCreationDescription& desc)
+ezRHIResourceViewHandle ezRHIRenderDeviceImpl::CreateResourceView(const ezRHIResourceViewCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIResourceBase* pResource = nullptr;
 
@@ -891,28 +912,28 @@ ezRHIResourceViewHandle ezRHIDevice::CreateResourceView(const ezRHIResourceViewC
     }
   }
 
-  ezRHIResourceView* pResourceView = CreateResourceViewPlatform(pResource, desc);
+  //ezRHIResourceView* pResourceView = CreateResourceViewPlatform(pResource, desc);
 
-  if (pResourceView != nullptr)
-  {
-    ezRHIResourceViewHandle hResourceView(m_ResourceViews.Insert(pResourceView));
-    pResource->m_ResourceViews.Insert(uiHash, hResourceView);
+  //if (pResourceView != nullptr)
+  //{
+  //  ezRHIResourceViewHandle hResourceView(m_ResourceViews.Insert(pResourceView));
+  //  pResource->m_ResourceViews.Insert(uiHash, hResourceView);
 
-    return hResourceView;
-  }
+  //  return hResourceView;
+  //}
 
   return ezRHIResourceViewHandle();
 }
 
-void ezRHIDevice::DestroyResourceView(ezRHIResourceViewHandle hResourceView)
+void ezRHIRenderDeviceImpl::DestroyResourceView(ezRHIResourceViewHandle hResourceView)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIResourceView* pResourceView = nullptr;
 
   if (m_ResourceViews.TryGetValue(hResourceView, pResourceView))
   {
-    AddDeadObject(GALObjectType::ResourceView, hResourceView);
+    AddDeadObject(RHIObjectType::ResourceView, hResourceView);
   }
   else
   {
@@ -920,7 +941,7 @@ void ezRHIDevice::DestroyResourceView(ezRHIResourceViewHandle hResourceView)
   }
 }
 
-ezRHIRenderTargetViewHandle ezRHIDevice::GetDefaultRenderTargetView(ezRHITextureHandle hTexture)
+ezRHIRenderTargetViewHandle ezRHIRenderDeviceImpl::GetDefaultRenderTargetView(ezRHITextureHandle hTexture)
 {
   if (const ezRHITexture* pTexture = GetTexture(hTexture))
   {
@@ -930,9 +951,9 @@ ezRHIRenderTargetViewHandle ezRHIDevice::GetDefaultRenderTargetView(ezRHITexture
   return ezRHIRenderTargetViewHandle();
 }
 
-ezRHIRenderTargetViewHandle ezRHIDevice::CreateRenderTargetView(const ezRHIRenderTargetViewCreationDescription& desc)
+ezRHIRenderTargetViewHandle ezRHIRenderDeviceImpl::CreateRenderTargetView(const ezRHIRenderTargetViewCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHITexture* pTexture = nullptr;
 
@@ -958,28 +979,28 @@ ezRHIRenderTargetViewHandle ezRHIDevice::CreateRenderTargetView(const ezRHIRende
     }
   }
 
-  ezRHIRenderTargetView* pRenderTargetView = CreateRenderTargetViewPlatform(pTexture, desc);
+  //ezRHIRenderTargetView* pRenderTargetView = CreateRenderTargetViewPlatform(pTexture, desc);
 
-  if (pRenderTargetView != nullptr)
-  {
-    ezRHIRenderTargetViewHandle hRenderTargetView(m_RenderTargetViews.Insert(pRenderTargetView));
-    pTexture->m_RenderTargetViews.Insert(uiHash, hRenderTargetView);
+  //if (pRenderTargetView != nullptr)
+  //{
+  //  ezRHIRenderTargetViewHandle hRenderTargetView(m_RenderTargetViews.Insert(pRenderTargetView));
+  //  pTexture->m_RenderTargetViews.Insert(uiHash, hRenderTargetView);
 
-    return hRenderTargetView;
-  }
+  //  return hRenderTargetView;
+  //}
 
   return ezRHIRenderTargetViewHandle();
 }
 
-void ezRHIDevice::DestroyRenderTargetView(ezRHIRenderTargetViewHandle hRenderTargetView)
+void ezRHIRenderDeviceImpl::DestroyRenderTargetView(ezRHIRenderTargetViewHandle hRenderTargetView)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIRenderTargetView* pRenderTargetView = nullptr;
 
   if (m_RenderTargetViews.TryGetValue(hRenderTargetView, pRenderTargetView))
   {
-    AddDeadObject(GALObjectType::RenderTargetView, hRenderTargetView);
+    AddDeadObject(RHIObjectType::RenderTargetView, hRenderTargetView);
   }
   else
   {
@@ -987,9 +1008,9 @@ void ezRHIDevice::DestroyRenderTargetView(ezRHIRenderTargetViewHandle hRenderTar
   }
 }
 
-ezRHIUnorderedAccessViewHandle ezRHIDevice::CreateUnorderedAccessView(const ezRHIUnorderedAccessViewCreationDescription& desc)
+ezRHIUnorderedAccessViewHandle ezRHIRenderDeviceImpl::CreateUnorderedAccessView(const ezRHIUnorderedAccessViewCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   if (!desc.m_hTexture.IsInvalidated() && !desc.m_hBuffer.IsInvalidated())
   {
@@ -1061,28 +1082,28 @@ ezRHIUnorderedAccessViewHandle ezRHIDevice::CreateUnorderedAccessView(const ezRH
     }
   }
 
-  ezRHIUnorderedAccessView* pUnorderedAccessViewView = CreateUnorderedAccessViewPlatform(pResource, desc);
+  //ezRHIUnorderedAccessView* pUnorderedAccessViewView = CreateUnorderedAccessViewPlatform(pResource, desc);
 
-  if (pUnorderedAccessViewView != nullptr)
-  {
-    ezRHIUnorderedAccessViewHandle hUnorderedAccessView(m_UnorderedAccessViews.Insert(pUnorderedAccessViewView));
-    pResource->m_UnorderedAccessViews.Insert(uiHash, hUnorderedAccessView);
+  //if (pUnorderedAccessViewView != nullptr)
+  //{
+  //  ezRHIUnorderedAccessViewHandle hUnorderedAccessView(m_UnorderedAccessViews.Insert(pUnorderedAccessViewView));
+  //  pResource->m_UnorderedAccessViews.Insert(uiHash, hUnorderedAccessView);
 
-    return hUnorderedAccessView;
-  }
+  //  return hUnorderedAccessView;
+  //}
 
   return ezRHIUnorderedAccessViewHandle();
 }
 
-void ezRHIDevice::DestroyUnorderedAccessView(ezRHIUnorderedAccessViewHandle hUnorderedAccessViewHandle)
+void ezRHIRenderDeviceImpl::DestroyUnorderedAccessView(ezRHIUnorderedAccessViewHandle hUnorderedAccessViewHandle)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIUnorderedAccessView* pUnorderedAccesssView = nullptr;
 
   if (m_UnorderedAccessViews.TryGetValue(hUnorderedAccessViewHandle, pUnorderedAccesssView))
   {
-    AddDeadObject(GALObjectType::UnorderedAccessView, hUnorderedAccessViewHandle);
+    AddDeadObject(RHIObjectType::UnorderedAccessView, hUnorderedAccessViewHandle);
   }
   else
   {
@@ -1090,9 +1111,9 @@ void ezRHIDevice::DestroyUnorderedAccessView(ezRHIUnorderedAccessViewHandle hUno
   }
 }
 
-ezRHISwapChainHandle ezRHIDevice::CreateSwapChain(const ezRHISwapChainCreationDescription& desc)
+ezRHISwapChainHandle ezRHIRenderDeviceImpl::CreateSwapChain(const ezRHISwapChainCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   /// \todo Platform independent validation
   if (desc.m_pWindow == nullptr)
@@ -1102,21 +1123,23 @@ ezRHISwapChainHandle ezRHIDevice::CreateSwapChain(const ezRHISwapChainCreationDe
   }
 
 
-  ezRHISwapChain* pSwapChain = CreateSwapChainPlatform(desc);
+  //ezRHISwapChain* pSwapChain = CreateSwapChainPlatform(desc);
 
-  if (pSwapChain == nullptr)
-  {
-    return ezRHISwapChainHandle();
-  }
-  else
-  {
-    return ezRHISwapChainHandle(m_SwapChains.Insert(pSwapChain));
-  }
+  //if (pSwapChain == nullptr)
+  //{
+  //  return ezRHISwapChainHandle();
+  //}
+  //else
+  //{
+  //  return ezRHISwapChainHandle(m_SwapChains.Insert(pSwapChain));
+  //}
+
+  return ezRHISwapChainHandle();
 }
 
-void ezRHIDevice::DestroySwapChain(ezRHISwapChainHandle hSwapChain)
+void ezRHIRenderDeviceImpl::DestroySwapChain(ezRHISwapChainHandle hSwapChain)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHISwapChain* pSwapChain = nullptr;
 
@@ -1128,7 +1151,7 @@ void ezRHIDevice::DestroySwapChain(ezRHISwapChainHandle hSwapChain)
 
   if (m_SwapChains.TryGetValue(hSwapChain, pSwapChain))
   {
-    AddDeadObject(GALObjectType::SwapChain, hSwapChain);
+    AddDeadObject(RHIObjectType::SwapChain, hSwapChain);
   }
   else
   {
@@ -1136,31 +1159,33 @@ void ezRHIDevice::DestroySwapChain(ezRHISwapChainHandle hSwapChain)
   }
 }
 
-ezRHIFenceHandle ezRHIDevice::CreateFence()
+ezRHIFenceHandle ezRHIRenderDeviceImpl::CreateFence()
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  ezRHIFence* pFence = CreateFencePlatform();
+  //ezRHIFence* pFence = CreateFencePlatform();
 
-  if (pFence == nullptr)
-  {
-    return ezRHIFenceHandle();
-  }
-  else
-  {
-    return ezRHIFenceHandle(m_Fences.Insert(pFence));
-  }
+  //if (pFence == nullptr)
+  //{
+  //  return ezRHIFenceHandle();
+  //}
+  //else
+  //{
+  //  return ezRHIFenceHandle(m_Fences.Insert(pFence));
+  //}
+
+  return ezRHIFenceHandle();
 }
 
-void ezRHIDevice::DestroyFence(ezRHIFenceHandle& hFence)
+void ezRHIRenderDeviceImpl::DestroyFence(ezRHIFenceHandle& hFence)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIFence* pFence = nullptr;
 
   if (m_Fences.TryGetValue(hFence, pFence))
   {
-    AddDeadObject(GALObjectType::Fence, hFence);
+    AddDeadObject(RHIObjectType::Fence, hFence);
   }
   else
   {
@@ -1168,31 +1193,33 @@ void ezRHIDevice::DestroyFence(ezRHIFenceHandle& hFence)
   }
 }
 
-ezRHIQueryHandle ezRHIDevice::CreateQuery(const ezRHIQueryCreationDescription& desc)
+ezRHIQueryHandle ezRHIRenderDeviceImpl::CreateQuery(const ezRHIQueryCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
-  ezRHIQuery* pQuery = CreateQueryPlatform(desc);
+  //ezRHIQuery* pQuery = CreateQueryPlatform(desc);
 
-  if (pQuery == nullptr)
-  {
-    return ezRHIQueryHandle();
-  }
-  else
-  {
-    return ezRHIQueryHandle(m_Queries.Insert(pQuery));
-  }
+  //if (pQuery == nullptr)
+  //{
+  //  return ezRHIQueryHandle();
+  //}
+  //else
+  //{
+  //  return ezRHIQueryHandle(m_Queries.Insert(pQuery));
+  //}
+
+  return ezRHIQueryHandle();
 }
 
-void ezRHIDevice::DestroyQuery(ezRHIQueryHandle hQuery)
+void ezRHIRenderDeviceImpl::DestroyQuery(ezRHIQueryHandle hQuery)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIQuery* pQuery = nullptr;
 
   if (m_Queries.TryGetValue(hQuery, pQuery))
   {
-    AddDeadObject(GALObjectType::Query, hQuery);
+    AddDeadObject(RHIObjectType::Query, hQuery);
   }
   else
   {
@@ -1200,9 +1227,9 @@ void ezRHIDevice::DestroyQuery(ezRHIQueryHandle hQuery)
   }
 }
 
-ezRHIVertexDeclarationHandle ezRHIDevice::CreateVertexDeclaration(const ezRHIVertexDeclarationCreationDescription& desc)
+ezRHIVertexDeclarationHandle ezRHIRenderDeviceImpl::CreateVertexDeclaration(const ezRHIVertexDeclarationCreationDescription& desc)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   /// \todo Platform independent validation
 
@@ -1216,7 +1243,7 @@ ezRHIVertexDeclarationHandle ezRHIDevice::CreateVertexDeclaration(const ezRHIVer
       ezRHIVertexDeclaration* pVertexDeclaration = m_VertexDeclarations[hVertexDeclaration];
       if (pVertexDeclaration->GetRefCount() == 0)
       {
-        ReviveDeadObject(GALObjectType::VertexDeclaration, hVertexDeclaration);
+        ReviveDeadObject(RHIObjectType::VertexDeclaration, hVertexDeclaration);
       }
 
       pVertexDeclaration->AddRef();
@@ -1224,24 +1251,24 @@ ezRHIVertexDeclarationHandle ezRHIDevice::CreateVertexDeclaration(const ezRHIVer
     }
   }
 
-  ezRHIVertexDeclaration* pVertexDeclaration = CreateVertexDeclarationPlatform(desc);
+  //ezRHIVertexDeclaration* pVertexDeclaration = CreateVertexDeclarationPlatform(desc);
 
-  if (pVertexDeclaration != nullptr)
-  {
-    pVertexDeclaration->AddRef();
+  //if (pVertexDeclaration != nullptr)
+  //{
+  //  pVertexDeclaration->AddRef();
 
-    ezRHIVertexDeclarationHandle hVertexDeclaration(m_VertexDeclarations.Insert(pVertexDeclaration));
-    m_VertexDeclarationTable.Insert(uiHash, hVertexDeclaration);
+  //  ezRHIVertexDeclarationHandle hVertexDeclaration(m_VertexDeclarations.Insert(pVertexDeclaration));
+  //  m_VertexDeclarationTable.Insert(uiHash, hVertexDeclaration);
 
-    return hVertexDeclaration;
-  }
+  //  return hVertexDeclaration;
+  //}
 
   return ezRHIVertexDeclarationHandle();
 }
 
-void ezRHIDevice::DestroyVertexDeclaration(ezRHIVertexDeclarationHandle hVertexDeclaration)
+void ezRHIRenderDeviceImpl::DestroyVertexDeclaration(ezRHIVertexDeclarationHandle hVertexDeclaration)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHIVertexDeclaration* pVertexDeclaration = nullptr;
 
@@ -1251,7 +1278,7 @@ void ezRHIDevice::DestroyVertexDeclaration(ezRHIVertexDeclarationHandle hVertexD
 
     if (pVertexDeclaration->GetRefCount() == 0)
     {
-      AddDeadObject(GALObjectType::VertexDeclaration, hVertexDeclaration);
+      AddDeadObject(RHIObjectType::VertexDeclaration, hVertexDeclaration);
     }
   }
   else
@@ -1262,15 +1289,15 @@ void ezRHIDevice::DestroyVertexDeclaration(ezRHIVertexDeclarationHandle hVertexD
 
 // Swap chain functions
 
-void ezRHIDevice::Present(ezRHISwapChainHandle hSwapChain, bool bVSync)
+void ezRHIRenderDeviceImpl::Present(ezRHISwapChainHandle hSwapChain, bool bVSync)
 {
-  EZ_ASSERT_DEV(m_bBeginFrameCalled, "You must have called ezRHIDevice::Begin before you can call this function");
+  EZ_ASSERT_DEV(m_bBeginFrameCalled, "You must have called ezRHIRenderDeviceImpl::Begin before you can call this function");
 
   ezRHISwapChain* pSwapChain = nullptr;
 
   if (m_SwapChains.TryGetValue(hSwapChain, pSwapChain))
   {
-    PresentPlatform(pSwapChain, bVSync);
+    //PresentPlatform(pSwapChain, bVSync);
   }
   else
   {
@@ -1278,7 +1305,7 @@ void ezRHIDevice::Present(ezRHISwapChainHandle hSwapChain, bool bVSync)
   }
 }
 
-ezRHITextureHandle ezRHIDevice::GetBackBufferTextureFromSwapChain(ezRHISwapChainHandle hSwapChain)
+ezRHITextureHandle ezRHIRenderDeviceImpl::GetBackBufferTextureFromSwapChain(ezRHISwapChainHandle hSwapChain)
 {
   ezRHISwapChain* pSwapChain = nullptr;
 
@@ -1297,71 +1324,71 @@ ezRHITextureHandle ezRHIDevice::GetBackBufferTextureFromSwapChain(ezRHISwapChain
 
 // Misc functions
 
-void ezRHIDevice::BeginFrame()
+void ezRHIRenderDeviceImpl::BeginFrame()
 {
   {
-    ezRHIDeviceEvent e;
+    ezRHIRenderDeviceEvent e;
     e.m_pDevice = this;
-    e.m_Type = ezRHIDeviceEvent::BeforeBeginFrame;
+    e.m_Type = ezRHIRenderDeviceEvent::BeforeBeginFrame;
     m_Events.Broadcast(e);
   }
 
   {
-    EZ_GALDEVICE_LOCK_AND_CHECK();
-    EZ_ASSERT_DEV(!m_bBeginFrameCalled, "You must call ezRHIDevice::EndFrame before you can call ezRHIDevice::BeginFrame again");
+    EZ_RHIDEVICE_LOCK_AND_CHECK();
+    EZ_ASSERT_DEV(!m_bBeginFrameCalled, "You must call ezRHIRenderDeviceImpl::EndFrame before you can call ezRHIRenderDeviceImpl::BeginFrame again");
     m_bBeginFrameCalled = true;
 
-    BeginFramePlatform();
+    //BeginFramePlatform();
   }
 
   // TODO: move to beginrendering/compute calls
   //m_pPrimaryContext->ClearStatisticsCounters();
 
   {
-    ezRHIDeviceEvent e;
+    ezRHIRenderDeviceEvent e;
     e.m_pDevice = this;
-    e.m_Type = ezRHIDeviceEvent::AfterBeginFrame;
+    e.m_Type = ezRHIRenderDeviceEvent::AfterBeginFrame;
     m_Events.Broadcast(e);
   }
 }
 
-void ezRHIDevice::EndFrame()
+void ezRHIRenderDeviceImpl::EndFrame()
 {
   {
-    ezRHIDeviceEvent e;
+    ezRHIRenderDeviceEvent e;
     e.m_pDevice = this;
-    e.m_Type = ezRHIDeviceEvent::BeforeEndFrame;
+    e.m_Type = ezRHIRenderDeviceEvent::BeforeEndFrame;
     m_Events.Broadcast(e);
   }
 
   {
-    EZ_GALDEVICE_LOCK_AND_CHECK();
-    EZ_ASSERT_DEV(m_bBeginFrameCalled, "You must have called ezRHIDevice::Begin before you can call ezRHIDevice::EndFrame");
+    EZ_RHIDEVICE_LOCK_AND_CHECK();
+    EZ_ASSERT_DEV(m_bBeginFrameCalled, "You must have called ezRHIRenderDeviceImpl::Begin before you can call ezRHIRenderDeviceImpl::EndFrame");
 
     DestroyDeadObjects();
 
-    EndFramePlatform();
+    //EndFramePlatform();
 
     m_bBeginFrameCalled = false;
   }
 
   {
-    ezRHIDeviceEvent e;
+    ezRHIRenderDeviceEvent e;
     e.m_pDevice = this;
-    e.m_Type = ezRHIDeviceEvent::AfterEndFrame;
+    e.m_Type = ezRHIRenderDeviceEvent::AfterEndFrame;
     m_Events.Broadcast(e);
   }
 }
 
-void ezRHIDevice::SetPrimarySwapChain(ezRHISwapChainHandle hSwapChain)
+void ezRHIRenderDeviceImpl::SetPrimarySwapChain(ezRHISwapChainHandle hSwapChain)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   ezRHISwapChain* pSwapChain = nullptr;
 
   if (m_SwapChains.TryGetValue(hSwapChain, pSwapChain))
   {
-    SetPrimarySwapChainPlatform(pSwapChain); // Needs a return value?
+    //SetPrimarySwapChainPlatform(pSwapChain); // Needs a return value?
     m_hPrimarySwapChain = hSwapChain;
   }
   else
@@ -1370,12 +1397,12 @@ void ezRHIDevice::SetPrimarySwapChain(ezRHISwapChainHandle hSwapChain)
   }
 }
 
-const ezRHIDeviceCapabilities& ezRHIDevice::GetCapabilities() const
+const ezRHIRenderDeviceCapabilities& ezRHIRenderDeviceImpl::GetCapabilities() const
 {
   return m_Capabilities;
 }
 
-ezUInt64 ezRHIDevice::GetMemoryConsumptionForTexture(const ezRHITextureCreationDescription& desc) const
+ezUInt64 ezRHIRenderDeviceImpl::GetMemoryConsumptionForTexture(const ezRHITextureCreationDescription& desc) const
 {
   // This generic implementation is only an approximation, but it can be overridden by specific devices
   // to give an accurate memory consumption figure.
@@ -1395,15 +1422,15 @@ ezUInt64 ezRHIDevice::GetMemoryConsumptionForTexture(const ezRHITextureCreationD
 }
 
 
-ezUInt64 ezRHIDevice::GetMemoryConsumptionForBuffer(const ezRHIBufferCreationDescription& desc) const
+ezUInt64 ezRHIRenderDeviceImpl::GetMemoryConsumptionForBuffer(const ezRHIBufferCreationDescription& desc) const
 {
   return desc.m_uiTotalSize;
 }
 
 
-void ezRHIDevice::DestroyViews(ezRHIResourceBase* pResource)
+void ezRHIRenderDeviceImpl::DestroyViews(ezRHIResourceBase* pResource)
 {
-  EZ_GALDEVICE_LOCK_AND_CHECK();
+  EZ_RHIDEVICE_LOCK_AND_CHECK();
 
   for (auto it = pResource->m_ResourceViews.GetIterator(); it.IsValid(); ++it)
   {
@@ -1412,7 +1439,7 @@ void ezRHIDevice::DestroyViews(ezRHIResourceBase* pResource)
 
     m_ResourceViews.Remove(hResourceView);
 
-    DestroyResourceViewPlatform(pResourceView);
+    //DestroyResourceViewPlatform(pResourceView);
   }
   pResource->m_ResourceViews.Clear();
   pResource->m_hDefaultResourceView.Invalidate();
@@ -1424,7 +1451,7 @@ void ezRHIDevice::DestroyViews(ezRHIResourceBase* pResource)
 
     m_RenderTargetViews.Remove(hRenderTargetView);
 
-    DestroyRenderTargetViewPlatform(pRenderTargetView);
+    //DestroyRenderTargetViewPlatform(pRenderTargetView);
   }
   pResource->m_RenderTargetViews.Clear();
   pResource->m_hDefaultRenderTargetView.Invalidate();
@@ -1436,12 +1463,12 @@ void ezRHIDevice::DestroyViews(ezRHIResourceBase* pResource)
 
     m_UnorderedAccessViews.Remove(hUnorderedAccessView);
 
-    DestroyUnorderedAccessViewPlatform(pUnorderedAccessView);
+    //DestroyUnorderedAccessViewPlatform(pUnorderedAccessView);
   }
   pResource->m_UnorderedAccessViews.Clear();
 }
 
-void ezRHIDevice::DestroyDeadObjects()
+void ezRHIRenderDeviceImpl::DestroyDeadObjects()
 {
   // Can't use range based for here since new objects might be added during iteration
   for (ezUInt32 i = 0; i < m_DeadObjects.GetCount(); ++i)
@@ -1450,7 +1477,7 @@ void ezRHIDevice::DestroyDeadObjects()
 
     switch (deadObject.m_uiType)
     {
-      case GALObjectType::BlendState:
+      case RHIObjectType::BlendState:
       {
         ezRHIBlendStateHandle hBlendState(ezRHI::ez16_16Id(deadObject.m_uiHandle));
         ezRHIBlendState* pBlendState = nullptr;
@@ -1458,11 +1485,11 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(m_BlendStates.Remove(hBlendState, &pBlendState), "BlendState not found in idTable");
         EZ_VERIFY(m_BlendStateTable.Remove(pBlendState->GetDescription().CalculateHash()), "BlendState not found in de-duplication table");
 
-        DestroyBlendStatePlatform(pBlendState);
+        //DestroyBlendStatePlatform(pBlendState);
 
         break;
       }
-      case GALObjectType::DepthStencilState:
+      case RHIObjectType::DepthStencilState:
       {
         ezRHIDepthStencilStateHandle hDepthStencilState(ezRHI::ez16_16Id(deadObject.m_uiHandle));
         ezRHIDepthStencilState* pDepthStencilState = nullptr;
@@ -1471,11 +1498,11 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(m_DepthStencilStateTable.Remove(pDepthStencilState->GetDescription().CalculateHash()),
           "DepthStencilState not found in de-duplication table");
 
-        DestroyDepthStencilStatePlatform(pDepthStencilState);
+        //DestroyDepthStencilStatePlatform(pDepthStencilState);
 
         break;
       }
-      case GALObjectType::RasterizerState:
+      case RHIObjectType::RasterizerState:
       {
         ezRHIRasterizerStateHandle hRasterizerState(ezRHI::ez16_16Id(deadObject.m_uiHandle));
         ezRHIRasterizerState* pRasterizerState = nullptr;
@@ -1484,11 +1511,11 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(
           m_RasterizerStateTable.Remove(pRasterizerState->GetDescription().CalculateHash()), "RasterizerState not found in de-duplication table");
 
-        DestroyRasterizerStatePlatform(pRasterizerState);
+        //DestroyRasterizerStatePlatform(pRasterizerState);
 
         break;
       }
-      case GALObjectType::SamplerState:
+      case RHIObjectType::SamplerState:
       {
         ezRHISamplerStateHandle hSamplerState(ezRHI::ez16_16Id(deadObject.m_uiHandle));
         ezRHISamplerState* pSamplerState = nullptr;
@@ -1496,22 +1523,22 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(m_SamplerStates.Remove(hSamplerState, &pSamplerState), "SamplerState not found in idTable");
         EZ_VERIFY(m_SamplerStateTable.Remove(pSamplerState->GetDescription().CalculateHash()), "SamplerState not found in de-duplication table");
 
-        DestroySamplerStatePlatform(pSamplerState);
+        //DestroySamplerStatePlatform(pSamplerState);
 
         break;
       }
-      case GALObjectType::Shader:
+      case RHIObjectType::Shader:
       {
         ezRHIShaderHandle hShader(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHIShader* pShader = nullptr;
 
         m_Shaders.Remove(hShader, &pShader);
 
-        DestroyShaderPlatform(pShader);
+        //DestroyShaderPlatform(pShader);
 
         break;
       }
-      case GALObjectType::Buffer:
+      case RHIObjectType::Buffer:
       {
         ezRHIBufferHandle hBuffer(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHIBuffer* pBuffer = nullptr;
@@ -1519,11 +1546,11 @@ void ezRHIDevice::DestroyDeadObjects()
         m_Buffers.Remove(hBuffer, &pBuffer);
 
         DestroyViews(pBuffer);
-        DestroyBufferPlatform(pBuffer);
+        //DestroyBufferPlatform(pBuffer);
 
         break;
       }
-      case GALObjectType::Texture:
+      case RHIObjectType::Texture:
       {
         ezRHITextureHandle hTexture(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHITexture* pTexture = nullptr;
@@ -1531,11 +1558,11 @@ void ezRHIDevice::DestroyDeadObjects()
         m_Textures.Remove(hTexture, &pTexture);
 
         DestroyViews(pTexture);
-        DestroyTexturePlatform(pTexture);
+        //DestroyTexturePlatform(pTexture);
 
         break;
       }
-      case GALObjectType::ResourceView:
+      case RHIObjectType::ResourceView:
       {
         ezRHIResourceViewHandle hResourceView(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHIResourceView* pResourceView = nullptr;
@@ -1548,11 +1575,11 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(pResource->m_ResourceViews.Remove(pResourceView->GetDescription().CalculateHash()), "");
         pResourceView->m_pResource = nullptr;
 
-        DestroyResourceViewPlatform(pResourceView);
+        //DestroyResourceViewPlatform(pResourceView);
 
         break;
       }
-      case GALObjectType::RenderTargetView:
+      case RHIObjectType::RenderTargetView:
       {
         ezRHIRenderTargetViewHandle hRenderTargetView(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHIRenderTargetView* pRenderTargetView = nullptr;
@@ -1564,11 +1591,11 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(pTexture->m_RenderTargetViews.Remove(pRenderTargetView->GetDescription().CalculateHash()), "");
         pRenderTargetView->m_pTexture = nullptr;
 
-        DestroyRenderTargetViewPlatform(pRenderTargetView);
+        //DestroyRenderTargetViewPlatform(pRenderTargetView);
 
         break;
       }
-      case GALObjectType::UnorderedAccessView:
+      case RHIObjectType::UnorderedAccessView:
       {
         ezRHIUnorderedAccessViewHandle hUnorderedAccessViewHandle(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHIUnorderedAccessView* pUnorderedAccesssView = nullptr;
@@ -1581,11 +1608,11 @@ void ezRHIDevice::DestroyDeadObjects()
         EZ_VERIFY(pResource->m_UnorderedAccessViews.Remove(pUnorderedAccesssView->GetDescription().CalculateHash()), "");
         pUnorderedAccesssView->m_pResource = nullptr;
 
-        DestroyUnorderedAccessViewPlatform(pUnorderedAccesssView);
+        //DestroyUnorderedAccessViewPlatform(pUnorderedAccesssView);
 
         break;
       }
-      case GALObjectType::SwapChain:
+      case RHIObjectType::SwapChain:
       {
         ezRHISwapChainHandle hSwapChain(ezRHI::ez16_16Id(deadObject.m_uiHandle));
         ezRHISwapChain* pSwapChain = nullptr;
@@ -1594,34 +1621,34 @@ void ezRHIDevice::DestroyDeadObjects()
 
         if (pSwapChain != nullptr)
         {
-          DestroySwapChainPlatform(pSwapChain);
+          //DestroySwapChainPlatform(pSwapChain);
         }
 
         break;
       }
-      case GALObjectType::Fence:
+      case RHIObjectType::Fence:
       {
         ezRHIFenceHandle hFence(ezRHI::ez20_12Id(deadObject.m_uiHandle));
         ezRHIFence* pFence = nullptr;
 
         m_Fences.Remove(hFence, &pFence);
 
-        DestroyFencePlatform(pFence);
+        //DestroyFencePlatform(pFence);
 
         break;
       }
-      case GALObjectType::Query:
+      case RHIObjectType::Query:
       {
         ezRHIQueryHandle hQuery(ezRHI::ez20_12Id(deadObject.m_uiHandle));
         ezRHIQuery* pQuery = nullptr;
 
         m_Queries.Remove(hQuery, &pQuery);
 
-        DestroyQueryPlatform(pQuery);
+        //DestroyQueryPlatform(pQuery);
 
         break;
       }
-      case GALObjectType::VertexDeclaration:
+      case RHIObjectType::VertexDeclaration:
       {
         ezRHIVertexDeclarationHandle hVertexDeclaration(ezRHI::ez18_14Id(deadObject.m_uiHandle));
         ezRHIVertexDeclaration* pVertexDeclaration = nullptr;
@@ -1629,7 +1656,7 @@ void ezRHIDevice::DestroyDeadObjects()
         m_VertexDeclarations.Remove(hVertexDeclaration, &pVertexDeclaration);
         m_VertexDeclarationTable.Remove(pVertexDeclaration->GetDescription().CalculateHash());
 
-        DestroyVertexDeclarationPlatform(pVertexDeclaration);
+        //DestroyVertexDeclarationPlatform(pVertexDeclaration);
 
         break;
       }
@@ -1639,6 +1666,25 @@ void ezRHIDevice::DestroyDeadObjects()
   }
 
   m_DeadObjects.Clear();
+}
+
+void ezRHIRenderDeviceImpl::FillCapabilities()
+{
+}
+
+void ezRHIRenderDeviceImpl::WaitForIdle()
+{
+  //m_pCommandQueue->Signal(m_pFence, ++m_uiFenceValue);
+  //m_pFence->Wait(m_uiFenceValue);
+}
+
+ezInternal::NewInstance<ezRHIRenderDevice> CreateRenderDevice(ezAllocatorBase* pAllocator, const ezRHIRenderDeviceCreationDescription& desc)
+{
+  return EZ_NEW(pAllocator, ezRHIRenderDeviceImpl, desc);
+}
+
+void DestroyRenderDevice(ezRHIRenderDevice* pRenderDevice)
+{
 }
 
 EZ_STATICLINK_FILE(RendererFoundation, RendererFoundation_Device_Implementation_Device);

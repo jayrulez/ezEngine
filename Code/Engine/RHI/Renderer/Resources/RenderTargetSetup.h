@@ -26,7 +26,7 @@ public:
   void DestroyAllAttachedViews();
 
 protected:
-  ezRHIRenderTargetViewHandle m_hRTs[EZ_GAL_MAX_RENDERTARGET_COUNT];
+  ezRHIRenderTargetViewHandle m_hRTs[EZ_RHI_MAX_RENDERTARGET_COUNT];
   ezRHIRenderTargetViewHandle m_hDSTarget;
 
   ezUInt8 m_uiMaxRTIndex;

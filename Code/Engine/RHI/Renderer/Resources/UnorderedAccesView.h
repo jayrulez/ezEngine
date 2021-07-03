@@ -10,15 +10,15 @@ public:
   EZ_ALWAYS_INLINE ezRHIResourceBase* GetResource() const { return m_pResource; }
 
 protected:
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 
   ezRHIUnorderedAccessView(ezRHIResourceBase* pResource, const ezRHIUnorderedAccessViewCreationDescription& description);
 
   virtual ~ezRHIUnorderedAccessView();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
   ezRHIResourceBase* m_pResource;
 };

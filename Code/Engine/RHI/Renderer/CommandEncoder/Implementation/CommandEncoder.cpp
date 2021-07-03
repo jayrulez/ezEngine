@@ -1,7 +1,7 @@
 #include <RHIPCH.h>
 
 #include <RHI/Renderer/CommandEncoder/CommandEncoder.h>
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDevice.h>
 #include <RHI/Renderer/Resources/Buffer.h>
 #include <RHI/Renderer/Resources/Query.h>
 #include <RHI/Renderer/Resources/RenderTargetView.h>
@@ -23,7 +23,7 @@ void ezRHICommandEncoder::SetShader(ezRHIShaderHandle hShader)
   const ezRHIShader* pShader = m_Device.GetShader(hShader);
   EZ_ASSERT_DEV(pShader != nullptr, "The given shader handle isn't valid, this may be a use after destroy!");
 
-  m_CommonImpl.SetShaderPlatform(pShader);
+  //m_CommonImpl.SetShaderPlatform(pShader);
 
   m_State.m_hShader = hShader;
   CountStateChange();
@@ -32,7 +32,7 @@ void ezRHICommandEncoder::SetShader(ezRHIShaderHandle hShader)
 void ezRHICommandEncoder::SetConstantBuffer(ezUInt32 uiSlot, ezRHIBufferHandle hBuffer)
 {
   AssertRenderingThread();
-  EZ_ASSERT_RELEASE(uiSlot < EZ_GAL_MAX_CONSTANT_BUFFER_COUNT, "Constant buffer slot index too big!");
+  EZ_ASSERT_RELEASE(uiSlot < EZ_RHI_MAX_CONSTANT_BUFFER_COUNT, "Constant buffer slot index too big!");
 
   if (m_State.m_hConstantBuffers[uiSlot] == hBuffer)
   {
@@ -43,7 +43,7 @@ void ezRHICommandEncoder::SetConstantBuffer(ezUInt32 uiSlot, ezRHIBufferHandle h
   const ezRHIBuffer* pBuffer = m_Device.GetBuffer(hBuffer);
   EZ_ASSERT_DEV(pBuffer == nullptr || pBuffer->GetDescription().m_BufferType == ezRHIBufferType::ConstantBuffer, "Wrong buffer type");
 
-  m_CommonImpl.SetConstantBufferPlatform(uiSlot, pBuffer);
+  //m_CommonImpl.SetConstantBufferPlatform(uiSlot, pBuffer);
 
   m_State.m_hConstantBuffers[uiSlot] = hBuffer;
 
@@ -53,7 +53,7 @@ void ezRHICommandEncoder::SetConstantBuffer(ezUInt32 uiSlot, ezRHIBufferHandle h
 void ezRHICommandEncoder::SetSamplerState(ezRHIShaderStage::Enum Stage, ezUInt32 uiSlot, ezRHISamplerStateHandle hSamplerState)
 {
   AssertRenderingThread();
-  EZ_ASSERT_RELEASE(uiSlot < EZ_GAL_MAX_SAMPLER_COUNT, "Sampler state slot index too big!");
+  EZ_ASSERT_RELEASE(uiSlot < EZ_RHI_MAX_SAMPLER_COUNT, "Sampler state slot index too big!");
 
   if (m_State.m_hSamplerStates[Stage][uiSlot] == hSamplerState)
   {
@@ -63,7 +63,7 @@ void ezRHICommandEncoder::SetSamplerState(ezRHIShaderStage::Enum Stage, ezUInt32
 
   const ezRHISamplerState* pSamplerState = m_Device.GetSamplerState(hSamplerState);
 
-  m_CommonImpl.SetSamplerStatePlatform(Stage, uiSlot, pSamplerState);
+  //m_CommonImpl.SetSamplerStatePlatform(Stage, uiSlot, pSamplerState);
 
   m_State.m_hSamplerStates[Stage][uiSlot] = hSamplerState;
 
@@ -88,11 +88,11 @@ void ezRHICommandEncoder::SetResourceView(ezRHIShaderStage::Enum Stage, ezUInt32
   {
     if (UnsetUnorderedAccessViews(pResourceView->GetResource()))
     {
-      m_CommonImpl.FlushPlatform();
+      //m_CommonImpl.FlushPlatform();
     }
   }
 
-  m_CommonImpl.SetResourceViewPlatform(Stage, uiSlot, pResourceView);
+  //m_CommonImpl.SetResourceViewPlatform(Stage, uiSlot, pResourceView);
 
   boundResourceViews.EnsureCount(uiSlot + 1);
   boundResourceViews[uiSlot] = hResourceView;
@@ -121,11 +121,11 @@ void ezRHICommandEncoder::SetUnorderedAccessView(ezUInt32 uiSlot, ezRHIUnordered
   {
     if (UnsetResourceViews(pUnorderedAccessView->GetResource()))
     {
-      m_CommonImpl.FlushPlatform();
+      //m_CommonImpl.FlushPlatform();
     }
   }
 
-  m_CommonImpl.SetUnorderedAccessViewPlatform(uiSlot, pUnorderedAccessView);
+  //m_CommonImpl.SetUnorderedAccessViewPlatform(uiSlot, pUnorderedAccessView);
 
   m_State.m_hUnorderedAccessViews.EnsureCount(uiSlot + 1);
   m_State.m_hUnorderedAccessViews[uiSlot] = hUnorderedAccessView;
@@ -148,7 +148,7 @@ bool ezRHICommandEncoder::UnsetResourceViews(const ezRHIResourceBase* pResource)
     {
       if (m_State.m_pResourcesForResourceViews[stage][uiSlot] == pResource)
       {
-        m_CommonImpl.SetResourceViewPlatform((ezRHIShaderStage::Enum)stage, uiSlot, nullptr);
+        //m_CommonImpl.SetResourceViewPlatform((ezRHIShaderStage::Enum)stage, uiSlot, nullptr);
 
         m_State.m_hResourceViews[stage][uiSlot].Invalidate();
         m_State.m_pResourcesForResourceViews[stage][uiSlot] = nullptr;
@@ -171,7 +171,7 @@ bool ezRHICommandEncoder::UnsetUnorderedAccessViews(const ezRHIResourceBase* pRe
   {
     if (m_State.m_pResourcesForUnorderedAccessViews[uiSlot] == pResource)
     {
-      m_CommonImpl.SetUnorderedAccessViewPlatform(uiSlot, nullptr);
+      //m_CommonImpl.SetUnorderedAccessViewPlatform(uiSlot, nullptr);
 
       m_State.m_hUnorderedAccessViews[uiSlot].Invalidate();
       m_State.m_pResourcesForUnorderedAccessViews[uiSlot] = nullptr;
@@ -187,21 +187,22 @@ void ezRHICommandEncoder::InsertFence(ezRHIFenceHandle hFence)
 {
   AssertRenderingThread();
 
-  m_CommonImpl.InsertFencePlatform(m_Device.GetFence(hFence));
+  //m_CommonImpl.InsertFencePlatform(m_Device.GetFence(hFence));
 }
 
 bool ezRHICommandEncoder::IsFenceReached(ezRHIFenceHandle hFence)
 {
   AssertRenderingThread();
 
-  return m_CommonImpl.IsFenceReachedPlatform(m_Device.GetFence(hFence));
+  //return m_CommonImpl.IsFenceReachedPlatform(m_Device.GetFence(hFence));
+  return false;
 }
 
 void ezRHICommandEncoder::WaitForFence(ezRHIFenceHandle hFence)
 {
   AssertRenderingThread();
 
-  m_CommonImpl.WaitForFencePlatform(m_Device.GetFence(hFence));
+  //m_CommonImpl.WaitForFencePlatform(m_Device.GetFence(hFence));
 }
 
 void ezRHICommandEncoder::BeginQuery(ezRHIQueryHandle hQuery)
@@ -211,7 +212,7 @@ void ezRHICommandEncoder::BeginQuery(ezRHIQueryHandle hQuery)
   auto query = m_Device.GetQuery(hQuery);
   EZ_ASSERT_DEV(!query->m_bStarted, "Can't stat ezRHIQuery because it is already running.");
 
-  m_CommonImpl.BeginQueryPlatform(query);
+  //m_CommonImpl.BeginQueryPlatform(query);
 }
 
 void ezRHICommandEncoder::EndQuery(ezRHIQueryHandle hQuery)
@@ -221,7 +222,7 @@ void ezRHICommandEncoder::EndQuery(ezRHIQueryHandle hQuery)
   auto query = m_Device.GetQuery(hQuery);
   EZ_ASSERT_DEV(query->m_bStarted, "Can't end ezRHIQuery, query hasn't started yet.");
 
-  m_CommonImpl.EndQueryPlatform(query);
+  //m_CommonImpl.EndQueryPlatform(query);
 }
 
 ezResult ezRHICommandEncoder::GetQueryResult(ezRHIQueryHandle hQuery, ezUInt64& uiQueryResult)
@@ -231,14 +232,16 @@ ezResult ezRHICommandEncoder::GetQueryResult(ezRHIQueryHandle hQuery, ezUInt64& 
   auto query = m_Device.GetQuery(hQuery);
   EZ_ASSERT_DEV(!query->m_bStarted, "Can't retrieve data from ezRHIQuery while query is still running.");
 
-  return m_CommonImpl.GetQueryResultPlatform(query, uiQueryResult);
+  //return m_CommonImpl.GetQueryResultPlatform(query, uiQueryResult);
+
+  return EZ_SUCCESS;
 }
 
 ezRHITimestampHandle ezRHICommandEncoder::InsertTimestamp()
 {
   ezRHITimestampHandle hTimestamp = m_Device.GetTimestamp();
 
-  m_CommonImpl.InsertTimestampPlatform(hTimestamp);
+  //m_CommonImpl.InsertTimestampPlatform(hTimestamp);
 
   return hTimestamp;
 }
@@ -254,7 +257,7 @@ void ezRHICommandEncoder::ClearUnorderedAccessView(ezRHIUnorderedAccessViewHandl
     return;
   }
 
-  m_CommonImpl.ClearUnorderedAccessViewPlatform(pUnorderedAccessView, clearValues);
+  //m_CommonImpl.ClearUnorderedAccessViewPlatform(pUnorderedAccessView, clearValues);
 }
 
 void ezRHICommandEncoder::ClearUnorderedAccessView(ezRHIUnorderedAccessViewHandle hUnorderedAccessView, ezVec4U32 clearValues)
@@ -268,7 +271,7 @@ void ezRHICommandEncoder::ClearUnorderedAccessView(ezRHIUnorderedAccessViewHandl
     return;
   }
 
-  m_CommonImpl.ClearUnorderedAccessViewPlatform(pUnorderedAccessView, clearValues);
+  //m_CommonImpl.ClearUnorderedAccessViewPlatform(pUnorderedAccessView, clearValues);
 }
 
 void ezRHICommandEncoder::CopyBuffer(ezRHIBufferHandle hDest, ezRHIBufferHandle hSource)
@@ -280,7 +283,7 @@ void ezRHICommandEncoder::CopyBuffer(ezRHIBufferHandle hDest, ezRHIBufferHandle 
 
   if (pDest != nullptr && pSource != nullptr)
   {
-    m_CommonImpl.CopyBufferPlatform(pDest, pSource);
+    //m_CommonImpl.CopyBufferPlatform(pDest, pSource);
   }
   else
   {
@@ -304,7 +307,7 @@ void ezRHICommandEncoder::CopyBufferRegion(
     EZ_ASSERT_DEV(uiDestSize >= uiDestOffset + uiByteCount, "Destination buffer too small (or offset too big)");
     EZ_ASSERT_DEV(uiSourceSize >= uiSourceOffset + uiByteCount, "Source buffer too small (or offset too big)");
 
-    m_CommonImpl.CopyBufferRegionPlatform(pDest, uiDestOffset, pSource, uiSourceOffset, uiByteCount);
+    //m_CommonImpl.CopyBufferRegionPlatform(pDest, uiDestOffset, pSource, uiSourceOffset, uiByteCount);
   }
   else
   {
@@ -329,7 +332,7 @@ void ezRHICommandEncoder::UpdateBuffer(
     }
 
     EZ_VERIFY(pDest->GetSize() >= (uiDestOffset + pSourceData.GetCount()), "Buffer is too small (or offset too big)");
-    m_CommonImpl.UpdateBufferPlatform(pDest, uiDestOffset, pSourceData, updateMode);
+    //m_CommonImpl.UpdateBufferPlatform(pDest, uiDestOffset, pSourceData, updateMode);
   }
   else
   {
@@ -346,7 +349,7 @@ void ezRHICommandEncoder::CopyTexture(ezRHITextureHandle hDest, ezRHITextureHand
 
   if (pDest != nullptr && pSource != nullptr)
   {
-    m_CommonImpl.CopyTexturePlatform(pDest, pSource);
+    //m_CommonImpl.CopyTexturePlatform(pDest, pSource);
   }
   else
   {
@@ -364,7 +367,7 @@ void ezRHICommandEncoder::CopyTextureRegion(ezRHITextureHandle hDest, const ezRH
 
   if (pDest != nullptr && pSource != nullptr)
   {
-    m_CommonImpl.CopyTextureRegionPlatform(pDest, DestinationSubResource, DestinationPoint, pSource, SourceSubResource, Box);
+    //m_CommonImpl.CopyTextureRegionPlatform(pDest, DestinationSubResource, DestinationPoint, pSource, SourceSubResource, Box);
   }
   else
   {
@@ -381,7 +384,7 @@ void ezRHICommandEncoder::UpdateTexture(ezRHITextureHandle hDest, const ezRHITex
 
   if (pDest != nullptr)
   {
-    m_CommonImpl.UpdateTexturePlatform(pDest, DestinationSubResource, DestinationBox, pSourceData);
+    //m_CommonImpl.UpdateTexturePlatform(pDest, DestinationSubResource, DestinationBox, pSourceData);
   }
   else
   {
@@ -399,7 +402,7 @@ void ezRHICommandEncoder::ResolveTexture(ezRHITextureHandle hDest, const ezRHITe
 
   if (pDest != nullptr && pSource != nullptr)
   {
-    m_CommonImpl.ResolveTexturePlatform(pDest, DestinationSubResource, pSource, SourceSubResource);
+    //m_CommonImpl.ResolveTexturePlatform(pDest, DestinationSubResource, pSource, SourceSubResource);
   }
   else
   {
@@ -418,7 +421,7 @@ void ezRHICommandEncoder::ReadbackTexture(ezRHITextureHandle hTexture)
     EZ_ASSERT_RELEASE(pTexture->GetDescription().m_ResourceAccess.m_bReadBack,
       "A texture supplied to read-back needs to be created with the correct resource usage (m_bReadBack = true)!");
 
-    m_CommonImpl.ReadbackTexturePlatform(pTexture);
+    //m_CommonImpl.ReadbackTexturePlatform(pTexture);
   }
 }
 
@@ -433,7 +436,7 @@ void ezRHICommandEncoder::CopyTextureReadbackResult(ezRHITextureHandle hTexture,
     EZ_ASSERT_RELEASE(pTexture->GetDescription().m_ResourceAccess.m_bReadBack,
       "A texture supplied to read-back needs to be created with the correct resource usage (m_bReadBack = true)!");
 
-    m_CommonImpl.CopyTextureReadbackResultPlatform(pTexture, SourceSubResource, TargetData);
+    //m_CommonImpl.CopyTextureReadbackResultPlatform(pTexture, SourceSubResource, TargetData);
   }
 }
 
@@ -449,7 +452,7 @@ void ezRHICommandEncoder::GenerateMipMaps(ezRHIResourceViewHandle hResourceView)
     EZ_ASSERT_DEV(pTexture->GetDescription().m_bAllowDynamicMipGeneration,
       "Dynamic mip map generation needs to be enabled (m_bAllowDynamicMipGeneration = true)!");
 
-    m_CommonImpl.GenerateMipMapsPlatform(pResourceView);
+    //m_CommonImpl.GenerateMipMapsPlatform(pResourceView);
   }
 }
 
@@ -457,7 +460,7 @@ void ezRHICommandEncoder::Flush()
 {
   AssertRenderingThread();
 
-  m_CommonImpl.FlushPlatform();
+  //m_CommonImpl.FlushPlatform();
 }
 
 // Debug helper functions
@@ -468,14 +471,14 @@ void ezRHICommandEncoder::PushMarker(const char* Marker)
 
   EZ_ASSERT_DEV(Marker != nullptr, "Invalid marker!");
 
-  m_CommonImpl.PushMarkerPlatform(Marker);
+  //m_CommonImpl.PushMarkerPlatform(Marker);
 }
 
 void ezRHICommandEncoder::PopMarker()
 {
   AssertRenderingThread();
 
-  m_CommonImpl.PopMarkerPlatform();
+  //m_CommonImpl.PopMarkerPlatform();
 }
 
 void ezRHICommandEncoder::InsertEventMarker(const char* Marker)
@@ -484,7 +487,7 @@ void ezRHICommandEncoder::InsertEventMarker(const char* Marker)
 
   EZ_ASSERT_DEV(Marker != nullptr, "Invalid marker!");
 
-  m_CommonImpl.InsertEventMarkerPlatform(Marker);
+  //m_CommonImpl.InsertEventMarkerPlatform(Marker);
 }
 
 void ezRHICommandEncoder::ClearStatisticsCounters()
@@ -494,10 +497,9 @@ void ezRHICommandEncoder::ClearStatisticsCounters()
   m_uiRedundantStateChanges = 0;
 }
 
-ezRHICommandEncoder::ezRHICommandEncoder(ezRHIDevice& device, ezRHICommandEncoderState& state, ezRHICommandEncoderCommonPlatformInterface& commonImpl)
+ezRHICommandEncoder::ezRHICommandEncoder(ezRHIRenderDevice& device, ezRHICommandEncoderState& state)
   : m_Device(device)
   , m_State(state)
-  , m_CommonImpl(commonImpl)
 {
 }
 

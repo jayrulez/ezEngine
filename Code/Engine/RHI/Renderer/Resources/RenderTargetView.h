@@ -10,15 +10,15 @@ public:
   EZ_ALWAYS_INLINE ezRHITexture* GetTexture() const { return m_pTexture; }
 
 protected:
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 
   ezRHIRenderTargetView(ezRHITexture* pTexture, const ezRHIRenderTargetViewCreationDescription& description);
 
   virtual ~ezRHIRenderTargetView();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
   ezRHITexture* m_pTexture;
 };

@@ -26,12 +26,12 @@ const ezRHIResourceBase* ezRHIProxyTexture::GetParentResource() const
   return m_pParentTexture;
 }
 
-ezResult ezRHIProxyTexture::InitPlatform(ezRHIDevice* pDevice, ezArrayPtr<ezRHISystemMemoryDescription> pInitialData)
+ezResult ezRHIProxyTexture::InitPlatform(ezRHIRenderDevice* pDevice, ezArrayPtr<ezRHISystemMemoryDescription> pInitialData)
 {
   return EZ_SUCCESS;
 }
 
-ezResult ezRHIProxyTexture::DeInitPlatform(ezRHIDevice* pDevice)
+ezResult ezRHIProxyTexture::DeInitPlatform(ezRHIRenderDevice* pDevice)
 {
   return EZ_SUCCESS;
 }

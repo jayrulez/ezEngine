@@ -64,7 +64,7 @@ void ezRHIPass::EndCompute(ezRHIComputeCommandEncoder* pCommandEncoder)
   EndComputePlatform(pCommandEncoder);
 }
 
-ezRHIPass::ezRHIPass(ezRHIDevice& device)
+ezRHIPass::ezRHIPass(ezRHIRenderDevice& device)
   : m_Device(device)
 {
 }

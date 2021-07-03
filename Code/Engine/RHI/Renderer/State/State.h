@@ -11,9 +11,9 @@ protected:
 
   virtual ~ezRHIBlendState();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 };
 
 class EZ_RHI_DLL ezRHIDepthStencilState : public ezRHIObject<ezRHIDepthStencilStateCreationDescription>
@@ -24,9 +24,9 @@ protected:
 
   virtual ~ezRHIDepthStencilState();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 };
 
 class EZ_RHI_DLL ezRHIRasterizerState : public ezRHIObject<ezRHIRasterizerStateCreationDescription>
@@ -37,9 +37,9 @@ protected:
 
   virtual ~ezRHIRasterizerState();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 };
 
 class EZ_RHI_DLL ezRHISamplerState : public ezRHIObject<ezRHISamplerStateCreationDescription>
@@ -50,7 +50,7 @@ protected:
 
   virtual ~ezRHISamplerState();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 };

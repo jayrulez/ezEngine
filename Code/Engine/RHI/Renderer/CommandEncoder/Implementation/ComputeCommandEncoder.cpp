@@ -1,12 +1,11 @@
 #include <RHIPCH.h>
 
 #include <RHI/Renderer/CommandEncoder/ComputeCommandEncoder.h>
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDevice.h>
 #include <RHI/Renderer/Resources/Buffer.h>
 
-ezRHIComputeCommandEncoder::ezRHIComputeCommandEncoder(ezRHIDevice& device, ezRHICommandEncoderState& state, ezRHICommandEncoderCommonPlatformInterface& commonImpl, ezRHICommandEncoderComputePlatformInterface& computeImpl)
-  : ezRHICommandEncoder(device, state, commonImpl)
-  , m_ComputeImpl(computeImpl)
+ezRHIComputeCommandEncoder::ezRHIComputeCommandEncoder(ezRHIRenderDevice& device, ezRHICommandEncoderState& state)
+  : ezRHICommandEncoder(device, state)
 {
 }
 
@@ -20,7 +19,7 @@ void ezRHIComputeCommandEncoder::Dispatch(ezUInt32 uiThreadGroupCountX, ezUInt32
 
   /// \todo Assert for compute
 
-  m_ComputeImpl.DispatchPlatform(uiThreadGroupCountX, uiThreadGroupCountY, uiThreadGroupCountZ);
+  //m_ComputeImpl.DispatchPlatform(uiThreadGroupCountX, uiThreadGroupCountY, uiThreadGroupCountZ);
 
   CountDispatchCall();
 }
@@ -36,7 +35,7 @@ void ezRHIComputeCommandEncoder::DispatchIndirect(ezRHIBufferHandle hIndirectArg
   EZ_ASSERT_DEV(pBuffer != nullptr, "Invalid buffer handle for indirect arguments!");
 
   /// \todo Assert that the buffer can be used for indirect arguments (flag in desc)
-  m_ComputeImpl.DispatchIndirectPlatform(pBuffer, uiArgumentOffsetInBytes);
+  //m_ComputeImpl.DispatchIndirectPlatform(pBuffer, uiArgumentOffsetInBytes);
 
   CountDispatchCall();
 }

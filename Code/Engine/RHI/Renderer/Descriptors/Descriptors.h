@@ -11,6 +11,8 @@
 #include <RHI/Renderer/Shader/ShaderByteCode.h>
 #include <Texture/Image/ImageEnums.h>
 
+#include <RHI/Instance/BaseTypes.h>
+
 class ezWindowBase;
 
 struct ezRHISwapChainCreationDescription : public ezHashableStruct<ezRHISwapChainCreationDescription>
@@ -26,11 +28,17 @@ struct ezRHISwapChainCreationDescription : public ezHashableStruct<ezRHISwapChai
   bool m_bAllowScreenshots = false;
 };
 
-struct ezRHIDeviceCreationDescription
+struct ezRHIRenderDeviceCreationDescription
 {
   ezRHISwapChainCreationDescription m_PrimarySwapChainDescription;
   bool m_bDebugDevice = false;
   bool m_bCreatePrimarySwapChain = true;
+
+  ApiType m_eApiType = ApiType::kVulkan;
+  bool m_bVsync = true;
+  bool m_bRoundFPS = false;
+  ezUInt32 m_uiRequiredGpuIndex = 0;
+  ezUInt32 m_uiFrameCount = 3;
 };
 
 struct ezRHIShaderCreationDescription : public ezHashableStruct<ezRHIShaderCreationDescription>
@@ -61,7 +69,7 @@ struct ezRHIRenderTargetBlendDescription : public ezHashableStruct<ezRHIRenderTa
 
 struct ezRHIBlendStateCreationDescription : public ezHashableStruct<ezRHIBlendStateCreationDescription>
 {
-  ezRHIRenderTargetBlendDescription m_RenderTargetBlendDescriptions[EZ_GAL_MAX_RENDERTARGET_COUNT];
+  ezRHIRenderTargetBlendDescription m_RenderTargetBlendDescriptions[EZ_RHI_MAX_RENDERTARGET_COUNT];
 
   bool m_bAlphaToCoverage = false;  ///< Alpha-to-coverage can only be used with MSAA render targets. Default is false.
   bool m_bIndependentBlend = false; ///< If disabled, the blend state of the first render target is used for all render targets. Otherwise each
@@ -93,7 +101,7 @@ struct ezRHIDepthStencilStateCreationDescription : public ezHashableStruct<ezRHI
   ezUInt8 m_uiStencilWriteMask = 0xFF;
 };
 
-/// \brief Describes the settings for a new rasterizer state. See ezRHIDevice::CreateRasterizerState
+/// \brief Describes the settings for a new rasterizer state. See ezRHIRenderDevice::CreateRasterizerState
 struct ezRHIRasterizerStateCreationDescription : public ezHashableStruct<ezRHIRasterizerStateCreationDescription>
 {
   ezEnum<ezRHICullMode> m_CullMode = ezRHICullMode::Back; ///< Which sides of a triangle to cull. Default is ezRHICullMode::Back
@@ -337,7 +345,7 @@ struct ezRHIQueryCreationDescription : public ezHashableStruct<ezRHIQueryCreatio
 };
 
 /// \brief Type for important GAL events.
-struct ezRHIDeviceEvent
+struct ezRHIRenderDeviceEvent
 {
   enum Type
   {
@@ -351,7 +359,7 @@ struct ezRHIDeviceEvent
   };
 
   Type m_Type;
-  class ezRHIDevice* m_pDevice;
+  class ezRHIRenderDevice* m_pDevice;
 };
 
 #include <RHI/Renderer/Descriptors/Implementation/Descriptors_inl.h>

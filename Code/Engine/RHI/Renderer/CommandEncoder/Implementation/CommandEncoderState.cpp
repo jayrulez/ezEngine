@@ -22,7 +22,7 @@ void ezRHICommandEncoderState::InvalidateState()
 
   for (ezUInt32 i = 0; i < ezRHIShaderStage::ENUM_COUNT; ++i)
   {
-    for (ezUInt32 j = 0; j < EZ_GAL_MAX_SAMPLER_COUNT; j++)
+    for (ezUInt32 j = 0; j < EZ_RHI_MAX_SAMPLER_COUNT; j++)
     {
       m_hSamplerStates[i][j].Invalidate();
     }

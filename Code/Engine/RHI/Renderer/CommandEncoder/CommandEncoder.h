@@ -2,7 +2,6 @@
 #pragma once
 
 #include <Foundation/Threading/ThreadUtils.h>
-#include <RHI/Renderer/CommandEncoder/CommandEncoderPlatformInterface.h>
 #include <RHI/Renderer/CommandEncoder/CommandEncoderState.h>
 
 class EZ_RHI_DLL ezRHICommandEncoder
@@ -76,12 +75,12 @@ public:
 
   virtual void ClearStatisticsCounters();
 
-  EZ_ALWAYS_INLINE ezRHIDevice& GetDevice() { return m_Device; }
+  EZ_ALWAYS_INLINE ezRHIRenderDevice& GetDevice() { return m_Device; }
 
 protected:
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 
-  ezRHICommandEncoder(ezRHIDevice& device, ezRHICommandEncoderState& state, ezRHICommandEncoderCommonPlatformInterface& commonImpl);
+  ezRHICommandEncoder(ezRHIRenderDevice& device, ezRHICommandEncoderState& state);
   virtual ~ezRHICommandEncoder();
 
   // Don't use light hearted ;)
@@ -99,13 +98,11 @@ private:
   friend class ezMemoryUtils;
 
   // Parent Device
-  ezRHIDevice& m_Device;
+  ezRHIRenderDevice& m_Device;
 
   // Statistic variables
   ezUInt32 m_uiStateChanges = 0;
   ezUInt32 m_uiRedundantStateChanges = 0;
 
   ezRHICommandEncoderState& m_State;
-
-  ezRHICommandEncoderCommonPlatformInterface& m_CommonImpl;
 };

@@ -4,10 +4,10 @@
 #include <RHI/Renderer/Basics.h>
 
 /// \brief This struct holds information about the rendering device capabilities (e.g. what shader stages are supported and more)
-/// To get the device capabilities you need to call the GetCapabilities() function on an ezRHIDevice object.
-struct EZ_RHI_DLL ezRHIDeviceCapabilities
+/// To get the device capabilities you need to call the GetCapabilities() function on an ezRHIRenderDevice object.
+struct EZ_RHI_DLL ezRHIRenderDeviceCapabilities
 {
-  ezRHIDeviceCapabilities();
+  ezRHIRenderDeviceCapabilities();
 
   // Device description
   ezString m_sAdapterName = "Unknown";

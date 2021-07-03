@@ -23,10 +23,10 @@ protected:
   virtual ezRHIComputeCommandEncoder* BeginComputePlatform(const char* szName) = 0;
   virtual void EndComputePlatform(ezRHIComputeCommandEncoder* pCommandEncoder) = 0;
 
-  ezRHIPass(ezRHIDevice& device);
+  ezRHIPass(ezRHIRenderDevice& device);
   virtual ~ezRHIPass();
 
-  ezRHIDevice& m_Device;
+  ezRHIRenderDevice& m_Device;
 
   enum class CommandEncoderType
   {

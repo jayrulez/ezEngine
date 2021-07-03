@@ -7,7 +7,7 @@
 class EZ_RHI_DLL ezRHIRenderCommandEncoder : public ezRHICommandEncoder
 {
 public:
-  ezRHIRenderCommandEncoder(ezRHIDevice& device, ezRHICommandEncoderRenderState& renderState, ezRHICommandEncoderCommonPlatformInterface& commonImpl, ezRHICommandEncoderRenderPlatformInterface& renderImpl);
+  ezRHIRenderCommandEncoder(ezRHIRenderDevice& device, ezRHICommandEncoderRenderState& renderState);
   virtual ~ezRHIRenderCommandEncoder();
 
   // Draw functions
@@ -57,5 +57,5 @@ private:
 
   ezRHICommandEncoderRenderState& m_RenderState;
 
-  ezRHICommandEncoderRenderPlatformInterface& m_RenderImpl;
+  //ezRHICommandEncoderRenderPlatformInterface& m_RenderImpl;
 };

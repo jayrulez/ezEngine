@@ -11,7 +11,7 @@ struct EZ_RHI_DLL ezRHICommandEncoderState
 
   ezRHIShaderHandle m_hShader;
 
-  ezRHIBufferHandle m_hConstantBuffers[EZ_GAL_MAX_CONSTANT_BUFFER_COUNT];
+  ezRHIBufferHandle m_hConstantBuffers[EZ_RHI_MAX_CONSTANT_BUFFER_COUNT];
 
   ezHybridArray<ezRHIResourceViewHandle, 16> m_hResourceViews[ezRHIShaderStage::ENUM_COUNT];
   ezHybridArray<const ezRHIResourceBase*, 16> m_pResourcesForResourceViews[ezRHIShaderStage::ENUM_COUNT];
@@ -19,14 +19,14 @@ struct EZ_RHI_DLL ezRHICommandEncoderState
   ezHybridArray<ezRHIUnorderedAccessViewHandle, 16> m_hUnorderedAccessViews;
   ezHybridArray<const ezRHIResourceBase*, 16> m_pResourcesForUnorderedAccessViews;
 
-  ezRHISamplerStateHandle m_hSamplerStates[ezRHIShaderStage::ENUM_COUNT][EZ_GAL_MAX_SAMPLER_COUNT];
+  ezRHISamplerStateHandle m_hSamplerStates[ezRHIShaderStage::ENUM_COUNT][EZ_RHI_MAX_SAMPLER_COUNT];
 };
 
 struct EZ_RHI_DLL ezRHICommandEncoderRenderState : public ezRHICommandEncoderState
 {
   virtual void InvalidateState() override;
 
-  ezRHIBufferHandle m_hVertexBuffers[EZ_GAL_MAX_VERTEX_BUFFER_COUNT];
+  ezRHIBufferHandle m_hVertexBuffers[EZ_RHI_MAX_VERTEX_BUFFER_COUNT];
   ezRHIBufferHandle m_hIndexBuffer;
 
   ezRHIVertexDeclarationHandle m_hVertexDeclaration;

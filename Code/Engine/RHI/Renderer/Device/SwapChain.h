@@ -17,9 +17,9 @@ protected:
 
   virtual ~ezRHISwapChain();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice);
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice);
 
   ezRHITextureHandle m_hBackBufferTexture;
 };

@@ -7,14 +7,14 @@
 #include <Foundation/Types/RefCounted.h>
 
 // Necessary array sizes
-#define EZ_GAL_MAX_CONSTANT_BUFFER_COUNT 16
-#define EZ_GAL_MAX_SAMPLER_COUNT 16
-#define EZ_GAL_MAX_VERTEX_BUFFER_COUNT 16
-#define EZ_GAL_MAX_RENDERTARGET_COUNT 8
+#define EZ_RHI_MAX_CONSTANT_BUFFER_COUNT 16
+#define EZ_RHI_MAX_SAMPLER_COUNT 16
+#define EZ_RHI_MAX_VERTEX_BUFFER_COUNT 16
+#define EZ_RHI_MAX_RENDERTARGET_COUNT 8
 
 // Forward declarations
 
-struct ezRHIDeviceCreationDescription;
+struct ezRHIRenderDeviceCreationDescription;
 struct ezRHISwapChainCreationDescription;
 struct ezRHIShaderCreationDescription;
 struct ezRHITextureCreationDescription;
@@ -45,7 +45,8 @@ class ezRHISamplerState;
 class ezRHIResourceView;
 class ezRHIRenderTargetView;
 class ezRHIUnorderedAccessView;
-class ezRHIDevice;
+class ezRHIRenderDevice;
+class ezRHIRenderDeviceImpl;
 class ezRHIPass;
 class ezRHICommandEncoder;
 class ezRHIRenderCommandEncoder;
@@ -305,98 +306,98 @@ class ezRHISwapChainHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHISwapChainHandle, ezRHI::ez16_16Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIShaderHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIShaderHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHITextureHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHITextureHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIBufferHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIBufferHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIResourceViewHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIResourceViewHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIUnorderedAccessViewHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIUnorderedAccessViewHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIRenderTargetViewHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIRenderTargetViewHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIDepthStencilStateHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIDepthStencilStateHandle, ezRHI::ez16_16Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIBlendStateHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIBlendStateHandle, ezRHI::ez16_16Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIRasterizerStateHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIRasterizerStateHandle, ezRHI::ez16_16Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHISamplerStateHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHISamplerStateHandle, ezRHI::ez16_16Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIVertexDeclarationHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIVertexDeclarationHandle, ezRHI::ez18_14Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIFenceHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIFenceHandle, ezRHI::ez20_12Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 class ezRHIQueryHandle
 {
   EZ_DECLARE_HANDLE_TYPE(ezRHIQueryHandle, ezRHI::ez20_12Id);
 
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 };
 
 struct ezRHITimestampHandle

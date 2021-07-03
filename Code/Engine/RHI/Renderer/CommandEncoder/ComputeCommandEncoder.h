@@ -2,11 +2,12 @@
 #pragma once
 
 #include <RHI/Renderer/CommandEncoder/CommandEncoder.h>
+#include <RHI/CommandList/CommandList.h>
 
 class EZ_RHI_DLL ezRHIComputeCommandEncoder : public ezRHICommandEncoder
 {
 public:
-  ezRHIComputeCommandEncoder(ezRHIDevice& device, ezRHICommandEncoderState& state, ezRHICommandEncoderCommonPlatformInterface& commonImpl, ezRHICommandEncoderComputePlatformInterface& computeImpl);
+  ezRHIComputeCommandEncoder(ezRHIRenderDevice& device, ezRHICommandEncoderState& state);
   virtual ~ezRHIComputeCommandEncoder();
 
   // Dispatch
@@ -22,5 +23,5 @@ private:
   // Statistic variables
   ezUInt32 m_uiDispatchCalls = 0;
 
-  ezRHICommandEncoderComputePlatformInterface& m_ComputeImpl;
+  std::shared_ptr<CommandList> m_pCommandList;
 };

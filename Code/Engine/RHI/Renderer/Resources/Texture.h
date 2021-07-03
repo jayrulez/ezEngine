@@ -8,15 +8,15 @@ class EZ_RHI_DLL ezRHITexture : public ezRHIResource<ezRHITextureCreationDescrip
 {
 public:
 protected:
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 
   ezRHITexture(const ezRHITextureCreationDescription& Description);
 
   virtual ~ezRHITexture();
 
-  virtual ezResult InitPlatform(ezRHIDevice* pDevice, ezArrayPtr<ezRHISystemMemoryDescription> pInitialData) = 0;
+  virtual ezResult InitPlatform(ezRHIRenderDevice* pDevice, ezArrayPtr<ezRHISystemMemoryDescription> pInitialData) = 0;
 
-  virtual ezResult DeInitPlatform(ezRHIDevice* pDevice) = 0;
+  virtual ezResult DeInitPlatform(ezRHIRenderDevice* pDevice) = 0;
 
   virtual ezResult ReplaceExisitingNativeObject(void* pExisitingNativeObject) = 0;
 };

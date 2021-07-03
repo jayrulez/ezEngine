@@ -1,6 +1,6 @@
 #include <RHIPCH.h>
 
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDevice.h>
 #include <RHI/Renderer/Resources/RenderTargetSetup.h>
 
 ezRHIRenderTargetSetup::ezRHIRenderTargetSetup()
@@ -10,7 +10,7 @@ ezRHIRenderTargetSetup::ezRHIRenderTargetSetup()
 
 ezRHIRenderTargetSetup& ezRHIRenderTargetSetup::SetRenderTarget(ezUInt8 uiIndex, ezRHIRenderTargetViewHandle hRenderTarget)
 {
-  EZ_ASSERT_DEV(uiIndex < EZ_GAL_MAX_RENDERTARGET_COUNT, "Render target index out of bounds - should be less than EZ_GAL_MAX_RENDERTARGET_COUNT");
+  EZ_ASSERT_DEV(uiIndex < EZ_RHI_MAX_RENDERTARGET_COUNT, "Render target index out of bounds - should be less than EZ_RHI_MAX_RENDERTARGET_COUNT");
 
   m_hRTs[uiIndex] = hRenderTarget;
 
@@ -57,7 +57,7 @@ bool ezRHIRenderTargetSetup::operator!=(const ezRHIRenderTargetSetup& other) con
 
 void ezRHIRenderTargetSetup::DestroyAllAttachedViews()
 {
-  ezRHIDevice* pDevice = ezRHIDevice::GetDefaultDevice();
+  ezRHIRenderDevice* pDevice = ezRHIRenderDevice::GetDefaultDevice();
 
   ezArrayPtr<ezRHIRenderTargetViewHandle> colorViews(m_hRTs);
   for (ezRHIRenderTargetViewHandle& hView : colorViews)

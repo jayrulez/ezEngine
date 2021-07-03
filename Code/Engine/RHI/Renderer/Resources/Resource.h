@@ -20,7 +20,7 @@ public:
   virtual const ezRHIResourceBase* GetParentResource() const { return this; }
 
 protected:
-  friend class ezRHIDevice;
+  friend class ezRHIRenderDeviceImpl;
 
   inline ~ezRHIResourceBase()
   {

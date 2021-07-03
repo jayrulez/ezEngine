@@ -1,7 +1,7 @@
 #include <RHIPCH.h>
 
 #include <RHI/Renderer/CommandEncoder/RenderCommandEncoder.h>
-#include <RHI/Renderer/Device/Device.h>
+#include <RHI/Renderer/Device/RenderDevice.h>
 #include <RHI/Renderer/Resources/Buffer.h>
 #include <RHI/Renderer/Resources/Query.h>
 #include <RHI/Renderer/Resources/RenderTargetView.h>
@@ -9,10 +9,9 @@
 #include <RHI/Renderer/Resources/Texture.h>
 #include <RHI/Renderer/Resources/UnorderedAccesView.h>
 
-ezRHIRenderCommandEncoder::ezRHIRenderCommandEncoder(ezRHIDevice& device, ezRHICommandEncoderRenderState& renderState, ezRHICommandEncoderCommonPlatformInterface& commonImpl, ezRHICommandEncoderRenderPlatformInterface& renderImpl)
-  : ezRHICommandEncoder(device, renderState, commonImpl)
+ezRHIRenderCommandEncoder::ezRHIRenderCommandEncoder(ezRHIRenderDevice& device, ezRHICommandEncoderRenderState& renderState)
+  : ezRHICommandEncoder(device, renderState)
   , m_RenderState(renderState)
-  , m_RenderImpl(renderImpl)
 {
 }
 
@@ -22,7 +21,7 @@ void ezRHIRenderCommandEncoder::Clear(const ezColor& ClearColor, ezUInt32 uiRend
 {
   AssertRenderingThread();
 
-  m_RenderImpl.ClearPlatform(ClearColor, uiRenderTargetClearMask, bClearDepth, bClearStencil, fDepthClear, uiStencilClear);
+  //m_RenderImpl.ClearPlatform(ClearColor, uiRenderTargetClearMask, bClearDepth, bClearStencil, fDepthClear, uiStencilClear);
 }
 
 void ezRHIRenderCommandEncoder::Draw(ezUInt32 uiVertexCount, ezUInt32 uiStartVertex)
@@ -32,7 +31,7 @@ void ezRHIRenderCommandEncoder::Draw(ezUInt32 uiVertexCount, ezUInt32 uiStartVer
   /// \todo If platform indicates that non-indexed rendering is not possible bind a helper index buffer which contains continuous indices
   /// (0, 1, 2, ..)
 
-  m_RenderImpl.DrawPlatform(uiVertexCount, uiStartVertex);
+ // m_RenderImpl.DrawPlatform(uiVertexCount, uiStartVertex);
 
   CountDrawCall();
 }
@@ -41,7 +40,7 @@ void ezRHIRenderCommandEncoder::DrawIndexed(ezUInt32 uiIndexCount, ezUInt32 uiSt
 {
   AssertRenderingThread();
 
-  m_RenderImpl.DrawIndexedPlatform(uiIndexCount, uiStartIndex);
+  //m_RenderImpl.DrawIndexedPlatform(uiIndexCount, uiStartIndex);
 
   CountDrawCall();
 }
@@ -51,7 +50,7 @@ void ezRHIRenderCommandEncoder::DrawIndexedInstanced(ezUInt32 uiIndexCountPerIns
   AssertRenderingThread();
   /// \todo Assert for instancing
 
-  m_RenderImpl.DrawIndexedInstancedPlatform(uiIndexCountPerInstance, uiInstanceCount, uiStartIndex);
+  //m_RenderImpl.DrawIndexedInstancedPlatform(uiIndexCountPerInstance, uiInstanceCount, uiStartIndex);
 
   CountDrawCall();
 }
@@ -67,7 +66,7 @@ void ezRHIRenderCommandEncoder::DrawIndexedInstancedIndirect(ezRHIBufferHandle h
   EZ_ASSERT_DEV(pBuffer != nullptr, "Invalid buffer handle for indirect arguments!");
 
   /// \todo Assert that the buffer can be used for indirect arguments (flag in desc)
-  m_RenderImpl.DrawIndexedInstancedIndirectPlatform(pBuffer, uiArgumentOffsetInBytes);
+  //m_RenderImpl.DrawIndexedInstancedIndirectPlatform(pBuffer, uiArgumentOffsetInBytes);
 
   CountDrawCall();
 }
@@ -80,7 +79,7 @@ void ezRHIRenderCommandEncoder::DrawInstanced(ezUInt32 uiVertexCountPerInstance,
   /// \todo If platform indicates that non-indexed rendering is not possible bind a helper index buffer which contains continuous indices
   /// (0, 1, 2, ..)
 
-  m_RenderImpl.DrawInstancedPlatform(uiVertexCountPerInstance, uiInstanceCount, uiStartVertex);
+  //m_RenderImpl.DrawInstancedPlatform(uiVertexCountPerInstance, uiInstanceCount, uiStartVertex);
 
   CountDrawCall();
 }
@@ -96,7 +95,7 @@ void ezRHIRenderCommandEncoder::DrawInstancedIndirect(ezRHIBufferHandle hIndirec
   EZ_ASSERT_DEV(pBuffer != nullptr, "Invalid buffer handle for indirect arguments!");
 
   /// \todo Assert that the buffer can be used for indirect arguments (flag in desc)
-  m_RenderImpl.DrawInstancedIndirectPlatform(pBuffer, uiArgumentOffsetInBytes);
+  //m_RenderImpl.DrawInstancedIndirectPlatform(pBuffer, uiArgumentOffsetInBytes);
 
   CountDrawCall();
 }
@@ -106,7 +105,7 @@ void ezRHIRenderCommandEncoder::DrawAuto()
   AssertRenderingThread();
   /// \todo Assert for draw auto support
 
-  m_RenderImpl.DrawAutoPlatform();
+  //m_RenderImpl.DrawAutoPlatform();
 
   CountDrawCall();
 }
@@ -116,14 +115,14 @@ void ezRHIRenderCommandEncoder::BeginStreamOut()
   AssertRenderingThread();
   /// \todo Assert for streamout support
 
-  m_RenderImpl.BeginStreamOutPlatform();
+  //m_RenderImpl.BeginStreamOutPlatform();
 }
 
 void ezRHIRenderCommandEncoder::EndStreamOut()
 {
   AssertRenderingThread();
 
-  m_RenderImpl.EndStreamOutPlatform();
+  //m_RenderImpl.EndStreamOutPlatform();
 }
 
 void ezRHIRenderCommandEncoder::SetIndexBuffer(ezRHIBufferHandle hIndexBuffer)
@@ -138,7 +137,7 @@ void ezRHIRenderCommandEncoder::SetIndexBuffer(ezRHIBufferHandle hIndexBuffer)
   /// \todo Assert on index buffer type (if non nullptr)
   // Note that GL4 can bind arbitrary buffer to arbitrary binding points (index/vertex/transform-feedback/indirect-draw/...)
 
-  m_RenderImpl.SetIndexBufferPlatform(pBuffer);
+  //m_RenderImpl.SetIndexBufferPlatform(pBuffer);
 
   m_RenderState.m_hIndexBuffer = hIndexBuffer;
   CountStateChange();
@@ -156,7 +155,7 @@ void ezRHIRenderCommandEncoder::SetVertexBuffer(ezUInt32 uiSlot, ezRHIBufferHand
   // Assert on vertex buffer type (if non-zero)
   // Note that GL4 can bind arbitrary buffer to arbitrary binding points (index/vertex/transform-feedback/indirect-draw/...)
 
-  m_RenderImpl.SetVertexBufferPlatform(uiSlot, pBuffer);
+  //m_RenderImpl.SetVertexBufferPlatform(uiSlot, pBuffer);
 
   m_RenderState.m_hVertexBuffers[uiSlot] = hVertexBuffer;
   CountStateChange();
@@ -172,7 +171,7 @@ void ezRHIRenderCommandEncoder::SetPrimitiveTopology(ezRHIPrimitiveTopology::Enu
     return;
   }
 
-  m_RenderImpl.SetPrimitiveTopologyPlatform(Topology);
+  //m_RenderImpl.SetPrimitiveTopologyPlatform(Topology);
 
   m_RenderState.m_Topology = Topology;
 
@@ -192,7 +191,7 @@ void ezRHIRenderCommandEncoder::SetVertexDeclaration(ezRHIVertexDeclarationHandl
   const ezRHIVertexDeclaration* pVertexDeclaration = GetDevice().GetVertexDeclaration(hVertexDeclaration);
   // Assert on vertex buffer type (if non-zero)
 
-  m_RenderImpl.SetVertexDeclarationPlatform(pVertexDeclaration);
+  //m_RenderImpl.SetVertexDeclarationPlatform(pVertexDeclaration);
 
   m_RenderState.m_hVertexDeclaration = hVertexDeclaration;
 
@@ -211,7 +210,7 @@ void ezRHIRenderCommandEncoder::SetBlendState(ezRHIBlendStateHandle hBlendState,
 
   const ezRHIBlendState* pBlendState = GetDevice().GetBlendState(hBlendState);
 
-  m_RenderImpl.SetBlendStatePlatform(pBlendState, BlendFactor, uiSampleMask);
+  //m_RenderImpl.SetBlendStatePlatform(pBlendState, BlendFactor, uiSampleMask);
 
   m_RenderState.m_hBlendState = hBlendState;
   m_RenderState.m_BlendFactor = BlendFactor;
@@ -232,7 +231,7 @@ void ezRHIRenderCommandEncoder::SetDepthStencilState(ezRHIDepthStencilStateHandl
 
   const ezRHIDepthStencilState* pDepthStencilState = GetDevice().GetDepthStencilState(hDepthStencilState);
 
-  m_RenderImpl.SetDepthStencilStatePlatform(pDepthStencilState, uiStencilRefValue);
+  //m_RenderImpl.SetDepthStencilStatePlatform(pDepthStencilState, uiStencilRefValue);
 
   m_RenderState.m_hDepthStencilState = hDepthStencilState;
   m_RenderState.m_uiStencilRefValue = uiStencilRefValue;
@@ -252,7 +251,7 @@ void ezRHIRenderCommandEncoder::SetRasterizerState(ezRHIRasterizerStateHandle hR
 
   const ezRHIRasterizerState* pRasterizerState = GetDevice().GetRasterizerState(hRasterizerState);
 
-  m_RenderImpl.SetRasterizerStatePlatform(pRasterizerState);
+  //m_RenderImpl.SetRasterizerStatePlatform(pRasterizerState);
 
   m_RenderState.m_hRasterizerState = hRasterizerState;
 
@@ -269,7 +268,7 @@ void ezRHIRenderCommandEncoder::SetViewport(const ezRectFloat& rect, float fMinD
     return;
   }
 
-  m_RenderImpl.SetViewportPlatform(rect, fMinDepth, fMaxDepth);
+  //m_RenderImpl.SetViewportPlatform(rect, fMinDepth, fMaxDepth);
 
   m_RenderState.m_ViewPortRect = rect;
   m_RenderState.m_fViewPortMinDepth = fMinDepth;
@@ -288,7 +287,7 @@ void ezRHIRenderCommandEncoder::SetScissorRect(const ezRectU32& rect)
     return;
   }
 
-  m_RenderImpl.SetScissorRectPlatform(rect);
+  //m_RenderImpl.SetScissorRectPlatform(rect);
 
   m_RenderState.m_ScissorRect = rect;
 
