@@ -16,7 +16,6 @@
 #  define EZ_RHI_DLL
 #endif
 
-
 struct EZ_RHI_DLL ezRHIResourceFormat
 {
   typedef ezUInt32 StorageType;

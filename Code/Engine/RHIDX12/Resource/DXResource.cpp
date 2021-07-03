@@ -87,9 +87,9 @@ void DXResource::BindMemory(const std::shared_ptr<Memory>& memory, uint64_t offs
     IID_PPV_ARGS(&resource));
 }
 
-uint32_t DXResource::GetWidth() const
+uint64_t DXResource::GetWidth() const
 {
-  return (ezUInt32)desc.Width;
+  return desc.Width;
 }
 
 uint32_t DXResource::GetHeight() const
