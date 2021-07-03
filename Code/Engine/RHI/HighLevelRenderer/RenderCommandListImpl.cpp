@@ -87,7 +87,7 @@ void RenderCommandListImpl::UpdateDefaultSubresource(const std::shared_ptr<Resou
   {
     case ResourceType::kBuffer:
     {
-      ezUInt32 buffer_size = resource->GetWidth();
+      ezUInt32 buffer_size = (ezUInt32)resource->GetWidth();
       if (!upload_resource)
       {
         upload_resource = m_device.CreateBuffer(BindFlag::kCopySource, buffer_size);
@@ -108,7 +108,7 @@ void RenderCommandListImpl::UpdateDefaultSubresource(const std::shared_ptr<Resou
       auto& region = regions.emplace_back();
       region.texture_mip_level = subresource % resource->GetLevelCount();
       region.texture_array_layer = subresource / resource->GetLevelCount();
-      region.texture_extent.width = std::max<uint32_t>(1, resource->GetWidth() >> region.texture_mip_level);
+      region.texture_extent.width = std::max<uint32_t>(1, (ezUInt32)resource->GetWidth() >> region.texture_mip_level);
       region.texture_extent.height = std::max<uint32_t>(1, resource->GetHeight() >> region.texture_mip_level);
       region.texture_extent.depth = 1;
 

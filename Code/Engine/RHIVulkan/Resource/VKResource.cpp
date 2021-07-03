@@ -44,7 +44,7 @@ void VKResource::BindMemory(const std::shared_ptr<Memory>& memory, uint64_t offs
     }
 }
 
-uint32_t VKResource::GetWidth() const
+uint64_t VKResource::GetWidth() const
 {
     if (resource_type == ResourceType::kTexture)
         return image.size.width;

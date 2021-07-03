@@ -23,7 +23,7 @@ public:
     virtual ResourceType GetResourceType() const = 0;
     virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
     virtual MemoryType GetMemoryType() const = 0;
-    virtual uint32_t GetWidth() const = 0;
+    virtual uint64_t GetWidth() const = 0;
     virtual uint32_t GetHeight() const = 0;
     virtual uint16_t GetLayerCount() const = 0;
     virtual uint16_t GetLevelCount() const = 0;

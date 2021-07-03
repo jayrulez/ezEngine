@@ -116,7 +116,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
   renderDeviceDesc.api_type = apiType;
   renderDeviceDesc.frame_count = frame_count;
   renderDeviceDesc.round_fps = true;
-  renderDeviceDesc.vsync = true;
+  renderDeviceDesc.vsync = false;
 
   device = CreateRenderDevice(renderDeviceDesc, m_pWindow);
 
@@ -192,11 +192,9 @@ ezApplication::Execution ezRHISampleApp::Run()
 
   // do the rendering
   {
-
-    auto width = m_pWindow->GetCreationDescription().m_Resolution.width;
-
+    auto frame_index = device->GetFrameIndex();
     RenderPassBeginDesc render_pass_desc = {};
-    render_pass_desc.colors[m_program->ps.om.rtv0].texture = device->GetBackBuffer(device->GetFrameIndex());
+    render_pass_desc.colors[m_program->ps.om.rtv0].texture = device->GetBackBuffer(frame_index);
     render_pass_desc.colors[m_program->ps.om.rtv0].clear_color = {0.0f, 0.2f, 0.4f, 1.0f};
 
     decltype(auto) command_list = device->CreateRenderCommandList();
@@ -209,7 +207,6 @@ ezApplication::Execution ezRHISampleApp::Run()
     command_list->DrawIndexed(3, 1, 0, 0, 0);
     command_list->EndRenderPass();
     command_list->Close();
-    //command_lists.emplace_back(command_list);
 
 
     device->ExecuteCommandLists({command_list});
