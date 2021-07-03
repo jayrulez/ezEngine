@@ -5,8 +5,7 @@
 #include <RHIDX12/Instance/DXInstance.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <Foundation/IO/OSFile.h>
-//#include <directx/d3d12.h>
-#include <DirectX-Headers/include/directx/d3d12.h>
+#include <directx/d3d12.h>
 #include <dxgi1_6.h>
 #include <filesystem>
 

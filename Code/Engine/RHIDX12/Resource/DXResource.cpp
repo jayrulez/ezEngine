@@ -2,8 +2,7 @@
 #include <RHIDX12/Memory/DXMemory.h>
 #include <RHIDX12/Resource/DXResource.h>
 #include <RHIDX12/Utilities/DXUtility.h>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 #include <optional>
 
 std::optional<D3D12_CLEAR_VALUE> GetClearValue(const D3D12_RESOURCE_DESC& desc)

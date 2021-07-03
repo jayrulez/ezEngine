@@ -2,8 +2,7 @@
 #include <RHIDX12/Fence/DXFence.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <dxgi1_6.h>
-//#include <directx/d3d12.h>
-#include <DirectX-Headers/include/directx/d3d12.h>
+#include <directx/d3d12.h>
 
 DXFence::DXFence(DXDevice& device, uint64_t initial_value)
   : m_device(device)

@@ -1,8 +1,7 @@
 #pragma once
 #include <RHIDX12/Pipeline/DXPipeline.h>
 #include <RHI/Instance/BaseTypes.h>
-//#include <directx/d3d12.h>
-#include <DirectX-Headers/include/directx/d3d12.h>
+#include <directx/d3d12.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 

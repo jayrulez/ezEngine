@@ -6,8 +6,7 @@
 #include <map>
 #include <memory>
 #include <wrl.h>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 using namespace Microsoft::WRL;
 
 class DXDevice;

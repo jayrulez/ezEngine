@@ -5,8 +5,7 @@
 #include <deque>
 #include <set>
 #include <stdexcept>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 
 DXProgram::DXProgram(DXDevice& device, const std::vector<std::shared_ptr<Shader>>& shaders)
     : ProgramBase(shaders)

@@ -2,10 +2,8 @@
 #include <RHIDX12/QueryHeap/DXRayTracingQueryHeap.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <dxgi1_6.h>
-//#include <directx/d3d12.h>
-#include <DirectX-Headers/include/directx/d3d12.h>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3d12.h>
+#include <directx/d3dx12.h>
 
 DXRayTracingQueryHeap::DXRayTracingQueryHeap(DXDevice& device, QueryHeapType type, uint32_t count)
   : m_device(device)

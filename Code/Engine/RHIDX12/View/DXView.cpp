@@ -2,8 +2,7 @@
 #include <RHIDX12/Device/DXDevice.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <cassert>
-//#include <directx/d3d12.h>
-#include <DirectX-Headers/include/directx/d3d12.h>
+#include <directx/d3d12.h>
 
 DXView::DXView(DXDevice& device, const std::shared_ptr<DXResource>& resource, const ViewDesc& m_view_desc)
     : m_device(device)
