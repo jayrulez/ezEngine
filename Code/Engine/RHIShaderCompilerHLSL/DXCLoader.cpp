@@ -62,10 +62,7 @@ std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType
   std::vector<wchar_t> prev_dll_dir(GetDllDirectoryW(0, nullptr));
   GetDllDirectoryW(static_cast<DWORD>(prev_dll_dir.size()), prev_dll_dir.data());
 
-  // ScopeGuard guard = [&]
-  //{
-  //  SetDllDirectoryW(prev_dll_dir.data());
-  //};
+  EZ_SCOPE_EXIT(SetDllDirectoryW(prev_dll_dir.data()));
 
   SetDllDirectoryW(std::filesystem::u8path(path).wstring().c_str());
 
