@@ -4,8 +4,7 @@
 #include <RHIDX12/Program/DXProgram.h>
 #include <deque>
 #include <stdexcept>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 
 D3D12_SHADER_VISIBILITY GetVisibility(ShaderType shader_type)
 {

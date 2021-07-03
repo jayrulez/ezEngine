@@ -1,7 +1,6 @@
 #include <RHIDX12/CPUDescriptorPool/DXCPUDescriptorPoolTyped.h>
 #include <RHIDX12/Device/DXDevice.h>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 
 DXCPUDescriptorPoolTyped::DXCPUDescriptorPoolTyped(DXDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type)
     : m_device(device)

@@ -1,10 +1,10 @@
-#include "Swapchain/DXSwapchain.h"
-#include <Adapter/DXAdapter.h>
-#include <Device/DXDevice.h>
-#include <CommandQueue/DXCommandQueue.h>
-#include <Instance/DXInstance.h>
-#include <Resource/DXResource.h>
-#include <Utilities/DXUtility.h>
+#include <RHIDX12/Swapchain/DXSwapchain.h>
+#include <RHIDX12/Adapter/DXAdapter.h>
+#include <RHIDX12/Device/DXDevice.h>
+#include <RHIDX12/CommandQueue/DXCommandQueue.h>
+#include <RHIDX12/Instance/DXInstance.h>
+#include <RHIDX12/Resource/DXResource.h>
+#include <RHIDX12/Utilities/DXUtility.h>
 
 DXSwapchain::DXSwapchain(DXCommandQueue& command_queue, Window window, uint32_t width, uint32_t height, uint32_t frame_count, bool vsync)
     : m_command_queue(command_queue)

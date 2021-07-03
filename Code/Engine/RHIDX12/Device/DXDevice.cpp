@@ -18,8 +18,7 @@
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <RHIDX12/View/DXView.h>
 #include <dxgi1_6.h>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 
 D3D12_RESOURCE_STATES ConvertState(ResourceState state)
 {

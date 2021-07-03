@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-//#include <directx/d3d12.h>
-#include <DirectX-Headers/include/directx/d3d12.h>
+#include <directx/d3d12.h>
 
 class DXStateBuilder
 {

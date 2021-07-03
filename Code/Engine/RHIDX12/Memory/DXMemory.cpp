@@ -1,7 +1,6 @@
 #include <RHIDX12/Memory/DXMemory.h>
 #include <RHIDX12/Device/DXDevice.h>
-//#include <directx/d3dx12.h>
-#include <DirectX-Headers/include/directx/d3dx12.h>
+#include <directx/d3dx12.h>
 
 DXMemory::DXMemory(DXDevice& device, uint64_t size, MemoryType memory_type, uint32_t memory_type_bits)
     : m_memory_type(memory_type)
