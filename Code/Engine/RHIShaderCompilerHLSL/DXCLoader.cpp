@@ -63,9 +63,9 @@ std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType
   GetDllDirectoryW(static_cast<DWORD>(prev_dll_dir.size()), prev_dll_dir.data());
 
   // ScopeGuard guard = [&]
-  {
-    SetDllDirectoryW(prev_dll_dir.data());
-  };
+  //{
+  //  SetDllDirectoryW(prev_dll_dir.data());
+  //};
 
   SetDllDirectoryW(std::filesystem::u8path(path).wstring().c_str());
 
