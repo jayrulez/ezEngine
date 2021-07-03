@@ -54,17 +54,21 @@ public:
   static GPUTimingScope& AllocateScope() { return m_TimingScopes.ExpandAndGetRef(); }
 
 private:
-  static void OnEngineStartup() { ezRHIRenderDevice::GetDefaultDevice()->m_Events.AddEventHandler(&GPUProfilingSystem::ProcessTimestamps); }
+  static void OnEngineStartup() {
+    //ezRHIRenderDevice::GetDefaultDevice()->m_Events.AddEventHandler(&GPUProfilingSystem::ProcessTimestamps);
+  }
 
-  static void OnEngineShutdown() { ezRHIRenderDevice::GetDefaultDevice()->m_Events.RemoveEventHandler(&GPUProfilingSystem::ProcessTimestamps); }
+  static void OnEngineShutdown() {
+    //ezRHIRenderDevice::GetDefaultDevice()->m_Events.RemoveEventHandler(&GPUProfilingSystem::ProcessTimestamps);
+  }
 
   static ezDeque<GPUTimingScope, ezStaticAllocatorWrapper> m_TimingScopes;
 
-  EZ_MAKE_SUBSYSTEM_STARTUP_FRIEND(RendererFoundation, GPUProfilingSystem);
+  EZ_MAKE_SUBSYSTEM_STARTUP_FRIEND(RHI, GPUProfilingSystem);
 };
 
 // clang-format off
-EZ_BEGIN_SUBSYSTEM_DECLARATION(RendererFoundation, GPUProfilingSystem)
+EZ_BEGIN_SUBSYSTEM_DECLARATION(RHI, GPUProfilingSystem)
 
   BEGIN_SUBSYSTEM_DEPENDENCIES
     "Foundation",
@@ -108,5 +112,3 @@ ezProfilingScopeAndMarker::~ezProfilingScopeAndMarker()
 }
 
 #endif
-
-EZ_STATICLINK_FILE(RendererFoundation, RendererFoundation_Profiling_Implementation_Profiling);
