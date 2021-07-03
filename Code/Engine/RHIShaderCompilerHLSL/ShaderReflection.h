@@ -6,4 +6,4 @@
 #include <string>
 #include <vector>
 
-EZ_RHISHADERCOMPILERHLSL_DLL std::shared_ptr<ShaderReflection> CreateShaderReflection(ShaderBlobType type, const void* data, size_t size);
+EZ_RHISHADERCOMPILERHLSL_DLL ezSharedPtr<ShaderReflection> CreateShaderReflection(ShaderBlobType type, const void* data, size_t size);

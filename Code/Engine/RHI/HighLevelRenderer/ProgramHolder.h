@@ -11,7 +11,7 @@
 template<ShaderType, typename T> class ShaderHolderImpl {};
 
 template<typename T>
-class ShaderHolderImpl<ShaderType::kPixel, T>
+class ShaderHolderImpl<ShaderType::kPixel, T> : public ezRefCounted
 {
 public:
     struct Api : public T
@@ -178,7 +178,7 @@ public:
         CompileShaders();
     }
 
-    operator std::shared_ptr<Program>& ()
+    operator ezSharedPtr<Program>& ()
     {
         return m_program;
     }
@@ -212,5 +212,5 @@ private:
     }
 
     RenderDevice& m_device;
-    std::shared_ptr<Program> m_program;
+    ezSharedPtr<Program> m_program;
 };

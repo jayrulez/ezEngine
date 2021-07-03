@@ -29,7 +29,7 @@ CreatorFuncInfo* GetCreatorFuncInfo(ApiType type)
   return pFuncInfo;
 }
 
-std::shared_ptr<Instance> InstanceFactory::CreateInstance(ApiType type)
+ezSharedPtr<Instance> InstanceFactory::CreateInstance(ApiType type)
 {
   if (auto pFuncInfo = GetCreatorFuncInfo(type))
   {
@@ -57,3 +57,7 @@ void InstanceFactory::UnregisterCreatorFunc(ApiType type)
 {
   EZ_VERIFY(s_CreatorFuncs.Remove(type), "Creator func not registered");
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Instance_Instance);
+

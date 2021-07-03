@@ -241,7 +241,7 @@ void ezRHISampleApp::OnResize(ezUInt32 width, ezUInt32 height)
   //command_queue->Signal(fence, ++fence_value);
   //fence->Wait(fence_value);
 
-  swapchain.reset();
+  swapchain.Clear();
   swapchain = device->CreateSwapchain(m_pWindow->GetNativeWindowHandle(), width, height, frame_count, renderDeviceDesc.vsync);
   frame_index = 0;
 }
@@ -269,15 +269,15 @@ ezApplication::Execution ezRHISampleApp::Run()
     ViewDesc back_buffer_view_desc = {};
     back_buffer_view_desc.view_type = ViewType::kRenderTarget;
     back_buffer_view_desc.dimension = ViewDimension::kTexture2D;
-    std::shared_ptr<Resource> back_buffer = swapchain->GetBackBuffer(frame_index);
-    std::shared_ptr<View> back_buffer_view = device->CreateView(back_buffer, back_buffer_view_desc);
+    ezSharedPtr<Resource> back_buffer = swapchain->GetBackBuffer(frame_index);
+    ezSharedPtr<View> back_buffer_view = device->CreateView(back_buffer, back_buffer_view_desc);
     FramebufferDesc framebuffer_desc = {};
     framebuffer_desc.render_pass = render_pass;
     framebuffer_desc.width = m_pWindow->GetClientAreaSize().width;
     framebuffer_desc.height = m_pWindow->GetClientAreaSize().height;
     framebuffer_desc.colors = {back_buffer_view};
-    std::shared_ptr<Framebuffer> framebuffer = device->CreateFramebuffer(framebuffer_desc);
-    std::shared_ptr<CommandList> command_list = device->CreateCommandList(CommandListType::kGraphics);
+    ezSharedPtr<Framebuffer> framebuffer = device->CreateFramebuffer(framebuffer_desc);
+    ezSharedPtr<CommandList> command_list = device->CreateCommandList(CommandListType::kGraphics);
     command_list->BindPipeline(pipeline);
     command_list->BindBindingSet(binding_set);
     command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);

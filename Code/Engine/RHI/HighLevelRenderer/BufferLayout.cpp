@@ -8,11 +8,11 @@ ViewProvider::ViewProvider(RenderDevice& device, const uint8_t* src_data, Buffer
 {
 }
 
-std::shared_ptr<ResourceLazyViewDesc> ViewProvider::GetView(RenderCommandList& command_list)
+ezSharedPtr<ResourceLazyViewDesc> ViewProvider::GetView(RenderCommandList& command_list)
 {
     if (SyncData() || !m_last_view)
     {
-        std::shared_ptr<Resource> resource;
+        ezSharedPtr<Resource> resource;
         if (!m_free_resources.empty())
         {
             resource = m_free_resources.back();
@@ -23,7 +23,7 @@ std::shared_ptr<ResourceLazyViewDesc> ViewProvider::GetView(RenderCommandList& c
             resource = m_device.CreateBuffer(BindFlag::kConstantBuffer, static_cast<uint32_t>(m_layout.dst_buffer_size), MemoryType::kUpload);
         }
         resource->UpdateUploadBuffer(0, m_dst_data.data(), m_dst_data.size());
-        m_last_view = std::make_shared<ResourceLazyViewDesc>(*this, resource);
+        m_last_view = EZ_DEFAULT_NEW(ResourceLazyViewDesc, *this, resource);
     }
     return m_last_view;
 }
@@ -48,3 +48,7 @@ bool ViewProvider::SyncData()
     }
     return dirty;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_HighLevelRenderer_BufferLayout);
+

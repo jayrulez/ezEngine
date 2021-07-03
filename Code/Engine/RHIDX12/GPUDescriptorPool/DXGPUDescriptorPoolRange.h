@@ -12,10 +12,10 @@ using namespace Microsoft::WRL;
 class DXDevice;
 class DXGPUDescriptorPoolTyped;
 
-class DXGPUDescriptorPoolRange
+class DXGPUDescriptorPoolRange : public ezRefCounted
 {
 public:
-  using Ptr = std::shared_ptr<DXGPUDescriptorPoolRange>;
+  using Ptr = ezSharedPtr<DXGPUDescriptorPoolRange>;
   DXGPUDescriptorPoolRange(
     DXGPUDescriptorPoolTyped& pool,
     DXDevice& device,

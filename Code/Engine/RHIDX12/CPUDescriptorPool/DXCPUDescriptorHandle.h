@@ -10,7 +10,7 @@ using namespace Microsoft::WRL;
 
 class DXDevice;
 
-class DXCPUDescriptorHandle
+class DXCPUDescriptorHandle : public ezRefCounted
 {
 public:
     DXCPUDescriptorHandle(

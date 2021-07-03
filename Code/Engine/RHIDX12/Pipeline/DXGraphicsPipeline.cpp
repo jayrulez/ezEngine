@@ -242,7 +242,7 @@ DXGraphicsPipeline::DXGraphicsPipeline(DXDevice& device, const GraphicsPipelineD
   EZ_ASSERT_ALWAYS(device2->CreatePipelineState(&psDesc, IID_PPV_ARGS(&m_pipeline_state)) == S_OK, "");
 }
 
-void DXGraphicsPipeline::ParseInputLayout(const std::shared_ptr<Shader>& shader)
+void DXGraphicsPipeline::ParseInputLayout(const ezSharedPtr<Shader>& shader)
 {
   for (auto& vertex : m_desc.input)
   {

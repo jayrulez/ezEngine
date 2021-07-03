@@ -12,7 +12,7 @@ public:
     DXResource(DXDevice& device);
 
     void CommitMemory(MemoryType memory_type) override;
-    void BindMemory(const std::shared_ptr<Memory>& memory, uint64_t offset) override;
+    void BindMemory(const ezSharedPtr<Memory>& memory, uint64_t offset) override;
     uint64_t GetWidth() const override;
     uint32_t GetHeight() const override;
     uint16_t GetLayerCount() const override;

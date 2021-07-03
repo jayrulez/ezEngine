@@ -18,9 +18,9 @@ const std::string& DXAdapter::GetName() const
     return m_name;
 }
 
-std::shared_ptr<Device> DXAdapter::CreateDevice()
+ezSharedPtr<Device> DXAdapter::CreateDevice()
 {
-    return std::make_shared<DXDevice>(*this);
+  return EZ_DEFAULT_NEW(DXDevice, *this);
 }
 
 DXInstance& DXAdapter::GetInstance()

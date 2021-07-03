@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <directx/d3dx12.h>
 
-DXProgram::DXProgram(DXDevice& device, const std::vector<std::shared_ptr<Shader>>& shaders)
+DXProgram::DXProgram(DXDevice& device, const std::vector<ezSharedPtr<Shader>>& shaders)
     : ProgramBase(shaders)
 {
 }

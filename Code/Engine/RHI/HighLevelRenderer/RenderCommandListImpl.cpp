@@ -7,7 +7,7 @@ RenderCommandListImpl::RenderCommandListImpl(Device& device, ObjectCache& object
   m_command_list = m_device.CreateCommandList(type);
 }
 
-const std::shared_ptr<CommandList>& RenderCommandListImpl::GetCommandList()
+const ezSharedPtr<CommandList>& RenderCommandListImpl::GetCommandList()
 {
   return m_command_list;
 }
@@ -23,7 +23,7 @@ void RenderCommandListImpl::Reset()
   m_bound_deferred_view.clear();
   m_binding_sets.clear();
   m_resource_lazy_view_descs.clear();
-  m_shading_rate_image.reset();
+  m_shading_rate_image.Clear();
   m_command_list->Reset();
 
   m_graphic_pipeline_desc = {};
@@ -37,7 +37,7 @@ void RenderCommandListImpl::Close()
     m_command_list->Close();
 }
 
-void RenderCommandListImpl::CopyBuffer(const std::shared_ptr<Resource>& src_buffer, const std::shared_ptr<Resource>& dst_buffer,
+void RenderCommandListImpl::CopyBuffer(const ezSharedPtr<Resource>& src_buffer, const ezSharedPtr<Resource>& dst_buffer,
   const std::vector<BufferCopyRegion>& regions)
 {
   for (const auto& region : regions)
@@ -48,7 +48,7 @@ void RenderCommandListImpl::CopyBuffer(const std::shared_ptr<Resource>& src_buff
   m_command_list->CopyBuffer(src_buffer, dst_buffer, regions);
 }
 
-void RenderCommandListImpl::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buffer, const std::shared_ptr<Resource>& dst_texture,
+void RenderCommandListImpl::CopyBufferToTexture(const ezSharedPtr<Resource>& src_buffer, const ezSharedPtr<Resource>& dst_texture,
   const std::vector<BufferToTextureCopyRegion>& regions)
 {
   for (const auto& region : regions)
@@ -59,7 +59,7 @@ void RenderCommandListImpl::CopyBufferToTexture(const std::shared_ptr<Resource>&
   m_command_list->CopyBufferToTexture(src_buffer, dst_texture, regions);
 }
 
-void RenderCommandListImpl::CopyTexture(const std::shared_ptr<Resource>& src_texture, const std::shared_ptr<Resource>& dst_texture, const std::vector<TextureCopyRegion>& regions)
+void RenderCommandListImpl::CopyTexture(const ezSharedPtr<Resource>& src_texture, const ezSharedPtr<Resource>& dst_texture, const std::vector<TextureCopyRegion>& regions)
 {
   for (const auto& region : regions)
   {
@@ -69,7 +69,7 @@ void RenderCommandListImpl::CopyTexture(const std::shared_ptr<Resource>& src_tex
   m_command_list->CopyTexture(src_texture, dst_texture, regions);
 }
 
-void RenderCommandListImpl::UpdateSubresource(const std::shared_ptr<Resource>& resource, uint32_t subresource, const void* data, uint32_t row_pitch, uint32_t depth_pitch)
+void RenderCommandListImpl::UpdateSubresource(const ezSharedPtr<Resource>& resource, uint32_t subresource, const void* data, uint32_t row_pitch, uint32_t depth_pitch)
 {
   switch (resource->GetMemoryType())
   {
@@ -80,9 +80,9 @@ void RenderCommandListImpl::UpdateSubresource(const std::shared_ptr<Resource>& r
   }
 }
 
-void RenderCommandListImpl::UpdateDefaultSubresource(const std::shared_ptr<Resource>& resource, uint32_t subresource, const void* data, uint32_t row_pitch, uint32_t depth_pitch)
+void RenderCommandListImpl::UpdateDefaultSubresource(const ezSharedPtr<Resource>& resource, uint32_t subresource, const void* data, uint32_t row_pitch, uint32_t depth_pitch)
 {
-  std::shared_ptr<Resource>& upload_resource = m_cmd_resources.emplace_back();
+  ezSharedPtr<Resource>& upload_resource = m_cmd_resources.emplace_back();
 
   switch (resource->GetResourceType())
   {
@@ -146,19 +146,19 @@ void RenderCommandListImpl::SetScissorRect(int32_t left, int32_t top, uint32_t r
   m_command_list->SetScissorRect(left, top, right, bottom);
 }
 
-void RenderCommandListImpl::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format)
+void RenderCommandListImpl::IASetIndexBuffer(const ezSharedPtr<Resource>& resource, ezRHIResourceFormat::Enum format)
 {
   BufferBarrier(resource, ResourceState::kIndexBuffer);
   m_command_list->IASetIndexBuffer(resource, format);
 }
 
-void RenderCommandListImpl::IASetVertexBuffer(uint32_t slot, const std::shared_ptr<Resource>& resource)
+void RenderCommandListImpl::IASetVertexBuffer(uint32_t slot, const ezSharedPtr<Resource>& resource)
 {
   BufferBarrier(resource, ResourceState::kVertexAndConstantBuffer);
   m_command_list->IASetVertexBuffer(slot, resource);
 }
 
-void RenderCommandListImpl::RSSetShadingRateImage(const std::shared_ptr<View>& view)
+void RenderCommandListImpl::RSSetShadingRateImage(const ezSharedPtr<View>& view)
 {
   ViewBarrier(view, ResourceState::kShadingRateSource);
   m_shading_rate_image = view;
@@ -186,14 +186,14 @@ void RenderCommandListImpl::DrawIndexed(uint32_t index_count, uint32_t instance_
   m_command_list->DrawIndexed(index_count, instance_count, first_index, vertex_offset, first_instance);
 }
 
-void RenderCommandListImpl::DrawIndirect(const std::shared_ptr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
+void RenderCommandListImpl::DrawIndirect(const ezSharedPtr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
 {
   Apply();
   BufferBarrier(argument_buffer, ResourceState::kIndirectArgument);
   m_command_list->DrawIndirect(argument_buffer, argument_buffer_offset);
 }
 
-void RenderCommandListImpl::DrawIndexedIndirect(const std::shared_ptr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
+void RenderCommandListImpl::DrawIndexedIndirect(const ezSharedPtr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
 {
   Apply();
   BufferBarrier(argument_buffer, ResourceState::kIndirectArgument);
@@ -201,9 +201,9 @@ void RenderCommandListImpl::DrawIndexedIndirect(const std::shared_ptr<Resource>&
 }
 
 void RenderCommandListImpl::DrawIndirectCount(
-  const std::shared_ptr<Resource>& argument_buffer,
+  const ezSharedPtr<Resource>& argument_buffer,
   uint64_t argument_buffer_offset,
-  const std::shared_ptr<Resource>& count_buffer,
+  const ezSharedPtr<Resource>& count_buffer,
   uint64_t count_buffer_offset,
   uint32_t max_draw_count,
   uint32_t stride)
@@ -220,9 +220,9 @@ void RenderCommandListImpl::DrawIndirectCount(
 }
 
 void RenderCommandListImpl::DrawIndexedIndirectCount(
-  const std::shared_ptr<Resource>& argument_buffer,
+  const ezSharedPtr<Resource>& argument_buffer,
   uint64_t argument_buffer_offset,
-  const std::shared_ptr<Resource>& count_buffer,
+  const ezSharedPtr<Resource>& count_buffer,
   uint64_t count_buffer_offset,
   uint32_t max_draw_count,
   uint32_t stride)
@@ -244,7 +244,7 @@ void RenderCommandListImpl::Dispatch(uint32_t thread_group_count_x, uint32_t thr
   m_command_list->Dispatch(thread_group_count_x, thread_group_count_y, thread_group_count_z);
 }
 
-void RenderCommandListImpl::DispatchIndirect(const std::shared_ptr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
+void RenderCommandListImpl::DispatchIndirect(const ezSharedPtr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
 {
   Apply();
   BufferBarrier(argument_buffer, ResourceState::kIndirectArgument);
@@ -263,7 +263,7 @@ void RenderCommandListImpl::DispatchRays(uint32_t width, uint32_t height, uint32
   m_command_list->DispatchRays(m_shader_tables, width, height, depth);
 }
 
-void RenderCommandListImpl::BufferBarrier(const std::shared_ptr<Resource>& resource, ResourceState state)
+void RenderCommandListImpl::BufferBarrier(const ezSharedPtr<Resource>& resource, ResourceState state)
 {
   if (!resource)
     return;
@@ -273,14 +273,14 @@ void RenderCommandListImpl::BufferBarrier(const std::shared_ptr<Resource>& resou
   LazyResourceBarrier({barrier});
 }
 
-void RenderCommandListImpl::ViewBarrier(const std::shared_ptr<View>& view, ResourceState state)
+void RenderCommandListImpl::ViewBarrier(const ezSharedPtr<View>& view, ResourceState state)
 {
   if (!view || !view->GetResource())
     return;
   ImageBarrier(view->GetResource(), view->GetBaseMipLevel(), view->GetLevelCount(), view->GetBaseArrayLayer(), view->GetLayerCount(), state);
 }
 
-void RenderCommandListImpl::ImageBarrier(const std::shared_ptr<Resource>& resource, uint32_t base_mip_level, uint32_t level_count, uint32_t base_array_layer, uint32_t layer_count, ResourceState state)
+void RenderCommandListImpl::ImageBarrier(const ezSharedPtr<Resource>& resource, uint32_t base_mip_level, uint32_t level_count, uint32_t base_array_layer, uint32_t layer_count, ResourceState state)
 {
   if (!resource)
     return;
@@ -294,7 +294,7 @@ void RenderCommandListImpl::ImageBarrier(const std::shared_ptr<Resource>& resour
   LazyResourceBarrier({barrier});
 }
 
-void RenderCommandListImpl::BuildBottomLevelAS(const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::vector<RaytracingGeometryDesc>& descs, BuildAccelerationStructureFlags flags)
+void RenderCommandListImpl::BuildBottomLevelAS(const ezSharedPtr<Resource>& src, const ezSharedPtr<Resource>& dst, const std::vector<RaytracingGeometryDesc>& descs, BuildAccelerationStructureFlags flags)
 {
   for (const auto& desc : descs)
   {
@@ -312,7 +312,7 @@ void RenderCommandListImpl::BuildBottomLevelAS(const std::shared_ptr<Resource>& 
   m_cmd_resources.emplace_back(scratch);
 }
 
-void RenderCommandListImpl::BuildTopLevelAS(const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::vector<std::pair<std::shared_ptr<Resource>, ezMat4>>& geometry, BuildAccelerationStructureFlags flags)
+void RenderCommandListImpl::BuildTopLevelAS(const ezSharedPtr<Resource>& src, const ezSharedPtr<Resource>& dst, const std::vector<std::pair<ezSharedPtr<Resource>, ezMat4>>& geometry, BuildAccelerationStructureFlags flags)
 {
   std::vector<RaytracingGeometryInstance> instances;
   for (const auto& mesh : geometry)
@@ -339,12 +339,12 @@ void RenderCommandListImpl::BuildTopLevelAS(const std::shared_ptr<Resource>& src
   m_cmd_resources.emplace_back(instance_data);
 }
 
-void RenderCommandListImpl::CopyAccelerationStructure(const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, CopyAccelerationStructureMode mode)
+void RenderCommandListImpl::CopyAccelerationStructure(const ezSharedPtr<Resource>& src, const ezSharedPtr<Resource>& dst, CopyAccelerationStructureMode mode)
 {
   m_command_list->CopyAccelerationStructure(src, dst, mode);
 }
 
-void RenderCommandListImpl::UseProgram(const std::shared_ptr<Program>& program)
+void RenderCommandListImpl::UseProgram(const ezSharedPtr<Program>& program)
 {
   m_program = program;
   m_layout = m_object_cache.GetBindingSetLayout(m_program->GetBindings());
@@ -421,7 +421,7 @@ void RenderCommandListImpl::UseProgram(const std::shared_ptr<Program>& program)
   m_bound_deferred_view.clear();
 }
 
-void RenderCommandListImpl::CreateShaderTable(std::shared_ptr<Pipeline> pipeline)
+void RenderCommandListImpl::CreateShaderTable(ezSharedPtr<Pipeline> pipeline)
 {
   decltype(auto) shader_handles = pipeline->GetRayTracingShaderGroupHandles(0, (ezUInt32)m_ray_tracing_pipeline_desc.groups.size());
 
@@ -520,12 +520,12 @@ void RenderCommandListImpl::ApplyBindingSet()
     desc.view = x.second;
   }
 
-  std::shared_ptr<BindingSet> binding_set = m_object_cache.GetBindingSet(m_layout, descs);
+  ezSharedPtr<BindingSet> binding_set = m_object_cache.GetBindingSet(m_layout, descs);
   m_command_list->BindBindingSet(binding_set);
   m_binding_sets.emplace_back(binding_set);
 }
 
-void RenderCommandListImpl::SetBinding(const BindKey& bind_key, const std::shared_ptr<View>& view)
+void RenderCommandListImpl::SetBinding(const BindKey& bind_key, const ezSharedPtr<View>& view)
 {
   auto it = m_bound_resources.find(bind_key);
   if (it == m_bound_resources.end())
@@ -572,7 +572,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
     render_pass_desc.shading_rate_format = ezRHIResourceFormat::UNKNOWN;
   }
 
-  std::vector<std::shared_ptr<View>> rtvs;
+  std::vector<ezSharedPtr<View>> rtvs;
   for (ezUInt32 i = 0; i < (ezUInt32)desc.colors.size(); ++i)
   {
     auto& view = rtvs.emplace_back();
@@ -586,7 +586,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
     ViewBarrier(view, ResourceState::kRenderTarget);
   }
 
-  std::shared_ptr<View> dsv;
+  ezSharedPtr<View> dsv;
   if (desc.depth_stencil.texture)
   {
     BindKey bind_key = {ShaderType::kPixel, ViewType::kDepthStencil, 0, 0};
@@ -594,7 +594,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
     ViewBarrier(dsv, ResourceState::kDepthStencilWrite);
   }
 
-  std::shared_ptr<RenderPass> render_pass = m_object_cache.GetRenderPass(render_pass_desc);
+  ezSharedPtr<RenderPass> render_pass = m_object_cache.GetRenderPass(render_pass_desc);
   m_graphic_pipeline_desc.render_pass = render_pass;
 
   FramebufferDesc framebuffer_desc = {};
@@ -604,7 +604,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
   framebuffer_desc.colors = rtvs;
   framebuffer_desc.depth_stencil = dsv;
   framebuffer_desc.shading_rate_image = m_shading_rate_image;
-  std::shared_ptr<Framebuffer> framebuffer = m_object_cache.GetFramebuffer(framebuffer_desc);
+  ezSharedPtr<Framebuffer> framebuffer = m_object_cache.GetFramebuffer(framebuffer_desc);
   m_framebuffers.emplace_back(framebuffer);
 
   std::array<ShadingRateCombiner, 2> combiners = {
@@ -627,17 +627,17 @@ void RenderCommandListImpl::EndRenderPass()
   m_command_list->EndRenderPass();
 }
 
-void RenderCommandListImpl::Attach(const BindKey& bind_key, const std::shared_ptr<DeferredView>& view)
+void RenderCommandListImpl::Attach(const BindKey& bind_key, const ezSharedPtr<DeferredView>& view)
 {
   m_bound_deferred_view[bind_key] = view;
 }
 
-void RenderCommandListImpl::Attach(const BindKey& bind_key, const std::shared_ptr<Resource>& resource, const LazyViewDesc& view_desc)
+void RenderCommandListImpl::Attach(const BindKey& bind_key, const ezSharedPtr<Resource>& resource, const LazyViewDesc& view_desc)
 {
   Attach(bind_key, m_object_cache.GetView(m_program, bind_key, resource, view_desc));
 }
 
-void RenderCommandListImpl::Attach(const BindKey& bind_key, const std::shared_ptr<View>& view)
+void RenderCommandListImpl::Attach(const BindKey& bind_key, const ezSharedPtr<View>& view)
 {
   SetBinding(bind_key, view);
   switch (bind_key.view_type)
@@ -674,7 +674,7 @@ void RenderCommandListImpl::SetDepthStencilState(const DepthStencilDesc& desc)
   m_graphic_pipeline_desc.depth_stencil_desc = desc;
 }
 
-void RenderCommandListImpl::OnAttachSRV(const BindKey& bind_key, const std::shared_ptr<View>& view)
+void RenderCommandListImpl::OnAttachSRV(const BindKey& bind_key, const ezSharedPtr<View>& view)
 {
   if (bind_key.shader_type == ShaderType::kPixel)
     ViewBarrier(view, ResourceState::kPixelShaderResource);
@@ -682,12 +682,12 @@ void RenderCommandListImpl::OnAttachSRV(const BindKey& bind_key, const std::shar
     ViewBarrier(view, ResourceState::kNonPixelShaderResource);
 }
 
-void RenderCommandListImpl::OnAttachUAV(const BindKey& bind_key, const std::shared_ptr<View>& view)
+void RenderCommandListImpl::OnAttachUAV(const BindKey& bind_key, const ezSharedPtr<View>& view)
 {
   ViewBarrier(view, ResourceState::kUnorderedAccess);
 }
 
-ResourceStateTracker& RenderCommandListImpl::GetResourceStateTracker(const std::shared_ptr<Resource>& resource)
+ResourceStateTracker& RenderCommandListImpl::GetResourceStateTracker(const ezSharedPtr<Resource>& resource)
 {
   auto it = m_resource_state_tracker.find(resource);
   if (it == m_resource_state_tracker.end())
@@ -695,7 +695,7 @@ ResourceStateTracker& RenderCommandListImpl::GetResourceStateTracker(const std::
   return it->second;
 }
 
-const std::map<std::shared_ptr<Resource>, ResourceStateTracker>& RenderCommandListImpl::GetResourceStateTrackers() const
+const std::map<ezSharedPtr<Resource>, ResourceStateTracker>& RenderCommandListImpl::GetResourceStateTrackers() const
 {
   return m_resource_state_tracker;
 }
@@ -757,3 +757,7 @@ uint64_t& RenderCommandListImpl::GetFenceValue()
 {
   return m_fence_value;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_HighLevelRenderer_RenderCommandListImpl);
+

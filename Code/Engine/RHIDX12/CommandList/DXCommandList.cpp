@@ -49,10 +49,10 @@ void DXCommandList::Reset()
   EZ_ASSERT_ALWAYS(m_command_list->Reset(m_command_allocator.Get(), nullptr) == S_OK, "");
   m_closed = false;
   m_heaps.clear();
-  m_state.reset();
-  m_binding_set.reset();
+  m_state.Clear();
+  m_binding_set.Clear();
   m_lazy_vertex.clear();
-  m_shading_rate_image_view.reset();
+  m_shading_rate_image_view.Clear();
 }
 
 void DXCommandList::Close()
@@ -64,11 +64,11 @@ void DXCommandList::Close()
   }
 }
 
-void DXCommandList::BindPipeline(const std::shared_ptr<Pipeline>& state)
+void DXCommandList::BindPipeline(const ezSharedPtr<Pipeline>& state)
 {
   if (state == m_state)
     return;
-  m_state = std::static_pointer_cast<DXPipeline>(state);
+  m_state = state.Downcast<DXPipeline>();
   m_command_list->SetComputeRootSignature(m_state->GetRootSignature().Get());
   auto type = m_state->GetPipelineType();
   if (type == PipelineType::kGraphics)
@@ -98,7 +98,7 @@ void DXCommandList::BindPipeline(const std::shared_ptr<Pipeline>& state)
   }
 }
 
-void DXCommandList::BindBindingSet(const std::shared_ptr<BindingSet>& binding_set)
+void DXCommandList::BindBindingSet(const ezSharedPtr<BindingSet>& binding_set)
 {
   if (binding_set == m_binding_set)
     return;
@@ -108,7 +108,7 @@ void DXCommandList::BindBindingSet(const std::shared_ptr<BindingSet>& binding_se
   m_binding_set = binding_set;
 }
 
-void DXCommandList::BeginRenderPass(const std::shared_ptr<RenderPass>& render_pass, const std::shared_ptr<Framebuffer>& framebuffer, const ClearDesc& clear_desc)
+void DXCommandList::BeginRenderPass(const ezSharedPtr<RenderPass>& render_pass, const ezSharedPtr<Framebuffer>& framebuffer, const ClearDesc& clear_desc)
 {
   if (m_device.IsRenderPassesSupported())
   {
@@ -164,14 +164,14 @@ D3D12_RENDER_PASS_ENDING_ACCESS_TYPE Convert(RenderPassStoreOp op)
   return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_DISCARD;
 }
 
-void DXCommandList::BeginRenderPassImpl(const std::shared_ptr<RenderPass>& render_pass, const std::shared_ptr<Framebuffer>& framebuffer, const ClearDesc& clear_desc)
+void DXCommandList::BeginRenderPassImpl(const ezSharedPtr<RenderPass>& render_pass, const ezSharedPtr<Framebuffer>& framebuffer, const ClearDesc& clear_desc)
 {
   decltype(auto) dx_render_pass = render_pass->As<DXRenderPass>();
   decltype(auto) dx_framebuffer = framebuffer->As<DXFramebuffer>();
   auto& rtvs = dx_framebuffer.GetDesc().colors;
   auto& dsv = dx_framebuffer.GetDesc().depth_stencil;
 
-  auto get_handle = [](const std::shared_ptr<View>& view) {
+  auto get_handle = [](const ezSharedPtr<View>& view) {
     if (!view)
       return D3D12_CPU_DESCRIPTOR_HANDLE{};
     decltype(auto) dx_view = view->As<DXView>();
@@ -214,7 +214,7 @@ void DXCommandList::BeginRenderPassImpl(const std::shared_ptr<RenderPass>& rende
   m_command_list4->BeginRenderPass(static_cast<uint32_t>(om_rtv.size()), om_rtv.data(), om_dsv_ptr, D3D12_RENDER_PASS_FLAG_NONE);
 }
 
-void DXCommandList::OMSetFramebuffer(const std::shared_ptr<RenderPass>& render_pass, const std::shared_ptr<Framebuffer>& framebuffer, const ClearDesc& clear_desc)
+void DXCommandList::OMSetFramebuffer(const ezSharedPtr<RenderPass>& render_pass, const ezSharedPtr<Framebuffer>& framebuffer, const ClearDesc& clear_desc)
 {
   decltype(auto) dx_render_pass = render_pass->As<DXRenderPass>();
   decltype(auto) dx_framebuffer = framebuffer->As<DXFramebuffer>();
@@ -222,7 +222,7 @@ void DXCommandList::OMSetFramebuffer(const std::shared_ptr<RenderPass>& render_p
   auto& dsv = dx_framebuffer.GetDesc().depth_stencil;
 
   std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> om_rtv(rtvs.size());
-  auto get_handle = [](const std::shared_ptr<View>& view) {
+  auto get_handle = [](const ezSharedPtr<View>& view) {
     if (!view)
       return D3D12_CPU_DESCRIPTOR_HANDLE{};
     decltype(auto) dx_view = view->As<DXView>();
@@ -285,9 +285,9 @@ void DXCommandList::DrawIndexed(uint32_t index_count, uint32_t instance_count, u
 
 void DXCommandList::ExecuteIndirect(
   D3D12_INDIRECT_ARGUMENT_TYPE type,
-  const std::shared_ptr<Resource>& argument_buffer,
+  const ezSharedPtr<Resource>& argument_buffer,
   uint64_t argument_buffer_offset,
-  const std::shared_ptr<Resource>& count_buffer,
+  const ezSharedPtr<Resource>& count_buffer,
   uint64_t count_buffer_offset,
   uint32_t max_draw_count,
   uint32_t stride)
@@ -311,20 +311,20 @@ void DXCommandList::ExecuteIndirect(
     count_buffer_offset);
 }
 
-void DXCommandList::DrawIndirect(const std::shared_ptr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
+void DXCommandList::DrawIndirect(const ezSharedPtr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
 {
   DrawIndirectCount(argument_buffer, argument_buffer_offset, {}, 0, 1, sizeof(DrawIndirectCommand));
 }
 
-void DXCommandList::DrawIndexedIndirect(const std::shared_ptr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
+void DXCommandList::DrawIndexedIndirect(const ezSharedPtr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
 {
   DrawIndexedIndirectCount(argument_buffer, argument_buffer_offset, {}, 0, 1, sizeof(DrawIndexedIndirectCommand));
 }
 
 void DXCommandList::DrawIndirectCount(
-  const std::shared_ptr<Resource>& argument_buffer,
+  const ezSharedPtr<Resource>& argument_buffer,
   uint64_t argument_buffer_offset,
-  const std::shared_ptr<Resource>& count_buffer,
+  const ezSharedPtr<Resource>& count_buffer,
   uint64_t count_buffer_offset,
   uint32_t max_draw_count,
   uint32_t stride)
@@ -340,9 +340,9 @@ void DXCommandList::DrawIndirectCount(
 }
 
 void DXCommandList::DrawIndexedIndirectCount(
-  const std::shared_ptr<Resource>& argument_buffer,
+  const ezSharedPtr<Resource>& argument_buffer,
   uint64_t argument_buffer_offset,
-  const std::shared_ptr<Resource>& count_buffer,
+  const ezSharedPtr<Resource>& count_buffer,
   uint64_t count_buffer_offset,
   uint32_t max_draw_count,
   uint32_t stride)
@@ -362,7 +362,7 @@ void DXCommandList::Dispatch(uint32_t thread_group_count_x, uint32_t thread_grou
   m_command_list->Dispatch(thread_group_count_x, thread_group_count_y, thread_group_count_z);
 }
 
-void DXCommandList::DispatchIndirect(const std::shared_ptr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
+void DXCommandList::DispatchIndirect(const ezSharedPtr<Resource>& argument_buffer, uint64_t argument_buffer_offset)
 {
   ExecuteIndirect(
     D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH,
@@ -458,7 +458,7 @@ void DXCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
     m_command_list->ResourceBarrier((ezUInt32)dx_barriers.size(), dx_barriers.data());
 }
 
-void DXCommandList::UAVResourceBarrier(const std::shared_ptr<Resource>& resource)
+void DXCommandList::UAVResourceBarrier(const ezSharedPtr<Resource>& resource)
 {
   D3D12_RESOURCE_BARRIER uav_barrier = {};
   uav_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -488,7 +488,7 @@ void DXCommandList::SetScissorRect(int32_t left, int32_t top, uint32_t right, ui
   m_command_list->RSSetScissorRects(1, &rect);
 }
 
-void DXCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format)
+void DXCommandList::IASetIndexBuffer(const ezSharedPtr<Resource>& resource, ezRHIResourceFormat::Enum format)
 {
   DXGI_FORMAT dx_format = DXUtils::ToDXGIFormat(format); //static_cast<DXGI_FORMAT>(gli::dx().translate(format).DXGIFormat.DDS);
   decltype(auto) dx_resource = resource->As<DXResource>();
@@ -499,7 +499,7 @@ void DXCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, 
   m_command_list->IASetIndexBuffer(&index_buffer_view);
 }
 
-void DXCommandList::IASetVertexBuffer(uint32_t slot, const std::shared_ptr<Resource>& resource)
+void DXCommandList::IASetVertexBuffer(uint32_t slot, const ezSharedPtr<Resource>& resource)
 {
   if (m_state && m_state->GetPipelineType() == PipelineType::kGraphics)
   {
@@ -514,7 +514,7 @@ void DXCommandList::IASetVertexBuffer(uint32_t slot, const std::shared_ptr<Resou
   m_lazy_vertex[slot] = resource;
 }
 
-void DXCommandList::IASetVertexBufferImpl(uint32_t slot, const std::shared_ptr<Resource>& resource, uint32_t stride)
+void DXCommandList::IASetVertexBufferImpl(uint32_t slot, const ezSharedPtr<Resource>& resource, uint32_t stride)
 {
   D3D12_VERTEX_BUFFER_VIEW vertex_buffer_view = {};
   if (resource)
@@ -532,7 +532,7 @@ void DXCommandList::RSSetShadingRate(ShadingRate shading_rate, const std::array<
   m_command_list5->RSSetShadingRate(static_cast<D3D12_SHADING_RATE>(shading_rate), reinterpret_cast<const D3D12_SHADING_RATE_COMBINER*>(combiners.data()));
 }
 
-void DXCommandList::BuildAccelerationStructure(D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS& inputs, const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::shared_ptr<Resource>& scratch, uint64_t scratch_offset)
+void DXCommandList::BuildAccelerationStructure(D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS& inputs, const ezSharedPtr<Resource>& src, const ezSharedPtr<Resource>& dst, const ezSharedPtr<Resource>& scratch, uint64_t scratch_offset)
 {
   decltype(auto) dx_dst = dst->As<DXResource>();
   decltype(auto) dx_scratch = scratch->As<DXResource>();
@@ -551,9 +551,9 @@ void DXCommandList::BuildAccelerationStructure(D3D12_BUILD_RAYTRACING_ACCELERATI
 }
 
 void DXCommandList::BuildBottomLevelAS(
-  const std::shared_ptr<Resource>& src,
-  const std::shared_ptr<Resource>& dst,
-  const std::shared_ptr<Resource>& scratch,
+  const ezSharedPtr<Resource>& src,
+  const ezSharedPtr<Resource>& dst,
+  const ezSharedPtr<Resource>& scratch,
   uint64_t scratch_offset,
   const std::vector<RaytracingGeometryDesc>& descs,
   BuildAccelerationStructureFlags flags)
@@ -573,11 +573,11 @@ void DXCommandList::BuildBottomLevelAS(
 }
 
 void DXCommandList::BuildTopLevelAS(
-  const std::shared_ptr<Resource>& src,
-  const std::shared_ptr<Resource>& dst,
-  const std::shared_ptr<Resource>& scratch,
+  const ezSharedPtr<Resource>& src,
+  const ezSharedPtr<Resource>& dst,
+  const ezSharedPtr<Resource>& scratch,
   uint64_t scratch_offset,
-  const std::shared_ptr<Resource>& instance_data,
+  const ezSharedPtr<Resource>& instance_data,
   uint64_t instance_offset,
   uint32_t instance_count,
   BuildAccelerationStructureFlags flags)
@@ -592,7 +592,7 @@ void DXCommandList::BuildTopLevelAS(
   BuildAccelerationStructure(inputs, src, dst, scratch, scratch_offset);
 }
 
-void DXCommandList::CopyAccelerationStructure(const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, CopyAccelerationStructureMode mode)
+void DXCommandList::CopyAccelerationStructure(const ezSharedPtr<Resource>& src, const ezSharedPtr<Resource>& dst, CopyAccelerationStructureMode mode)
 {
   decltype(auto) dx_src = src->As<DXResource>();
   decltype(auto) dx_dst = dst->As<DXResource>();
@@ -614,7 +614,7 @@ void DXCommandList::CopyAccelerationStructure(const std::shared_ptr<Resource>& s
     dx_mode);
 }
 
-void DXCommandList::CopyBuffer(const std::shared_ptr<Resource>& src_buffer, const std::shared_ptr<Resource>& dst_buffer,
+void DXCommandList::CopyBuffer(const ezSharedPtr<Resource>& src_buffer, const ezSharedPtr<Resource>& dst_buffer,
   const std::vector<BufferCopyRegion>& regions)
 {
   decltype(auto) dx_src_buffer = src_buffer->As<DXResource>();
@@ -625,7 +625,7 @@ void DXCommandList::CopyBuffer(const std::shared_ptr<Resource>& src_buffer, cons
   }
 }
 
-void DXCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buffer, const std::shared_ptr<Resource>& dst_texture,
+void DXCommandList::CopyBufferToTexture(const ezSharedPtr<Resource>& src_buffer, const ezSharedPtr<Resource>& dst_texture,
   const std::vector<BufferToTextureCopyRegion>& regions)
 {
   decltype(auto) dx_src_buffer = src_buffer->As<DXResource>();
@@ -660,7 +660,7 @@ void DXCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
   }
 }
 
-void DXCommandList::CopyTexture(const std::shared_ptr<Resource>& src_texture, const std::shared_ptr<Resource>& dst_texture,
+void DXCommandList::CopyTexture(const ezSharedPtr<Resource>& src_texture, const ezSharedPtr<Resource>& dst_texture,
   const std::vector<TextureCopyRegion>& regions)
 {
   decltype(auto) dx_src_texture = src_texture->As<DXResource>();
@@ -690,8 +690,8 @@ void DXCommandList::CopyTexture(const std::shared_ptr<Resource>& src_texture, co
 }
 
 void DXCommandList::WriteAccelerationStructuresProperties(
-  const std::vector<std::shared_ptr<Resource>>& acceleration_structures,
-  const std::shared_ptr<QueryHeap>& query_heap,
+  const std::vector<ezSharedPtr<Resource>>& acceleration_structures,
+  const ezSharedPtr<QueryHeap>& query_heap,
   uint32_t first_query)
 {
   if (query_heap->GetType() != QueryHeapType::kAccelerationStructureCompactedSize)
@@ -713,10 +713,10 @@ void DXCommandList::WriteAccelerationStructuresProperties(
 }
 
 void DXCommandList::ResolveQueryData(
-  const std::shared_ptr<QueryHeap>& query_heap,
+  const ezSharedPtr<QueryHeap>& query_heap,
   uint32_t first_query,
   uint32_t query_count,
-  const std::shared_ptr<Resource>& dst_buffer,
+  const ezSharedPtr<Resource>& dst_buffer,
   uint64_t dst_offset)
 {
   if (query_heap->GetType() != QueryHeapType::kAccelerationStructureCompactedSize)

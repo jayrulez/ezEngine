@@ -1,7 +1,8 @@
 #pragma once
 #include <RHI/RHIDLL.h>
+#include <Foundation/Types/SharedPtr.h>
 
-class EZ_RHI_DLL QueryInterface
+class EZ_RHI_DLL QueryInterface : public ezRefCounted
 {
 public:
     virtual ~QueryInterface() = default;

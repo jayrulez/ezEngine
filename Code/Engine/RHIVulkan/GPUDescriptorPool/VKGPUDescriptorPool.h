@@ -11,7 +11,7 @@ struct DescriptorSetPool
     vk::UniqueDescriptorSet set;
 };
 
-class VKGPUDescriptorPool
+class VKGPUDescriptorPool //: public ezRefCounted
 {
 public:
     VKGPUDescriptorPool(VKDevice& device);

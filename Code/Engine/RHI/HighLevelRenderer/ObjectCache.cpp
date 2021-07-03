@@ -5,7 +5,7 @@ ObjectCache::ObjectCache(Device& device)
 {
 }
 
-std::shared_ptr<Pipeline> ObjectCache::GetPipeline(const GraphicsPipelineDesc& desc)
+ezSharedPtr<Pipeline> ObjectCache::GetPipeline(const GraphicsPipelineDesc& desc)
 {
   auto it = m_graphics_object_cache.find(desc);
   if (it == m_graphics_object_cache.end())
@@ -19,7 +19,7 @@ std::shared_ptr<Pipeline> ObjectCache::GetPipeline(const GraphicsPipelineDesc& d
   return it->second;
 }
 
-std::shared_ptr<Pipeline> ObjectCache::GetPipeline(const ComputePipelineDesc& desc)
+ezSharedPtr<Pipeline> ObjectCache::GetPipeline(const ComputePipelineDesc& desc)
 {
   auto it = m_compute_object_cache.find(desc);
   if (it == m_compute_object_cache.end())
@@ -33,7 +33,7 @@ std::shared_ptr<Pipeline> ObjectCache::GetPipeline(const ComputePipelineDesc& de
   return it->second;
 }
 
-std::shared_ptr<Pipeline> ObjectCache::GetPipeline(const RayTracingPipelineDesc& desc)
+ezSharedPtr<Pipeline> ObjectCache::GetPipeline(const RayTracingPipelineDesc& desc)
 {
   auto it = m_ray_tracing_object_cache.find(desc);
   if (it == m_ray_tracing_object_cache.end())
@@ -47,7 +47,7 @@ std::shared_ptr<Pipeline> ObjectCache::GetPipeline(const RayTracingPipelineDesc&
   return it->second;
 }
 
-std::shared_ptr<RenderPass> ObjectCache::GetRenderPass(const RenderPassDesc& desc)
+ezSharedPtr<RenderPass> ObjectCache::GetRenderPass(const RenderPassDesc& desc)
 {
   auto it = m_render_pass_cache.find(desc);
   if (it == m_render_pass_cache.end())
@@ -61,7 +61,7 @@ std::shared_ptr<RenderPass> ObjectCache::GetRenderPass(const RenderPassDesc& des
   return it->second;
 }
 
-std::shared_ptr<BindingSetLayout> ObjectCache::GetBindingSetLayout(const std::vector<BindKey>& keys)
+ezSharedPtr<BindingSetLayout> ObjectCache::GetBindingSetLayout(const std::vector<BindKey>& keys)
 {
   auto it = m_layout_cache.find(keys);
   if (it == m_layout_cache.end())
@@ -75,7 +75,7 @@ std::shared_ptr<BindingSetLayout> ObjectCache::GetBindingSetLayout(const std::ve
   return it->second;
 }
 
-std::shared_ptr<BindingSet> ObjectCache::GetBindingSet(const std::shared_ptr<BindingSetLayout>& layout, const std::vector<BindingDesc>& bindings)
+ezSharedPtr<BindingSet> ObjectCache::GetBindingSet(const ezSharedPtr<BindingSetLayout>& layout, const std::vector<BindingDesc>& bindings)
 {
   auto it = m_binding_set_cache.find({layout, bindings});
   if (it == m_binding_set_cache.end())
@@ -90,7 +90,7 @@ std::shared_ptr<BindingSet> ObjectCache::GetBindingSet(const std::shared_ptr<Bin
   return it->second;
 }
 
-std::shared_ptr<Framebuffer> ObjectCache::GetFramebuffer(const FramebufferDesc& desc)
+ezSharedPtr<Framebuffer> ObjectCache::GetFramebuffer(const FramebufferDesc& desc)
 {
   for (const auto& view : desc.colors)
   {
@@ -118,7 +118,7 @@ std::shared_ptr<Framebuffer> ObjectCache::GetFramebuffer(const FramebufferDesc& 
   return it->second;
 }
 
-uint32_t GetPlaneSlice(const std::shared_ptr<Resource>& resource, ViewType view_type, ReturnType return_type)
+uint32_t GetPlaneSlice(const ezSharedPtr<Resource>& resource, ViewType view_type, ReturnType return_type)
 {
   if (!resource)
   {
@@ -154,7 +154,7 @@ uint32_t GetPlaneSlice(const std::shared_ptr<Resource>& resource, ViewType view_
   return 0;
 }
 
-ViewDimension GetViewDimension(const std::shared_ptr<Resource>& resource)
+ViewDimension GetViewDimension(const ezSharedPtr<Resource>& resource)
 {
   if (resource->GetSampleCount() > 1)
   {
@@ -172,7 +172,7 @@ ViewDimension GetViewDimension(const std::shared_ptr<Resource>& resource)
   }
 }
 
-std::shared_ptr<View> ObjectCache::GetView(const std::shared_ptr<Program>& program, const BindKey& bind_key, const std::shared_ptr<Resource>& resource, const LazyViewDesc& view_desc)
+ezSharedPtr<View> ObjectCache::GetView(const ezSharedPtr<Program>& program, const BindKey& bind_key, const ezSharedPtr<Resource>& resource, const LazyViewDesc& view_desc)
 {
   auto it = m_views.find({program, bind_key, resource, view_desc});
   if (it != m_views.end())
@@ -209,3 +209,7 @@ std::shared_ptr<View> ObjectCache::GetView(const std::shared_ptr<Program>& progr
   }
   return view;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_HighLevelRenderer_ObjectCache);
+

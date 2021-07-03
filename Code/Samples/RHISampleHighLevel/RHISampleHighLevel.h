@@ -1,14 +1,14 @@
 #pragma once
 
-#include <memory>
 #include <Foundation/Application/Application.h>
 #include <Foundation/Types/UniquePtr.h>
+#include <memory>
 
-#include <RHI/HighLevelRenderer/RenderDevice.h>
-#include <RHI/Swapchain/Swapchain.h>
 #include <RHI/Fence/Fence.h>
-#include <RHI/Instance/Instance.h>
 #include <RHI/HighLevelRenderer/ProgramHolder.h>
+#include <RHI/HighLevelRenderer/RenderDevice.h>
+#include <RHI/Instance/Instance.h>
+#include <RHI/Swapchain/Swapchain.h>
 #include <RHIShaderCompilerHLSL/Compiler.h>
 #include <RHIShaderCompilerHLSL/ShaderReflection.h>
 
@@ -54,11 +54,11 @@ public:
   {
     auto full_desc = desc;
     std::vector<uint8_t> byteCode = Compile(full_desc, m_ShaderBlobType);
-    std::shared_ptr<ShaderReflection> reflection = CreateShaderReflection(m_ShaderBlobType, byteCode.data(), byteCode.size());
+    ezSharedPtr<ShaderReflection> reflection = CreateShaderReflection(m_ShaderBlobType, byteCode.data(), byteCode.size());
     shader = device.CreateShader(full_desc, byteCode, reflection);
   }
 
-  std::shared_ptr<Shader> shader;
+  ezSharedPtr<Shader> shader;
 
 private:
   ShaderBlobType m_ShaderBlobType;
@@ -115,16 +115,18 @@ public:
   {
     auto full_desc = desc;
     std::vector<uint8_t> byteCode = Compile(full_desc, m_ShaderBlobType);
-    std::shared_ptr<ShaderReflection> reflection = CreateShaderReflection(m_ShaderBlobType, byteCode.data(), byteCode.size());
+    ezSharedPtr<ShaderReflection> reflection = CreateShaderReflection(m_ShaderBlobType, byteCode.data(), byteCode.size());
     shader = device.CreateShader(full_desc, byteCode, reflection);
     cbv.Settings = shader->GetBindKey("Settings");
   }
 
-  std::shared_ptr<Shader> shader;
+  ezSharedPtr<Shader> shader;
 
 private:
   ShaderBlobType m_ShaderBlobType;
 };
+
+using ProgramHolderType = ProgramHolder<PixelShader, VertexShader>;
 
 class ezRHISampleApp : public ezApplication
 {
@@ -144,10 +146,10 @@ public:
 private:
   ezRHISampleWindow* m_pWindow = nullptr;
   RenderDeviceDesc renderDeviceDesc;
-  std::shared_ptr<RenderDevice> device;
-  std::shared_ptr<RenderCommandList> upload_command_list;
+  ezSharedPtr<RenderDevice> device;
+  ezSharedPtr<RenderCommandList> upload_command_list;
   //std::vector<std::shared_ptr<RenderCommandList>> command_lists;
-  std::shared_ptr<Resource> index;
-  std::shared_ptr<Resource> pos;
-  std::shared_ptr<ProgramHolder<PixelShader, VertexShader>> m_program;
+  ezSharedPtr<Resource> index;
+  ezSharedPtr<Resource> pos;
+  ezSharedPtr<ProgramHolder<PixelShader, VertexShader>> m_program;
 };

@@ -38,24 +38,24 @@ ezRHIResourceFormat::Enum RenderDeviceImpl::GetFormat() const
   return m_swapchain->GetFormat();
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::GetBackBuffer(uint32_t buffer)
+ezSharedPtr<Resource> RenderDeviceImpl::GetBackBuffer(uint32_t buffer)
 {
   return m_swapchain->GetBackBuffer(buffer);
 }
 
-std::shared_ptr<RenderCommandList> RenderDeviceImpl::CreateRenderCommandList(CommandListType type)
+ezSharedPtr<RenderCommandList> RenderDeviceImpl::CreateRenderCommandList(CommandListType type)
 {
-  return std::make_shared<RenderCommandListImpl>(*m_device, *m_object_cache, CommandListType::kGraphics);
+  return EZ_DEFAULT_NEW(RenderCommandListImpl, *m_device, *m_object_cache, CommandListType::kGraphics);
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::CreateTexture(uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
+ezSharedPtr<Resource> RenderDeviceImpl::CreateTexture(uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
 {
   auto res = m_device->CreateTexture(TextureType::k2D, bind_flag, format, sample_count, width, height, depth, mip_levels);
   res->CommitMemory(MemoryType::kDefault);
   return res;
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::CreateBuffer(uint32_t bind_flag, uint32_t buffer_size, MemoryType memory_type)
+ezSharedPtr<Resource> RenderDeviceImpl::CreateBuffer(uint32_t bind_flag, uint32_t buffer_size, MemoryType memory_type)
 {
   auto res = m_device->CreateBuffer(bind_flag, buffer_size);
   if (res)
@@ -63,38 +63,38 @@ std::shared_ptr<Resource> RenderDeviceImpl::CreateBuffer(uint32_t bind_flag, uin
   return res;
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::CreateSampler(const SamplerDesc& desc)
+ezSharedPtr<Resource> RenderDeviceImpl::CreateSampler(const SamplerDesc& desc)
 {
   return m_device->CreateSampler(desc);
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::CreateBottomLevelAS(const std::vector<RaytracingGeometryDesc>& descs, BuildAccelerationStructureFlags flags)
+ezSharedPtr<Resource> RenderDeviceImpl::CreateBottomLevelAS(const std::vector<RaytracingGeometryDesc>& descs, BuildAccelerationStructureFlags flags)
 {
   auto prebuild_info = m_device->GetBLASPrebuildInfo(descs, flags);
-  std::shared_ptr<Resource> memory = m_device->CreateBuffer(BindFlag::kAccelerationStructure, (ezUInt32)prebuild_info.acceleration_structure_size);
+  ezSharedPtr<Resource> memory = m_device->CreateBuffer(BindFlag::kAccelerationStructure, (ezUInt32)prebuild_info.acceleration_structure_size);
   memory->CommitMemory(MemoryType::kDefault);
   return m_device->CreateAccelerationStructure(AccelerationStructureType::kBottomLevel, memory, 0);
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::CreateTopLevelAS(uint32_t instance_count, BuildAccelerationStructureFlags flags)
+ezSharedPtr<Resource> RenderDeviceImpl::CreateTopLevelAS(uint32_t instance_count, BuildAccelerationStructureFlags flags)
 {
   auto prebuild_info = m_device->GetTLASPrebuildInfo(instance_count, flags);
-  std::shared_ptr<Resource> memory = m_device->CreateBuffer(BindFlag::kAccelerationStructure, (ezUInt32)prebuild_info.acceleration_structure_size);
+  ezSharedPtr<Resource> memory = m_device->CreateBuffer(BindFlag::kAccelerationStructure, (ezUInt32)prebuild_info.acceleration_structure_size);
   memory->CommitMemory(MemoryType::kDefault);
   return m_device->CreateAccelerationStructure(AccelerationStructureType::kTopLevel, memory, 0);
 }
 
-std::shared_ptr<View> RenderDeviceImpl::CreateView(const std::shared_ptr<Resource>& resource, const ViewDesc& view_desc)
+ezSharedPtr<View> RenderDeviceImpl::CreateView(const ezSharedPtr<Resource>& resource, const ViewDesc& view_desc)
 {
   return m_device->CreateView(resource, view_desc);
 }
 
-std::shared_ptr<Shader> RenderDeviceImpl::CreateShader(const ShaderDesc& desc, std::vector<uint8_t> byteCode, std::shared_ptr<ShaderReflection> reflection)
+ezSharedPtr<Shader> RenderDeviceImpl::CreateShader(const ShaderDesc& desc, std::vector<uint8_t> byteCode, ezSharedPtr<ShaderReflection> reflection)
 {
   return m_device->CreateShader(desc, byteCode, reflection);
 }
 
-std::shared_ptr<Program> RenderDeviceImpl::CreateProgram(const std::vector<std::shared_ptr<Shader>>& shaders)
+ezSharedPtr<Program> RenderDeviceImpl::CreateProgram(const std::vector<ezSharedPtr<Shader>>& shaders)
 {
   return m_device->CreateProgram(shaders);
 }
@@ -124,7 +124,7 @@ uint32_t RenderDeviceImpl::GetShadingRateImageTileSize() const
   return m_device->GetShadingRateImageTileSize();
 }
 
-void RenderDeviceImpl::ExecuteCommandLists(const std::vector<std::shared_ptr<RenderCommandList>>& command_lists)
+void RenderDeviceImpl::ExecuteCommandLists(const std::vector<ezSharedPtr<RenderCommandList>>& command_lists)
 {
   for (auto& command_list : command_lists)
   {
@@ -139,9 +139,9 @@ const std::string& RenderDeviceImpl::GetGpuName() const
   return m_adapter->GetName();
 }
 
-void RenderDeviceImpl::ExecuteCommandListsImpl(const std::vector<std::shared_ptr<RenderCommandList>>& command_lists)
+void RenderDeviceImpl::ExecuteCommandListsImpl(const std::vector<ezSharedPtr<RenderCommandList>>& command_lists)
 {
-  std::vector<std::shared_ptr<CommandList>> raw_command_lists;
+  std::vector<ezSharedPtr<CommandList>> raw_command_lists;
   size_t patch_cmds = 0;
   for (size_t c = 0; c < command_lists.size(); ++c)
   {
@@ -183,7 +183,7 @@ void RenderDeviceImpl::ExecuteCommandListsImpl(const std::vector<std::shared_ptr
 
     if (!new_barriers.empty())
     {
-      std::shared_ptr<CommandList> tmp_cmd;
+      ezSharedPtr<CommandList> tmp_cmd;
       if (c != 0 && kUseFakeClose)
       {
         tmp_cmd = command_lists[c - 1]->As<RenderCommandListImpl>().GetCommandList();
@@ -250,7 +250,7 @@ void RenderDeviceImpl::Resize(uint32_t width, uint32_t height)
 {
   m_width = width;
   m_height = height;
-  m_swapchain.reset();
+  m_swapchain.Clear();
   m_swapchain = m_device->CreateSwapchain(m_window->GetNativeWindowHandle(), m_width, m_height, m_frame_count, m_vsync);
   m_frame_index = 0;
 }
@@ -295,7 +295,11 @@ uint32_t RenderDeviceImpl::GetFrameIndex() const
   return m_frame_index;
 }
 
-std::shared_ptr<RenderDevice> CreateRenderDevice(const RenderDeviceDesc& settings, ezWindowBase* window)
+ezSharedPtr<RenderDevice> CreateRenderDevice(const RenderDeviceDesc& settings, ezWindowBase* window)
 {
-  return std::make_shared<RenderDeviceImpl>(settings, window);
+  return EZ_DEFAULT_NEW(RenderDeviceImpl, settings, window);
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_HighLevelRenderer_RenderDeviceImpl);
+

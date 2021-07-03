@@ -1,11 +1,12 @@
 #pragma once
+#include <RHIDX12/RHIDX12DLL.h>
 #include <memory>
 #include <functional>
 #include <vulkan/vulkan.hpp>
 
 class VKGPUBindlessDescriptorPoolTyped;
 
-class VKGPUDescriptorPoolRange
+class VKGPUDescriptorPoolRange : public ezRefCounted
 {
 public:
     VKGPUDescriptorPoolRange(VKGPUBindlessDescriptorPoolTyped& pool,

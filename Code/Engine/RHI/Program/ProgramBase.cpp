@@ -1,7 +1,7 @@
 #include <RHI/Program/ProgramBase.h>
 #include <deque>
 
-ProgramBase::ProgramBase(const std::vector<std::shared_ptr<Shader>>& shaders)
+ProgramBase::ProgramBase(const std::vector<ezSharedPtr<Shader>>& shaders)
     : m_shaders(shaders)
 {
     for (const auto& shader : m_shaders)
@@ -21,7 +21,7 @@ bool ProgramBase::HasShader(ShaderType type) const
     return m_shaders_by_type.count(type);
 }
 
-std::shared_ptr<Shader> ProgramBase::GetShader(ShaderType type) const
+ezSharedPtr<Shader> ProgramBase::GetShader(ShaderType type) const
 {
     auto it = m_shaders_by_type.find(type);
     if (it != m_shaders_by_type.end())
@@ -31,7 +31,7 @@ std::shared_ptr<Shader> ProgramBase::GetShader(ShaderType type) const
     return {};
 }
 
-const std::vector<std::shared_ptr<Shader>>& ProgramBase::GetShaders() const
+const std::vector<ezSharedPtr<Shader>>& ProgramBase::GetShaders() const
 {
     return m_shaders;
 }
@@ -45,3 +45,7 @@ const std::vector<EntryPoint>& ProgramBase::GetEntryPoints() const
 {
     return m_entry_points;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Program_ProgramBase);
+

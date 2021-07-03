@@ -74,3 +74,7 @@ void ResourceStateTracker::Merge(const ResourceStateTracker& other)
         }
     }
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resource_ResourceStateTracker);
+

@@ -6,7 +6,7 @@ class VKInstance : public Instance
 {
 public:
     VKInstance();
-    std::vector<std::shared_ptr<Adapter>> EnumerateAdapters() override;
+    std::vector<ezSharedPtr<Adapter>> EnumerateAdapters() override;
     vk::Instance& GetInstance();
 
 private:

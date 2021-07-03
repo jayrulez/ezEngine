@@ -1,4 +1,5 @@
 #pragma once
+#include <Foundation/Types/SharedPtr.h>
 #include <RHI/Instance/EnumUtils.h>
 #include <RHI/RHIDLL.h>
 #include <array>
@@ -9,8 +10,17 @@
 #include <string>
 #include <tuple>
 #include <vector>
+//#include <RHI/RenderPass/RenderPass.h>
+#include <RHI/Instance/QueryInterface.h>
 
 class Resource;
+class RenderPass;
+class View;
+class Program;
+class BindingSetLayout;
+class RenderCommandList;
+class ShaderReflection;
+struct ResourceLazyViewDesc;
 
 namespace enum_class
 {
@@ -301,11 +311,10 @@ struct ViewDesc
   }
 };
 
-class ShaderReflection;
 struct ShaderDesc
 {
   //std::vector<uint8_t> blob;
-  //std::shared_ptr<ShaderReflection> reflection;
+  //ezSharedPtr<ShaderReflection> reflection;
 
   std::string shader_path;
   std::string entrypoint;
@@ -318,8 +327,8 @@ struct ShaderDesc
     , entrypoint(entrypoint)
     , type(type)
     , model(model)
-    //, blob{}
-    //, reflection{}
+  //, blob{}
+  //, reflection{}
   {
   }
 };
@@ -406,17 +415,14 @@ struct RenderPassDesc
   }
 };
 
-class RenderPass;
-class View;
-
 struct FramebufferDesc
 {
-  std::shared_ptr<RenderPass> render_pass;
+  ezSharedPtr<RenderPass> render_pass;
   uint32_t width;
   uint32_t height;
-  std::vector<std::shared_ptr<View>> colors;
-  std::shared_ptr<View> depth_stencil;
-  std::shared_ptr<View> shading_rate_image;
+  std::vector<ezSharedPtr<View>> colors;
+  ezSharedPtr<View> depth_stencil;
+  ezSharedPtr<View> shading_rate_image;
 
   auto MakeTie() const
   {
@@ -426,7 +432,7 @@ struct FramebufferDesc
 
 struct RenderPassBeginColorDesc
 {
-  std::shared_ptr<Resource> texture;
+  ezSharedPtr<Resource> texture;
   LazyViewDesc view_desc;
   RenderPassLoadOp load_op = RenderPassLoadOp::kClear;
   RenderPassStoreOp store_op = RenderPassStoreOp::kStore;
@@ -435,7 +441,7 @@ struct RenderPassBeginColorDesc
 
 struct RenderPassBeginDepthStencilDesc
 {
-  std::shared_ptr<Resource> texture;
+  ezSharedPtr<Resource> texture;
   LazyViewDesc view_desc;
   RenderPassLoadOp depth_load_op = RenderPassLoadOp::kClear;
   RenderPassStoreOp depth_store_op = RenderPassStoreOp::kStore;
@@ -451,17 +457,12 @@ struct RenderPassBeginDesc
   RenderPassBeginDepthStencilDesc depth_stencil;
 };
 
-class Program;
-class BindingSetLayout;
-class View;
-class RenderPass;
-
 struct GraphicsPipelineDesc
 {
-  std::shared_ptr<Program> program;
-  std::shared_ptr<BindingSetLayout> layout;
+  ezSharedPtr<Program> program;
+  ezSharedPtr<BindingSetLayout> layout;
   std::vector<InputLayoutDesc> input;
-  std::shared_ptr<RenderPass> render_pass;
+  ezSharedPtr<RenderPass> render_pass;
   DepthStencilDesc depth_stencil_desc;
   BlendDesc blend_desc;
   RasterizerDesc rasterizer_desc;
@@ -474,8 +475,8 @@ struct GraphicsPipelineDesc
 
 struct ComputePipelineDesc
 {
-  std::shared_ptr<Program> program;
-  std::shared_ptr<BindingSetLayout> layout;
+  ezSharedPtr<Program> program;
+  ezSharedPtr<BindingSetLayout> layout;
 
   auto MakeTie() const
   {
@@ -506,8 +507,8 @@ struct RayTracingShaderGroup
 
 struct RayTracingPipelineDesc
 {
-  std::shared_ptr<Program> program;
-  std::shared_ptr<BindingSetLayout> layout;
+  ezSharedPtr<Program> program;
+  ezSharedPtr<BindingSetLayout> layout;
   std::vector<RayTracingShaderGroup> groups;
 
   auto MakeTie() const
@@ -518,7 +519,7 @@ struct RayTracingPipelineDesc
 
 struct RayTracingShaderTable
 {
-  std::shared_ptr<Resource> resource;
+  ezSharedPtr<Resource> resource;
   uint64_t offset;
   uint64_t size;
   uint64_t stride;
@@ -549,7 +550,7 @@ struct BindKey
 struct BindingDesc
 {
   BindKey bind_key;
-  std::shared_ptr<View> view;
+  ezSharedPtr<View> view;
 
   auto MakeTie() const
   {
@@ -587,7 +588,7 @@ enum class PipelineType
 
 struct BufferDesc
 {
-  std::shared_ptr<Resource> res;
+  ezSharedPtr<Resource> res;
   ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
   uint32_t count = 0;
   uint32_t offset = 0;
@@ -679,7 +680,7 @@ EZ_CHECK_AT_COMPILETIME(sizeof(RaytracingGeometryInstance) == 64);
 
 struct ResourceBarrierDesc
 {
-  std::shared_ptr<Resource> resource;
+  ezSharedPtr<Resource> resource;
   ResourceState state_before;
   ResourceState state_after;
   uint32_t base_mip_level = 0;
@@ -688,19 +689,16 @@ struct ResourceBarrierDesc
   uint32_t layer_count = 1;
 };
 
-class RenderCommandList;
-struct ResourceLazyViewDesc;
-
-class EZ_RHI_DLL DeferredView
+class EZ_RHI_DLL DeferredView : public ezRefCounted
 {
 public:
-  virtual std::shared_ptr<ResourceLazyViewDesc> GetView(RenderCommandList& command_list) = 0;
+  virtual ezSharedPtr<ResourceLazyViewDesc> GetView(RenderCommandList& command_list) = 0;
   virtual void OnDestroy(ResourceLazyViewDesc& view_desc) = 0;
 };
 
-struct ResourceLazyViewDesc
+struct ResourceLazyViewDesc : public ezRefCounted
 {
-  ResourceLazyViewDesc(DeferredView& deferred_view, const std::shared_ptr<Resource>& resource)
+  ResourceLazyViewDesc(DeferredView& deferred_view, const ezSharedPtr<Resource>& resource)
     : m_deferred_view(deferred_view)
     , resource(resource)
   {
@@ -711,7 +709,7 @@ struct ResourceLazyViewDesc
     m_deferred_view.OnDestroy(*this);
   }
 
-  std::shared_ptr<Resource> resource;
+  ezSharedPtr<Resource> resource;
   LazyViewDesc view_desc;
   DeferredView& m_deferred_view;
 };

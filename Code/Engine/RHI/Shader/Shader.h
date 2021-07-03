@@ -1,6 +1,7 @@
 #pragma once
 #include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
+#include <RHI/Resource/Resource.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <RHI/ShaderReflection/ShaderReflection.h>
 #include <memory>
@@ -18,5 +19,5 @@ public:
     virtual const std::vector<InputLayoutDesc>& GetInputLayouts() const = 0;
     virtual uint32_t GetInputLayoutLocation(const std::string& semantic_name) const = 0;
     virtual const std::vector<BindKey>& GetBindings() const = 0;
-    virtual const std::shared_ptr<ShaderReflection>& GetReflection() const = 0;
+    virtual const ezSharedPtr<ShaderReflection>& GetReflection() const = 0;
 };

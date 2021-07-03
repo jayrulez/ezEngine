@@ -1,4 +1,5 @@
 #include <RHI/Resource/ResourceBase.h>
+#include <RHI/Resource/Resource.h>
 
 ResourceBase::ResourceBase()
     : m_resource_state_tracker(*this)
@@ -68,3 +69,7 @@ const ResourceStateTracker& ResourceBase::GetGlobalResourceStateTracker() const
 {
     return m_resource_state_tracker;
 }
+
+
+EZ_STATICLINK_FILE(RHI, RHI_Resource_ResourceBase);
+

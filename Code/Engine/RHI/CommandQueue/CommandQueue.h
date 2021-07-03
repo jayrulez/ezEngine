@@ -7,7 +7,7 @@ class CommandQueue : public QueryInterface
 {
 public:
     virtual ~CommandQueue() = default;
-    virtual void Wait(const std::shared_ptr<Fence>& fence, uint64_t value) = 0;
-    virtual void Signal(const std::shared_ptr<Fence>& fence, uint64_t value) = 0;
-    virtual void ExecuteCommandLists(const std::vector<std::shared_ptr<CommandList>>& command_lists) = 0;
+    virtual void Wait(const ezSharedPtr<Fence>& fence, uint64_t value) = 0;
+    virtual void Signal(const ezSharedPtr<Fence>& fence, uint64_t value) = 0;
+    virtual void ExecuteCommandLists(const std::vector<ezSharedPtr<CommandList>>& command_lists) = 0;
 };

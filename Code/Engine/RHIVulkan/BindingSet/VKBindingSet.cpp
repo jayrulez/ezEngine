@@ -3,7 +3,7 @@
 #include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>
 #include <RHIVulkan/View/VKView.h>
 
-VKBindingSet::VKBindingSet(VKDevice& device, const std::shared_ptr<VKBindingSetLayout>& layout)
+VKBindingSet::VKBindingSet(VKDevice& device, const ezSharedPtr<VKBindingSetLayout>& layout)
     : m_device(device)
     , m_layout(layout)
 {

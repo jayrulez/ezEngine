@@ -35,7 +35,7 @@ vk::ShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind)
     return {};
 }
 
-VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program, const std::shared_ptr<BindingSetLayout>& layout)
+VKPipeline::VKPipeline(VKDevice& device, const ezSharedPtr<Program>& program, const ezSharedPtr<BindingSetLayout>& layout)
     : m_device(device)
 {
     decltype(auto) vk_layout = layout->As<VKBindingSetLayout>();

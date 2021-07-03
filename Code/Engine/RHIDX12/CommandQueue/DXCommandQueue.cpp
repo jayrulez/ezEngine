@@ -30,19 +30,19 @@ DXCommandQueue::DXCommandQueue(DXDevice& device, CommandListType type)
   EZ_ASSERT_ALWAYS(m_device.GetDevice()->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&m_command_queue)) == S_OK, "");
 }
 
-void DXCommandQueue::Wait(const std::shared_ptr<Fence>& fence, uint64_t value)
+void DXCommandQueue::Wait(const ezSharedPtr<Fence>& fence, uint64_t value)
 {
   decltype(auto) dx_fence = fence->As<DXFence>();
   EZ_ASSERT_ALWAYS(m_command_queue->Wait(dx_fence.GetFence().Get(), value) == S_OK, "");
 }
 
-void DXCommandQueue::Signal(const std::shared_ptr<Fence>& fence, uint64_t value)
+void DXCommandQueue::Signal(const ezSharedPtr<Fence>& fence, uint64_t value)
 {
   decltype(auto) dx_fence = fence->As<DXFence>();
   EZ_ASSERT_ALWAYS(m_command_queue->Signal(dx_fence.GetFence().Get(), value) == S_OK, "");
 }
 
-void DXCommandQueue::ExecuteCommandLists(const std::vector<std::shared_ptr<CommandList>>& command_lists)
+void DXCommandQueue::ExecuteCommandLists(const std::vector<ezSharedPtr<CommandList>>& command_lists)
 {
   std::vector<ID3D12CommandList*> dx_command_lists;
   for (auto& command_list : command_lists)

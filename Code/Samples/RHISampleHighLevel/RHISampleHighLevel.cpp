@@ -135,7 +135,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
   upload_command_list->Close();
   device->ExecuteCommandLists({upload_command_list});
 
-  m_program = std::make_shared<ProgramHolder<PixelShader, VertexShader>>(*device, shaderBlobType);
+  m_program = EZ_DEFAULT_NEW(ProgramHolderType, *device, shaderBlobType);
   m_program->ps.cbuffer.Settings.color = ezColor(1, 0, 0, 1);
 
   //for (uint32_t i = 0; i < renderDeviceDesc.frame_count; ++i)

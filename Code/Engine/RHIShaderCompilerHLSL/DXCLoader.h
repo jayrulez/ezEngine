@@ -1,5 +1,6 @@
 #pragma once
 #include <RHI/Instance/BaseTypes.h>
+#include <RHI/Resource/Resource.h>
 #ifdef NULL
 #  undef NULL
 #endif

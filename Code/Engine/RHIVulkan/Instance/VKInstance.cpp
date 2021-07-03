@@ -9,9 +9,9 @@
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
-std::shared_ptr<Instance> CreateVKInstance()
+ezSharedPtr<Instance> CreateVKInstance()
 {
-  return std::make_shared<VKInstance>();
+  return EZ_DEFAULT_NEW(VKInstance);
 }
 
 // clang-format off
@@ -147,9 +147,9 @@ VKInstance::VKInstance()
   }
 }
 
-std::vector<std::shared_ptr<Adapter>> VKInstance::EnumerateAdapters()
+std::vector<ezSharedPtr<Adapter>> VKInstance::EnumerateAdapters()
 {
-  std::vector<std::shared_ptr<Adapter>> adapters;
+  std::vector<ezSharedPtr<Adapter>> adapters;
   auto devices = m_instance->enumeratePhysicalDevices();
   for (const auto& device : devices)
   {
@@ -158,7 +158,7 @@ std::vector<std::shared_ptr<Adapter>> VKInstance::EnumerateAdapters()
     if (device_properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu ||
         device_properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu)
     {
-      adapters.emplace_back(std::make_shared<VKAdapter>(*this, device));
+      adapters.emplace_back(EZ_DEFAULT_NEW(VKAdapter, *this, device));
     }
   }
   return adapters;

@@ -10,8 +10,8 @@ class DXResource;
 class DXView : public View
 {
 public:
-    DXView(DXDevice& device, const std::shared_ptr<DXResource>& resource, const ViewDesc& view_desc);
-    std::shared_ptr<Resource> GetResource() override;
+    DXView(DXDevice& device, const ezSharedPtr<DXResource>& resource, const ViewDesc& view_desc);
+    ezSharedPtr<Resource> GetResource() override;
     uint32_t GetDescriptorId() const override;
     uint32_t GetBaseMipLevel() const override;
     uint32_t GetLevelCount() const override;
@@ -31,8 +31,8 @@ private:
     void CreateSampler();
 
     DXDevice& m_device;
-    std::shared_ptr<DXResource> m_resource;
+    ezSharedPtr<DXResource> m_resource;
     ViewDesc m_view_desc;
-    std::shared_ptr<DXCPUDescriptorHandle> m_handle;
-    std::shared_ptr<DXGPUDescriptorPoolRange> m_range;
+    ezSharedPtr<DXCPUDescriptorHandle> m_handle;
+    ezSharedPtr<DXGPUDescriptorPoolRange> m_range;
 };

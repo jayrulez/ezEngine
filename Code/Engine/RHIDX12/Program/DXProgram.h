@@ -12,5 +12,5 @@ class DXDevice;
 class DXProgram : public ProgramBase
 {
 public:
-    DXProgram(DXDevice& device, const std::vector<std::shared_ptr<Shader>>& shaders);
+    DXProgram(DXDevice& device, const std::vector<ezSharedPtr<Shader>>& shaders);
 };

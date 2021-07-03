@@ -63,7 +63,7 @@ void DXResource::CommitMemory(MemoryType memory_type)
     IID_PPV_ARGS(&resource));
 }
 
-void DXResource::BindMemory(const std::shared_ptr<Memory>& memory, uint64_t offset)
+void DXResource::BindMemory(const ezSharedPtr<Memory>& memory, uint64_t offset)
 {
   m_memory = memory;
   m_memory_type = m_memory->GetMemoryType();

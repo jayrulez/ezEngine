@@ -11,7 +11,7 @@ DXCPUDescriptorPool::DXCPUDescriptorPool(DXDevice& device)
 {
 }
 
-std::shared_ptr<DXCPUDescriptorHandle> DXCPUDescriptorPool::AllocateDescriptor(ViewType view_type)
+ezSharedPtr<DXCPUDescriptorHandle> DXCPUDescriptorPool::AllocateDescriptor(ViewType view_type)
 {
     DXCPUDescriptorPoolTyped& pool = SelectHeap(view_type);
     return pool.Allocate(1);

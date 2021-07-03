@@ -13,7 +13,7 @@ class DXBindingSet
     : public BindingSet
 {
 public:
-    DXBindingSet(DXDevice& device, const std::shared_ptr<DXBindingSetLayout>& layout);
+    DXBindingSet(DXDevice& device, const ezSharedPtr<DXBindingSetLayout>& layout);
 
     void WriteBindings(const std::vector<BindingDesc>& bindings) override;
 
@@ -21,6 +21,6 @@ public:
 
 private:
     DXDevice& m_device;
-    std::shared_ptr<DXBindingSetLayout> m_layout;
-    std::map<D3D12_DESCRIPTOR_HEAP_TYPE, std::shared_ptr<DXGPUDescriptorPoolRange>> m_descriptor_ranges;
+    ezSharedPtr<DXBindingSetLayout> m_layout;
+    std::map<D3D12_DESCRIPTOR_HEAP_TYPE, ezSharedPtr<DXGPUDescriptorPoolRange>> m_descriptor_ranges;
 };

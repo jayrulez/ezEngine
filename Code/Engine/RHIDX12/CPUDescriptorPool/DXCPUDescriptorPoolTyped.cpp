@@ -10,12 +10,12 @@ DXCPUDescriptorPoolTyped::DXCPUDescriptorPoolTyped(DXDevice& device, D3D12_DESCR
 {
 }
 
-std::shared_ptr<DXCPUDescriptorHandle> DXCPUDescriptorPoolTyped::Allocate(size_t count)
+ezSharedPtr<DXCPUDescriptorHandle> DXCPUDescriptorPoolTyped::Allocate(size_t count)
 {
     if (m_offset + count > m_size)
         ResizeHeap(ezMath::Max(m_offset + count, 2 * (m_size + 1)));
     m_offset += count;
-    return std::make_shared<DXCPUDescriptorHandle>(m_device, m_heap, m_cpu_handle, m_offset - count, count, m_device.GetDevice()->GetDescriptorHandleIncrementSize(m_type), m_type);
+    return EZ_DEFAULT_NEW(DXCPUDescriptorHandle, m_device, m_heap, m_cpu_handle, m_offset - count, count, m_device.GetDevice()->GetDescriptorHandleIncrementSize(m_type), m_type);
 }
 
 void DXCPUDescriptorPoolTyped::ResizeHeap(size_t req_size)

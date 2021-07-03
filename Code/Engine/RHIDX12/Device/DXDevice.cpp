@@ -17,8 +17,8 @@
 #include <RHIDX12/Swapchain/DXSwapchain.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <RHIDX12/View/DXView.h>
-#include <dxgi1_6.h>
 #include <directx/d3dx12.h>
+#include <dxgi1_6.h>
 
 D3D12_RESOURCE_STATES ConvertState(ResourceState state)
 {
@@ -116,9 +116,9 @@ DXDevice::DXDevice(DXAdapter& adapter)
     m_is_mesh_shading_supported = feature_support7.MeshShaderTier >= D3D12_MESH_SHADER_TIER_1;
   }
 
-  m_command_queues[CommandListType::kGraphics] = std::make_shared<DXCommandQueue>(*this, CommandListType::kGraphics);
-  m_command_queues[CommandListType::kCompute] = std::make_shared<DXCommandQueue>(*this, CommandListType::kCompute);
-  m_command_queues[CommandListType::kCopy] = std::make_shared<DXCommandQueue>(*this, CommandListType::kCopy);
+  m_command_queues[CommandListType::kGraphics] = EZ_DEFAULT_NEW(DXCommandQueue, *this, CommandListType::kGraphics);
+  m_command_queues[CommandListType::kCompute] = EZ_DEFAULT_NEW(DXCommandQueue, *this, CommandListType::kCompute);
+  m_command_queues[CommandListType::kCopy] = EZ_DEFAULT_NEW(DXCommandQueue, *this, CommandListType::kCopy);
 
   static const bool debug_enabled = IsDebuggerPresent();
   if (debug_enabled)
@@ -154,12 +154,12 @@ DXDevice::DXDevice(DXAdapter& adapter)
   }
 }
 
-std::shared_ptr<Memory> DXDevice::AllocateMemory(uint64_t size, MemoryType memory_type, uint32_t memory_type_bits)
+ezSharedPtr<Memory> DXDevice::AllocateMemory(uint64_t size, MemoryType memory_type, uint32_t memory_type_bits)
 {
-  return std::make_shared<DXMemory>(*this, size, memory_type, memory_type_bits);
+  return EZ_DEFAULT_NEW(DXMemory, *this, size, memory_type, memory_type_bits);
 }
 
-std::shared_ptr<CommandQueue> DXDevice::GetCommandQueue(CommandListType type)
+ezSharedPtr<CommandQueue> DXDevice::GetCommandQueue(CommandListType type)
 {
   return m_command_queues.at(type);
 }
@@ -169,22 +169,22 @@ uint32_t DXDevice::GetTextureDataPitchAlignment() const
   return D3D12_TEXTURE_DATA_PITCH_ALIGNMENT;
 }
 
-std::shared_ptr<Swapchain> DXDevice::CreateSwapchain(Window window, uint32_t width, uint32_t height, uint32_t frame_count, bool vsync)
+ezSharedPtr<Swapchain> DXDevice::CreateSwapchain(Window window, uint32_t width, uint32_t height, uint32_t frame_count, bool vsync)
 {
-  return std::make_shared<DXSwapchain>(*m_command_queues.at(CommandListType::kGraphics), window, width, height, frame_count, vsync);
+  return EZ_DEFAULT_NEW(DXSwapchain, *m_command_queues.at(CommandListType::kGraphics), window, width, height, frame_count, vsync);
 }
 
-std::shared_ptr<CommandList> DXDevice::CreateCommandList(CommandListType type)
+ezSharedPtr<CommandList> DXDevice::CreateCommandList(CommandListType type)
 {
-  return std::make_shared<DXCommandList>(*this, type);
+  return EZ_DEFAULT_NEW(DXCommandList, *this, type);
 }
 
-std::shared_ptr<Fence> DXDevice::CreateFence(uint64_t initial_value)
+ezSharedPtr<Fence> DXDevice::CreateFence(uint64_t initial_value)
 {
-  return std::make_shared<DXFence>(*this, initial_value);
+  return EZ_DEFAULT_NEW(DXFence, *this, initial_value);
 }
 
-std::shared_ptr<Resource> DXDevice::CreateTexture(TextureType type, uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
+ezSharedPtr<Resource> DXDevice::CreateTexture(TextureType type, uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
 {
   DXGI_FORMAT dx_format = DXUtils::ToDXGIFormat(format); //static_cast<DXGI_FORMAT>(gli::dx().translate(format).DXGIFormat.DDS);
   if (bind_flag & BindFlag::kShaderResource)
@@ -192,7 +192,7 @@ std::shared_ptr<Resource> DXDevice::CreateTexture(TextureType type, uint32_t bin
     dx_format = DXUtils::MakeTypelessDepthStencil(dx_format);
   }
 
-  std::shared_ptr<DXResource> res = std::make_shared<DXResource>(*this);
+  ezSharedPtr<DXResource> res = EZ_DEFAULT_NEW(DXResource, *this);
   res->resource_type = ResourceType::kTexture;
   res->format = format;
 
@@ -234,12 +234,12 @@ std::shared_ptr<Resource> DXDevice::CreateTexture(TextureType type, uint32_t bin
   return res;
 }
 
-std::shared_ptr<Resource> DXDevice::CreateBuffer(uint32_t bind_flag, uint32_t buffer_size)
+ezSharedPtr<Resource> DXDevice::CreateBuffer(uint32_t bind_flag, uint32_t buffer_size)
 {
   if (buffer_size == 0)
     return {};
 
-  std::shared_ptr<DXResource> res = std::make_shared<DXResource>(*this);
+  ezSharedPtr<DXResource> res = EZ_DEFAULT_NEW(DXResource, *this);
 
   if (bind_flag & BindFlag::kConstantBuffer)
     buffer_size = (buffer_size + 255) & ~255;
@@ -272,9 +272,9 @@ std::shared_ptr<Resource> DXDevice::CreateBuffer(uint32_t bind_flag, uint32_t bu
   return res;
 }
 
-std::shared_ptr<Resource> DXDevice::CreateSampler(const SamplerDesc& desc)
+ezSharedPtr<Resource> DXDevice::CreateSampler(const SamplerDesc& desc)
 {
-  std::shared_ptr<DXResource> res = std::make_shared<DXResource>(*this);
+  ezSharedPtr<DXResource> res = EZ_DEFAULT_NEW(DXResource, *this);
   D3D12_SAMPLER_DESC& sampler_desc = res->sampler_desc;
 
   switch (desc.filter)
@@ -324,70 +324,70 @@ std::shared_ptr<Resource> DXDevice::CreateSampler(const SamplerDesc& desc)
   return res;
 }
 
-std::shared_ptr<View> DXDevice::CreateView(const std::shared_ptr<Resource>& resource, const ViewDesc& view_desc)
+ezSharedPtr<View> DXDevice::CreateView(const ezSharedPtr<Resource>& resource, const ViewDesc& view_desc)
 {
-  return std::make_shared<DXView>(*this, std::static_pointer_cast<DXResource>(resource), view_desc);
+  return EZ_DEFAULT_NEW(DXView, *this, resource.Downcast<DXResource>(), view_desc);
 }
 
-std::shared_ptr<BindingSetLayout> DXDevice::CreateBindingSetLayout(const std::vector<BindKey>& descs)
+ezSharedPtr<BindingSetLayout> DXDevice::CreateBindingSetLayout(const std::vector<BindKey>& descs)
 {
-  return std::make_shared<DXBindingSetLayout>(*this, descs);
+  return EZ_DEFAULT_NEW(DXBindingSetLayout, *this, descs);
 }
 
-std::shared_ptr<BindingSet> DXDevice::CreateBindingSet(const std::shared_ptr<BindingSetLayout>& layout)
+ezSharedPtr<BindingSet> DXDevice::CreateBindingSet(const ezSharedPtr<BindingSetLayout>& layout)
 {
-  return std::make_shared<DXBindingSet>(*this, std::static_pointer_cast<DXBindingSetLayout>(layout));
+  return EZ_DEFAULT_NEW(DXBindingSet, *this, layout.Downcast<DXBindingSetLayout>());
 }
 
-std::shared_ptr<RenderPass> DXDevice::CreateRenderPass(const RenderPassDesc& desc)
+ezSharedPtr<RenderPass> DXDevice::CreateRenderPass(const RenderPassDesc& desc)
 {
-  return std::make_shared<DXRenderPass>(*this, desc);
+  return EZ_DEFAULT_NEW(DXRenderPass, *this, desc);
 }
 
-std::shared_ptr<Framebuffer> DXDevice::CreateFramebuffer(const FramebufferDesc& desc)
+ezSharedPtr<Framebuffer> DXDevice::CreateFramebuffer(const FramebufferDesc& desc)
 {
-  return std::make_shared<DXFramebuffer>(desc);
+  return EZ_DEFAULT_NEW(DXFramebuffer, desc);
 }
 
-std::shared_ptr<Shader> DXDevice::CreateShader(const ShaderDesc& desc, std::vector<uint8_t> byteCode, std::shared_ptr<ShaderReflection> reflection)
+ezSharedPtr<Shader> DXDevice::CreateShader(const ShaderDesc& desc, std::vector<uint8_t> byteCode, ezSharedPtr<ShaderReflection> reflection)
 {
-  return std::make_shared<ShaderBase>(desc, byteCode, reflection, ShaderBlobType::kDXIL);
+  return EZ_DEFAULT_NEW(ShaderBase, desc, byteCode, reflection, ShaderBlobType::kDXIL);
 }
 
-std::shared_ptr<Program> DXDevice::CreateProgram(const std::vector<std::shared_ptr<Shader>>& shaders)
+ezSharedPtr<Program> DXDevice::CreateProgram(const std::vector<ezSharedPtr<Shader>>& shaders)
 {
-  return std::make_shared<DXProgram>(*this, shaders);
+  return EZ_DEFAULT_NEW(DXProgram, *this, shaders);
 }
 
-std::shared_ptr<Pipeline> DXDevice::CreateGraphicsPipeline(const GraphicsPipelineDesc& desc)
+ezSharedPtr<Pipeline> DXDevice::CreateGraphicsPipeline(const GraphicsPipelineDesc& desc)
 {
-  return std::make_shared<DXGraphicsPipeline>(*this, desc);
+  return EZ_DEFAULT_NEW(DXGraphicsPipeline, *this, desc);
 }
 
-std::shared_ptr<Pipeline> DXDevice::CreateComputePipeline(const ComputePipelineDesc& desc)
+ezSharedPtr<Pipeline> DXDevice::CreateComputePipeline(const ComputePipelineDesc& desc)
 {
-  return std::make_shared<DXComputePipeline>(*this, desc);
+  return EZ_DEFAULT_NEW(DXComputePipeline, *this, desc);
 }
 
-std::shared_ptr<Pipeline> DXDevice::CreateRayTracingPipeline(const RayTracingPipelineDesc& desc)
+ezSharedPtr<Pipeline> DXDevice::CreateRayTracingPipeline(const RayTracingPipelineDesc& desc)
 {
-  return std::make_shared<DXRayTracingPipeline>(*this, desc);
+  return EZ_DEFAULT_NEW(DXRayTracingPipeline, *this, desc);
 }
 
-std::shared_ptr<Resource> DXDevice::CreateAccelerationStructure(AccelerationStructureType type, const std::shared_ptr<Resource>& resource, uint64_t offset)
+ezSharedPtr<Resource> DXDevice::CreateAccelerationStructure(AccelerationStructureType type, const ezSharedPtr<Resource>& resource, uint64_t offset)
 {
-  std::shared_ptr<DXResource> res = std::make_shared<DXResource>(*this);
+  ezSharedPtr<DXResource> res = EZ_DEFAULT_NEW(DXResource, *this);
   res->resource_type = ResourceType::kAccelerationStructure;
   res->acceleration_structures_memory = resource;
   res->acceleration_structure_handle = resource->As<DXResource>().resource->GetGPUVirtualAddress() + offset;
   return res;
 }
 
-std::shared_ptr<QueryHeap> DXDevice::CreateQueryHeap(QueryHeapType type, uint32_t count)
+ezSharedPtr<QueryHeap> DXDevice::CreateQueryHeap(QueryHeapType type, uint32_t count)
 {
   if (type == QueryHeapType::kAccelerationStructureCompactedSize)
   {
-    return std::make_shared<DXRayTracingQueryHeap>(*this, type, count);
+    return EZ_DEFAULT_NEW(DXRayTracingQueryHeap, *this, type, count);
   }
   return {};
 }
@@ -396,8 +396,8 @@ D3D12_RAYTRACING_GEOMETRY_DESC FillRaytracingGeometryDesc(const BufferDesc& vert
 {
   D3D12_RAYTRACING_GEOMETRY_DESC geometry_desc = {};
 
-  auto vertex_res = std::static_pointer_cast<DXResource>(vertex.res);
-  auto index_res = std::static_pointer_cast<DXResource>(index.res);
+  auto vertex_res = vertex.res.Downcast<DXResource>();
+  auto index_res = index.res.Downcast<DXResource>();
 
   geometry_desc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
   switch (flags)

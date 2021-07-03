@@ -5,13 +5,13 @@
 #include <RHIDX12/Device/DXDevice.h>
 #include <RHIDX12/View/DXView.h>
 
-DXBindingSet::DXBindingSet(DXDevice& device, const std::shared_ptr<DXBindingSetLayout>& layout)
+DXBindingSet::DXBindingSet(DXDevice& device, const ezSharedPtr<DXBindingSetLayout>& layout)
     : m_device(device)
     , m_layout(layout)
 {
     for (const auto& desc : m_layout->GetHeapDescs())
     {
-        std::shared_ptr<DXGPUDescriptorPoolRange> heap_range = std::make_shared<DXGPUDescriptorPoolRange>(m_device.GetGPUDescriptorPool().Allocate(desc.first, desc.second));
+      ezSharedPtr<DXGPUDescriptorPoolRange> heap_range = EZ_DEFAULT_NEW(DXGPUDescriptorPoolRange, m_device.GetGPUDescriptorPool().Allocate(desc.first, desc.second));
         m_descriptor_ranges.emplace(std::piecewise_construct,
             std::forward_as_tuple(desc.first),
             std::forward_as_tuple(heap_range)
@@ -28,7 +28,7 @@ void DXBindingSet::WriteBindings(const std::vector<BindingDesc>& bindings)
             continue;
         }
         decltype(auto) binding_layout = m_layout->GetLayout().at(binding.bind_key);
-        std::shared_ptr<DXGPUDescriptorPoolRange> heap_range = m_descriptor_ranges.at(binding_layout.heap_type);
+        ezSharedPtr<DXGPUDescriptorPoolRange> heap_range = m_descriptor_ranges.at(binding_layout.heap_type);
         decltype(auto) src_cpu_handle = binding.view->As<DXView>().GetHandle();
         heap_range->CopyCpuHandle(binding_layout.heap_offset, src_cpu_handle);
     }

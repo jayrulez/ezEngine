@@ -20,7 +20,7 @@ public:
     const std::map<ezUInt32, uint32_t>& GetStrideMap() const;
 
 private:
-    void ParseInputLayout(const std::shared_ptr<Shader>& shader);
+    void ParseInputLayout(const ezSharedPtr<Shader>& shader);
     D3D12_INPUT_LAYOUT_DESC GetInputLayoutDesc();
 
     DXDevice& m_device;

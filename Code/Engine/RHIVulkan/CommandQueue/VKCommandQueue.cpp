@@ -10,7 +10,7 @@ VKCommandQueue::VKCommandQueue(VKDevice& device, CommandListType type, uint32_t 
     m_queue = m_device.GetDevice().getQueue(m_queue_family_index, 0);
 }
 
-void VKCommandQueue::Wait(const std::shared_ptr<Fence>& fence, uint64_t value)
+void VKCommandQueue::Wait(const ezSharedPtr<Fence>& fence, uint64_t value)
 {
     decltype(auto) vk_fence = fence->As<VKTimelineSemaphore>();
     vk::TimelineSemaphoreSubmitInfo timeline_info = {};
@@ -26,7 +26,7 @@ void VKCommandQueue::Wait(const std::shared_ptr<Fence>& fence, uint64_t value)
     vk::Result res = m_queue.submit(1, &signal_submit_info, {});
 }
 
-void VKCommandQueue::Signal(const std::shared_ptr<Fence>& fence, uint64_t value)
+void VKCommandQueue::Signal(const ezSharedPtr<Fence>& fence, uint64_t value)
 {
     decltype(auto) vk_fence = fence->As<VKTimelineSemaphore>();
     vk::TimelineSemaphoreSubmitInfo timeline_info = {};
@@ -40,7 +40,7 @@ void VKCommandQueue::Signal(const std::shared_ptr<Fence>& fence, uint64_t value)
     vk::Result res = m_queue.submit(1, &signal_submit_info, {});
 }
 
-void VKCommandQueue::ExecuteCommandLists(const std::vector<std::shared_ptr<CommandList>>& command_lists)
+void VKCommandQueue::ExecuteCommandLists(const std::vector<ezSharedPtr<CommandList>>& command_lists)
 {
     std::vector<vk::CommandBuffer> vk_command_lists;
     for (auto& command_list : command_lists)

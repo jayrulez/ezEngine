@@ -14,7 +14,7 @@ class EZ_RHI_DLL ViewProvider : public DeferredView
 {
 public:
     ViewProvider(RenderDevice& device, const uint8_t* src_data, BufferLayout& layout);
-    std::shared_ptr<ResourceLazyViewDesc> GetView(RenderCommandList& command_list) override;
+    ezSharedPtr<ResourceLazyViewDesc> GetView(RenderCommandList& command_list) override;
     void OnDestroy(ResourceLazyViewDesc& view_desc) override;
 
 private:
@@ -24,8 +24,8 @@ private:
     const uint8_t* m_src_data;
     BufferLayout& m_layout;
     std::vector<uint8_t> m_dst_data;
-    std::shared_ptr<ResourceLazyViewDesc> m_last_view;
-    std::vector<std::shared_ptr<Resource>> m_free_resources;
+    ezSharedPtr<ResourceLazyViewDesc> m_last_view;
+    std::vector<ezSharedPtr<Resource>> m_free_resources;
 };
 
 template<typename T>
@@ -35,14 +35,14 @@ public:
     ConstantBuffer(RenderDevice& device, BufferLayout& layout)
     {
         T& data = static_cast<T&>(*this);
-        m_view_provider = std::make_shared<ViewProvider>(device, reinterpret_cast<const uint8_t*>(&data), layout);
+        m_view_provider = EZ_DEFAULT_NEW(ViewProvider, device, reinterpret_cast<const uint8_t*>(&data), layout);
     }
 
-    operator std::shared_ptr<DeferredView>& ()
+    operator ezSharedPtr<DeferredView>& ()
     {
         return m_view_provider;
     }
 
 private:
-    std::shared_ptr<DeferredView> m_view_provider;
+    ezSharedPtr<DeferredView> m_view_provider;
 };

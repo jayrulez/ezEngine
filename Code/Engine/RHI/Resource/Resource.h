@@ -19,7 +19,7 @@ class EZ_RHI_DLL Resource : public QueryInterface
 public:
     virtual ~Resource() = default;
     virtual void CommitMemory(MemoryType memory_type) = 0;
-    virtual void BindMemory(const std::shared_ptr<Memory>& memory, uint64_t offset) = 0;
+    virtual void BindMemory(const ezSharedPtr<Memory>& memory, uint64_t offset) = 0;
     virtual ResourceType GetResourceType() const = 0;
     virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
     virtual MemoryType GetMemoryType() const = 0;

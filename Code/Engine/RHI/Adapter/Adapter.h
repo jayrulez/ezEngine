@@ -9,5 +9,5 @@ class Adapter : public QueryInterface
 public:
     virtual ~Adapter() = default;
     virtual const std::string& GetName() const = 0;
-    virtual std::shared_ptr<Device> CreateDevice() = 0;
+    virtual ezSharedPtr<Device> CreateDevice() = 0;
 };

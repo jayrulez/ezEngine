@@ -10,9 +10,9 @@ class DXCommandQueue : public CommandQueue
 {
 public:
     DXCommandQueue(DXDevice& device, CommandListType type);
-    void Wait(const std::shared_ptr<Fence>& fence, uint64_t value) override;
-    void Signal(const std::shared_ptr<Fence>& fence, uint64_t value) override;
-    void ExecuteCommandLists(const std::vector<std::shared_ptr<CommandList>>& command_lists) override;
+    void Wait(const ezSharedPtr<Fence>& fence, uint64_t value) override;
+    void Signal(const ezSharedPtr<Fence>& fence, uint64_t value) override;
+    void ExecuteCommandLists(const std::vector<ezSharedPtr<CommandList>>& command_lists) override;
 
     DXDevice& GetDevice();
     ComPtr<ID3D12CommandQueue> GetQueue();

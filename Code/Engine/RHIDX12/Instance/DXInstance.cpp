@@ -9,9 +9,9 @@
 #include <dxgi1_6.h>
 #include <filesystem>
 
-std::shared_ptr<Instance> CreateDXInstance()
+ezSharedPtr<Instance> CreateDXInstance()
 {
-  return std::make_shared<DXInstance>();
+  return EZ_DEFAULT_NEW(DXInstance);
 }
 
 // clang-format off
@@ -102,9 +102,9 @@ DXInstance::DXInstance()
   EZ_ASSERT_ALWAYS(CreateDXGIFactory2(flags, IID_PPV_ARGS(&m_dxgi_factory)) == S_OK, "");
 }
 
-std::vector<std::shared_ptr<Adapter>> DXInstance::EnumerateAdapters()
+std::vector<ezSharedPtr<Adapter>> DXInstance::EnumerateAdapters()
 {
-  std::vector<std::shared_ptr<Adapter>> adapters;
+  std::vector<ezSharedPtr<Adapter>> adapters;
 
   ComPtr<IDXGIFactory6> dxgi_factory6;
   m_dxgi_factory.As(&dxgi_factory6);
@@ -125,7 +125,7 @@ std::vector<std::shared_ptr<Adapter>> DXInstance::EnumerateAdapters()
     if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
       continue;
 
-    adapters.emplace_back(std::make_shared<DXAdapter>(*this, adapter));
+    adapters.emplace_back(EZ_DEFAULT_NEW(DXAdapter, *this, adapter));
   }
   return adapters;
 }

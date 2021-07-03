@@ -4,7 +4,7 @@
 #include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>
 #include <RHIVulkan/Utilities/VKUtility.h>
 
-VKView::VKView(VKDevice& device, const std::shared_ptr<VKResource>& resource, const ViewDesc& view_desc)
+VKView::VKView(VKDevice& device, const ezSharedPtr<VKResource>& resource, const ViewDesc& view_desc)
     : m_device(device)
     , m_resource(resource)
     , m_view_desc(view_desc)
@@ -18,7 +18,7 @@ VKView::VKView(VKDevice& device, const std::shared_ptr<VKResource>& resource, co
     {
         vk::DescriptorType type = GetDescriptorType(view_desc.view_type);
         decltype(auto) pool = device.GetGPUBindlessDescriptorPool(type);
-        m_range = std::make_shared<VKGPUDescriptorPoolRange>(pool.Allocate(1));
+        m_range = EZ_DEFAULT_NEW(VKGPUDescriptorPoolRange, pool.Allocate(1));
 
         m_descriptor.dstSet = m_range->GetDescriptoSet();
         m_descriptor.dstArrayElement = m_range->GetOffset();
@@ -149,7 +149,7 @@ void VKView::CreateBufferView()
     m_buffer_view = m_device.GetDevice().createBufferViewUnique(buffer_view_desc);
 }
 
-std::shared_ptr<Resource> VKView::GetResource()
+ezSharedPtr<Resource> VKView::GetResource()
 {
     return m_resource;
 }

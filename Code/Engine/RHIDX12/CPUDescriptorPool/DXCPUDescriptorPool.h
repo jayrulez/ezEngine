@@ -16,7 +16,7 @@ class DXCPUDescriptorPool
 {
 public:
     DXCPUDescriptorPool(DXDevice& device);
-    std::shared_ptr<DXCPUDescriptorHandle> AllocateDescriptor(ViewType view_type);
+    ezSharedPtr<DXCPUDescriptorHandle> AllocateDescriptor(ViewType view_type);
 
 private:
     DXCPUDescriptorPoolTyped& SelectHeap(ViewType view_type);

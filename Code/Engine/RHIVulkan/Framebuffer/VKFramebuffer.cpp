@@ -10,7 +10,7 @@ VKFramebuffer::VKFramebuffer(VKDevice& device, const FramebufferDesc& desc)
     vk::FramebufferCreateInfo framebuffer_info = {};
     std::vector<vk::ImageView> attachment_views;
     framebuffer_info.layers = 1;
-    auto add_view = [&](const std::shared_ptr<View>& view)
+    auto add_view = [&](const ezSharedPtr<View>& view)
     {
         if (!view)
             return;
