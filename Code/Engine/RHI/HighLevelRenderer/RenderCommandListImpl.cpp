@@ -115,7 +115,7 @@ void RenderCommandListImpl::UpdateDefaultSubresource(const std::shared_ptr<Resou
 
       ezUInt32 num_bytes = 0, row_bytes = 0, num_rows = 0;
 
-      ezRHIResourceFormat::GetInfo(region.texture_extent.width, region.texture_extent.height, resource->GetFormat(), num_bytes, row_bytes, num_rows, m_device.GetTextureDataPitchAlignment());
+      ResourceFormat::GetInfo(region.texture_extent.width, region.texture_extent.height, resource->GetFormat(), num_bytes, row_bytes, num_rows, m_device.GetTextureDataPitchAlignment());
 
       region.buffer_row_pitch = row_bytes;
 
@@ -146,7 +146,7 @@ void RenderCommandListImpl::SetScissorRect(int32_t left, int32_t top, uint32_t r
   m_command_list->SetScissorRect(left, top, right, bottom);
 }
 
-void RenderCommandListImpl::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format)
+void RenderCommandListImpl::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ResourceFormat::Enum format)
 {
   BufferBarrier(resource, ResourceState::kIndexBuffer);
   m_command_list->IASetIndexBuffer(resource, format);
@@ -569,7 +569,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
   }
   else
   {
-    render_pass_desc.shading_rate_format = ezRHIResourceFormat::UNKNOWN;
+    render_pass_desc.shading_rate_format = ResourceFormat::UNKNOWN;
   }
 
   std::vector<std::shared_ptr<View>> rtvs;

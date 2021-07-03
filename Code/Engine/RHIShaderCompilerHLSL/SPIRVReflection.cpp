@@ -51,57 +51,57 @@ std::vector<InputParameterDesc> ParseInputParameters(const spirv_cross::Compiler
     {
       if (type.vecsize == 1)
       {
-        input.format = ezRHIResourceFormat::R32_FLOAT; // gli::format::FORMAT_R32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32_FLOAT; // gli::format::FORMAT_R32_SFLOAT_PACK32;
       }
       else if (type.vecsize == 2)
       {
-        input.format = ezRHIResourceFormat::R32G32_FLOAT; //gli::format::FORMAT_RG32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32G32_FLOAT; //gli::format::FORMAT_RG32_SFLOAT_PACK32;
       }
       else if (type.vecsize == 3)
       {
-        input.format = ezRHIResourceFormat::R32G32B32_FLOAT; //gli::format::FORMAT_RGB32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32G32B32_FLOAT; //gli::format::FORMAT_RGB32_SFLOAT_PACK32;
       }
       else if (type.vecsize == 4)
       {
-        input.format = ezRHIResourceFormat::R32G32B32A32_FLOAT; //gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32G32B32A32_FLOAT; //gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
       }
     }
     else if (type.basetype == spirv_cross::SPIRType::UInt)
     {
       if (type.vecsize == 1)
       {
-        input.format = ezRHIResourceFormat::R32_UINT; //gli::format::FORMAT_R32_UINT_PACK32;
+        input.format = ResourceFormat::R32_UINT; //gli::format::FORMAT_R32_UINT_PACK32;
       }
       else if (type.vecsize == 2)
       {
-        input.format = ezRHIResourceFormat::R32G32_UINT; //gli::format::FORMAT_RG32_UINT_PACK32;
+        input.format = ResourceFormat::R32G32_UINT; //gli::format::FORMAT_RG32_UINT_PACK32;
       }
       else if (type.vecsize == 3)
       {
-        input.format = ezRHIResourceFormat::R32G32B32_UINT; //gli::format::FORMAT_RGB32_UINT_PACK32;
+        input.format = ResourceFormat::R32G32B32_UINT; //gli::format::FORMAT_RGB32_UINT_PACK32;
       }
       else if (type.vecsize == 4)
       {
-        input.format = ezRHIResourceFormat::R32G32B32A32_UINT; //gli::format::FORMAT_RGBA32_UINT_PACK32;
+        input.format = ResourceFormat::R32G32B32A32_UINT; //gli::format::FORMAT_RGBA32_UINT_PACK32;
       }
     }
     else if (type.basetype == spirv_cross::SPIRType::Int)
     {
       if (type.vecsize == 1)
       {
-        input.format = ezRHIResourceFormat::R32_SINT; //gli::format::FORMAT_R32_SINT_PACK32;
+        input.format = ResourceFormat::R32_SINT; //gli::format::FORMAT_R32_SINT_PACK32;
       }
       else if (type.vecsize == 2)
       {
-        input.format = ezRHIResourceFormat::R32G32_SINT; //gli::format::FORMAT_RG32_SINT_PACK32;
+        input.format = ResourceFormat::R32G32_SINT; //gli::format::FORMAT_RG32_SINT_PACK32;
       }
       else if (type.vecsize == 3)
       {
-        input.format = ezRHIResourceFormat::R32G32B32_SINT; //gli::format::FORMAT_RGB32_SINT_PACK32;
+        input.format = ResourceFormat::R32G32B32_SINT; //gli::format::FORMAT_RGB32_SINT_PACK32;
       }
       else if (type.vecsize == 4)
       {
-        input.format = ezRHIResourceFormat::R32G32B32A32_SINT; //gli::format::FORMAT_RGBA32_SINT_PACK32;
+        input.format = ResourceFormat::R32G32B32A32_SINT; //gli::format::FORMAT_RGBA32_SINT_PACK32;
       }
     }
   }

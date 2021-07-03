@@ -61,7 +61,7 @@ struct InputParameterDesc
 {
     uint32_t location;
     std::string semantic_name;
-    ezRHIResourceFormat::Enum format;
+    ResourceFormat::Enum format;
 };
 
 struct OutputParameterDesc

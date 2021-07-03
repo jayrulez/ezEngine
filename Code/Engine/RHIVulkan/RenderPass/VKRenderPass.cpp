@@ -34,15 +34,15 @@ vk::AttachmentStoreOp Convert(RenderPassStoreOp op)
 VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
     : m_desc(desc)
 {
-    while (!m_desc.colors.empty() && m_desc.colors.back().format == ezRHIResourceFormat::UNKNOWN)
+    while (!m_desc.colors.empty() && m_desc.colors.back().format == ResourceFormat::UNKNOWN)
     {
         m_desc.colors.pop_back();
     }
 
     std::vector<vk::AttachmentDescription2> attachment_descriptions;
-    auto add_attachment = [&](vk::AttachmentReference2& reference, ezRHIResourceFormat::Enum format, vk::ImageLayout layout, RenderPassLoadOp load_op, RenderPassStoreOp store_op)
+    auto add_attachment = [&](vk::AttachmentReference2& reference, ResourceFormat::Enum format, vk::ImageLayout layout, RenderPassLoadOp load_op, RenderPassStoreOp store_op)
     {
-      if (format == ezRHIResourceFormat::UNKNOWN)
+      if (format == ResourceFormat::UNKNOWN)
         {
             reference.attachment = VK_ATTACHMENT_UNUSED;
             return;
@@ -72,7 +72,7 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
     sub_pass.pColorAttachments = color_attachment_references.data();
 
     vk::AttachmentReference2 depth_attachment_reference = {};
-    if (m_desc.depth_stencil.format != ezRHIResourceFormat::UNKNOWN)
+    if (m_desc.depth_stencil.format != ResourceFormat::UNKNOWN)
     {
         add_attachment(depth_attachment_reference, m_desc.depth_stencil.format, vk::ImageLayout::eDepthStencilAttachmentOptimal, m_desc.depth_stencil.depth_load_op, m_desc.depth_stencil.depth_store_op);
         if (depth_attachment_reference.attachment != VK_ATTACHMENT_UNUSED)
@@ -84,7 +84,7 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
         sub_pass.pDepthStencilAttachment = &depth_attachment_reference;
     }
 
-    if (m_desc.shading_rate_format != ezRHIResourceFormat::UNKNOWN)
+    if (m_desc.shading_rate_format != ResourceFormat::UNKNOWN)
     {
         vk::AttachmentReference2 shading_rate_image_attachment_reference = {};
         add_attachment(

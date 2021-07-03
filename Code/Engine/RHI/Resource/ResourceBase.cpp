@@ -10,7 +10,7 @@ ResourceType ResourceBase::GetResourceType() const
     return resource_type;
 }
 
-ezRHIResourceFormat::Enum ResourceBase::GetFormat() const
+ResourceFormat::Enum ResourceBase::GetFormat() const
 {
     return format;
 }

@@ -21,416 +21,416 @@
 namespace DXUtils
 {
 
-  DXGI_FORMAT ToDXGIFormat(ezRHIResourceFormat::Enum value)
+  DXGI_FORMAT ToDXGIFormat(ResourceFormat::Enum value)
   {
     switch (value)
     {
-      case ezRHIResourceFormat::UNKNOWN:
+      case ResourceFormat::UNKNOWN:
         return DXGI_FORMAT_UNKNOWN;
         break;
-      case ezRHIResourceFormat::R32G32B32A32_FLOAT:
+      case ResourceFormat::R32G32B32A32_FLOAT:
         return DXGI_FORMAT_R32G32B32A32_FLOAT;
         break;
-      case ezRHIResourceFormat::R32G32B32A32_UINT:
+      case ResourceFormat::R32G32B32A32_UINT:
         return DXGI_FORMAT_R32G32B32A32_UINT;
         break;
-      case ezRHIResourceFormat::R32G32B32A32_SINT:
+      case ResourceFormat::R32G32B32A32_SINT:
         return DXGI_FORMAT_R32G32B32A32_SINT;
         break;
-      case ezRHIResourceFormat::R32G32B32_FLOAT:
+      case ResourceFormat::R32G32B32_FLOAT:
         return DXGI_FORMAT_R32G32B32_FLOAT;
         break;
-      case ezRHIResourceFormat::R32G32B32_UINT:
+      case ResourceFormat::R32G32B32_UINT:
         return DXGI_FORMAT_R32G32B32_UINT;
         break;
-      case ezRHIResourceFormat::R32G32B32_SINT:
+      case ResourceFormat::R32G32B32_SINT:
         return DXGI_FORMAT_R32G32B32_SINT;
         break;
-      case ezRHIResourceFormat::R16G16B16A16_FLOAT:
+      case ResourceFormat::R16G16B16A16_FLOAT:
         return DXGI_FORMAT_R16G16B16A16_FLOAT;
         break;
-      case ezRHIResourceFormat::R16G16B16A16_UNORM:
+      case ResourceFormat::R16G16B16A16_UNORM:
         return DXGI_FORMAT_R16G16B16A16_UNORM;
         break;
-      case ezRHIResourceFormat::R16G16B16A16_UINT:
+      case ResourceFormat::R16G16B16A16_UINT:
         return DXGI_FORMAT_R16G16B16A16_UINT;
         break;
-      case ezRHIResourceFormat::R16G16B16A16_SNORM:
+      case ResourceFormat::R16G16B16A16_SNORM:
         return DXGI_FORMAT_R16G16B16A16_SNORM;
         break;
-      case ezRHIResourceFormat::R16G16B16A16_SINT:
+      case ResourceFormat::R16G16B16A16_SINT:
         return DXGI_FORMAT_R16G16B16A16_SINT;
         break;
-      case ezRHIResourceFormat::R32G32_FLOAT:
+      case ResourceFormat::R32G32_FLOAT:
         return DXGI_FORMAT_R32G32_FLOAT;
         break;
-      case ezRHIResourceFormat::R32G32_UINT:
+      case ResourceFormat::R32G32_UINT:
         return DXGI_FORMAT_R32G32_UINT;
         break;
-      case ezRHIResourceFormat::R32G32_SINT:
+      case ResourceFormat::R32G32_SINT:
         return DXGI_FORMAT_R32G32_SINT;
         break;
-      case ezRHIResourceFormat::R32G8X24_TYPELESS:
+      case ResourceFormat::R32G8X24_TYPELESS:
         return DXGI_FORMAT_R32G8X24_TYPELESS;
         break;
-      case ezRHIResourceFormat::D32_FLOAT_S8X24_UINT:
+      case ResourceFormat::D32_FLOAT_S8X24_UINT:
         return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
         break;
-      case ezRHIResourceFormat::R10G10B10A2_UNORM:
+      case ResourceFormat::R10G10B10A2_UNORM:
         return DXGI_FORMAT_R10G10B10A2_UNORM;
         break;
-      case ezRHIResourceFormat::R10G10B10A2_UINT:
+      case ResourceFormat::R10G10B10A2_UINT:
         return DXGI_FORMAT_R10G10B10A2_UINT;
         break;
-      case ezRHIResourceFormat::R11G11B10_FLOAT:
+      case ResourceFormat::R11G11B10_FLOAT:
         return DXGI_FORMAT_R11G11B10_FLOAT;
         break;
-      case ezRHIResourceFormat::R8G8B8A8_UNORM:
+      case ResourceFormat::R8G8B8A8_UNORM:
         return DXGI_FORMAT_R8G8B8A8_UNORM;
         break;
-      case ezRHIResourceFormat::R8G8B8A8_UNORM_SRGB:
+      case ResourceFormat::R8G8B8A8_UNORM_SRGB:
         return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         break;
-      case ezRHIResourceFormat::R8G8B8A8_UINT:
+      case ResourceFormat::R8G8B8A8_UINT:
         return DXGI_FORMAT_R8G8B8A8_UINT;
         break;
-      case ezRHIResourceFormat::R8G8B8A8_SNORM:
+      case ResourceFormat::R8G8B8A8_SNORM:
         return DXGI_FORMAT_R8G8B8A8_SNORM;
         break;
-      case ezRHIResourceFormat::R8G8B8A8_SINT:
+      case ResourceFormat::R8G8B8A8_SINT:
         return DXGI_FORMAT_R8G8B8A8_SINT;
         break;
-      case ezRHIResourceFormat::R16G16_FLOAT:
+      case ResourceFormat::R16G16_FLOAT:
         return DXGI_FORMAT_R16G16_FLOAT;
         break;
-      case ezRHIResourceFormat::R16G16_UNORM:
+      case ResourceFormat::R16G16_UNORM:
         return DXGI_FORMAT_R16G16_UNORM;
         break;
-      case ezRHIResourceFormat::R16G16_UINT:
+      case ResourceFormat::R16G16_UINT:
         return DXGI_FORMAT_R16G16_UINT;
         break;
-      case ezRHIResourceFormat::R16G16_SNORM:
+      case ResourceFormat::R16G16_SNORM:
         return DXGI_FORMAT_R16G16_SNORM;
         break;
-      case ezRHIResourceFormat::R16G16_SINT:
+      case ResourceFormat::R16G16_SINT:
         return DXGI_FORMAT_R16G16_SINT;
         break;
-      case ezRHIResourceFormat::R32_TYPELESS:
+      case ResourceFormat::R32_TYPELESS:
         return DXGI_FORMAT_R32_TYPELESS;
         break;
-      case ezRHIResourceFormat::D32_FLOAT:
+      case ResourceFormat::D32_FLOAT:
         return DXGI_FORMAT_D32_FLOAT;
         break;
-      case ezRHIResourceFormat::R32_FLOAT:
+      case ResourceFormat::R32_FLOAT:
         return DXGI_FORMAT_R32_FLOAT;
         break;
-      case ezRHIResourceFormat::R32_UINT:
+      case ResourceFormat::R32_UINT:
         return DXGI_FORMAT_R32_UINT;
         break;
-      case ezRHIResourceFormat::R32_SINT:
+      case ResourceFormat::R32_SINT:
         return DXGI_FORMAT_R32_SINT;
         break;
-      case ezRHIResourceFormat::R8G8_UNORM:
+      case ResourceFormat::R8G8_UNORM:
         return DXGI_FORMAT_R8G8_UNORM;
         break;
-      case ezRHIResourceFormat::R8G8_UINT:
+      case ResourceFormat::R8G8_UINT:
         return DXGI_FORMAT_R8G8_UINT;
         break;
-      case ezRHIResourceFormat::R8G8_SNORM:
+      case ResourceFormat::R8G8_SNORM:
         return DXGI_FORMAT_R8G8_SNORM;
         break;
-      case ezRHIResourceFormat::R8G8_SINT:
+      case ResourceFormat::R8G8_SINT:
         return DXGI_FORMAT_R8G8_SINT;
         break;
-      case ezRHIResourceFormat::R16_TYPELESS:
+      case ResourceFormat::R16_TYPELESS:
         return DXGI_FORMAT_R16_TYPELESS;
         break;
-      case ezRHIResourceFormat::R16_FLOAT:
+      case ResourceFormat::R16_FLOAT:
         return DXGI_FORMAT_R16_FLOAT;
         break;
-      case ezRHIResourceFormat::D16_UNORM:
+      case ResourceFormat::D16_UNORM:
         return DXGI_FORMAT_D16_UNORM;
         break;
-      case ezRHIResourceFormat::R16_UNORM:
+      case ResourceFormat::R16_UNORM:
         return DXGI_FORMAT_R16_UNORM;
         break;
-      case ezRHIResourceFormat::R16_UINT:
+      case ResourceFormat::R16_UINT:
         return DXGI_FORMAT_R16_UINT;
         break;
-      case ezRHIResourceFormat::R16_SNORM:
+      case ResourceFormat::R16_SNORM:
         return DXGI_FORMAT_R16_SNORM;
         break;
-      case ezRHIResourceFormat::R16_SINT:
+      case ResourceFormat::R16_SINT:
         return DXGI_FORMAT_R16_SINT;
         break;
-      case ezRHIResourceFormat::R8_UNORM:
+      case ResourceFormat::R8_UNORM:
         return DXGI_FORMAT_R8_UNORM;
         break;
-      case ezRHIResourceFormat::R8_UINT:
+      case ResourceFormat::R8_UINT:
         return DXGI_FORMAT_R8_UINT;
         break;
-      case ezRHIResourceFormat::R8_SNORM:
+      case ResourceFormat::R8_SNORM:
         return DXGI_FORMAT_R8_SNORM;
         break;
-      case ezRHIResourceFormat::R8_SINT:
+      case ResourceFormat::R8_SINT:
         return DXGI_FORMAT_R8_SINT;
         break;
-      case ezRHIResourceFormat::BC1_UNORM:
+      case ResourceFormat::BC1_UNORM:
         return DXGI_FORMAT_BC1_UNORM;
         break;
-      case ezRHIResourceFormat::BC1_UNORM_SRGB:
+      case ResourceFormat::BC1_UNORM_SRGB:
         return DXGI_FORMAT_BC1_UNORM_SRGB;
         break;
-      case ezRHIResourceFormat::BC2_UNORM:
+      case ResourceFormat::BC2_UNORM:
         return DXGI_FORMAT_BC2_UNORM;
         break;
-      case ezRHIResourceFormat::BC2_UNORM_SRGB:
+      case ResourceFormat::BC2_UNORM_SRGB:
         return DXGI_FORMAT_BC2_UNORM_SRGB;
         break;
-      case ezRHIResourceFormat::BC3_UNORM:
+      case ResourceFormat::BC3_UNORM:
         return DXGI_FORMAT_BC3_UNORM;
         break;
-      case ezRHIResourceFormat::BC3_UNORM_SRGB:
+      case ResourceFormat::BC3_UNORM_SRGB:
         return DXGI_FORMAT_BC3_UNORM_SRGB;
         break;
-      case ezRHIResourceFormat::BC4_UNORM:
+      case ResourceFormat::BC4_UNORM:
         return DXGI_FORMAT_BC4_UNORM;
         break;
-      case ezRHIResourceFormat::BC4_SNORM:
+      case ResourceFormat::BC4_SNORM:
         return DXGI_FORMAT_BC4_SNORM;
         break;
-      case ezRHIResourceFormat::BC5_UNORM:
+      case ResourceFormat::BC5_UNORM:
         return DXGI_FORMAT_BC5_UNORM;
         break;
-      case ezRHIResourceFormat::BC5_SNORM:
+      case ResourceFormat::BC5_SNORM:
         return DXGI_FORMAT_BC5_SNORM;
         break;
-      case ezRHIResourceFormat::B8G8R8A8_UNORM:
+      case ResourceFormat::B8G8R8A8_UNORM:
         return DXGI_FORMAT_B8G8R8A8_UNORM;
         break;
-      case ezRHIResourceFormat::B8G8R8A8_UNORM_SRGB:
+      case ResourceFormat::B8G8R8A8_UNORM_SRGB:
         return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
         break;
-      case ezRHIResourceFormat::BC6H_UF16:
+      case ResourceFormat::BC6H_UF16:
         return DXGI_FORMAT_BC6H_UF16;
         break;
-      case ezRHIResourceFormat::BC6H_SF16:
+      case ResourceFormat::BC6H_SF16:
         return DXGI_FORMAT_BC6H_SF16;
         break;
-      case ezRHIResourceFormat::BC7_UNORM:
+      case ResourceFormat::BC7_UNORM:
         return DXGI_FORMAT_BC7_UNORM;
         break;
-      case ezRHIResourceFormat::BC7_UNORM_SRGB:
+      case ResourceFormat::BC7_UNORM_SRGB:
         return DXGI_FORMAT_BC7_UNORM_SRGB;
         break;
     }
     return DXGI_FORMAT_UNKNOWN;
   }
 
-  ezRHIResourceFormat::Enum ToEngineFormat(DXGI_FORMAT value)
+  ResourceFormat::Enum ToEngineFormat(DXGI_FORMAT value)
   {
     switch (value)
     {
       case DXGI_FORMAT_UNKNOWN:
-        return ezRHIResourceFormat::UNKNOWN;
+        return ResourceFormat::UNKNOWN;
         break;
       case DXGI_FORMAT_R32G32B32A32_FLOAT:
-        return ezRHIResourceFormat::R32G32B32A32_FLOAT;
+        return ResourceFormat::R32G32B32A32_FLOAT;
         break;
       case DXGI_FORMAT_R32G32B32A32_UINT:
-        return ezRHIResourceFormat::R32G32B32A32_UINT;
+        return ResourceFormat::R32G32B32A32_UINT;
         break;
       case DXGI_FORMAT_R32G32B32A32_SINT:
-        return ezRHIResourceFormat::R32G32B32A32_SINT;
+        return ResourceFormat::R32G32B32A32_SINT;
         break;
       case DXGI_FORMAT_R32G32B32_FLOAT:
-        return ezRHIResourceFormat::R32G32B32_FLOAT;
+        return ResourceFormat::R32G32B32_FLOAT;
         break;
       case DXGI_FORMAT_R32G32B32_UINT:
-        return ezRHIResourceFormat::R32G32B32_UINT;
+        return ResourceFormat::R32G32B32_UINT;
         break;
       case DXGI_FORMAT_R32G32B32_SINT:
-        return ezRHIResourceFormat::R32G32B32_SINT;
+        return ResourceFormat::R32G32B32_SINT;
         break;
       case DXGI_FORMAT_R16G16B16A16_FLOAT:
-        return ezRHIResourceFormat::R16G16B16A16_FLOAT;
+        return ResourceFormat::R16G16B16A16_FLOAT;
         break;
       case DXGI_FORMAT_R16G16B16A16_UNORM:
-        return ezRHIResourceFormat::R16G16B16A16_UNORM;
+        return ResourceFormat::R16G16B16A16_UNORM;
         break;
       case DXGI_FORMAT_R16G16B16A16_UINT:
-        return ezRHIResourceFormat::R16G16B16A16_UINT;
+        return ResourceFormat::R16G16B16A16_UINT;
         break;
       case DXGI_FORMAT_R16G16B16A16_SNORM:
-        return ezRHIResourceFormat::R16G16B16A16_SNORM;
+        return ResourceFormat::R16G16B16A16_SNORM;
         break;
       case DXGI_FORMAT_R16G16B16A16_SINT:
-        return ezRHIResourceFormat::R16G16B16A16_SINT;
+        return ResourceFormat::R16G16B16A16_SINT;
         break;
       case DXGI_FORMAT_R32G32_FLOAT:
-        return ezRHIResourceFormat::R32G32_FLOAT;
+        return ResourceFormat::R32G32_FLOAT;
         break;
       case DXGI_FORMAT_R32G32_UINT:
-        return ezRHIResourceFormat::R32G32_UINT;
+        return ResourceFormat::R32G32_UINT;
         break;
       case DXGI_FORMAT_R32G32_SINT:
-        return ezRHIResourceFormat::R32G32_SINT;
+        return ResourceFormat::R32G32_SINT;
         break;
       case DXGI_FORMAT_R32G8X24_TYPELESS:
-        return ezRHIResourceFormat::R32G8X24_TYPELESS;
+        return ResourceFormat::R32G8X24_TYPELESS;
         break;
       case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
-        return ezRHIResourceFormat::D32_FLOAT_S8X24_UINT;
+        return ResourceFormat::D32_FLOAT_S8X24_UINT;
         break;
       case DXGI_FORMAT_R10G10B10A2_UNORM:
-        return ezRHIResourceFormat::R10G10B10A2_UNORM;
+        return ResourceFormat::R10G10B10A2_UNORM;
         break;
       case DXGI_FORMAT_R10G10B10A2_UINT:
-        return ezRHIResourceFormat::R10G10B10A2_UINT;
+        return ResourceFormat::R10G10B10A2_UINT;
         break;
       case DXGI_FORMAT_R11G11B10_FLOAT:
-        return ezRHIResourceFormat::R11G11B10_FLOAT;
+        return ResourceFormat::R11G11B10_FLOAT;
         break;
       case DXGI_FORMAT_R8G8B8A8_UNORM:
-        return ezRHIResourceFormat::R8G8B8A8_UNORM;
+        return ResourceFormat::R8G8B8A8_UNORM;
         break;
       case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-        return ezRHIResourceFormat::R8G8B8A8_UNORM_SRGB;
+        return ResourceFormat::R8G8B8A8_UNORM_SRGB;
         break;
       case DXGI_FORMAT_R8G8B8A8_UINT:
-        return ezRHIResourceFormat::R8G8B8A8_UINT;
+        return ResourceFormat::R8G8B8A8_UINT;
         break;
       case DXGI_FORMAT_R8G8B8A8_SNORM:
-        return ezRHIResourceFormat::R8G8B8A8_SNORM;
+        return ResourceFormat::R8G8B8A8_SNORM;
         break;
       case DXGI_FORMAT_R8G8B8A8_SINT:
-        return ezRHIResourceFormat::R8G8B8A8_SINT;
+        return ResourceFormat::R8G8B8A8_SINT;
         break;
       case DXGI_FORMAT_R16G16_FLOAT:
-        return ezRHIResourceFormat::R16G16_FLOAT;
+        return ResourceFormat::R16G16_FLOAT;
         break;
       case DXGI_FORMAT_R16G16_UNORM:
-        return ezRHIResourceFormat::R16G16_UNORM;
+        return ResourceFormat::R16G16_UNORM;
         break;
       case DXGI_FORMAT_R16G16_UINT:
-        return ezRHIResourceFormat::R16G16_UINT;
+        return ResourceFormat::R16G16_UINT;
         break;
       case DXGI_FORMAT_R16G16_SNORM:
-        return ezRHIResourceFormat::R16G16_SNORM;
+        return ResourceFormat::R16G16_SNORM;
         break;
       case DXGI_FORMAT_R16G16_SINT:
-        return ezRHIResourceFormat::R16G16_SINT;
+        return ResourceFormat::R16G16_SINT;
         break;
       case DXGI_FORMAT_R32_TYPELESS:
-        return ezRHIResourceFormat::R32_TYPELESS;
+        return ResourceFormat::R32_TYPELESS;
         break;
       case DXGI_FORMAT_D32_FLOAT:
-        return ezRHIResourceFormat::D32_FLOAT;
+        return ResourceFormat::D32_FLOAT;
         break;
       case DXGI_FORMAT_R32_FLOAT:
-        return ezRHIResourceFormat::R32_FLOAT;
+        return ResourceFormat::R32_FLOAT;
         break;
       case DXGI_FORMAT_R32_UINT:
-        return ezRHIResourceFormat::R32_UINT;
+        return ResourceFormat::R32_UINT;
         break;
       case DXGI_FORMAT_R32_SINT:
-        return ezRHIResourceFormat::R32_SINT;
+        return ResourceFormat::R32_SINT;
         break;
       case DXGI_FORMAT_R8G8_UNORM:
-        return ezRHIResourceFormat::R8G8_UNORM;
+        return ResourceFormat::R8G8_UNORM;
         break;
       case DXGI_FORMAT_R8G8_UINT:
-        return ezRHIResourceFormat::R8G8_UINT;
+        return ResourceFormat::R8G8_UINT;
         break;
       case DXGI_FORMAT_R8G8_SNORM:
-        return ezRHIResourceFormat::R8G8_SNORM;
+        return ResourceFormat::R8G8_SNORM;
         break;
       case DXGI_FORMAT_R8G8_SINT:
-        return ezRHIResourceFormat::R8G8_SINT;
+        return ResourceFormat::R8G8_SINT;
         break;
       case DXGI_FORMAT_R16_TYPELESS:
-        return ezRHIResourceFormat::R16_TYPELESS;
+        return ResourceFormat::R16_TYPELESS;
         break;
       case DXGI_FORMAT_R16_FLOAT:
-        return ezRHIResourceFormat::R16_FLOAT;
+        return ResourceFormat::R16_FLOAT;
         break;
       case DXGI_FORMAT_D16_UNORM:
-        return ezRHIResourceFormat::D16_UNORM;
+        return ResourceFormat::D16_UNORM;
         break;
       case DXGI_FORMAT_R16_UNORM:
-        return ezRHIResourceFormat::R16_UNORM;
+        return ResourceFormat::R16_UNORM;
         break;
       case DXGI_FORMAT_R16_UINT:
-        return ezRHIResourceFormat::R16_UINT;
+        return ResourceFormat::R16_UINT;
         break;
       case DXGI_FORMAT_R16_SNORM:
-        return ezRHIResourceFormat::R16_SNORM;
+        return ResourceFormat::R16_SNORM;
         break;
       case DXGI_FORMAT_R16_SINT:
-        return ezRHIResourceFormat::R16_SINT;
+        return ResourceFormat::R16_SINT;
         break;
       case DXGI_FORMAT_R8_UNORM:
-        return ezRHIResourceFormat::R8_UNORM;
+        return ResourceFormat::R8_UNORM;
         break;
       case DXGI_FORMAT_R8_UINT:
-        return ezRHIResourceFormat::R8_UINT;
+        return ResourceFormat::R8_UINT;
         break;
       case DXGI_FORMAT_R8_SNORM:
-        return ezRHIResourceFormat::R8_SNORM;
+        return ResourceFormat::R8_SNORM;
         break;
       case DXGI_FORMAT_R8_SINT:
-        return ezRHIResourceFormat::R8_SINT;
+        return ResourceFormat::R8_SINT;
         break;
       case DXGI_FORMAT_BC1_UNORM:
-        return ezRHIResourceFormat::BC1_UNORM;
+        return ResourceFormat::BC1_UNORM;
         break;
       case DXGI_FORMAT_BC1_UNORM_SRGB:
-        return ezRHIResourceFormat::BC1_UNORM_SRGB;
+        return ResourceFormat::BC1_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC2_UNORM:
-        return ezRHIResourceFormat::BC2_UNORM;
+        return ResourceFormat::BC2_UNORM;
         break;
       case DXGI_FORMAT_BC2_UNORM_SRGB:
-        return ezRHIResourceFormat::BC2_UNORM_SRGB;
+        return ResourceFormat::BC2_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC3_UNORM:
-        return ezRHIResourceFormat::BC3_UNORM;
+        return ResourceFormat::BC3_UNORM;
         break;
       case DXGI_FORMAT_BC3_UNORM_SRGB:
-        return ezRHIResourceFormat::BC3_UNORM_SRGB;
+        return ResourceFormat::BC3_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC4_UNORM:
-        return ezRHIResourceFormat::BC4_UNORM;
+        return ResourceFormat::BC4_UNORM;
         break;
       case DXGI_FORMAT_BC4_SNORM:
-        return ezRHIResourceFormat::BC4_SNORM;
+        return ResourceFormat::BC4_SNORM;
         break;
       case DXGI_FORMAT_BC5_UNORM:
-        return ezRHIResourceFormat::BC5_UNORM;
+        return ResourceFormat::BC5_UNORM;
         break;
       case DXGI_FORMAT_BC5_SNORM:
-        return ezRHIResourceFormat::BC5_SNORM;
+        return ResourceFormat::BC5_SNORM;
         break;
       case DXGI_FORMAT_B8G8R8A8_UNORM:
-        return ezRHIResourceFormat::B8G8R8A8_UNORM;
+        return ResourceFormat::B8G8R8A8_UNORM;
         break;
       case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-        return ezRHIResourceFormat::B8G8R8A8_UNORM_SRGB;
+        return ResourceFormat::B8G8R8A8_UNORM_SRGB;
         break;
       case DXGI_FORMAT_BC6H_UF16:
-        return ezRHIResourceFormat::BC6H_UF16;
+        return ResourceFormat::BC6H_UF16;
         break;
       case DXGI_FORMAT_BC6H_SF16:
-        return ezRHIResourceFormat::BC6H_SF16;
+        return ResourceFormat::BC6H_SF16;
         break;
       case DXGI_FORMAT_BC7_UNORM:
-        return ezRHIResourceFormat::BC7_UNORM;
+        return ResourceFormat::BC7_UNORM;
         break;
       case DXGI_FORMAT_BC7_UNORM_SRGB:
-        return ezRHIResourceFormat::BC7_UNORM_SRGB;
+        return ResourceFormat::BC7_UNORM_SRGB;
         break;
     }
-    return ezRHIResourceFormat::UNKNOWN;
+    return ResourceFormat::UNKNOWN;
   }
 
   //--------------------------------------------------------------------------------------
@@ -588,7 +588,7 @@ namespace DXUtils
   void GetSurfaceInfo(
     _In_ size_t width,
     _In_ size_t height,
-    _In_ ezRHIResourceFormat::Enum format,
+    _In_ ResourceFormat::Enum format,
     _Out_opt_ size_t* outNumBytes,
     _Out_opt_ size_t* outRowBytes,
     _Out_opt_ size_t* outNumRows)

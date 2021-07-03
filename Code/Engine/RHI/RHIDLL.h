@@ -16,7 +16,7 @@
 #  define EZ_RHI_DLL
 #endif
 
-struct EZ_RHI_DLL ezRHIResourceFormat
+struct EZ_RHI_DLL ResourceFormat
 {
   typedef ezUInt32 StorageType;
 
@@ -112,31 +112,31 @@ struct EZ_RHI_DLL ezRHIResourceFormat
 
   // General format Meta-Informations:
 
-  EZ_ALWAYS_INLINE static ezUInt32 GetFormatStride(ezRHIResourceFormat::Enum value);
-  EZ_ALWAYS_INLINE static ezUInt32 GetBlockSize(ezRHIResourceFormat::Enum value);
-  EZ_ALWAYS_INLINE static ezVec3U32 GetBlockExtent(ezRHIResourceFormat::Enum value);
-  EZ_ALWAYS_INLINE static bool IsFormatUnorm(ezRHIResourceFormat::Enum value);
-  EZ_ALWAYS_INLINE static bool IsFormatBlockCompressed(ezRHIResourceFormat::Enum value);
-  EZ_ALWAYS_INLINE static bool IsFormatStencilSupport(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static ezUInt32 GetFormatStride(ResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static ezUInt32 GetBlockSize(ResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static ezVec3U32 GetBlockExtent(ResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static bool IsFormatUnorm(ResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static bool IsFormatBlockCompressed(ResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static bool IsFormatStencilSupport(ResourceFormat::Enum value);
   EZ_ALWAYS_INLINE static void GetInfo(ezUInt32 width,
     ezUInt32 height,
-    ezRHIResourceFormat::Enum format,
+    ResourceFormat::Enum format,
     ezUInt32& num_bytes,
     ezUInt32& row_bytes,
     ezUInt32& num_rows,
     uint32_t alignment);
   EZ_ALWAYS_INLINE static void GetInfo(ezUInt32 width,
     ezUInt32 height,
-    ezRHIResourceFormat::Enum format,
+    ResourceFormat::Enum format,
     ezUInt32& num_bytes,
     ezUInt32& row_bytes);
 
   EZ_ALWAYS_INLINE static uint32_t Align(uint32_t size, uint32_t alignment);
 };
 
-EZ_DECLARE_REFLECTABLE_TYPE(EZ_RHI_DLL, ezRHIResourceFormat);
+EZ_DECLARE_REFLECTABLE_TYPE(EZ_RHI_DLL, ResourceFormat);
 
-EZ_ALWAYS_INLINE ezUInt32 ezRHIResourceFormat::GetFormatStride(ezRHIResourceFormat::Enum value)
+EZ_ALWAYS_INLINE ezUInt32 ResourceFormat::GetFormatStride(ResourceFormat::Enum value)
 {
   switch (value)
   {
@@ -231,7 +231,7 @@ EZ_ALWAYS_INLINE ezUInt32 ezRHIResourceFormat::GetFormatStride(ezRHIResourceForm
   return 16;
 }
 
-EZ_ALWAYS_INLINE ezUInt32 ezRHIResourceFormat::GetBlockSize(ezRHIResourceFormat::Enum value)
+EZ_ALWAYS_INLINE ezUInt32 ResourceFormat::GetBlockSize(ResourceFormat::Enum value)
 {
   switch (value)
   {
@@ -263,87 +263,87 @@ EZ_ALWAYS_INLINE ezUInt32 ezRHIResourceFormat::GetBlockSize(ezRHIResourceFormat:
   return 0;
 }
 
-EZ_ALWAYS_INLINE ezVec3U32 ezRHIResourceFormat::GetBlockExtent(ezRHIResourceFormat::Enum value)
+EZ_ALWAYS_INLINE ezVec3U32 ResourceFormat::GetBlockExtent(ResourceFormat::Enum value)
 {
-  static ezMap<ezRHIResourceFormat::Enum, FormatInfo> s_FormatInfos;
+  static ezMap<ResourceFormat::Enum, FormatInfo> s_FormatInfos;
   if (s_FormatInfos.GetCount() == 0)
   {
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32B32A32_FLOAT, FormatInfo{16, ezVec3U32(1, 1, 1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32B32A32_UINT, FormatInfo{16, ezVec3U32(1, 1, 1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32B32A32_SINT, FormatInfo{16, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R32G32B32A32_FLOAT, FormatInfo{16, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R32G32B32A32_UINT, FormatInfo{16, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R32G32B32A32_SINT, FormatInfo{16, ezVec3U32(1, 1, 1), 3});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32B32_FLOAT, FormatInfo{12, ezVec3U32(1, 1, 1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32B32_UINT, FormatInfo{12, ezVec3U32(1, 1, 1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32B32_SINT, FormatInfo{12, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R32G32B32_FLOAT, FormatInfo{12, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R32G32B32_UINT, FormatInfo{12, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R32G32B32_SINT, FormatInfo{12, ezVec3U32(1, 1, 1), 3});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16B16A16_FLOAT, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16B16A16_UNORM, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16B16A16_UINT, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16B16A16_SNORM, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16B16A16_SINT, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R16G16B16A16_FLOAT, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R16G16B16A16_UNORM, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R16G16B16A16_UINT, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R16G16B16A16_SNORM, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R16G16B16A16_SINT, FormatInfo{8, ezVec3U32(1, 1, 1), 4});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32_FLOAT, FormatInfo{8, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32_UINT, FormatInfo{8, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32G32_SINT, FormatInfo{8, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R32G32_FLOAT, FormatInfo{8, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R32G32_UINT, FormatInfo{8, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R32G32_SINT, FormatInfo{8, ezVec3U32(1, 1, 1), 2});
 
-    //s_FormatInfos.Insert(ezRHIResourceFormat::R32G8X24_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
-    s_FormatInfos.Insert(ezRHIResourceFormat::D32_FLOAT_S8X24_UINT, FormatInfo{5, ezVec3U32(1, 1, 1), 2});
+    //s_FormatInfos.Insert(ResourceFormat::R32G8X24_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
+    s_FormatInfos.Insert(ResourceFormat::D32_FLOAT_S8X24_UINT, FormatInfo{5, ezVec3U32(1, 1, 1), 2});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R10G10B10A2_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R10G10B10A2_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R10G10B10A2_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R10G10B10A2_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R11G11B10_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8B8A8_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8B8A8_UNORM_SRGB, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8B8A8_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8B8A8_SNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8B8A8_SINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::B8G8R8A8_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::B8G8R8A8_UNORM_SRGB, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16_SNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16G16_SINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
-    //s_FormatInfos.Insert(ezRHIResourceFormat::R32_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
-    s_FormatInfos.Insert(ezRHIResourceFormat::D32_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R32_SINT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
-    //s_FormatInfos.Insert(ezRHIResourceFormat::R24G8_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
-    s_FormatInfos.Insert(ezRHIResourceFormat::D24_UNORM_S8_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R11G11B10_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 3});
+    s_FormatInfos.Insert(ResourceFormat::R8G8B8A8_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R8G8B8A8_UNORM_SRGB, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R8G8B8A8_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R8G8B8A8_SNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R8G8B8A8_SINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::B8G8R8A8_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::B8G8R8A8_UNORM_SRGB, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::R16G16_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R16G16_UNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R16G16_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R16G16_SNORM, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R16G16_SINT, FormatInfo{4, ezVec3U32(1, 1, 1), 4});
+    //s_FormatInfos.Insert(ResourceFormat::R32_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
+    s_FormatInfos.Insert(ResourceFormat::D32_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R32_FLOAT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R32_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R32_SINT, FormatInfo{4, ezVec3U32(1, 1, 1), 1});
+    //s_FormatInfos.Insert(ResourceFormat::R24G8_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
+    s_FormatInfos.Insert(ResourceFormat::D24_UNORM_S8_UINT, FormatInfo{4, ezVec3U32(1, 1, 1), 2});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8_UNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8_UINT, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8_SNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8G8_SINT, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
-    //s_FormatInfos.Insert(ezRHIResourceFormat::R16_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16_FLOAT, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::D16_UNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16_UNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16_UINT, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16_SNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R16_SINT, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R8G8_UNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R8G8_UINT, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R8G8_SNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::R8G8_SINT, FormatInfo{2, ezVec3U32(1, 1, 1), 2});
+    //s_FormatInfos.Insert(ResourceFormat::R16_TYPELESS, FormatInfo{0, ezVec3U32(), 0});
+    s_FormatInfos.Insert(ResourceFormat::R16_FLOAT, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::D16_UNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R16_UNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R16_UINT, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R16_SNORM, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R16_SINT, FormatInfo{2, ezVec3U32(1, 1, 1), 1});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8_UNORM, FormatInfo{1, ezVec3U32(1,1,1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8_UINT, FormatInfo{1, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8_SNORM, FormatInfo{1, ezVec3U32(1, 1, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::R8_SINT, FormatInfo{1, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R8_UNORM, FormatInfo{1, ezVec3U32(1,1,1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R8_UINT, FormatInfo{1, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R8_SNORM, FormatInfo{1, ezVec3U32(1, 1, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::R8_SINT, FormatInfo{1, ezVec3U32(1, 1, 1), 1});
 
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC1_UNORM, FormatInfo{8, ezVec3U32(4,4,1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC1_UNORM_SRGB, FormatInfo{8, ezVec3U32(4,4,1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC2_UNORM, FormatInfo{16, ezVec3U32(4,4,1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC2_UNORM_SRGB, FormatInfo{16, ezVec3U32(4, 4, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC3_UNORM, FormatInfo{16, ezVec3U32(4, 4, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC3_UNORM_SRGB, FormatInfo{16, ezVec3U32(4, 4, 1), 4});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC4_UNORM, FormatInfo{8, ezVec3U32(4,4,1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC4_SNORM, FormatInfo{8, ezVec3U32(4, 4, 1), 1});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC5_UNORM, FormatInfo{16, ezVec3U32(4,4,1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC5_SNORM, FormatInfo{16, ezVec3U32(4, 4, 1), 2});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC6H_UF16, FormatInfo{16, ezVec3U32(4,4,1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC6H_SF16, FormatInfo{16, ezVec3U32(4,4,1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC7_UNORM, FormatInfo{16, ezVec3U32(4,4,1), 3});
-    s_FormatInfos.Insert(ezRHIResourceFormat::BC7_UNORM_SRGB, FormatInfo{16, ezVec3U32(4,4,1), 3});
+    s_FormatInfos.Insert(ResourceFormat::BC1_UNORM, FormatInfo{8, ezVec3U32(4,4,1), 4});
+    s_FormatInfos.Insert(ResourceFormat::BC1_UNORM_SRGB, FormatInfo{8, ezVec3U32(4,4,1), 4});
+    s_FormatInfos.Insert(ResourceFormat::BC2_UNORM, FormatInfo{16, ezVec3U32(4,4,1), 4});
+    s_FormatInfos.Insert(ResourceFormat::BC2_UNORM_SRGB, FormatInfo{16, ezVec3U32(4, 4, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::BC3_UNORM, FormatInfo{16, ezVec3U32(4, 4, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::BC3_UNORM_SRGB, FormatInfo{16, ezVec3U32(4, 4, 1), 4});
+    s_FormatInfos.Insert(ResourceFormat::BC4_UNORM, FormatInfo{8, ezVec3U32(4,4,1), 1});
+    s_FormatInfos.Insert(ResourceFormat::BC4_SNORM, FormatInfo{8, ezVec3U32(4, 4, 1), 1});
+    s_FormatInfos.Insert(ResourceFormat::BC5_UNORM, FormatInfo{16, ezVec3U32(4,4,1), 2});
+    s_FormatInfos.Insert(ResourceFormat::BC5_SNORM, FormatInfo{16, ezVec3U32(4, 4, 1), 2});
+    s_FormatInfos.Insert(ResourceFormat::BC6H_UF16, FormatInfo{16, ezVec3U32(4,4,1), 3});
+    s_FormatInfos.Insert(ResourceFormat::BC6H_SF16, FormatInfo{16, ezVec3U32(4,4,1), 3});
+    s_FormatInfos.Insert(ResourceFormat::BC7_UNORM, FormatInfo{16, ezVec3U32(4,4,1), 3});
+    s_FormatInfos.Insert(ResourceFormat::BC7_UNORM_SRGB, FormatInfo{16, ezVec3U32(4,4,1), 3});
   }
 
   if (s_FormatInfos.Contains(value))
@@ -354,7 +354,7 @@ EZ_ALWAYS_INLINE ezVec3U32 ezRHIResourceFormat::GetBlockExtent(ezRHIResourceForm
   return {};
 }
 
-EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatUnorm(ezRHIResourceFormat::Enum value)
+EZ_ALWAYS_INLINE bool ResourceFormat::IsFormatUnorm(ResourceFormat::Enum value)
 {
   switch (value)
   {
@@ -376,7 +376,7 @@ EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatUnorm(ezRHIResourceFormat::En
   return false;
 }
 
-EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatBlockCompressed(ezRHIResourceFormat::Enum value)
+EZ_ALWAYS_INLINE bool ResourceFormat::IsFormatBlockCompressed(ResourceFormat::Enum value)
 {
   switch (value)
   {
@@ -400,7 +400,7 @@ EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatBlockCompressed(ezRHIResource
   return false;
 }
 
-EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatStencilSupport(ezRHIResourceFormat::Enum value)
+EZ_ALWAYS_INLINE bool ResourceFormat::IsFormatStencilSupport(ResourceFormat::Enum value)
 {
   switch (value)
   {
@@ -415,9 +415,9 @@ EZ_ALWAYS_INLINE bool ezRHIResourceFormat::IsFormatStencilSupport(ezRHIResourceF
 }
 
 
-EZ_ALWAYS_INLINE void ezRHIResourceFormat::GetInfo(ezUInt32 width,
+EZ_ALWAYS_INLINE void ResourceFormat::GetInfo(ezUInt32 width,
   ezUInt32 height,
-  ezRHIResourceFormat::Enum format,
+  ResourceFormat::Enum format,
   ezUInt32& num_bytes,
   ezUInt32& row_bytes,
   ezUInt32& num_rows,
@@ -438,9 +438,9 @@ EZ_ALWAYS_INLINE void ezRHIResourceFormat::GetInfo(ezUInt32 width,
   num_bytes = row_bytes * num_rows;
 }
 
-EZ_ALWAYS_INLINE void ezRHIResourceFormat::GetInfo(ezUInt32 width,
+EZ_ALWAYS_INLINE void ResourceFormat::GetInfo(ezUInt32 width,
   ezUInt32 height,
-  ezRHIResourceFormat::Enum format,
+  ResourceFormat::Enum format,
   ezUInt32& num_bytes,
   ezUInt32& row_bytes)
 {
@@ -449,7 +449,7 @@ EZ_ALWAYS_INLINE void ezRHIResourceFormat::GetInfo(ezUInt32 width,
   return GetInfo(width, height, format, num_bytes, row_bytes, num_rows, alignment);
 }
 
-EZ_ALWAYS_INLINE uint32_t ezRHIResourceFormat::Align(uint32_t size, uint32_t alignment)
+EZ_ALWAYS_INLINE uint32_t ResourceFormat::Align(uint32_t size, uint32_t alignment)
 {
   return (size + (alignment - 1)) & ~(alignment - 1);
 }

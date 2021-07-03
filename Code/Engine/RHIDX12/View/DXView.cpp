@@ -175,7 +175,7 @@ void DXView::CreateSRV()
             //srv_desc.Format = static_cast<DXGI_FORMAT>(gli::dx().translate(m_view_desc.buffer_format).DXGIFormat.DDS);
           srv_desc.Format = DXUtils::ToDXGIFormat(m_view_desc.buffer_format);
             //stride = gli::detail::bits_per_pixel(m_view_desc.buffer_format) / 8;
-          stride = ezRHIResourceFormat::GetFormatStride(m_view_desc.buffer_format);
+          stride = ResourceFormat::GetFormatStride(m_view_desc.buffer_format);
         }
         else
         {
@@ -259,7 +259,7 @@ void DXView::CreateUAV()
             //uav_desc.Format = static_cast<DXGI_FORMAT>(gli::dx().translate(m_view_desc.buffer_format).DXGIFormat.DDS);
           uav_desc.Format = DXUtils::ToDXGIFormat(m_view_desc.buffer_format);
             //stride = gli::detail::bits_per_pixel(m_view_desc.buffer_format) / 8;
-          stride = ezRHIResourceFormat::GetFormatStride(m_view_desc.buffer_format);
+          stride = ResourceFormat::GetFormatStride(m_view_desc.buffer_format);
         }
         else
         {

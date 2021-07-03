@@ -33,7 +33,7 @@ RenderDeviceImpl::~RenderDeviceImpl()
   WaitForIdle();
 }
 
-ezRHIResourceFormat::Enum RenderDeviceImpl::GetFormat() const
+ResourceFormat::Enum RenderDeviceImpl::GetFormat() const
 {
   return m_swapchain->GetFormat();
 }
@@ -48,7 +48,7 @@ std::shared_ptr<RenderCommandList> RenderDeviceImpl::CreateRenderCommandList(Com
   return std::make_shared<RenderCommandListImpl>(*m_device, *m_object_cache, CommandListType::kGraphics);
 }
 
-std::shared_ptr<Resource> RenderDeviceImpl::CreateTexture(uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
+std::shared_ptr<Resource> RenderDeviceImpl::CreateTexture(uint32_t bind_flag, ResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
 {
   auto res = m_device->CreateTexture(TextureType::k2D, bind_flag, format, sample_count, width, height, depth, mip_levels);
   res->CommitMemory(MemoryType::kDefault);

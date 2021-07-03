@@ -184,7 +184,7 @@ std::shared_ptr<Fence> DXDevice::CreateFence(uint64_t initial_value)
   return std::make_shared<DXFence>(*this, initial_value);
 }
 
-std::shared_ptr<Resource> DXDevice::CreateTexture(TextureType type, uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
+std::shared_ptr<Resource> DXDevice::CreateTexture(TextureType type, uint32_t bind_flag, ResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
 {
   DXGI_FORMAT dx_format = DXUtils::ToDXGIFormat(format); //static_cast<DXGI_FORMAT>(gli::dx().translate(format).DXGIFormat.DDS);
   if (bind_flag & BindFlag::kShaderResource)
@@ -410,14 +410,14 @@ D3D12_RAYTRACING_GEOMETRY_DESC FillRaytracingGeometryDesc(const BufferDesc& vert
       break;
   }
 
-  auto vertex_stride = ezRHIResourceFormat::GetFormatStride(vertex.format); //gli::detail::bits_per_pixel(vertex.format) / 8;
+  auto vertex_stride = ResourceFormat::GetFormatStride(vertex.format); //gli::detail::bits_per_pixel(vertex.format) / 8;
   geometry_desc.Triangles.VertexBuffer.StartAddress = vertex_res->resource->GetGPUVirtualAddress() + vertex.offset * vertex_stride;
   geometry_desc.Triangles.VertexBuffer.StrideInBytes = vertex_stride;
   geometry_desc.Triangles.VertexFormat = DXUtils::ToDXGIFormat(vertex.format); //static_cast<DXGI_FORMAT>(gli::dx().translate(vertex.format).DXGIFormat.DDS);
   geometry_desc.Triangles.VertexCount = vertex.count;
   if (index_res)
   {
-    auto index_stride = ezRHIResourceFormat::GetFormatStride(index.format); //gli::detail::bits_per_pixel(index.format) / 8;
+    auto index_stride = ResourceFormat::GetFormatStride(index.format); //gli::detail::bits_per_pixel(index.format) / 8;
     geometry_desc.Triangles.IndexBuffer = index_res->resource->GetGPUVirtualAddress() + index.offset * index_stride;
     geometry_desc.Triangles.IndexFormat = DXUtils::ToDXGIFormat(index.format); //static_cast<DXGI_FORMAT>(gli::dx().translate(index.format).DXGIFormat.DDS);
     geometry_desc.Triangles.IndexCount = index.count;

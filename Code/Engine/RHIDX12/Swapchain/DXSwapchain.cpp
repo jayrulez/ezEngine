@@ -40,9 +40,9 @@ DXSwapchain::DXSwapchain(DXCommandQueue& command_queue, Window window, uint32_t 
     }
 }
 
-ezRHIResourceFormat::Enum DXSwapchain::GetFormat() const
+ResourceFormat::Enum DXSwapchain::GetFormat() const
 {
-    return ezRHIResourceFormat::R8G8B8A8_UNORM;
+    return ResourceFormat::R8G8B8A8_UNORM;
 }
 
 std::shared_ptr<Resource> DXSwapchain::GetBackBuffer(uint32_t buffer)

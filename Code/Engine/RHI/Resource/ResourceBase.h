@@ -8,7 +8,7 @@ public:
   ResourceBase();
 
   ResourceType GetResourceType() const override final;
-  ezRHIResourceFormat::Enum GetFormat() const override final;
+  ResourceFormat::Enum GetFormat() const override final;
   MemoryType GetMemoryType() const override final;
 
   void UpdateUploadBuffer(uint64_t buffer_offset, const void* data, uint64_t num_bytes) override final;
@@ -20,7 +20,7 @@ public:
   ResourceStateTracker& GetGlobalResourceStateTracker();
   const ResourceStateTracker& GetGlobalResourceStateTracker() const;
 
-  ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum format = ResourceFormat::UNKNOWN;
   ResourceType resource_type = ResourceType::kUnknown;
   std::shared_ptr<Resource> acceleration_structures_memory;
   bool is_back_buffer = false;

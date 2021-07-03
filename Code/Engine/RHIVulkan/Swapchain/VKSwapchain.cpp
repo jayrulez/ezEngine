@@ -103,7 +103,7 @@ VKSwapchain::~VKSwapchain()
     m_fence->Wait(1);
 }
 
-ezRHIResourceFormat::Enum VKSwapchain::GetFormat() const
+ResourceFormat::Enum VKSwapchain::GetFormat() const
 {
   return VKUtils::ToEngineFormat(m_swapchain_color_format);
 }

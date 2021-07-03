@@ -21,7 +21,7 @@
 #include <vulkan/vulkan.hpp>
 #include <set>
 
-static vk::IndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
+static vk::IndexType GetVkIndexType(ResourceFormat::Enum format)
 {
     vk::Format vk_format = VKUtils::ToVkFormat(format);
     switch (vk_format)
@@ -297,7 +297,7 @@ std::shared_ptr<Fence> VKDevice::CreateFence(uint64_t initial_value)
     return std::make_shared<VKTimelineSemaphore>(*this, initial_value);
 }
 
-std::shared_ptr<Resource> VKDevice::CreateTexture(TextureType type, uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
+std::shared_ptr<Resource> VKDevice::CreateTexture(TextureType type, uint32_t bind_flag, ResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels)
 {
     std::shared_ptr<VKResource> res = std::make_shared<VKResource>(*this);
     res->format = format;
@@ -549,14 +549,14 @@ vk::AccelerationStructureGeometryKHR VKDevice::FillRaytracingGeometryTriangles(c
     auto vk_vertex_res = std::static_pointer_cast<VKResource>(vertex.res);
     auto vk_index_res = std::static_pointer_cast<VKResource>(index.res);
 
-    auto vertex_stride = ezRHIResourceFormat::GetFormatStride(vertex.format);
+    auto vertex_stride = ResourceFormat::GetFormatStride(vertex.format);
     geometry_desc.geometry.triangles.vertexData = m_device->getBufferAddress({ vk_vertex_res->buffer.res.get() }) + vertex.offset * vertex_stride;
     geometry_desc.geometry.triangles.vertexStride = vertex_stride;
     geometry_desc.geometry.triangles.vertexFormat = VKUtils::ToVkFormat(vertex.format);
     geometry_desc.geometry.triangles.maxVertex = vertex.count;
     if (vk_index_res)
     {
-        auto index_stride = ezRHIResourceFormat::GetFormatStride(index.format);
+        auto index_stride = ResourceFormat::GetFormatStride(index.format);
         geometry_desc.geometry.triangles.indexData = m_device->getBufferAddress({ vk_index_res->buffer.res.get() }) + index.offset * index_stride;
         geometry_desc.geometry.triangles.indexType = GetVkIndexType(index.format);
     }

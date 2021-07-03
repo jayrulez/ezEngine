@@ -23,7 +23,7 @@ class RenderDevice : public QueryInterface
 public:
     virtual ~RenderDevice() = default;
     virtual std::shared_ptr<RenderCommandList> CreateRenderCommandList(CommandListType type = CommandListType::kGraphics) = 0;
-    virtual std::shared_ptr<Resource> CreateTexture(uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth = 1, int mip_levels = 1) = 0;
+    virtual std::shared_ptr<Resource> CreateTexture(uint32_t bind_flag, ResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth = 1, int mip_levels = 1) = 0;
     virtual std::shared_ptr<Resource> CreateBuffer(uint32_t bind_flag, uint32_t buffer_size, MemoryType memory_type = MemoryType::kDefault) = 0;
     virtual std::shared_ptr<Resource> CreateSampler(const SamplerDesc& desc) = 0;
     virtual std::shared_ptr<Resource> CreateBottomLevelAS(const std::vector<RaytracingGeometryDesc>& descs, BuildAccelerationStructureFlags flags) = 0;
@@ -37,7 +37,7 @@ public:
     virtual bool IsMeshShadingSupported() const = 0;
     virtual uint32_t GetShadingRateImageTileSize() const = 0;
     virtual uint32_t GetFrameIndex() const = 0;
-    virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
+    virtual ResourceFormat::Enum GetFormat() const = 0;
     virtual std::shared_ptr<Resource> GetBackBuffer(uint32_t buffer) = 0;
     virtual const std::string& GetGpuName() const = 0;
     virtual void ExecuteCommandLists(const std::vector<std::shared_ptr<RenderCommandList>>& command_lists) = 0;

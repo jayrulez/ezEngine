@@ -488,7 +488,7 @@ void DXCommandList::SetScissorRect(int32_t left, int32_t top, uint32_t right, ui
   m_command_list->RSSetScissorRects(1, &rect);
 }
 
-void DXCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format)
+void DXCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ResourceFormat::Enum format)
 {
   DXGI_FORMAT dx_format = DXUtils::ToDXGIFormat(format); //static_cast<DXGI_FORMAT>(gli::dx().translate(format).DXGIFormat.DDS);
   decltype(auto) dx_resource = resource->As<DXResource>();
@@ -646,9 +646,9 @@ void DXCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
     src.PlacedFootprint.Footprint.Width = region.texture_extent.width;
     src.PlacedFootprint.Footprint.Height = region.texture_extent.height;
     src.PlacedFootprint.Footprint.Depth = region.texture_extent.depth;
-    if (ezRHIResourceFormat::IsFormatBlockCompressed(format))
+    if (ResourceFormat::IsFormatBlockCompressed(format))
     {
-      auto extent = ezRHIResourceFormat::GetBlockExtent(format);
+      auto extent = ResourceFormat::GetBlockExtent(format);
       src.PlacedFootprint.Footprint.Width = std::max<uint32_t>(extent.x, src.PlacedFootprint.Footprint.Width);
       src.PlacedFootprint.Footprint.Height = std::max<uint32_t>(extent.y, src.PlacedFootprint.Footprint.Height);
       src.PlacedFootprint.Footprint.Depth = std::max<uint32_t>(extent.z, src.PlacedFootprint.Footprint.Depth);

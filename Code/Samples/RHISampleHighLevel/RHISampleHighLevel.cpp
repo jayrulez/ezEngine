@@ -201,7 +201,7 @@ ezApplication::Execution ezRHISampleApp::Run()
     command_list->UseProgram(*m_program);
     command_list->Attach(m_program->ps.cbv.Settings, m_program->ps.cbuffer.Settings);
     command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
-    command_list->IASetIndexBuffer(index, ezRHIResourceFormat::R32_UINT);
+    command_list->IASetIndexBuffer(index, ResourceFormat::R32_UINT);
     command_list->IASetVertexBuffer(m_program->vs.ia.POSITION, pos);
     command_list->BeginRenderPass(render_pass_desc);
     command_list->DrawIndexed(3, 1, 0, 0, 0);

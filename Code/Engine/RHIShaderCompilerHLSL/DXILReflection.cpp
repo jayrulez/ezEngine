@@ -499,38 +499,38 @@ std::vector<InputParameterDesc> ParseInputParameters(const D3D12_SHADER_DESC& de
     if (param_desc.Mask == 1)
     {
       if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32)
-        input.format = ezRHIResourceFormat::R32_UINT; //gli::format::FORMAT_R32_UINT_PACK32;
+        input.format = ResourceFormat::R32_UINT; //gli::format::FORMAT_R32_UINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32)
-        input.format = ezRHIResourceFormat::R32_SINT; //gli::format::FORMAT_R32_SINT_PACK32;
+        input.format = ResourceFormat::R32_SINT; //gli::format::FORMAT_R32_SINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-        input.format = ezRHIResourceFormat::R32_FLOAT; //gli::format::FORMAT_R32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32_FLOAT; //gli::format::FORMAT_R32_SFLOAT_PACK32;
     }
     else if (param_desc.Mask <= 3)
     {
       if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32)
-        input.format = ezRHIResourceFormat::R32G32_UINT; //gli::format::FORMAT_RG32_UINT_PACK32;
+        input.format = ResourceFormat::R32G32_UINT; //gli::format::FORMAT_RG32_UINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32)
-        input.format = ezRHIResourceFormat::R32G32_SINT; //gli::format::FORMAT_RG32_SINT_PACK32;
+        input.format = ResourceFormat::R32G32_SINT; //gli::format::FORMAT_RG32_SINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-        input.format = ezRHIResourceFormat::R32G32_FLOAT; //gli::format::FORMAT_RG32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32G32_FLOAT; //gli::format::FORMAT_RG32_SFLOAT_PACK32;
     }
     else if (param_desc.Mask <= 7)
     {
       if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32)
-        input.format = ezRHIResourceFormat::R32G32B32_UINT; //gli::format::FORMAT_RGB32_UINT_PACK32;
+        input.format = ResourceFormat::R32G32B32_UINT; //gli::format::FORMAT_RGB32_UINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32)
-        input.format = ezRHIResourceFormat::R32G32B32_SINT; //gli::format::FORMAT_RGB32_SINT_PACK32;
+        input.format = ResourceFormat::R32G32B32_SINT; //gli::format::FORMAT_RGB32_SINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-        input.format = ezRHIResourceFormat::R32G32B32_FLOAT; //gli::format::FORMAT_RGB32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32G32B32_FLOAT; //gli::format::FORMAT_RGB32_SFLOAT_PACK32;
     }
     else if (param_desc.Mask <= 15)
     {
       if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32)
-        input.format = ezRHIResourceFormat::R32G32B32A32_UINT; //gli::format::FORMAT_RGBA32_UINT_PACK32;
+        input.format = ResourceFormat::R32G32B32A32_UINT; //gli::format::FORMAT_RGBA32_UINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32)
-        input.format = ezRHIResourceFormat::R32G32B32A32_SINT; //gli::format::FORMAT_RGBA32_SINT_PACK32;
+        input.format = ResourceFormat::R32G32B32A32_SINT; //gli::format::FORMAT_RGBA32_SINT_PACK32;
       else if (param_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-        input.format = ezRHIResourceFormat::R32G32B32A32_FLOAT; //gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+        input.format = ResourceFormat::R32G32B32A32_FLOAT; //gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
     }
   }
   return input_parameters;

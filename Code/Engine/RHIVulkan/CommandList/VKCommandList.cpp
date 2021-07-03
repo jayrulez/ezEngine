@@ -96,7 +96,7 @@ void VKCommandList::BeginRenderPass(const std::shared_ptr<RenderPass>& render_pa
         clear_value.color.float32[3] = clear_desc.colors[i].a;
     }
     clear_values.resize(vk_render_pass.GetDesc().colors.size());
-    if (vk_render_pass.GetDesc().depth_stencil.format != ezRHIResourceFormat::UNKNOWN)
+    if (vk_render_pass.GetDesc().depth_stencil.format != ResourceFormat::UNKNOWN)
     {
         vk::ClearValue clear_value = {};
         clear_value.depthStencil.depth = clear_desc.depth;
@@ -432,7 +432,7 @@ void VKCommandList::SetScissorRect(int32_t left, int32_t top, uint32_t right, ui
     m_command_list->setScissor(0, 1, &rect);
 }
 
-static vk::IndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
+static vk::IndexType GetVkIndexType(ResourceFormat::Enum format)
 {
   vk::Format vk_format = VKUtils::ToVkFormat(format);
     switch (vk_format)
@@ -447,7 +447,7 @@ static vk::IndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
     }
 }
 
-void VKCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format)
+void VKCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ResourceFormat::Enum format)
 {
     decltype(auto) vk_resource = resource->As<VKResource>();
     vk::IndexType index_type = GetVkIndexType(format);
@@ -678,15 +678,15 @@ void VKCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
     {
         auto& vk_region = vk_regions.emplace_back();
         vk_region.bufferOffset = region.buffer_offset;
-        if (ezRHIResourceFormat::IsFormatBlockCompressed(format))
+        if (ResourceFormat::IsFormatBlockCompressed(format))
         {
-            ezVec3U32 extent = ezRHIResourceFormat::GetBlockExtent(format);
-            vk_region.bufferRowLength = region.buffer_row_pitch / ezRHIResourceFormat::GetBlockSize(format) * extent.x;
+            ezVec3U32 extent = ResourceFormat::GetBlockExtent(format);
+            vk_region.bufferRowLength = region.buffer_row_pitch / ResourceFormat::GetBlockSize(format) * extent.x;
             vk_region.bufferImageHeight = ((region.texture_extent.height + extent.y - 1) / extent.y) * extent.x;
         }
         else
         {
-            vk_region.bufferRowLength = region.buffer_row_pitch / ezRHIResourceFormat::GetFormatStride(format);
+            vk_region.bufferRowLength = region.buffer_row_pitch / ResourceFormat::GetFormatStride(format);
             vk_region.bufferImageHeight = region.texture_extent.height;
         }
         vk_region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;

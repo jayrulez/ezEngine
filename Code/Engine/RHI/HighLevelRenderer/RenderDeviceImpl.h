@@ -22,7 +22,7 @@ public:
     ~RenderDeviceImpl();
 
     std::shared_ptr<RenderCommandList> CreateRenderCommandList(CommandListType type) override;
-    std::shared_ptr<Resource> CreateTexture(uint32_t bind_flag, ezRHIResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels) override;
+    std::shared_ptr<Resource> CreateTexture(uint32_t bind_flag, ResourceFormat::Enum format, uint32_t sample_count, int width, int height, int depth, int mip_levels) override;
     std::shared_ptr<Resource> CreateBuffer(uint32_t bind_flag, uint32_t buffer_size, MemoryType memory_type) override;
     std::shared_ptr<Resource> CreateSampler(const SamplerDesc& desc) override;
     std::shared_ptr<Resource> CreateBottomLevelAS(const std::vector<RaytracingGeometryDesc>& descs, BuildAccelerationStructureFlags flags) override;
@@ -36,7 +36,7 @@ public:
     bool IsMeshShadingSupported() const override;
     uint32_t GetShadingRateImageTileSize() const override;
     uint32_t GetFrameIndex() const override;
-    ezRHIResourceFormat::Enum GetFormat() const override;
+    ResourceFormat::Enum GetFormat() const override;
     std::shared_ptr<Resource> GetBackBuffer(uint32_t buffer) override;
     const std::string& GetGpuName() const override;
     void ExecuteCommandLists(const std::vector<std::shared_ptr<RenderCommandList>>& command_lists) override;

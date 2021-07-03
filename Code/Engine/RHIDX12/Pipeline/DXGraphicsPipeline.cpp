@@ -61,7 +61,7 @@ CD3DX12_BLEND_DESC GetBlendDesc(const GraphicsPipelineDesc& desc)
   const RenderPassDesc& render_pass_desc = desc.render_pass->GetDesc();
   for (size_t i = 0; i < render_pass_desc.colors.size(); ++i)
   {
-    if (render_pass_desc.colors[i].format == ezRHIResourceFormat::UNKNOWN)
+    if (render_pass_desc.colors[i].format == ResourceFormat::UNKNOWN)
       continue;
     decltype(auto) rt_desc = blend_desc.RenderTarget[i];
     rt_desc.BlendEnable = desc.blend_desc.blend_enable;
@@ -165,7 +165,7 @@ D3D12_RT_FORMAT_ARRAY GetRTVFormats(const GraphicsPipelineDesc& desc)
   D3D12_RT_FORMAT_ARRAY rt_formats = {};
   for (ezUInt32 i = 0; i < (ezUInt32)render_pass_desc.colors.size(); ++i)
   {
-    if (render_pass_desc.colors[i].format == ezRHIResourceFormat::UNKNOWN)
+    if (render_pass_desc.colors[i].format == ResourceFormat::UNKNOWN)
       continue;
     rt_formats.NumRenderTargets = i + 1;
     rt_formats.RTFormats[i] = DXUtils::ToDXGIFormat(render_pass_desc.colors[i].format); //static_cast<DXGI_FORMAT>(gli::dx().translate(render_pass_desc.colors[i].format).DXGIFormat.DDS);
@@ -176,7 +176,7 @@ D3D12_RT_FORMAT_ARRAY GetRTVFormats(const GraphicsPipelineDesc& desc)
 DXGI_FORMAT GetDSVFormat(const GraphicsPipelineDesc& desc)
 {
   const RenderPassDesc& render_pass_desc = desc.render_pass->GetDesc();
-  if (render_pass_desc.depth_stencil.format == ezRHIResourceFormat::UNKNOWN)
+  if (render_pass_desc.depth_stencil.format == ResourceFormat::UNKNOWN)
     return DXGI_FORMAT_UNKNOWN;
   return DXUtils::ToDXGIFormat(render_pass_desc.depth_stencil.format); //static_cast<DXGI_FORMAT>(gli::dx().translate(render_pass_desc.depth_stencil.format).DXGIFormat.DDS);
 }

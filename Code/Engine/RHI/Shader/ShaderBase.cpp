@@ -28,7 +28,7 @@ ShaderBase::ShaderBase(const ShaderDesc& desc, std::vector<uint8_t> byteCode, st
     layout.slot = i;
     layout.semantic_name = input_parameters[i].semantic_name;
     layout.format = input_parameters[i].format;
-    layout.stride = ezRHIResourceFormat::GetFormatStride(layout.format);
+    layout.stride = ResourceFormat::GetFormatStride(layout.format);
     m_locations[input_parameters[i].semantic_name] = input_parameters[i].location;
   }
 

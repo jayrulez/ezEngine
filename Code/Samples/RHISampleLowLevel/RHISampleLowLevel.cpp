@@ -190,7 +190,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
   GraphicsPipelineDesc pipeline_desc = {
     program,
     layout,
-    {{0, "POSITION", ezRHIResourceFormat::R32G32B32_FLOAT, sizeof(vertex_data.front())}},
+    {{0, "POSITION", ResourceFormat::R32G32B32_FLOAT, sizeof(vertex_data.front())}},
     render_pass};
   pipeline = device->CreateGraphicsPipeline(pipeline_desc);
 
@@ -282,7 +282,7 @@ ezApplication::Execution ezRHISampleApp::Run()
     command_list->BindBindingSet(binding_set);
     command_list->SetViewport(0, 0, (float)m_pWindow->GetClientAreaSize().width, (float)m_pWindow->GetClientAreaSize().height);
     command_list->SetScissorRect(0, 0, m_pWindow->GetClientAreaSize().width, m_pWindow->GetClientAreaSize().height);
-    command_list->IASetIndexBuffer(index_buffer, ezRHIResourceFormat::R32_UINT);
+    command_list->IASetIndexBuffer(index_buffer, ResourceFormat::R32_UINT);
     command_list->IASetVertexBuffer(0, vertex_buffer);
     command_list->ResourceBarrier({{back_buffer, ResourceState::kPresent, ResourceState::kRenderTarget}});
     command_list->BeginRenderPass(render_pass, framebuffer, clear_desc);

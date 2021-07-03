@@ -272,7 +272,7 @@ struct LazyViewDesc
 {
   ezUInt32 level = 0;
   ezUInt32 count = static_cast<ezUInt32>(-1);
-  ezRHIResourceFormat::Enum buffer_format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum buffer_format = ResourceFormat::UNKNOWN;
 
   auto MakeTie() const
   {
@@ -292,7 +292,7 @@ struct ViewDesc
   uint64_t offset = 0;
   uint32_t structure_stride = 0;
   uint64_t buffer_size = static_cast<uint64_t>(-1);
-  ezRHIResourceFormat::Enum buffer_format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum buffer_format = ResourceFormat::UNKNOWN;
   bool bindless = false;
 
   auto MakeTie() const
@@ -345,7 +345,7 @@ struct InputLayoutDesc
 {
   uint32_t slot = 0;
   std::string semantic_name;
-  ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum format = ResourceFormat::UNKNOWN;
   uint32_t stride = 0;
 
   auto MakeTie() const
@@ -369,7 +369,7 @@ enum class RenderPassStoreOp
 
 struct RenderPassColorDesc
 {
-  ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum format = ResourceFormat::UNKNOWN;
   RenderPassLoadOp load_op = RenderPassLoadOp::kLoad;
   RenderPassStoreOp store_op = RenderPassStoreOp::kStore;
 
@@ -381,7 +381,7 @@ struct RenderPassColorDesc
 
 struct RenderPassDepthStencilDesc
 {
-  ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum format = ResourceFormat::UNKNOWN;
   RenderPassLoadOp depth_load_op = RenderPassLoadOp::kLoad;
   RenderPassStoreOp depth_store_op = RenderPassStoreOp::kStore;
   RenderPassLoadOp stencil_load_op = RenderPassLoadOp::kLoad;
@@ -397,7 +397,7 @@ struct RenderPassDesc
 {
   std::vector<RenderPassColorDesc> colors;
   RenderPassDepthStencilDesc depth_stencil;
-  ezRHIResourceFormat::Enum shading_rate_format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum shading_rate_format = ResourceFormat::UNKNOWN;
   uint32_t sample_count = 1;
 
   auto MakeTie() const
@@ -588,7 +588,7 @@ enum class PipelineType
 struct BufferDesc
 {
   std::shared_ptr<Resource> res;
-  ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
+  ResourceFormat::Enum format = ResourceFormat::UNKNOWN;
   uint32_t count = 0;
   uint32_t offset = 0;
 };

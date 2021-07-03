@@ -24,9 +24,9 @@
 
 namespace DXUtils
 {
-  DXGI_FORMAT ToDXGIFormat(ezRHIResourceFormat::Enum value);
+  DXGI_FORMAT ToDXGIFormat(ResourceFormat::Enum value);
 
-  ezRHIResourceFormat::Enum ToEngineFormat(DXGI_FORMAT value);
+  ResourceFormat::Enum ToEngineFormat(DXGI_FORMAT value);
 
   //--------------------------------------------------------------------------------------
   // Get surface information for a particular format
@@ -34,7 +34,7 @@ namespace DXUtils
   void GetSurfaceInfo(
     _In_ size_t width,
     _In_ size_t height,
-    _In_ ezRHIResourceFormat::Enum format,
+    _In_ ResourceFormat::Enum format,
     _Out_opt_ size_t* outNumBytes,
     _Out_opt_ size_t* outRowBytes,
     _Out_opt_ size_t* outNumRows);
