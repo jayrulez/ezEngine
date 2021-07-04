@@ -95,7 +95,7 @@ void VKCommandList::BeginRenderPass(const ezSharedPtr<RenderPass>& render_pass, 
         clear_value.color.float32[2] = clear_desc.colors[i].b;
         clear_value.color.float32[3] = clear_desc.colors[i].a;
     }
-    clear_values.resize(vk_render_pass.GetDesc().colors.size());
+    clear_values.resize(vk_render_pass.GetDesc().colors.GetCount());
     if (vk_render_pass.GetDesc().depth_stencil.format != ezRHIResourceFormat::UNKNOWN)
     {
         vk::ClearValue clear_value = {};

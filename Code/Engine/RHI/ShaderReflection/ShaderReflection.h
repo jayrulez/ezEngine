@@ -33,30 +33,30 @@ struct EntryPoint
     uint32_t attribute_size;
 };
 
-inline bool operator== (const EntryPoint& lhs, const EntryPoint& rhs)
-{
-    return std::tie(lhs.name, lhs.kind) == std::tie(rhs.name, rhs.kind);
-}
-
-inline bool operator< (const EntryPoint& lhs, const EntryPoint& rhs)
-{
-    return std::tie(lhs.name, lhs.kind) < std::tie(rhs.name, rhs.kind);
-}
+//inline bool operator== (const EntryPoint& lhs, const EntryPoint& rhs)
+//{
+//    return std::tie(lhs.name, lhs.kind) == std::tie(rhs.name, rhs.kind);
+//}
+//
+//inline bool operator< (const EntryPoint& lhs, const EntryPoint& rhs)
+//{
+//    return std::tie(lhs.name, lhs.kind) < std::tie(rhs.name, rhs.kind);
+//}
 
 inline auto MakeTie(const ResourceBindingDesc& desc)
 {
     return std::tie(desc.name, desc.type, desc.slot, desc.space, desc.dimension);
 };
 
-inline bool operator== (const ResourceBindingDesc& lhs, const ResourceBindingDesc& rhs)
-{
-    return MakeTie(lhs) == MakeTie(rhs);
-}
-
-inline bool operator< (const ResourceBindingDesc& lhs, const ResourceBindingDesc& rhs)
-{
-    return MakeTie(lhs) < MakeTie(rhs);
-}
+//inline bool operator== (const ResourceBindingDesc& lhs, const ResourceBindingDesc& rhs)
+//{
+//    return MakeTie(lhs) == MakeTie(rhs);
+//}
+//
+//inline bool operator< (const ResourceBindingDesc& lhs, const ResourceBindingDesc& rhs)
+//{
+//    return MakeTie(lhs) < MakeTie(rhs);
+//}
 
 struct InputParameterDesc
 {
@@ -96,15 +96,15 @@ inline auto MakeTie(const VariableLayout& desc)
     return std::tie(desc.name, desc.type, desc.offset, desc.size, desc.rows, desc.columns, desc.elements, desc.members);
 };
 
-inline bool operator== (const VariableLayout& lhs, const VariableLayout& rhs)
-{
-    return MakeTie(lhs) == MakeTie(rhs);
-}
-
-inline bool operator< (const VariableLayout& lhs, const VariableLayout& rhs)
-{
-    return MakeTie(lhs) < MakeTie(rhs);
-}
+//inline bool operator== (const VariableLayout& lhs, const VariableLayout& rhs)
+//{
+//    return MakeTie(lhs) == MakeTie(rhs);
+//}
+//
+//inline bool operator< (const VariableLayout& lhs, const VariableLayout& rhs)
+//{
+//    return MakeTie(lhs) < MakeTie(rhs);
+//}
 
 struct ShaderFeatureInfo
 {

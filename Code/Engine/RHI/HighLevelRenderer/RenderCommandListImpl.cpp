@@ -538,10 +538,10 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
 {
   RenderPassDesc render_pass_desc = {};
   ClearDesc clear_desc = {};
-  render_pass_desc.colors.reserve(desc.colors.size());
+  render_pass_desc.colors.Reserve(desc.colors.GetCount());
   for (const auto& color_desc : desc.colors)
   {
-    auto& color = render_pass_desc.colors.emplace_back();
+    auto& color = render_pass_desc.colors.ExpandAndGetRef();
     clear_desc.colors.emplace_back() = color_desc.clear_color;
     if (!color_desc.texture)
       continue;
@@ -573,7 +573,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
   }
 
   std::vector<ezSharedPtr<View>> rtvs;
-  for (ezUInt32 i = 0; i < (ezUInt32)desc.colors.size(); ++i)
+  for (ezUInt32 i = 0; i < desc.colors.GetCount(); ++i)
   {
     auto& view = rtvs.emplace_back();
     if (!desc.colors[i].texture)

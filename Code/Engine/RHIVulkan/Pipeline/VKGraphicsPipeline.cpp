@@ -159,7 +159,7 @@ VKGraphicsPipeline::VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineD
         color_blend_attachment.alphaBlendOp = convert_op(m_desc.blend_desc.blend_op_alpha);
     }
 
-    std::vector<vk::PipelineColorBlendAttachmentState> color_blend_attachments(render_pass_desc.colors.size(), color_blend_attachment);
+    std::vector<vk::PipelineColorBlendAttachmentState> color_blend_attachments(render_pass_desc.colors.GetCount(), color_blend_attachment);
 
     vk::PipelineColorBlendStateCreateInfo color_blending = {};
     color_blending.logicOpEnable = VK_FALSE;

@@ -59,7 +59,7 @@ CD3DX12_BLEND_DESC GetBlendDesc(const GraphicsPipelineDesc& desc)
     return static_cast<D3D12_BLEND_OP>(0);
   };
   const RenderPassDesc& render_pass_desc = desc.render_pass->GetDesc();
-  for (size_t i = 0; i < render_pass_desc.colors.size(); ++i)
+  for (ezUInt32 i = 0; i < render_pass_desc.colors.GetCount(); ++i)
   {
     if (render_pass_desc.colors[i].format == ezRHIResourceFormat::UNKNOWN)
       continue;
@@ -163,7 +163,7 @@ D3D12_RT_FORMAT_ARRAY GetRTVFormats(const GraphicsPipelineDesc& desc)
 {
   const RenderPassDesc& render_pass_desc = desc.render_pass->GetDesc();
   D3D12_RT_FORMAT_ARRAY rt_formats = {};
-  for (ezUInt32 i = 0; i < (ezUInt32)render_pass_desc.colors.size(); ++i)
+  for (ezUInt32 i = 0; i < render_pass_desc.colors.GetCount(); ++i)
   {
     if (render_pass_desc.colors[i].format == ezRHIResourceFormat::UNKNOWN)
       continue;

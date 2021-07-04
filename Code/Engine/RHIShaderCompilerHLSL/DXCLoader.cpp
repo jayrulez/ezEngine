@@ -45,7 +45,7 @@ HRESULT Test(dxc::DxcDllSupport& dll_support, ShaderBlobType target)
   return hr;
 }
 
-std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType target)
+ezUniquePtr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType target)
 {
   auto dxcompiler_path = std::filesystem::u8path(path) / "dxcompiler.dll";
   if (!std::filesystem::exists(dxcompiler_path))
@@ -66,7 +66,7 @@ std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType
 
   SetDllDirectoryW(std::filesystem::u8path(path).wstring().c_str());
 
-  auto dll_support = std::make_unique<dxc::DxcDllSupport>();
+  auto dll_support = EZ_DEFAULT_NEW(dxc::DxcDllSupport);
   if (FAILED(dll_support->InitializeForDll(dxcompiler_path.wstring().c_str(), "DxcCreateInstance")))
   {
     return {};
@@ -79,7 +79,7 @@ std::unique_ptr<dxc::DxcDllSupport> Load(const std::string& path, ShaderBlobType
   return dll_support;
 }
 
-std::unique_ptr<dxc::DxcDllSupport> GetDxcSupportImpl(ShaderBlobType target)
+ezUniquePtr<dxc::DxcDllSupport> GetDxcSupportImpl(ShaderBlobType target)
 {
   ezStringBuilder vkBinDir(ezEnvironmentVariableUtils::GetValueString("VULKAN_SDK"), "/Bin");
   vkBinDir.MakeCleanPath();
@@ -103,7 +103,7 @@ std::unique_ptr<dxc::DxcDllSupport> GetDxcSupportImpl(ShaderBlobType target)
 
 dxc::DxcDllSupport& GetDxcSupport(ShaderBlobType target)
 {
-  static std::map<ShaderBlobType, std::unique_ptr<dxc::DxcDllSupport>> cache;
+  static std::map<ShaderBlobType, ezUniquePtr<dxc::DxcDllSupport>> cache;
   auto it = cache.find(target);
   if (it == cache.end())
   {

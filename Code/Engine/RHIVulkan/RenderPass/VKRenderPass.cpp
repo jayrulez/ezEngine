@@ -34,9 +34,9 @@ vk::AttachmentStoreOp Convert(RenderPassStoreOp op)
 VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
     : m_desc(desc)
 {
-    while (!m_desc.colors.empty() && m_desc.colors.back().format == ezRHIResourceFormat::UNKNOWN)
+    while (!m_desc.colors.IsEmpty() && m_desc.colors.PeekBack().format == ezRHIResourceFormat::UNKNOWN)
     {
-        m_desc.colors.pop_back();
+        m_desc.colors.PopBack();
     }
 
     std::vector<vk::AttachmentDescription2> attachment_descriptions;

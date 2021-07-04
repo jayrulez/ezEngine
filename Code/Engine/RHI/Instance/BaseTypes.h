@@ -1,5 +1,6 @@
 #pragma once
 #include <Foundation/Types/SharedPtr.h>
+#include <Foundation/Types/UniquePtr.h>
 #include <RHI/Instance/EnumUtils.h>
 #include <RHI/RHIDLL.h>
 #include <array>
@@ -404,7 +405,7 @@ struct RenderPassDepthStencilDesc
 
 struct RenderPassDesc
 {
-  std::vector<RenderPassColorDesc> colors;
+  ezDynamicArray<RenderPassColorDesc> colors;
   RenderPassDepthStencilDesc depth_stencil;
   ezRHIResourceFormat::Enum shading_rate_format = ezRHIResourceFormat::UNKNOWN;
   uint32_t sample_count = 1;
@@ -453,7 +454,7 @@ struct RenderPassBeginDepthStencilDesc
 
 struct RenderPassBeginDesc
 {
-  std::array<RenderPassBeginColorDesc, 8> colors = {};
+  ezStaticArray<RenderPassBeginColorDesc, 8> colors = {};
   RenderPassBeginDepthStencilDesc depth_stencil;
 };
 
@@ -819,7 +820,8 @@ enum class QueryHeapType
 template <typename T>
 auto operator<(const T& l, const T& r) -> std::enable_if_t<std::is_same_v<decltype(l.MakeTie() < r.MakeTie()), bool>, bool>
 {
-  return l.MakeTie() < r.MakeTie();
+  //return l.MakeTie() < r.MakeTie();
+  return false;
 }
 
 enum class ApiType

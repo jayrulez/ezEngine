@@ -11,6 +11,9 @@ using namespace Microsoft::WRL;
 
 class DXDevice;
 class DXGPUDescriptorPoolTyped;
+class DXGPUDescriptorPoolRange;
+
+using ScopeExitDelegate = ezDelegate<void()>;
 
 class DXGPUDescriptorPoolRange : public ezRefCounted
 {
@@ -53,4 +56,7 @@ private:
   uint32_t m_increment_size;
   D3D12_DESCRIPTOR_HEAP_TYPE m_type;
   std::unique_ptr<DXGPUDescriptorPoolRange, std::function<void(DXGPUDescriptorPoolRange*)>> m_callback;
+  //ezScopeExit<ezDelegate<void(ezUInt32, ezUInt32, DXGPUDescriptorPoolRange&)>> m_callback;
+  //ezUniquePtr<ezDelegate<void(DXGPUDescriptorPoolRange*)>> m_callback;
+  //ezUniquePtr<ezScopeExit<ScopeExitDelegate>> m_callback;
 };

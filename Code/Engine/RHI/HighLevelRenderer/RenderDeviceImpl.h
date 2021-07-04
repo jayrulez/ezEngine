@@ -67,5 +67,5 @@ private:
     ezSharedPtr<Fence> m_fence;
     std::vector<ezSharedPtr<CommandList>> m_command_list_pool;
     std::deque<std::pair<uint64_t /*fence_value*/, size_t /*offset*/>> m_fence_value_by_cmd;
-    std::unique_ptr<ObjectCache> m_object_cache;
+    ezUniquePtr<ObjectCache> m_object_cache;
 };

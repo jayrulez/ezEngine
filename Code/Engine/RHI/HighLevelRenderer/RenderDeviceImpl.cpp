@@ -13,7 +13,7 @@ RenderDeviceImpl::RenderDeviceImpl(const RenderDeviceDesc& settings, ezWindowBas
   m_adapter = std::move(m_instance->EnumerateAdapters()[settings.required_gpu_index]);
   m_device = m_adapter->CreateDevice();
   m_command_queue = m_device->GetCommandQueue(CommandListType::kGraphics);
-  m_object_cache = std::make_unique<ObjectCache>(*m_device);
+  m_object_cache = EZ_DEFAULT_NEW(ObjectCache, *m_device);
 
   m_width = m_window->GetClientAreaSize().width;
   m_height = m_window->GetClientAreaSize().height;
