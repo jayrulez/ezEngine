@@ -11,7 +11,7 @@ VKRayTracingPipeline::VKRayTracingPipeline(VKDevice& device, const RayTracingPip
   : VKPipeline(device, desc.program, desc.layout)
   , m_desc(desc)
 {
-  std::vector<vk::RayTracingShaderGroupCreateInfoKHR> groups(m_desc.groups.size());
+  std::vector<vk::RayTracingShaderGroupCreateInfoKHR> groups(m_desc.groups.GetCount());
 
   auto get = [&](uint64_t id) -> uint32_t {
     auto it = m_shader_ids.find(id);
@@ -22,7 +22,7 @@ VKRayTracingPipeline::VKRayTracingPipeline(VKDevice& device, const RayTracingPip
     return it->second;
   };
 
-  for (size_t i = 0; i < m_desc.groups.size(); ++i)
+  for (ezUInt32 i = 0; i < m_desc.groups.GetCount(); ++i)
   {
     decltype(auto) group = groups[i];
     group.generalShader = VK_SHADER_UNUSED_KHR;

@@ -361,7 +361,7 @@ void RenderCommandListImpl::UseProgram(const ezSharedPtr<Program>& program)
     m_ray_tracing_pipeline_desc.program = m_program;
     m_ray_tracing_pipeline_desc.layout = m_layout;
 
-    std::vector<RayTracingShaderGroup>& groups = m_ray_tracing_pipeline_desc.groups;
+    ezDynamicArray<RayTracingShaderGroup>& groups = m_ray_tracing_pipeline_desc.groups;
     m_shader_tables = {};
     m_shader_tables.raygen.stride = m_device.GetShaderTableAlignment();
     m_shader_tables.miss.stride = m_device.GetShaderTableAlignment();
@@ -394,16 +394,16 @@ void RenderCommandListImpl::UseProgram(const ezSharedPtr<Program>& program)
           case ShaderKind::kRayGeneration:
           case ShaderKind::kMiss:
           case ShaderKind::kCallable:
-            groups.push_back({RayTracingShaderGroupType::kGeneral, shader->GetId(entry_point.name)});
+            groups.PushBack({RayTracingShaderGroupType::kGeneral, shader->GetId(entry_point.name)});
             break;
           case ShaderKind::kClosestHit:
-            groups.push_back({RayTracingShaderGroupType::kTrianglesHitGroup, 0, shader->GetId(entry_point.name)});
+            groups.PushBack({RayTracingShaderGroupType::kTrianglesHitGroup, 0, shader->GetId(entry_point.name)});
             break;
           case ShaderKind::kAnyHit:
-            groups.push_back({RayTracingShaderGroupType::kTrianglesHitGroup, 0, 0, shader->GetId(entry_point.name)});
+            groups.PushBack({RayTracingShaderGroupType::kTrianglesHitGroup, 0, 0, shader->GetId(entry_point.name)});
             break;
           case ShaderKind::kIntersection:
-            groups.push_back({RayTracingShaderGroupType::kProceduralHitGroup, 0, 0, 0, shader->GetId(entry_point.name)});
+            groups.PushBack({RayTracingShaderGroupType::kProceduralHitGroup, 0, 0, 0, shader->GetId(entry_point.name)});
             break;
         }
       }
@@ -423,7 +423,7 @@ void RenderCommandListImpl::UseProgram(const ezSharedPtr<Program>& program)
 
 void RenderCommandListImpl::CreateShaderTable(ezSharedPtr<Pipeline> pipeline)
 {
-  decltype(auto) shader_handles = pipeline->GetRayTracingShaderGroupHandles(0, (ezUInt32)m_ray_tracing_pipeline_desc.groups.size());
+  decltype(auto) shader_handles = pipeline->GetRayTracingShaderGroupHandles(0, m_ray_tracing_pipeline_desc.groups.GetCount());
 
   uint64_t table_size = m_shader_tables.raygen.size + m_shader_tables.miss.size + m_shader_tables.callable.size + m_shader_tables.hit.size;
   m_shader_table = m_device.CreateBuffer(BindFlag::kShaderTable, (ezUInt32)table_size);
@@ -542,7 +542,7 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
   for (const auto& color_desc : desc.colors)
   {
     auto& color = render_pass_desc.colors.ExpandAndGetRef();
-    clear_desc.colors.emplace_back() = color_desc.clear_color;
+    clear_desc.colors.ExpandAndGetRef() = color_desc.clear_color;
     if (!color_desc.texture)
       continue;
     color.format = color_desc.texture->GetFormat();
@@ -572,10 +572,10 @@ void RenderCommandListImpl::BeginRenderPass(const RenderPassBeginDesc& desc)
     render_pass_desc.shading_rate_format = ezRHIResourceFormat::UNKNOWN;
   }
 
-  std::vector<ezSharedPtr<View>> rtvs;
+  ezDynamicArray<ezSharedPtr<View>> rtvs;
   for (ezUInt32 i = 0; i < desc.colors.GetCount(); ++i)
   {
-    auto& view = rtvs.emplace_back();
+    auto& view = rtvs.ExpandAndGetRef();
     if (!desc.colors[i].texture)
     {
       continue;

@@ -179,13 +179,13 @@ void DXCommandList::BeginRenderPassImpl(const ezSharedPtr<RenderPass>& render_pa
   };
 
   std::vector<D3D12_RENDER_PASS_RENDER_TARGET_DESC> om_rtv;
-  for (uint32_t slot = 0; slot < rtvs.size(); ++slot)
+  for (uint32_t slot = 0; slot < rtvs.GetCount(); ++slot)
   {
     auto handle = get_handle(rtvs[slot]);
     if (!handle.ptr)
       continue;
     D3D12_RENDER_PASS_BEGINNING_ACCESS begin = {Convert(dx_render_pass.GetDesc().colors[slot].load_op), {}};
-    if (slot < clear_desc.colors.size())
+    if (slot < clear_desc.colors.GetCount())
     {
       begin.Clear.ClearValue.Color[0] = clear_desc.colors[slot].r;
       begin.Clear.ClearValue.Color[1] = clear_desc.colors[slot].g;
@@ -221,14 +221,14 @@ void DXCommandList::OMSetFramebuffer(const ezSharedPtr<RenderPass>& render_pass,
   auto& rtvs = dx_framebuffer.GetDesc().colors;
   auto& dsv = dx_framebuffer.GetDesc().depth_stencil;
 
-  std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> om_rtv(rtvs.size());
+  std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> om_rtv(rtvs.GetCount());
   auto get_handle = [](const ezSharedPtr<View>& view) {
     if (!view)
       return D3D12_CPU_DESCRIPTOR_HANDLE{};
     decltype(auto) dx_view = view->As<DXView>();
     return dx_view.GetHandle();
   };
-  for (uint32_t slot = 0; slot < rtvs.size(); ++slot)
+  for (uint32_t slot = 0; slot < rtvs.GetCount(); ++slot)
   {
     om_rtv[slot] = get_handle(rtvs[slot]);
     if (dx_render_pass.GetDesc().colors[slot].load_op == RenderPassLoadOp::kClear)

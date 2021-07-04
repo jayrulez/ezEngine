@@ -1,5 +1,8 @@
 #include <RHI/Resource/ResourceBase.h>
 #include <RHI/Resource/Resource.h>
+#include <RHI/RenderPass/RenderPass.h>
+#include <RHI/Program/Program.h>
+#include <RHI/BindingSetLayout/BindingSetLayout.h>
 
 ResourceBase::ResourceBase()
     : m_resource_state_tracker(*this)

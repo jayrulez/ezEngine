@@ -46,7 +46,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
     }
 
     size_t hit_group_count = 0;
-    for (size_t i = 0; i < m_desc.groups.size(); ++i)
+    for (ezUInt32 i = 0; i < m_desc.groups.GetCount(); ++i)
     {
         if (m_desc.groups[i].type == RayTracingShaderGroupType::kGeneral)
         {

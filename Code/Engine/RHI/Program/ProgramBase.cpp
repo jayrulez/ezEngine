@@ -1,4 +1,6 @@
 #include <RHI/Program/ProgramBase.h>
+#include <RHI/RenderPass/RenderPass.h>
+#include <RHI/BindingSetLayout/BindingSetLayout.h>
 #include <deque>
 
 ProgramBase::ProgramBase(const std::vector<ezSharedPtr<Shader>>& shaders)

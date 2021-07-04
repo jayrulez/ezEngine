@@ -86,25 +86,25 @@ void VKCommandList::BeginRenderPass(const ezSharedPtr<RenderPass>& render_pass, 
     render_pass_info.renderPass = vk_render_pass.GetRenderPass();
     render_pass_info.framebuffer = vk_framebuffer.GetFramebuffer();
     render_pass_info.renderArea.extent = vk_framebuffer.GetExtent();
-    std::vector<vk::ClearValue> clear_values;
-    for (size_t i = 0; i < clear_desc.colors.size(); ++i)
+    ezDynamicArray<vk::ClearValue> clear_values;
+    for (ezUInt32 i = 0; i < clear_desc.colors.GetCount(); ++i)
     {
-        auto& clear_value = clear_values.emplace_back();
+        auto& clear_value = clear_values.ExpandAndGetRef();
         clear_value.color.float32[0] = clear_desc.colors[i].r;
         clear_value.color.float32[1] = clear_desc.colors[i].g;
         clear_value.color.float32[2] = clear_desc.colors[i].b;
         clear_value.color.float32[3] = clear_desc.colors[i].a;
     }
-    clear_values.resize(vk_render_pass.GetDesc().colors.GetCount());
+    clear_values.SetCount(vk_render_pass.GetDesc().colors.GetCount());
     if (vk_render_pass.GetDesc().depth_stencil.format != ezRHIResourceFormat::UNKNOWN)
     {
         vk::ClearValue clear_value = {};
         clear_value.depthStencil.depth = clear_desc.depth;
         clear_value.depthStencil.stencil = clear_desc.stencil;
-        clear_values.emplace_back(clear_value);
+        clear_values.PushBack(clear_value);
     }
-    render_pass_info.clearValueCount = (ezUInt32)clear_values.size();
-    render_pass_info.pClearValues = clear_values.data();
+    render_pass_info.clearValueCount = clear_values.GetCount();
+    render_pass_info.pClearValues = clear_values.GetData();
     m_command_list->beginRenderPass(render_pass_info, vk::SubpassContents::eInline);
 }
 

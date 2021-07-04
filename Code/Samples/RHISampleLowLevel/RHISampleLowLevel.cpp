@@ -83,7 +83,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     ezInputManager::SetInputActionConfig("Main", "CloseApp", cfg, true);
   }
 
-  
+
   ShaderBlobType shaderBlobType = ShaderBlobType::kSPIRV;
   ApiType apiType = ApiType::kVulkan;
 
@@ -181,16 +181,21 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
   binding_set = device->CreateBindingSet(layout);
   binding_set->WriteBindings({{settings_key, constant_view}});
 
-  RenderPassDesc render_pass_desc = {
-    {{swapchain->GetFormat(), RenderPassLoadOp::kClear, RenderPassStoreOp::kStore}},
-  };
+  //RenderPassDesc render_pass_desc = {
+  //  {{swapchain->GetFormat(), RenderPassLoadOp::kClear, RenderPassStoreOp::kStore}},
+  //};
+  RenderPassDesc render_pass_desc;
+  render_pass_desc.colors.PushBack({swapchain->GetFormat(), RenderPassLoadOp::kClear, RenderPassStoreOp::kStore});
+
   render_pass = device->CreateRenderPass(render_pass_desc);
 
+  ezDynamicArray<InputLayoutDesc> inputs;
+  inputs.PushBack({0, "POSITION", ezRHIResourceFormat::R32G32B32_FLOAT, sizeof(vertex_data.front())});
 
   GraphicsPipelineDesc pipeline_desc = {
     program,
     layout,
-    {{0, "POSITION", ezRHIResourceFormat::R32G32B32_FLOAT, sizeof(vertex_data.front())}},
+    inputs,
     render_pass};
   pipeline = device->CreateGraphicsPipeline(pipeline_desc);
 
@@ -264,7 +269,8 @@ ezApplication::Execution ezRHISampleApp::Run()
   {
     frame_index = swapchain->NextImage(fence, ++fence_value);
 
-    ClearDesc clear_desc = {{{0.0, 0.2, 0.4, 1.0}}};
+    ClearDesc clear_desc;
+    clear_desc.colors.PushBack({0.0, 0.2, 0.4, 1.0});
 
     ViewDesc back_buffer_view_desc = {};
     back_buffer_view_desc.view_type = ViewType::kRenderTarget;
@@ -275,7 +281,11 @@ ezApplication::Execution ezRHISampleApp::Run()
     framebuffer_desc.render_pass = render_pass;
     framebuffer_desc.width = m_pWindow->GetClientAreaSize().width;
     framebuffer_desc.height = m_pWindow->GetClientAreaSize().height;
-    framebuffer_desc.colors = {back_buffer_view};
+
+    ezDynamicArray<ezSharedPtr<View>> views;
+    views.PushBack(back_buffer_view);
+    framebuffer_desc.colors = views;
+
     ezSharedPtr<Framebuffer> framebuffer = device->CreateFramebuffer(framebuffer_desc);
     ezSharedPtr<CommandList> command_list = device->CreateCommandList(CommandListType::kGraphics);
     command_list->BindPipeline(pipeline);

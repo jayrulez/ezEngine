@@ -1,7 +1,9 @@
 #pragma once
+#include <Foundation/Algorithm/HashableStruct.h>
 #include <Foundation/Types/SharedPtr.h>
 #include <Foundation/Types/UniquePtr.h>
 #include <RHI/Instance/EnumUtils.h>
+#include <RHI/Instance/QueryInterface.h>
 #include <RHI/RHIDLL.h>
 #include <array>
 #include <cassert>
@@ -11,8 +13,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-//#include <RHI/RenderPass/RenderPass.h>
-#include <RHI/Instance/QueryInterface.h>
 
 class Resource;
 class RenderPass;
@@ -172,7 +172,7 @@ enum class CullMode
   kBack,
 };
 
-struct RasterizerDesc
+struct RasterizerDesc : public ezHashableStruct<RasterizerDesc>
 {
   FillMode fill_mode = FillMode::kSolid;
   CullMode cull_mode = CullMode::kBack;
@@ -196,7 +196,7 @@ enum class BlendOp
   kAdd,
 };
 
-struct BlendDesc
+struct BlendDesc : public ezHashableStruct<BlendDesc>
 {
   bool blend_enable = false;
   Blend blend_src;
@@ -236,7 +236,7 @@ enum class StencilOp
   kDecr
 };
 
-struct StencilOpDesc
+struct StencilOpDesc : public ezHashableStruct<StencilOpDesc>
 {
   StencilOp fail_op = StencilOp::kKeep;
   StencilOp depth_fail_op = StencilOp::kKeep;
@@ -249,7 +249,7 @@ struct StencilOpDesc
   }
 };
 
-struct DepthStencilDesc
+struct DepthStencilDesc : public ezHashableStruct<DepthStencilDesc>
 {
   bool depth_test_enable = true;
   ComparisonFunc depth_func = ComparisonFunc::kLess;
@@ -279,7 +279,7 @@ enum class ShaderType
   kLibrary,
 };
 
-struct LazyViewDesc
+struct LazyViewDesc : public ezHashableStruct<LazyViewDesc>
 {
   ezUInt32 level = 0;
   ezUInt32 count = static_cast<ezUInt32>(-1);
@@ -291,7 +291,7 @@ struct LazyViewDesc
   }
 };
 
-struct ViewDesc
+struct ViewDesc : public ezHashableStruct<ViewDesc>
 {
   ViewType view_type = ViewType::kUnknown;
   ViewDimension dimension = ViewDimension::kUnknown;
@@ -312,7 +312,7 @@ struct ViewDesc
   }
 };
 
-struct ShaderDesc
+struct ShaderDesc : public ezHashableStruct<ShaderDesc>
 {
   //std::vector<uint8_t> blob;
   //ezSharedPtr<ShaderReflection> reflection;
@@ -351,12 +351,25 @@ struct ShaderDesc
 //  }
 //};
 
-struct InputLayoutDesc
+struct InputLayoutDesc : public ezHashableStruct<InputLayoutDesc>
 {
   uint32_t slot = 0;
   std::string semantic_name;
   ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
   uint32_t stride = 0;
+
+  InputLayoutDesc() = default;
+
+  InputLayoutDesc(uint32_t slot = 0,
+    std::string semantic_name = {},
+    ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN,
+    uint32_t stride = 0)
+    : slot{slot}
+    , semantic_name(semantic_name)
+    , format{format}
+    , stride{stride}
+  {
+  }
 
   auto MakeTie() const
   {
@@ -377,11 +390,22 @@ enum class RenderPassStoreOp
   kDontCare,
 };
 
-struct RenderPassColorDesc
+struct RenderPassColorDesc : public ezHashableStruct<RenderPassColorDesc>
 {
   ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
   RenderPassLoadOp load_op = RenderPassLoadOp::kLoad;
   RenderPassStoreOp store_op = RenderPassStoreOp::kStore;
+
+  //RenderPassColorDesc() = default;
+
+  RenderPassColorDesc(ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN,
+    RenderPassLoadOp load_op = RenderPassLoadOp::kLoad,
+    RenderPassStoreOp store_op = RenderPassStoreOp::kStore)
+    : format{format}
+    , load_op{load_op}
+    , store_op{store_op}
+  {
+  }
 
   auto MakeTie() const
   {
@@ -389,7 +413,7 @@ struct RenderPassColorDesc
   }
 };
 
-struct RenderPassDepthStencilDesc
+struct RenderPassDepthStencilDesc : public ezHashableStruct<RenderPassDepthStencilDesc>
 {
   ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
   RenderPassLoadOp depth_load_op = RenderPassLoadOp::kLoad;
@@ -403,7 +427,7 @@ struct RenderPassDepthStencilDesc
   }
 };
 
-struct RenderPassDesc
+struct RenderPassDesc : public ezHashableStruct<RenderPassDesc>
 {
   ezDynamicArray<RenderPassColorDesc> colors;
   RenderPassDepthStencilDesc depth_stencil;
@@ -416,12 +440,12 @@ struct RenderPassDesc
   }
 };
 
-struct FramebufferDesc
+struct FramebufferDesc : public ezHashableStruct<FramebufferDesc>
 {
   ezSharedPtr<RenderPass> render_pass;
   uint32_t width;
   uint32_t height;
-  std::vector<ezSharedPtr<View>> colors;
+  ezDynamicArray<ezSharedPtr<View>> colors;
   ezSharedPtr<View> depth_stencil;
   ezSharedPtr<View> shading_rate_image;
 
@@ -431,7 +455,7 @@ struct FramebufferDesc
   }
 };
 
-struct RenderPassBeginColorDesc
+struct RenderPassBeginColorDesc : public ezHashableStruct<RenderPassBeginColorDesc>
 {
   ezSharedPtr<Resource> texture;
   LazyViewDesc view_desc;
@@ -440,7 +464,7 @@ struct RenderPassBeginColorDesc
   ezColor clear_color = {};
 };
 
-struct RenderPassBeginDepthStencilDesc
+struct RenderPassBeginDepthStencilDesc : public ezHashableStruct<RenderPassBeginDepthStencilDesc>
 {
   ezSharedPtr<Resource> texture;
   LazyViewDesc view_desc;
@@ -452,21 +476,40 @@ struct RenderPassBeginDepthStencilDesc
   uint8_t clear_stencil = 0;
 };
 
-struct RenderPassBeginDesc
+struct RenderPassBeginDesc : public ezHashableStruct<RenderPassBeginDesc>
 {
   ezStaticArray<RenderPassBeginColorDesc, 8> colors = {};
   RenderPassBeginDepthStencilDesc depth_stencil;
 };
 
-struct GraphicsPipelineDesc
+struct GraphicsPipelineDesc : public ezHashableStruct<GraphicsPipelineDesc>
 {
   ezSharedPtr<Program> program;
   ezSharedPtr<BindingSetLayout> layout;
-  std::vector<InputLayoutDesc> input;
+  ezDynamicArray<InputLayoutDesc> input;
   ezSharedPtr<RenderPass> render_pass;
   DepthStencilDesc depth_stencil_desc;
   BlendDesc blend_desc;
   RasterizerDesc rasterizer_desc;
+
+  //GraphicsPipelineDesc() {}
+
+  GraphicsPipelineDesc(ezSharedPtr<Program> program = nullptr,
+    ezSharedPtr<BindingSetLayout> layout = nullptr,
+    ezDynamicArray<InputLayoutDesc> input = ezDynamicArray<InputLayoutDesc>(),
+    ezSharedPtr<RenderPass> render_pass = nullptr,
+    const DepthStencilDesc& depth_stencil_desc = {},
+    const BlendDesc& blend_desc = {},
+    const RasterizerDesc& rasterizer_desc = {})
+    : program{program}
+    , layout{layout}
+    , input{input}
+    , render_pass{render_pass}
+    , depth_stencil_desc{depth_stencil_desc}
+    , blend_desc{blend_desc}
+    , rasterizer_desc{rasterizer_desc}
+  {
+  }
 
   auto MakeTie() const
   {
@@ -474,7 +517,7 @@ struct GraphicsPipelineDesc
   }
 };
 
-struct ComputePipelineDesc
+struct ComputePipelineDesc : public ezHashableStruct<ComputePipelineDesc>
 {
   ezSharedPtr<Program> program;
   ezSharedPtr<BindingSetLayout> layout;
@@ -492,7 +535,7 @@ enum class RayTracingShaderGroupType
   kProceduralHitGroup,
 };
 
-struct RayTracingShaderGroup
+struct RayTracingShaderGroup : public ezHashableStruct<RayTracingShaderGroup>
 {
   RayTracingShaderGroupType type = RayTracingShaderGroupType::kGeneral;
   uint64_t general = 0;
@@ -500,17 +543,26 @@ struct RayTracingShaderGroup
   uint64_t any_hit = 0;
   uint64_t intersection = 0;
 
+  RayTracingShaderGroup(RayTracingShaderGroupType type = RayTracingShaderGroupType::kGeneral, uint64_t general = 0, uint64_t closest_hit = 0, uint64_t any_hit = 0, uint64_t intersection = 0)
+    : type{type}
+    , general{general}
+    , closest_hit{closest_hit}
+    , any_hit{any_hit}
+    , intersection{intersection}
+  {
+  }
+
   auto MakeTie() const
   {
     return std::tie(type, general, closest_hit, any_hit, intersection);
   }
 };
 
-struct RayTracingPipelineDesc
+struct RayTracingPipelineDesc : public ezHashableStruct<RayTracingPipelineDesc>
 {
   ezSharedPtr<Program> program;
   ezSharedPtr<BindingSetLayout> layout;
-  std::vector<RayTracingShaderGroup> groups;
+  ezDynamicArray<RayTracingShaderGroup> groups;
 
   auto MakeTie() const
   {
@@ -518,7 +570,7 @@ struct RayTracingPipelineDesc
   }
 };
 
-struct RayTracingShaderTable
+struct RayTracingShaderTable : public ezHashableStruct<RayTracingShaderTable>
 {
   ezSharedPtr<Resource> resource;
   uint64_t offset;
@@ -526,7 +578,7 @@ struct RayTracingShaderTable
   uint64_t stride;
 };
 
-struct RayTracingShaderTables
+struct RayTracingShaderTables : public ezHashableStruct<RayTracingShaderTables>
 {
   RayTracingShaderTable raygen;
   RayTracingShaderTable miss;
@@ -534,7 +586,7 @@ struct RayTracingShaderTables
   RayTracingShaderTable callable;
 };
 
-struct BindKey
+struct BindKey : public ezHashableStruct<BindKey>
 {
   ShaderType shader_type = ShaderType::kUnknown;
   ViewType view_type = ViewType::kUnknown;
@@ -542,16 +594,33 @@ struct BindKey
   uint32_t space = 0;
   uint32_t count = 0;
 
+  BindKey(ShaderType shader_type = ShaderType::kUnknown, ViewType view_type = ViewType::kUnknown, uint32_t slot = 0, uint32_t space = 0, uint32_t count = 0)
+    : shader_type{shader_type}
+    , view_type{view_type}
+    , slot{slot}
+    , space{space}
+    , count{count}
+  {
+  }
+
   auto MakeTie() const
   {
     return std::tie(shader_type, view_type, slot, space, count);
   }
 };
 
-struct BindingDesc
+struct BindingDesc : public ezHashableStruct<BindingDesc>
 {
   BindKey bind_key;
   ezSharedPtr<View> view;
+
+  BindingDesc() = default;
+
+  BindingDesc(const BindKey& bind_key, ezSharedPtr<View> view)
+    : bind_key{bind_key}
+    , view{view}
+  {
+  }
 
   auto MakeTie() const
   {
@@ -568,7 +637,7 @@ enum class ReturnType
   kDouble,
 };
 
-struct ResourceBindingDesc
+struct ResourceBindingDesc : public ezHashableStruct<ResourceBindingDesc>
 {
   std::string name;
   ViewType type;
@@ -587,7 +656,7 @@ enum class PipelineType
   kRayTracing,
 };
 
-struct BufferDesc
+struct BufferDesc : public ezHashableStruct<BufferDesc>
 {
   ezSharedPtr<Resource> res;
   ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
@@ -611,7 +680,7 @@ enum class RaytracingGeometryFlags
   kNoDuplicateAnyHitInvocation
 };
 
-struct RaytracingGeometryDesc
+struct RaytracingGeometryDesc : public ezHashableStruct<RaytracingGeometryDesc>
 {
   BufferDesc vertex;
   BufferDesc index;
@@ -667,7 +736,7 @@ struct BufferCopyRegion
   uint64_t num_bytes;
 };
 
-struct RaytracingGeometryInstance
+struct RaytracingGeometryInstance : public ezHashableStruct<RaytracingGeometryInstance>
 {
   ezRHIFloat3X4 transform;
   uint32_t instance_id : 24;
@@ -679,7 +748,7 @@ struct RaytracingGeometryInstance
 
 EZ_CHECK_AT_COMPILETIME(sizeof(RaytracingGeometryInstance) == 64);
 
-struct ResourceBarrierDesc
+struct ResourceBarrierDesc : public ezHashableStruct<ResourceBarrierDesc>
 {
   ezSharedPtr<Resource> resource;
   ResourceState state_before;
@@ -688,6 +757,25 @@ struct ResourceBarrierDesc
   uint32_t level_count = 1;
   uint32_t base_array_layer = 0;
   uint32_t layer_count = 1;
+
+  ResourceBarrierDesc() = default;
+
+  ResourceBarrierDesc(ezSharedPtr<Resource> resource,
+    ResourceState state_before,
+    ResourceState state_after,
+    uint32_t base_mip_level = 0,
+    uint32_t level_count = 1,
+    uint32_t base_array_layer = 0,
+    uint32_t layer_count = 1)
+    : resource{resource}
+    , state_before{state_before}
+    , state_after{state_after}
+    , base_mip_level{base_mip_level}
+    , level_count{level_count}
+    , base_array_layer{base_array_layer}
+    , layer_count{layer_count}
+  {
+  }
 };
 
 class EZ_RHI_DLL DeferredView : public ezRefCounted
@@ -755,9 +843,9 @@ enum class CommandListType
   kCopy,
 };
 
-struct ClearDesc
+struct ClearDesc : public ezHashableStruct<ClearDesc>
 {
-  std::vector<ezColor> colors;
+  ezDynamicArray<ezColor> colors;
   float depth = 1.0f;
   uint8_t stencil = 0;
 };

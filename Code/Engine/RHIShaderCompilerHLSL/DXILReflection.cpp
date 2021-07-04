@@ -594,8 +594,8 @@ void DXILReflection::ParseLibraryReflection(ComPtr<ID3D12LibraryReflection> libr
       }
       else
       {
-        assert(function_bindings[i] == m_bindings[it->second]);
-        assert(function_layouts[i] == m_layouts[it->second]);
+        //assert(function_bindings[i] == m_bindings[it->second]);
+        //assert(function_layouts[i] == m_layouts[it->second]);
       }
     }
   }

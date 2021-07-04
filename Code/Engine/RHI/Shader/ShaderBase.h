@@ -15,7 +15,7 @@ public:
   const BindKey& GetBindKey(const std::string& name) const override;
   const std::vector<ResourceBindingDesc>& GetResourceBindings() const override;
   const ResourceBindingDesc& GetResourceBinding(const BindKey& bind_key) const override;
-  const std::vector<InputLayoutDesc>& GetInputLayouts() const override;
+  const ezDynamicArray<InputLayoutDesc>& GetInputLayouts() const override;
   uint32_t GetInputLayoutLocation(const std::string& semantic_name) const override;
   const std::vector<BindKey>& GetBindings() const override;
   const ezSharedPtr<ShaderReflection>& GetReflection() const override;
@@ -29,7 +29,7 @@ protected:
   std::vector<BindKey> m_binding_keys;
   std::map<BindKey, size_t> m_mapping;
   std::map<std::string, BindKey> m_bind_keys;
-  std::vector<InputLayoutDesc> m_input_layout_descs;
+  ezDynamicArray<InputLayoutDesc> m_input_layout_descs;
   std::map<std::string, uint32_t> m_locations;
   ezSharedPtr<ShaderReflection> m_reflection;
 };
