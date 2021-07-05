@@ -77,9 +77,121 @@ enum class ezRHITextureType
   Texture3D,
 };
 
-enum class ezRHIResourceFormat
+struct EZ_RHI_DLL ezRHIResourceFormat
 {
-  Unknown
+  typedef ezUInt32 StorageType;
+
+  enum Enum
+  {
+    Unknown,
+    R32G32B32A32_FLOAT,
+    R32G32B32A32_UINT,
+    R32G32B32A32_SINT,
+
+    R32G32B32_FLOAT,
+    R32G32B32_UINT,
+    R32G32B32_SINT,
+
+    R16G16B16A16_FLOAT,
+    R16G16B16A16_UNORM,
+    R16G16B16A16_UINT,
+    R16G16B16A16_SNORM,
+    R16G16B16A16_SINT,
+
+    R32G32_FLOAT,
+    R32G32_UINT,
+    R32G32_SINT,
+    R32G8X24_TYPELESS,    // depth (32-bit) + stencil (8-bit) + shader resource (32-bit)
+    D32_FLOAT_S8X24_UINT, // depth (32-bit) + stencil (8-bit)
+
+    R10G10B10A2_UNORM,
+    R10G10B10A2_UINT,
+    R11G11B10_FLOAT,
+    R8G8B8A8_UNORM,
+    R8G8B8A8_UNORM_SRGB,
+    R8G8B8A8_UINT,
+    R8G8B8A8_SNORM,
+    R8G8B8A8_SINT,
+    B8G8R8A8_UNORM,
+    B8G8R8A8_UNORM_SRGB,
+    R16G16_FLOAT,
+    R16G16_UNORM,
+    R16G16_UINT,
+    R16G16_SNORM,
+    R16G16_SINT,
+    R32_TYPELESS, // depth (32-bit) + shader resource (32-bit)
+    D32_FLOAT,    // depth (32-bit)
+    R32_FLOAT,
+    R32_UINT,
+    R32_SINT,
+    R24G8_TYPELESS,    // depth (24-bit) + stencil (8-bit) + shader resource (24-bit)
+    D24_UNORM_S8_UINT, // depth (24-bit) + stencil (8-bit)
+
+    R8G8_UNORM,
+    R8G8_UINT,
+    R8G8_SNORM,
+    R8G8_SINT,
+    R16_TYPELESS, // depth (16-bit) + shader resource (16-bit)
+    R16_FLOAT,
+    D16_UNORM, // depth (16-bit)
+    R16_UNORM,
+    R16_UINT,
+    R16_SNORM,
+    R16_SINT,
+
+    R8_UNORM,
+    R8_UINT,
+    R8_SNORM,
+    R8_SINT,
+
+    BC1_UNORM,
+    BC1_UNORM_SRGB,
+    BC2_UNORM,
+    BC2_UNORM_SRGB,
+    BC3_UNORM,
+    BC3_UNORM_SRGB,
+    BC4_UNORM,
+    BC4_SNORM,
+    BC5_UNORM,
+    BC5_SNORM,
+    BC6H_UF16,
+    BC6H_SF16,
+    BC7_UNORM,
+    BC7_UNORM_SRGB,
+
+    ENUM_COUNT,
+
+    Default = R8G8B8A8_UNORM_SRGB //RGBAUByteNormalizedsRGB
+  };
+
+  struct FormatInfo
+  {
+    ezUInt8 BlockSize;
+    ezVec3U32 BlockExtent;
+    ezUInt8 Components;
+  };
+
+  EZ_ALWAYS_INLINE static ezUInt32 GetFormatStride(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static ezUInt32 GetBlockSize(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static ezVec3U32 GetBlockExtent(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static bool IsFormatUnorm(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static bool IsFormatBlockCompressed(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static bool IsFormatStencilSupport(ezRHIResourceFormat::Enum value);
+  EZ_ALWAYS_INLINE static void GetInfo(ezUInt32 width,
+    ezUInt32 height,
+    ezRHIResourceFormat::Enum format,
+    ezUInt32& numBytes,
+    ezUInt32& rowBytes,
+    ezUInt32& numRows,
+    ezUInt32 alignment);
+  EZ_ALWAYS_INLINE static void GetInfo(ezUInt32 width,
+    ezUInt32 height,
+    ezRHIResourceFormat::Enum format,
+    ezUInt32& numBytes,
+    ezUInt32& rowBytes);
+
+private:
+  EZ_ALWAYS_INLINE static ezUInt32 Align(ezUInt32 size, ezUInt32 alignment);
 };
 
 enum class ezRHIIndexFormat
@@ -365,7 +477,7 @@ struct EZ_RHI_DLL ezRHITextureCreationDescription
 {
   ezRHITextureType m_Type;
   ezUInt32 m_BindFlag;
-  ezRHIResourceFormat m_Format;
+  ezRHIResourceFormat::Enum m_Format;
   ezUInt32 m_SampleCount;
   ezInt32 m_Width;
   ezInt32 m_Height;
@@ -398,7 +510,7 @@ struct EZ_RHI_DLL ezRHIViewDesc
   ezUInt32 m_Offset = 0;
   ezUInt32 m_StructureStride = 0;
   ezUInt64 m_BufferSize = static_cast<ezUInt64>(-1);
-  ezRHIResourceFormat m_BufferFormat = ezRHIResourceFormat::Unknown;
+  ezRHIResourceFormat::Enum m_BufferFormat = ezRHIResourceFormat::Unknown;
   bool m_Bindless = false;
 };
 
@@ -412,18 +524,17 @@ struct EZ_RHI_DLL ezRHIBindKeyDescription : public ezHashableStruct<ezRHIBindKey
 
   ezRHIBindKeyDescription() = default;
 
-  ezRHIBindKeyDescription(ezRHIShaderType shaderType, 
-                          ezRHIViewType viewType,
-                          ezUInt32 slot,
-                          ezUInt32 space,
-                          ezUInt32 count)
+  ezRHIBindKeyDescription(ezRHIShaderType shaderType,
+    ezRHIViewType viewType,
+    ezUInt32 slot,
+    ezUInt32 space,
+    ezUInt32 count)
     : m_ShaderType{shaderType}
     , m_ViewType{viewType}
     , m_Slot{slot}
     , m_Space{space}
     , m_Count{count}
   {
-
   }
 
   /*
@@ -447,14 +558,14 @@ struct EZ_RHI_DLL ezRHIBindingDescription
 
 struct EZ_RHI_DLL ezRHIRenderPassColorDescription
 {
-  ezRHIResourceFormat m_Format = ezRHIResourceFormat::Unknown;
+  ezRHIResourceFormat::Enum m_Format = ezRHIResourceFormat::Unknown;
   ezRHIRenderPassLoadOp m_LoadOp = ezRHIRenderPassLoadOp::Load;
   ezRHIRenderPassStoreOp m_StoreOp = ezRHIRenderPassStoreOp::Store;
 };
 
 struct EZ_RHI_DLL ezRHIRenderPassDepthStencilDescription
 {
-  ezRHIResourceFormat m_Format = ezRHIResourceFormat::Unknown;
+  ezRHIResourceFormat::Enum m_Format = ezRHIResourceFormat::Unknown;
   ezRHIRenderPassLoadOp m_DepthLoadOp = ezRHIRenderPassLoadOp::Load;
   ezRHIRenderPassStoreOp m_DepthStoreOp = ezRHIRenderPassStoreOp::Store;
   ezRHIRenderPassLoadOp m_StencilLoadOp = ezRHIRenderPassLoadOp::Load;
@@ -465,7 +576,7 @@ struct EZ_RHI_DLL ezRHIRenderPassCreationDescription
 {
   ezDynamicArray<ezRHIRenderPassColorDescription> m_Colors;
   ezRHIRenderPassDepthStencilDescription m_DepthStencil;
-  ezRHIResourceFormat m_ShadingRateFormat = ezRHIResourceFormat::Unknown;
+  ezRHIResourceFormat::Enum m_ShadingRateFormat = ezRHIResourceFormat::Unknown;
   ezUInt32 m_SampleCount = 1;
 };
 
@@ -523,7 +634,7 @@ struct EZ_RHI_DLL ezRHIInputLayoutDescription
 {
   ezUInt32 m_Slot = 0;
   ezString m_SemanticName;
-  ezRHIResourceFormat m_Format = ezRHIResourceFormat::Unknown;
+  ezRHIResourceFormat::Enum m_Format = ezRHIResourceFormat::Unknown;
   ezUInt32 m_Stride = 0;
 };
 
@@ -700,3 +811,5 @@ struct EZ_RHI_DLL ezRHIBufferCopyRegion
   ezUInt64 m_DstOffset;
   ezUInt64 m_NumBytes;
 };
+
+#include <RHI/Basics_inl.h>

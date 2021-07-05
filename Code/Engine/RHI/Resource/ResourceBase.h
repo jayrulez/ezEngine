@@ -12,7 +12,7 @@ public:
   ezRHIResourceBase();
 
   ezRHIResourceType GetResourceType() const override final;
-  ezRHIResourceFormat GetFormat() const override final;
+  ezRHIResourceFormat::Enum GetFormat() const override final;
   ezRHIMemoryType GetMemoryType() const override final;
 
   void UpdateUploadBuffer(ezUInt64 bufferOffset, const void* pData, ezUInt64 numBytes) override final;
@@ -25,7 +25,7 @@ public:
   ezRHIResourceStateTracker& GetGlobalResourceStateTracker();
   const ezRHIResourceStateTracker& GetGlobalResourceStateTracker() const;
 
-  ezRHIResourceFormat m_Format = ezRHIResourceFormat::Unknown;
+  ezRHIResourceFormat::Enum m_Format = ezRHIResourceFormat::Unknown;
   ezRHIResourceType m_ResourceType = ezRHIResourceType::Unknown;
   ezRHIResource* m_AccelerationStructuresMemory;
   bool m_IsBackBuffer = false;

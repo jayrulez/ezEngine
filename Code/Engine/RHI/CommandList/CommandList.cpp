@@ -111,7 +111,7 @@ void ezRHICommandList::SetScissorRect(ezInt32 left, ezInt32 top, ezUInt32 right,
   SetScissorRectPlatform(left, top, right, bottom);
 }
 
-void ezRHICommandList::IASetIndexBuffer(const ezRHIResource* pResource, ezRHIResourceFormat format)
+void ezRHICommandList::IASetIndexBuffer(const ezRHIResource* pResource, ezRHIResourceFormat::Enum format)
 {
   IASetIndexBufferPlatform(pResource, format);
 }

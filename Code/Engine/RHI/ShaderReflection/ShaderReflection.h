@@ -43,7 +43,7 @@ struct EZ_RHI_DLL ezRHIInputParameterDescription
 {
   ezUInt32 m_Location;
   ezString m_SemanticName;
-  ezRHIResourceFormat m_Format;
+  ezRHIResourceFormat::Enum m_Format;
 };
 
 struct EZ_RHI_DLL ezRHIOutputParameterDescription

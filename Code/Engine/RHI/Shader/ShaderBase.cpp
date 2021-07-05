@@ -32,7 +32,7 @@ ezRHIShaderBase::ezRHIShaderBase(const ezRHIShaderCreationDescription& desc, ezR
     layout.m_Slot = i;
     layout.m_SemanticName = inputParameters[i].m_SemanticName;
     layout.m_Format = inputParameters[i].m_Format;
-    //layout.m_Stride = gli::detail::bits_per_pixel(layout.m_Format) / 8;
+    layout.m_Stride = ezRHIResourceFormat::GetFormatStride(layout.m_Format);
     m_Locations[inputParameters[i].m_SemanticName] = inputParameters[i].m_Location;
   }
 

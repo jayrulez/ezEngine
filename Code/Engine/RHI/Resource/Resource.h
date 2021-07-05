@@ -18,7 +18,7 @@ public:
   virtual void CommitMemory(ezRHIMemoryType memoryType) = 0;
   virtual void BindMemory(const ezRHIMemory* pMemory, ezUInt64 offset) = 0;
   virtual ezRHIResourceType GetResourceType() const = 0;
-  virtual ezRHIResourceFormat GetFormat() const = 0;
+  virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
   virtual ezRHIMemoryType GetMemoryType() const = 0;
   virtual ezUInt64 GetWidth() const = 0;
   virtual ezUInt32 GetHeight() const = 0;

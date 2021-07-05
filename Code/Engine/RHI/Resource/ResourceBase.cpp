@@ -12,7 +12,7 @@ ezRHIResourceType ezRHIResourceBase::GetResourceType() const
   return m_ResourceType;
 }
 
-ezRHIResourceFormat ezRHIResourceBase::GetFormat() const
+ezRHIResourceFormat::Enum ezRHIResourceBase::GetFormat() const
 {
   return m_Format;
 }

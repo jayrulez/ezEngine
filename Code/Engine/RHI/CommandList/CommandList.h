@@ -42,7 +42,7 @@ public:
   void UAVResourceBarrier(const ezRHIResource* pResource);
   void SetViewport(float x, float y, float width, float height);
   void SetScissorRect(ezInt32 left, ezInt32 top, ezUInt32 right, ezUInt32 bottom);
-  void IASetIndexBuffer(const ezRHIResource* pResource, ezRHIResourceFormat format);
+  void IASetIndexBuffer(const ezRHIResource* pResource, ezRHIResourceFormat::Enum format);
   void IASetVertexBuffer(ezUInt32 slot, const ezRHIResource* pResource);
   void RSSetShadingRate(ezRHIShadingRate shadingRate, const ezStaticArray<ezRHIShadingRateCombiner, 2>& combiners);
   void BuildBottomLevelAS(
@@ -114,7 +114,7 @@ public:
   virtual void UAVResourceBarrierPlatform(const ezRHIResource* pResource) = 0;
   virtual void SetViewportPlatform(float x, float y, float width, float height) = 0;
   virtual void SetScissorRectPlatform(ezInt32 left, ezInt32 top, ezUInt32 right, ezUInt32 bottom) = 0;
-  virtual void IASetIndexBufferPlatform(const ezRHIResource* pResource, ezRHIResourceFormat format) = 0;
+  virtual void IASetIndexBufferPlatform(const ezRHIResource* pResource, ezRHIResourceFormat::Enum format) = 0;
   virtual void IASetVertexBufferPlatform(ezUInt32 slot, const ezRHIResource* pResource) = 0;
   virtual void RSSetShadingRatePlatform(ezRHIShadingRate shadingRate, const ezStaticArray<ezRHIShadingRateCombiner, 2>& combiners) = 0;
   virtual void BuildBottomLevelASPlatform(
