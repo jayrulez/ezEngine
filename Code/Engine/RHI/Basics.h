@@ -479,8 +479,11 @@ struct EZ_RHI_DLL ezRHIFramebufferCreationDescription
   ezRHIView* m_ShadingRateImage;
 };
 
+/*
 struct EZ_RHI_DLL ezRHIShaderCreationDescription
 {
+  ezDynamicArray<ezUInt8> m_Blob;
+  ezRHIShaderReflection* m_Reflection;
   ezString m_ShaderPath;
   ezString m_EntryPoint;
   ezRHIShaderType m_Type;
@@ -492,6 +495,26 @@ struct EZ_RHI_DLL ezRHIShaderCreationDescription
     , m_EntryPoint{entryPoint}
     , m_Type{type}
     , m_Model{model}
+  {
+  }
+};
+*/
+
+struct EZ_RHI_DLL ezRHIShaderCreationDescription
+{
+  ezDynamicArray<ezUInt8> m_Blob;
+  ezRHIShaderReflection* m_Reflection;
+  ezString m_EntryPoint;
+  ezRHIShaderType m_Type;
+  ezString m_Model;
+  ezMap<ezString, ezString> m_Defines;
+
+  ezRHIShaderCreationDescription(const ezString& shaderPath, const ezString& entryPoint, ezRHIShaderType type, const ezString& model, ezDynamicArray<ezUInt8> blob, ezRHIShaderReflection* reflection)
+    : m_EntryPoint{entryPoint}
+    , m_Type{type}
+    , m_Model{model}
+    , m_Blob{blob}
+    , m_Reflection{reflection}
   {
   }
 };

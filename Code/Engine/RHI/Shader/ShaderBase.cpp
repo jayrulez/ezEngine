@@ -13,9 +13,8 @@ ezRHIShaderBase::ezRHIShaderBase(const ezRHIShaderCreationDescription& desc, ezR
   : m_ShaderType{desc.m_Type}
   , m_BlobType{blobType}
 {
-  m_Reflection = nullptr;
-  //m_Blob = Compile(desc, blobType);
-  //m_Reflection = CreateShaderReflection(blobType, m_Blob.GetData(), m_Blob.GetCount());
+  m_Blob = desc.m_Blob;
+  m_Reflection = desc.m_Reflection;
 
   m_Bindings = m_Reflection->GetBindings();
   for (ezUInt32 i = 0; i < m_Bindings.GetCount(); ++i)
