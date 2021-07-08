@@ -295,7 +295,7 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
       continue;
 
     VkImageMemoryBarrier& image_memory_barrier = image_memory_barriers.emplace_back();
-    image_memory_barrier = {};
+    //image_memory_barrier = {};
     image_memory_barrier.sType = VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     image_memory_barrier.oldLayout = vk_state_before;
     image_memory_barrier.newLayout = vk_state_after;

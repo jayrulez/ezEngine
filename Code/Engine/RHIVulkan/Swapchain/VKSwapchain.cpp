@@ -86,7 +86,10 @@ VKSwapchain::VKSwapchain(VKCommandQueue& command_queue, Window window, uint32_t 
   vkCreateSwapchainKHR(m_device.GetDevice(), &swap_chain_create_info, nullptr, &m_swapchain);
 
   ezUInt32 swapchainImagesCount = 0;
-  vkGetSwapchainImagesKHR(m_device.GetDevice(), m_swapchain, &swapchainImagesCount, nullptr);
+  if (vkGetSwapchainImagesKHR(m_device.GetDevice(), m_swapchain, &swapchainImagesCount, nullptr) != VK_SUCCESS)
+  {
+    EZ_REPORT_FAILURE("Failed to get SwapChain Images");
+  }
 
   ezDynamicArray<VkImage> images;
   images.SetCount(swapchainImagesCount);
@@ -120,6 +123,10 @@ VKSwapchain::VKSwapchain(VKCommandQueue& command_queue, Window window, uint32_t 
 VKSwapchain::~VKSwapchain()
 {
   m_fence->Wait(1);
+  if (m_swapchain != nullptr)
+  {
+    vkDestroySwapchainKHR(m_device.GetDevice(), m_swapchain, nullptr);
+  }
 }
 
 ezRHIResourceFormat::Enum VKSwapchain::GetFormat() const

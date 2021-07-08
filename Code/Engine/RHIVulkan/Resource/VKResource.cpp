@@ -9,6 +9,25 @@ VKResource::VKResource(VKDevice& device)
 {
 }
 
+VKResource::~VKResource()
+{
+  if (resource_type == ResourceType::kBuffer)
+  {
+    if (buffer.res != VK_NULL_HANDLE)
+      vkDestroyBuffer(m_device.GetDevice(), buffer.res, nullptr);
+  }
+  else if (resource_type == ResourceType::kTexture)
+  {
+    //if (image.res != VK_NULL_HANDLE)
+      //vkDestroyImage(m_device.GetDevice(), image.res, nullptr);
+  }
+  else if (resource_type == ResourceType::kSampler)
+  {
+    if (sampler.res != VK_NULL_HANDLE)
+      vkDestroySampler(m_device.GetDevice(), sampler.res, nullptr);
+  }
+}
+
 void VKResource::CommitMemory(MemoryType memory_type)
 {
   MemoryRequirements mem_requirements = GetMemoryRequirements();
@@ -94,19 +113,19 @@ void VKResource::SetName(const std::string& name)
     info.objectType = VkObjectType::VK_OBJECT_TYPE_IMAGE;
     info.objectHandle = reinterpret_cast<uint64_t>(static_cast<VkImage>(image.res));
   }
-  vkSetDebugUtilsObjectNameEXT(m_device.GetDevice() , &info);
+  vkSetDebugUtilsObjectNameEXT(m_device.GetDevice(), &info);
 }
 
 uint8_t* VKResource::Map()
 {
   uint8_t* dst_data = nullptr;
-  VkResult res = vkMapMemory(m_device.GetDevice() , m_vk_memory, 0, VK_WHOLE_SIZE, {}, reinterpret_cast<void**>(&dst_data));
+  VkResult res = vkMapMemory(m_device.GetDevice(), m_vk_memory, 0, VK_WHOLE_SIZE, {}, reinterpret_cast<void**>(&dst_data));
   return dst_data;
 }
 
 void VKResource::Unmap()
 {
-  vkUnmapMemory(m_device.GetDevice() , m_vk_memory);
+  vkUnmapMemory(m_device.GetDevice(), m_vk_memory);
 }
 
 bool VKResource::AllowCommonStatePromotion(ResourceState state_after)
@@ -123,14 +142,14 @@ MemoryRequirements VKResource::GetMemoryRequirements() const
     VkBufferMemoryRequirementsInfo2KHR buffer_mem_req = {};
     buffer_mem_req.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2;
     buffer_mem_req.buffer = buffer.res;
-    vkGetBufferMemoryRequirements2(m_device.GetDevice() , & buffer_mem_req, &mem_requirements);
+    vkGetBufferMemoryRequirements2(m_device.GetDevice(), &buffer_mem_req, &mem_requirements);
   }
   else if (resource_type == ResourceType::kTexture)
   {
     VkImageMemoryRequirementsInfo2KHR image_mem_req = {};
     image_mem_req.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2;
     image_mem_req.image = image.res;
-    vkGetImageMemoryRequirements2(m_device.GetDevice() , & image_mem_req, &mem_requirements);
+    vkGetImageMemoryRequirements2(m_device.GetDevice(), &image_mem_req, &mem_requirements);
   }
   return {mem_requirements.memoryRequirements.size, mem_requirements.memoryRequirements.alignment, mem_requirements.memoryRequirements.memoryTypeBits};
 }

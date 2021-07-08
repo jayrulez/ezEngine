@@ -33,6 +33,7 @@ VkAttachmentStoreOp Convert(RenderPassStoreOp op)
 
 VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
   : m_desc(desc)
+  , m_device{device}
 {
   while (!m_desc.colors.empty() && m_desc.colors.back().format == ezRHIResourceFormat::UNKNOWN)
   {
@@ -114,6 +115,14 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
   render_pass_info.pSubpasses = &sub_pass;
 
   vkCreateRenderPass2(device.GetDevice(), &render_pass_info, nullptr, &m_render_pass);
+}
+
+VKRenderPass::~VKRenderPass()
+{
+  if (m_render_pass != VK_NULL_HANDLE)
+  {
+    vkDestroyRenderPass(m_device.GetDevice(), m_render_pass, nullptr);
+  }
 }
 
 const RenderPassDesc& VKRenderPass::GetDesc() const
