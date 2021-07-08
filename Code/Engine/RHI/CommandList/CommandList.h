@@ -10,8 +10,8 @@ public:
   virtual ~ezRHICommandList() = default;
   void Reset();
   void Close();
-  void BindPipeline(const ezRHIPipeline* pState);
-  void BindBindingSet(const ezRHIBindingSet* pBindingSet);
+  void BindPipeline(ezRHIPipeline* pState);
+  void BindBindingSet(ezRHIBindingSet* pBindingSet);
   void BeginRenderPass(const ezRHIRenderPass* pRenderPass, const ezRHIFramebuffer* pFramebuffer, const ezRHIClearDescription& clearDesc);
   void EndRenderPass();
   void BeginEvent(const ezString& name);
@@ -75,15 +75,15 @@ public:
   void ResolveQueryData(
     const ezRHIQueryHeap* pQueryHeap,
     ezUInt32 firstQuery,
-    ezUInt32 queryQount,
+    ezUInt32 queryCount,
     const ezRHIResource* pDstBuffer,
     ezUInt64 dstOffset);
 
-  protected:
+protected:
   virtual void ResetPlatform() = 0;
   virtual void ClosePlatform() = 0;
-  virtual void BindPipelinePlatform(const ezRHIPipeline* pState) = 0;
-  virtual void BindBindingSetPlatform(const ezRHIBindingSet* pBindingSet) = 0;
+  virtual void BindPipelinePlatform(ezRHIPipeline* pState) = 0;
+  virtual void BindBindingSetPlatform(ezRHIBindingSet* pBindingSet) = 0;
   virtual void BeginRenderPassPlatform(const ezRHIRenderPass* pRenderPass, const ezRHIFramebuffer* pFramebuffer, const ezRHIClearDescription& clearDesc) = 0;
   virtual void EndRenderPassPlatform() = 0;
   virtual void BeginEventPlatform(const ezString& name) = 0;
@@ -147,7 +147,7 @@ public:
   virtual void ResolveQueryDataPlatform(
     const ezRHIQueryHeap* pQueryHeap,
     ezUInt32 firstQuery,
-    ezUInt32 queryQount,
+    ezUInt32 queryCount,
     const ezRHIResource* pDstBuffer,
     ezUInt64 dstOffset) = 0;
 };

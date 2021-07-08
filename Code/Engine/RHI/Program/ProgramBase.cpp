@@ -11,13 +11,13 @@ ezRHIProgramBase::ezRHIProgramBase(const ezDynamicArray<ezRHIShader*>& shaders)
     m_ShadersByType[shader->GetType()] = shader;
     const ezDynamicArray<ezRHIBindKeyDescription>& bindings = shader->GetBindings();
     // m_bindings.insert(m_bindings.begin(), bindings.begin(), bindings.end());
-    //m_Bindings.PushBackRange(bindings); // todo: verify behaviour
+    m_Bindings.PushBackRange(bindings); // todo: verify behaviour
 
     const ezRHIShaderReflection* reflection = shader->GetReflection();
     auto shaderEntryPoints = reflection->GetEntryPoints();
 
     //m_entry_points.insert(m_entry_points.end(), shader_entry_points.begin(), shader_entry_points.end());
-    //m_EntryPoints.PushBackRange(shaderEntryPoints); // todo: verify behaviour
+    m_EntryPoints.PushBackRange(shaderEntryPoints); // todo: verify behaviour
   }
 }
 

@@ -62,7 +62,7 @@ ezRHIBindingSetLayout* ezRHIDevice::CreateBindingSetLayout(const ezDynamicArray<
   return CreateBindingSetLayoutPlatform(descs);
 }
 
-ezRHIBindingSet* ezRHIDevice::CreateBindingSet(const ezRHIBindingSetLayout* pLayout)
+ezRHIBindingSet* ezRHIDevice::CreateBindingSet(ezRHIBindingSetLayout* pLayout)
 {
   return CreateBindingSetPlatform(pLayout);
 }
@@ -102,7 +102,7 @@ ezRHIPipeline* ezRHIDevice::CreateRayTracingPipeline(const ezRHIRayTracingPipeli
   return CreateRayTracingPipelinePlatform(desc);
 }
 
-ezRHIResource* ezRHIDevice::CreateAccelerationStructure(ezRHIAccelerationStructureType type, const ezRHIResource* pResource, ezUInt64 offset)
+ezRHIResource* ezRHIDevice::CreateAccelerationStructure(ezRHIAccelerationStructureType type, ezRHIResource* pResource, ezUInt64 offset)
 {
   return CreateAccelerationStructurePlatform(type, pResource, offset);
 }

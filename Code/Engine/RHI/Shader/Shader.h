@@ -4,7 +4,7 @@
 
 #include <RHI/Basics.h>
 
-class ezRHIShader : public ezRHIQueryInterface
+class EZ_RHI_DLL ezRHIShader : public ezRHIQueryInterface
 {
 public:
   virtual ~ezRHIShader() = default;

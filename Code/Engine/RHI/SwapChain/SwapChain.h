@@ -4,10 +4,10 @@
 
 #include <RHI/Basics.h>
 
-class ezRHISwapchain : public ezRHIQueryInterface
+class ezRHISwapChain : public ezRHIQueryInterface
 {
 public:
-  virtual ~ezRHISwapchain() = default;
+  virtual ~ezRHISwapChain() = default;
   virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
   virtual ezRHIResource* GetBackBuffer(ezUInt32 buffer) = 0;
   virtual ezUInt32 NextImage(const ezRHIFence* fence, ezUInt64 signalValue) = 0;

@@ -16,7 +16,7 @@ class EZ_RHI_DLL ezRHIResource : public ezRHIQueryInterface
 public:
   virtual ~ezRHIResource() = default;
   virtual void CommitMemory(ezRHIMemoryType memoryType) = 0;
-  virtual void BindMemory(const ezRHIMemory* pMemory, ezUInt64 offset) = 0;
+  virtual void BindMemory(ezRHIMemory* pMemory, ezUInt64 offset) = 0;
   virtual ezRHIResourceType GetResourceType() const = 0;
   virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
   virtual ezRHIMemoryType GetMemoryType() const = 0;

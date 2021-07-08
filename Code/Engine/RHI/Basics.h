@@ -4,6 +4,10 @@
 
 #include <Foundation/Algorithm/HashableStruct.h>
 
+using ezRHIIndirectCountType = ezUInt32;
+
+constexpr ezUInt64 ACCELERATION_STRUCTURE_ALIGNMENT = 256;
+
 // Forward declarations
 
 class ezWindowBase;
@@ -28,11 +32,77 @@ class ezRHIShaderReflection;
 class ezRHISwapChain;
 class ezRHIView;
 
+struct EZ_RHI_DLL ezRHIFloat3X4
+{
+  union
+  {
+    struct
+    {
+      float _11, _12, _13, _14;
+      float _21, _22, _23, _24;
+      float _31, _32, _33, _34;
+    };
+    float m[3][4];
+    float f[12];
+  };
+
+  ezRHIFloat3X4() = default;
+
+  ezRHIFloat3X4(const ezRHIFloat3X4&) = default;
+  ezRHIFloat3X4& operator=(const ezRHIFloat3X4&) = default;
+
+  ezRHIFloat3X4(ezRHIFloat3X4&&) = default;
+  ezRHIFloat3X4& operator=(ezRHIFloat3X4&&) = default;
+
+  constexpr ezRHIFloat3X4(float m00, float m01, float m02, float m03,
+    float m10, float m11, float m12, float m13,
+    float m20, float m21, float m22, float m23)
+    : _11(m00)
+    , _12(m01)
+    , _13(m02)
+    , _14(m03)
+    , _21(m10)
+    , _22(m11)
+    , _23(m12)
+    , _24(m13)
+    , _31(m20)
+    , _32(m21)
+    , _33(m22)
+    , _34(m23)
+  {
+  }
+  explicit ezRHIFloat3X4(const float* pArray);
+
+  float operator()(size_t Row, size_t Column) const { return m[Row][Column]; }
+  float& operator()(size_t Row, size_t Column) { return m[Row][Column]; }
+};
+
+inline ezRHIFloat3X4::ezRHIFloat3X4(
+  const float* pArray)
+{
+  EZ_ASSERT_ALWAYS(pArray != nullptr, "The float pointer passed should not be null.");
+
+  m[0][0] = pArray[0];
+  m[0][1] = pArray[1];
+  m[0][2] = pArray[2];
+  m[0][3] = pArray[3];
+
+  m[1][0] = pArray[4];
+  m[1][1] = pArray[5];
+  m[1][2] = pArray[6];
+  m[1][3] = pArray[7];
+
+  m[2][0] = pArray[8];
+  m[2][1] = pArray[9];
+  m[2][2] = pArray[10];
+  m[2][3] = pArray[11];
+}
+
 class EZ_RHI_DLL ezRHIQueryInterface : public ezRefCounted
 {
 public:
   virtual ~ezRHIQueryInterface() = default;
-
+  /*
   template <typename T>
   T& As()
   {
@@ -44,9 +114,28 @@ public:
   {
     return static_cast<T&>(*this);
   }
+  */
+
+  template <typename T>
+  T* As()
+  {
+    return static_cast<T*>(this);
+  }
+
+  template <typename T>
+  const T* As() const
+  {
+    return static_cast<const T*>(this);
+  }
 };
 
 // Basic enums
+enum class ezRHIApiType
+{
+  Vulkan,
+  DX12
+};
+
 enum class ezRHIMemoryType
 {
   Default,
@@ -344,6 +433,15 @@ enum class ezRHIQueryHeapType
   AccelerationStructureCompactedSize
 };
 
+enum class ezRHIRaytracingInstanceFlags : ezUInt32
+{
+  None = 0x0,
+  TriangleCullDisable = 0x1,
+  TriangleFrontCounterclockwise = 0x2,
+  ForceOpaque = 0x4,
+  ForceNonOpaque = 0x8
+};
+
 enum class ezRHIRaytracingGeometryFlags
 {
   None,
@@ -437,6 +535,35 @@ struct ezRHIResourceState
 };
 EZ_DECLARE_FLAGS_OPERATORS(ezRHIResourceState);
 
+struct ezRHIBindFlag
+{
+  using StorageType = ezUInt32;
+  enum Enum
+  {
+    None = 0,
+    RenderTarget = 1 << 1,
+    DepthStencil = 1 << 2,
+    ShaderResource = 1 << 3,
+    UnorderedAccess = 1 << 4,
+    ConstantBuffer = 1 << 5,
+    IndexBuffer = 1 << 6,
+    VertexBuffer = 1 << 7,
+    AccelerationStructure = 1 << 8,
+    RayTracing = 1 << 9,
+    CopyDest = 1 << 10,
+    CopySource = 1 << 11,
+    ShadingRateSource = 1 << 12,
+    ShaderTable = 1 << 13,
+    IndirectBuffer = 1 << 14,
+    Default = None
+  };
+
+  struct Bits
+  {
+  };
+};
+EZ_DECLARE_FLAGS_OPERATORS(ezRHIBindFlag);
+
 template <>
 struct ezCompareHelper<ezBitflags<ezRHIResourceState>>
 {
@@ -487,8 +614,16 @@ struct EZ_RHI_DLL ezRHITextureCreationDescription
 
 struct EZ_RHI_DLL ezRHIBufferCreationDescription
 {
-  ezUInt32 m_BindFlag;
-  ezUInt32 m_BufferSize;
+  ezBitflags<ezRHIBindFlag> m_BindFlag = ezRHIBindFlag::Default;
+  ezInt32 m_BufferSize = 0;
+};
+
+struct EZ_RHI_DLL ezRHIBufferDescription
+{
+  ezRHIResource* m_Resource;
+  ezRHIResourceFormat::Enum m_Format = ezRHIResourceFormat::Unknown;
+  ezInt32 m_Count = 0;
+  ezInt32 m_Offset = 0;
 };
 
 struct EZ_RHI_DLL ezRHISamplerCreationDescription
@@ -620,7 +755,7 @@ struct EZ_RHI_DLL ezRHIShaderCreationDescription
   ezString m_Model;
   ezMap<ezString, ezString> m_Defines;
 
-  ezRHIShaderCreationDescription(const ezString& shaderPath, const ezString& entryPoint, ezRHIShaderType type, const ezString& model, ezDynamicArray<ezUInt8> blob, ezRHIShaderReflection* reflection)
+  ezRHIShaderCreationDescription(const ezString& entryPoint, ezRHIShaderType type, const ezString& model, ezDynamicArray<ezUInt8> blob = ezDynamicArray<ezUInt8>(), ezRHIShaderReflection* reflection = nullptr)
     : m_EntryPoint{entryPoint}
     , m_Type{type}
     , m_Model{model}
@@ -717,11 +852,23 @@ struct EZ_RHI_DLL ezRHIRaytracingASPrebuildInfo
   ezUInt64 m_UpdateScratchDataSize = 0;
 };
 
+struct ezRHIRaytracingGeometryInstance
+{
+  ezRHIFloat3X4 m_Transform;
+  ezUInt32 m_InstanceId : 24;
+  ezUInt32 m_InstanceMask : 8;
+  ezUInt32 m_InstanceOffset : 24;
+  ezRHIRaytracingInstanceFlags m_Flags : 8;
+  ezUInt64 m_AccelerationStructureHandle;
+};
+
+EZ_CHECK_AT_COMPILETIME(sizeof(ezRHIRaytracingGeometryInstance) == 64);
+
 struct EZ_RHI_DLL ezRHIRaytracingGeometryDescription
 {
-  ezRHIBufferCreationDescription m_Vertex;
-  ezRHIBufferCreationDescription m_Index;
-  ezRHIRaytracingGeometryFlags flags = ezRHIRaytracingGeometryFlags::None;
+  ezRHIBufferDescription m_Vertex;
+  ezRHIBufferDescription m_Index;
+  ezRHIRaytracingGeometryFlags m_Flags = ezRHIRaytracingGeometryFlags::None;
 };
 
 struct EZ_RHI_DLL ezRHIRayTracingShaderTable
@@ -760,7 +907,7 @@ struct EZ_RHI_DLL ezRHIResourceBindingDescription
   ezUInt32 m_Count;
   ezRHIViewDimension m_Dimension;
   ezRHIReturnType m_ReturnType;
-  uint32_t StructureStride;
+  ezUInt32 StructureStride;
 };
 
 struct EZ_RHI_DLL ezRHIClearDescription
@@ -810,6 +957,30 @@ struct EZ_RHI_DLL ezRHIBufferCopyRegion
   ezUInt64 m_SrcOffset;
   ezUInt64 m_DstOffset;
   ezUInt64 m_NumBytes;
+};
+
+struct EZ_RHI_DLL ezRHIDrawIndirectCommand
+{
+  ezUInt32 m_VertexCount;
+  ezUInt32 m_InstanceCount;
+  ezUInt32 m_FirstVertex;
+  ezUInt32 m_FirstInstance;
+};
+
+struct EZ_RHI_DLL ezRHIDrawIndexedIndirectCommand
+{
+  ezUInt32 m_IndexCount;
+  ezUInt32 m_InstanceCount;
+  ezUInt32 m_FirstIndex;
+  ezInt32 m_VertexOffset;
+  ezUInt32 m_FirstInstance;
+};
+
+struct EZ_RHI_DLL ezRHIDispatchIndirectCommand
+{
+  ezUInt32 m_ThreadGroupCountX;
+  ezUInt32 m_ThreadGroupCountY;
+  ezUInt32 m_ThreadGroupCountZ;
 };
 
 #include <RHI/Basics_inl.h>

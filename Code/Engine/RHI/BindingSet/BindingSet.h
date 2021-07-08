@@ -4,7 +4,7 @@
 
 #include <RHI/Basics.h>
 
-class ezRHIBindingSet : public ezRHIQueryInterface
+class EZ_RHI_DLL ezRHIBindingSet : public ezRHIQueryInterface
 {
 public:
   virtual ~ezRHIBindingSet() = default;

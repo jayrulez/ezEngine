@@ -21,7 +21,7 @@ public:
   ezRHIResource* CreateSampler(const ezRHISamplerCreationDescription& desc);
   ezRHIView* CreateView(ezRHIResource* pResource, const ezRHIViewDesc& desc);
   ezRHIBindingSetLayout* CreateBindingSetLayout(const ezDynamicArray<ezRHIBindKeyDescription>& descs);
-  ezRHIBindingSet* CreateBindingSet(const ezRHIBindingSetLayout* pLayout);
+  ezRHIBindingSet* CreateBindingSet(ezRHIBindingSetLayout* pLayout);
   ezRHIRenderPass* CreateRenderPass(const ezRHIRenderPassCreationDescription& desc);
   ezRHIFramebuffer* CreateFramebuffer(const ezRHIFramebufferCreationDescription& desc);
   ezRHIShader* CreateShader(const ezRHIShaderCreationDescription& desc);
@@ -29,7 +29,7 @@ public:
   ezRHIPipeline* CreateGraphicsPipeline(const ezRHIGraphicsPipelineCreationDescription& desc);
   ezRHIPipeline* CreateComputePipeline(const ezRHIComputePipelineCreationDescription& desc);
   ezRHIPipeline* CreateRayTracingPipeline(const ezRHIRayTracingPipelineCreationDescription& desc);
-  ezRHIResource* CreateAccelerationStructure(ezRHIAccelerationStructureType type, const ezRHIResource* pResource, ezUInt64 offset);
+  ezRHIResource* CreateAccelerationStructure(ezRHIAccelerationStructureType type, ezRHIResource* pResource, ezUInt64 offset);
   ezRHIQueryHeap* CreateQueryHeap(ezRHIQueryHeapType type, ezUInt32 count);
 
   virtual ezRHIRaytracingASPrebuildInfo GetBLASPrebuildInfo(const ezDynamicArray<ezRHIRaytracingGeometryDescription>& descs,
@@ -54,7 +54,7 @@ protected:
   virtual ezRHIResource* CreateSamplerPlatform(const ezRHISamplerCreationDescription& desc) = 0;
   virtual ezRHIView* CreateViewPlatform(ezRHIResource* pResource, const ezRHIViewDesc& desc) = 0;
   virtual ezRHIBindingSetLayout* CreateBindingSetLayoutPlatform(const ezDynamicArray<ezRHIBindKeyDescription>& descs) = 0;
-  virtual ezRHIBindingSet* CreateBindingSetPlatform(const ezRHIBindingSetLayout* pLayout) = 0;
+  virtual ezRHIBindingSet* CreateBindingSetPlatform(ezRHIBindingSetLayout* pLayout) = 0;
   virtual ezRHIRenderPass* CreateRenderPassPlatform(const ezRHIRenderPassCreationDescription& desc) = 0;
   virtual ezRHIFramebuffer* CreateFramebufferPlatform(const ezRHIFramebufferCreationDescription& desc) = 0;
   virtual ezRHIShader* CreateShaderPlatform(const ezRHIShaderCreationDescription& desc) = 0;
@@ -62,7 +62,7 @@ protected:
   virtual ezRHIPipeline* CreateGraphicsPipelinePlatform(const ezRHIGraphicsPipelineCreationDescription& desc) = 0;
   virtual ezRHIPipeline* CreateComputePipelinePlatform(const ezRHIComputePipelineCreationDescription& desc) = 0;
   virtual ezRHIPipeline* CreateRayTracingPipelinePlatform(const ezRHIRayTracingPipelineCreationDescription& desc) = 0;
-  virtual ezRHIResource* CreateAccelerationStructurePlatform(ezRHIAccelerationStructureType type, const ezRHIResource* pResource, ezUInt64 offset) = 0;
+  virtual ezRHIResource* CreateAccelerationStructurePlatform(ezRHIAccelerationStructureType type, ezRHIResource* pResource, ezUInt64 offset) = 0;
   virtual ezRHIQueryHeap* CreateQueryHeapPlatform(ezRHIQueryHeapType type, ezUInt32 count) = 0;
 
 

@@ -5,7 +5,7 @@
 #include <RHI/Basics.h>
 #include <RHI/Shader/Shader.h>
 
-class ezRHIShaderBase : public ezRHIShader
+class EZ_RHI_DLL ezRHIShaderBase : public ezRHIShader
 {
 public:
   ezRHIShaderBase(const ezRHIShaderCreationDescription& desc, ezRHIShaderBlobType blobType);

@@ -48,6 +48,7 @@ struct EZ_RHI_DLL ezRHIInputParameterDescription
 
 struct EZ_RHI_DLL ezRHIOutputParameterDescription
 {
+  EZ_DECLARE_POD_TYPE();
   ezUInt32 m_Slot;
 };
 

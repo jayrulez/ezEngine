@@ -12,12 +12,12 @@ void ezRHICommandList::Close()
   ClosePlatform();
 }
 
-void ezRHICommandList::BindPipeline(const ezRHIPipeline* pState)
+void ezRHICommandList::BindPipeline(ezRHIPipeline* pState)
 {
   BindPipelinePlatform(pState);
 }
 
-void ezRHICommandList::BindBindingSet(const ezRHIBindingSet* pBindingSet)
+void ezRHICommandList::BindBindingSet(ezRHIBindingSet* pBindingSet)
 {
   BindBindingSetPlatform(pBindingSet);
 }
@@ -161,7 +161,7 @@ void ezRHICommandList::WriteAccelerationStructuresProperties(const ezDynamicArra
   WriteAccelerationStructuresPropertiesPlatform(accelerationStructures, pQueryHeap, firstQuery);
 }
 
-void ezRHICommandList::ResolveQueryData(const ezRHIQueryHeap* pQueryHeap, ezUInt32 firstQuery, ezUInt32 queryQount, const ezRHIResource* pDstBuffer, ezUInt64 dstOffset)
+void ezRHICommandList::ResolveQueryData(const ezRHIQueryHeap* pQueryHeap, ezUInt32 firstQuery, ezUInt32 queryCount, const ezRHIResource* pDstBuffer, ezUInt64 dstOffset)
 {
-  ResolveQueryDataPlatform(pQueryHeap, firstQuery, queryQount, pDstBuffer, dstOffset);
+  ResolveQueryDataPlatform(pQueryHeap, firstQuery, queryCount, pDstBuffer, dstOffset);
 }
