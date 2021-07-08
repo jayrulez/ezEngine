@@ -44,9 +44,9 @@ public:
     RaytracingASPrebuildInfo GetTLASPrebuildInfo(uint32_t instance_count, BuildAccelerationStructureFlags flags) const override;
 
     VKAdapter& GetAdapter();
-    VkDevice GetDevice();
+    VkDevice& GetDevice();
     CommandListType GetAvailableCommandListType(CommandListType type);
-    VkCommandPool GetCmdPool(CommandListType type);
+    VkCommandPool& GetCmdPool(CommandListType type);
     VkImageAspectFlags GetAspectFlags(VkFormat format) const;
     VKGPUBindlessDescriptorPoolTyped& GetGPUBindlessDescriptorPool(VkDescriptorType type);
     VKGPUDescriptorPool& GetGPUDescriptorPool();

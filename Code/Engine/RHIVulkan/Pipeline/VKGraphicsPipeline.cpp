@@ -80,20 +80,24 @@ VKGraphicsPipeline::VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineD
   const RenderPassDesc& render_pass_desc = m_desc.render_pass->GetDesc();
 
   VkPipelineVertexInputStateCreateInfo vertex_input_info = {};
+  vertex_input_info.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
   vertex_input_info.vertexBindingDescriptionCount = (ezUInt32)m_binding_desc.size();
   vertex_input_info.pVertexBindingDescriptions = m_binding_desc.data();
   vertex_input_info.vertexAttributeDescriptionCount = (ezUInt32)m_attribute_desc.size();
   vertex_input_info.pVertexAttributeDescriptions = m_attribute_desc.data();
 
   VkPipelineInputAssemblyStateCreateInfo input_assembly = {};
+  input_assembly.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
   input_assembly.topology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
   input_assembly.primitiveRestartEnable = VK_FALSE;
 
   VkPipelineViewportStateCreateInfo viewport_state = {};
+  viewport_state.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
   viewport_state.viewportCount = 1;
   viewport_state.scissorCount = 1;
 
   VkPipelineRasterizationStateCreateInfo rasterizer = {};
+  rasterizer.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
   rasterizer.depthClampEnable = VK_FALSE;
   rasterizer.lineWidth = 1.0f;
   rasterizer.frontFace = VkFrontFace::VK_FRONT_FACE_CLOCKWISE;
@@ -160,16 +164,19 @@ VKGraphicsPipeline::VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineD
   std::vector<VkPipelineColorBlendAttachmentState> color_blend_attachments(render_pass_desc.colors.size(), color_blend_attachment);
 
   VkPipelineColorBlendStateCreateInfo color_blending = {};
+  color_blending.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
   color_blending.logicOpEnable = VK_FALSE;
   color_blending.logicOp = VkLogicOp::VK_LOGIC_OP_AND;
   color_blending.attachmentCount = (ezUInt32)color_blend_attachments.size();
   color_blending.pAttachments = color_blend_attachments.data();
 
   VkPipelineMultisampleStateCreateInfo multisampling = {};
+  multisampling.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   multisampling.rasterizationSamples = static_cast<VkSampleCountFlagBits>(render_pass_desc.sample_count);
   multisampling.sampleShadingEnable = multisampling.rasterizationSamples != VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
 
   VkPipelineDepthStencilStateCreateInfo depth_stencil = {};
+  depth_stencil.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
   depth_stencil.depthTestEnable = m_desc.depth_stencil_desc.depth_test_enable;
   depth_stencil.depthWriteEnable = m_desc.depth_stencil_desc.depth_write_enable;
   depth_stencil.depthCompareOp = Convert(m_desc.depth_stencil_desc.depth_func);
@@ -184,6 +191,7 @@ VKGraphicsPipeline::VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineD
     VkDynamicState::VK_DYNAMIC_STATE_FRAGMENT_SHADING_RATE_KHR,
   };
   VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo{};
+  pipelineDynamicStateCreateInfo.sType = VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
   pipelineDynamicStateCreateInfo.pDynamicStates = dynamic_state_enables.data();
   pipelineDynamicStateCreateInfo.dynamicStateCount = (ezUInt32)dynamic_state_enables.size();
 

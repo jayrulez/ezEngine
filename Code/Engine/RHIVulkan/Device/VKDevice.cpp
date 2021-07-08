@@ -56,7 +56,7 @@ VkImageLayout ConvertState(ResourceState state)
 }
 
 VKDevice::VKDevice(VKAdapter& adapter)
-  : m_adapter(adapter)
+  : m_adapter{adapter}
   , m_physical_device(adapter.GetPhysicalDevice())
   , m_gpu_descriptor_pool(*this)
 {
@@ -172,7 +172,9 @@ VKDevice::VKDevice(VKAdapter& adapter)
     assert(shading_rate_palette.empty());
 
     VkPhysicalDeviceFragmentShadingRatePropertiesKHR shading_rate_image_properties = {};
+    shading_rate_image_properties.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 device_props2 = {};
+    device_props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     device_props2.pNext = &shading_rate_image_properties;
     vkGetPhysicalDeviceProperties2(m_adapter.GetPhysicalDevice(), &device_props2);
     assert(shading_rate_image_properties.minFragmentShadingRateAttachmentTexelSize == shading_rate_image_properties.maxFragmentShadingRateAttachmentTexelSize);
@@ -181,6 +183,7 @@ VKDevice::VKDevice(VKAdapter& adapter)
     m_shading_rate_image_tile_size = shading_rate_image_properties.maxFragmentShadingRateAttachmentTexelSize.width;
 
     VkPhysicalDeviceFragmentShadingRateFeaturesKHR fragment_shading_rate_features = {};
+    fragment_shading_rate_features.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR;
     fragment_shading_rate_features.attachmentFragmentShadingRate = true;
     add_extension(fragment_shading_rate_features);
   }
@@ -188,7 +191,9 @@ VKDevice::VKDevice(VKAdapter& adapter)
   if (m_is_dxr_supported)
   {
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_properties = {};
+    ray_tracing_properties.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 device_props2 = {};
+    device_props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     device_props2.pNext = &ray_tracing_properties;
     vkGetPhysicalDeviceProperties2(m_physical_device, &device_props2);
 
@@ -219,6 +224,7 @@ VKDevice::VKDevice(VKAdapter& adapter)
   device_features.shaderImageGatherExtended = true;
 
   VkPhysicalDeviceVulkan12Features device_vulkan12_features = {};
+  device_vulkan12_features.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
   device_vulkan12_features.drawIndirectCount = true;
   device_vulkan12_features.bufferDeviceAddress = true;
   device_vulkan12_features.timelineSemaphore = true;
@@ -227,6 +233,7 @@ VKDevice::VKDevice(VKAdapter& adapter)
   add_extension(device_vulkan12_features);
 
   VkPhysicalDeviceMeshShaderFeaturesNV mesh_shader_feature = {};
+  mesh_shader_feature.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV;
   mesh_shader_feature.taskShader = true;
   mesh_shader_feature.meshShader = true;
   if (m_is_mesh_shading_supported)
@@ -235,12 +242,15 @@ VKDevice::VKDevice(VKAdapter& adapter)
   }
 
   VkPhysicalDeviceRayTracingPipelineFeaturesKHR raytracing_pipeline_feature = {};
+  raytracing_pipeline_feature.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
   raytracing_pipeline_feature.rayTracingPipeline = true;
 
   VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_feature = {};
+  acceleration_structure_feature.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
   acceleration_structure_feature.accelerationStructure = true;
 
   VkPhysicalDeviceRayQueryFeaturesKHR rayquery_pipeline_feature = {};
+  rayquery_pipeline_feature.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
   rayquery_pipeline_feature.rayQuery = true;
 
   if (m_is_dxr_supported)
@@ -749,7 +759,7 @@ VKAdapter& VKDevice::GetAdapter()
   return m_adapter;
 }
 
-VkDevice VKDevice::GetDevice()
+VkDevice& VKDevice::GetDevice()
 {
   return m_device;
 }
@@ -763,7 +773,7 @@ CommandListType VKDevice::GetAvailableCommandListType(CommandListType type)
   return CommandListType::kGraphics;
 }
 
-VkCommandPool VKDevice::GetCmdPool(CommandListType type)
+VkCommandPool& VKDevice::GetCmdPool(CommandListType type)
 {
   return m_cmd_pools.at(GetAvailableCommandListType(type));
 }
@@ -789,7 +799,7 @@ VkImageAspectFlags VKDevice::GetAspectFlags(VkFormat format) const
 
 uint32_t VKDevice::FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties)
 {
-  VkPhysicalDeviceMemoryProperties memProperties;
+  VkPhysicalDeviceMemoryProperties memProperties = {};
   vkGetPhysicalDeviceMemoryProperties(m_physical_device, &memProperties);
 
   for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)

@@ -10,9 +10,9 @@ ez_create_target(LIBRARY ${PROJECT_NAME})
 
 #target_compile_definitions(${PROJECT_NAME} PRIVATE VULKAN_HPP_DISPATCH_LOADER_DYNAMIC)
 #target_compile_definitions(${PROJECT_NAME} PRIVATE VK_NO_PROTOTYPES)
-target_compile_definitions(${PROJECT_NAME} PRIVATE VK_USE_PLATFORM_WIN32_KHR)
+#target_compile_definitions(${PROJECT_NAME} PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 
-ez_link_target_vulkan(${PROJECT_NAME})
+#ez_link_target_vulkan(${PROJECT_NAME})
 
 #target_link_libraries(${PROJECT_NAME}
 #  PRIVATE
@@ -24,4 +24,5 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
   Foundation
   RHI
+  volk
 )

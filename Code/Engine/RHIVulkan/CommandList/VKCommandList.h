@@ -80,7 +80,7 @@ public:
         const std::shared_ptr<Resource>& dst_buffer,
         uint64_t dst_offset) override;
 
-    VkCommandBuffer GetCommandList();
+    VkCommandBuffer& GetCommandList();
 
 private:
     void BuildAccelerationStructure(VkAccelerationStructureCreateInfoKHR& build_info, const VkBuffer& instance_data, uint64_t instance_offset, const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::shared_ptr<Resource>& scratch, uint64_t scratch_offset);

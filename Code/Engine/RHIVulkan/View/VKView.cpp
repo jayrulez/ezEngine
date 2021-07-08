@@ -20,12 +20,13 @@ VKView::VKView(VKDevice& device, const std::shared_ptr<VKResource>& resource, co
     decltype(auto) pool = device.GetGPUBindlessDescriptorPool(type);
     m_range = std::make_shared<VKGPUDescriptorPoolRange>(pool.Allocate(1));
 
+    m_descriptor.sType = VkStructureType::VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     m_descriptor.dstSet = m_range->GetDescriptoSet();
     m_descriptor.dstArrayElement = m_range->GetOffset();
     m_descriptor.descriptorType = type;
     m_descriptor.dstBinding = 0;
     m_descriptor.descriptorCount = 1;
-    m_device.GetDevice().updateDescriptorSets(1, &m_descriptor, 0, nullptr);
+    vkUpdateDescriptorSets(m_device.GetDevice() , 1, &m_descriptor, 0, nullptr);
   }
 }
 
@@ -56,10 +57,11 @@ VkImageViewType GetImageViewType(ViewDimension dimension)
 
 void VKView::CreateView()
 {
+  m_descriptor.sType = VkStructureType::VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
   switch (m_view_desc.view_type)
   {
     case ViewType::kSampler:
-      m_descriptor_image.sampler = m_resource->sampler.res.get();
+      m_descriptor_image.sampler = m_resource->sampler.res;
       m_descriptor.pImageInfo = &m_descriptor_image;
       break;
     case ViewType::kTexture:
@@ -80,8 +82,10 @@ void VKView::CreateView()
     }
     case ViewType::kAccelerationStructure:
     {
+      m_descriptor_acceleration_structure.sType = VkStructureType::VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+
       m_descriptor_acceleration_structure.accelerationStructureCount = 1;
-      m_descriptor_acceleration_structure.pAccelerationStructures = &m_resource->acceleration_structure_handle.get();
+      m_descriptor_acceleration_structure.pAccelerationStructures = &m_resource->acceleration_structure_handle;
       m_descriptor.pNext = &m_descriptor_acceleration_structure;
       break;
     }
@@ -95,7 +99,7 @@ void VKView::CreateView()
     case ViewType::kConstantBuffer:
     case ViewType::kStructuredBuffer:
     case ViewType::kRWStructuredBuffer:
-      m_descriptor_buffer.buffer = m_resource->buffer.res.get();
+      m_descriptor_buffer.buffer = m_resource->buffer.res;
       m_descriptor_buffer.offset = m_view_desc.offset;
       m_descriptor_buffer.range = m_view_desc.buffer_size;
       m_descriptor.pBufferInfo = &m_descriptor_buffer;
@@ -144,11 +148,11 @@ void VKView::CreateBufferView()
 {
   VkBufferViewCreateInfo buffer_view_desc = {};
   buffer_view_desc.sType = VkStructureType::VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-  buffer_view_desc.buffer = m_resource->buffer.res.get();
+  buffer_view_desc.buffer = m_resource->buffer.res;
   buffer_view_desc.format = VKUtils::ToVkFormat(m_view_desc.buffer_format);
   buffer_view_desc.offset = m_view_desc.offset;
   buffer_view_desc.range = m_view_desc.buffer_size;
-  m_buffer_view = m_device.GetDevice().createBufferViewUnique(buffer_view_desc);
+  vkCreateBufferView(m_device.GetDevice(), &buffer_view_desc, nullptr, &m_buffer_view);
 }
 
 std::shared_ptr<Resource> VKView::GetResource()

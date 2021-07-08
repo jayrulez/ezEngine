@@ -30,7 +30,6 @@ ON_CORESYSTEMS_SHUTDOWN
 EZ_END_SUBSYSTEM_DECLARATION;
 // clang-format on
 
-
 static bool SkipIt(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT object_type, const std::string& message)
 {
   if (object_type == VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT && flags != VK_DEBUG_REPORT_ERROR_BIT_EXT)
@@ -84,6 +83,11 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportCallback(
 
 VKInstance::VKInstance()
 {
+  if (volkInitialize() != VK_SUCCESS)
+  {
+    EZ_REPORT_FAILURE("Volk initialization failed.");
+  }
+
   ezUInt32 layerCount = 0;
   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -93,7 +97,7 @@ VKInstance::VKInstance()
   vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.GetData());
 
   std::set<std::string> req_layers;
-  static const bool debug_enabled = IsDebuggerPresent();
+  static const bool debug_enabled = true; //IsDebuggerPresent();
   if (debug_enabled)
     req_layers.insert("VK_LAYER_KHRONOS_validation");
   std::vector<const char*> found_layers;
@@ -131,11 +135,20 @@ VKInstance::VKInstance()
       found_extension.push_back(extension.extensionName);
   }
 
+  ezUInt32 versionMajor = 1; //  reinterpret_cast<ezUInt32>(*(&BUILDSYSTEM_VERSION_MAJOR));
+  ezUInt32 versionMinor = 0; //  reinterpret_cast<ezUInt32>(*(&BUILDSYSTEM_VERSION_MINOR));
+  ezUInt32 versionPatch = 0; //  reinterpret_cast<ezUInt32>(*(&BUILDSYSTEM_VERSION_PATCH));
+
   VkApplicationInfo app_info = {};
   app_info.apiVersion = VK_API_VERSION_1_2;
   app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  app_info.pApplicationName = "ezEngine";
+  app_info.applicationVersion = VK_MAKE_VERSION(versionMajor, versionMinor, versionPatch);
+  app_info.pEngineName = "ezEngine";
+  app_info.engineVersion = VK_MAKE_VERSION(versionMajor, versionMinor, versionPatch);
+  app_info.apiVersion = VK_API_VERSION_1_2;
 
-  VkInstanceCreateInfo create_info;
+  VkInstanceCreateInfo create_info = {};
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   create_info.pApplicationInfo = &app_info;
   create_info.enabledLayerCount = static_cast<uint32_t>(found_layers.size());
@@ -147,6 +160,8 @@ VKInstance::VKInstance()
   {
     EZ_REPORT_FAILURE("Failed to create Vulkan instance.");
   }
+
+  volkLoadInstance(m_instance);
 
   if (debug_enabled)
   {

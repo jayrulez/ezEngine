@@ -12,6 +12,7 @@
 
 #include <RHIShaderCompilerHLSL/Compiler.h>
 #include <RHIShaderCompilerHLSL/ShaderReflection.h>
+#include <RHI/Device/Device.h>
 
 static ezUInt32 g_uiWindowWidth = 640;
 static ezUInt32 g_uiWindowHeight = 480;

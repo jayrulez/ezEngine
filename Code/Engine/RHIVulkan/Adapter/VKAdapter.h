@@ -1,7 +1,6 @@
 #pragma once
 #include <RHIVulkan/RHIVulkanDLL.h>
 #include <RHI/Adapter/Adapter.h>
-#include <vulkan/vulkan.h>
 
 class VKInstance;
 
@@ -12,7 +11,7 @@ public:
   const std::string& GetName() const override;
   std::shared_ptr<Device> CreateDevice() override;
   VKInstance& GetInstance();
-  VkPhysicalDevice GetPhysicalDevice();
+  VkPhysicalDevice& GetPhysicalDevice();
 
 private:
   VKInstance& m_instance;

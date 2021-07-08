@@ -20,7 +20,7 @@ VKCommandList::VKCommandList(VKDevice& device, CommandListType type)
   cmd_buf_alloc_info.commandBufferCount = 1;
   cmd_buf_alloc_info.level = VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY;
   std::vector<VkCommandBuffer> cmd_bufs(cmd_buf_alloc_info.commandBufferCount);
-  vkAllocateCommandBuffers(device.GetDevice(), nullptr, cmd_bufs.data());
+  vkAllocateCommandBuffers(device.GetDevice(), &cmd_buf_alloc_info, cmd_bufs.data());
   m_command_list = std::move(cmd_bufs.front());
 
   VkCommandBufferBeginInfo begin_info = {};
@@ -257,12 +257,17 @@ static VkStridedDeviceAddressRegionKHR GetStridedDeviceAddressRegion(VKDevice& d
 
 void VKCommandList::DispatchRays(const RayTracingShaderTables& shader_tables, uint32_t width, uint32_t height, uint32_t depth)
 {
+  VkStridedDeviceAddressRegionKHR raygen = GetStridedDeviceAddressRegion(m_device, shader_tables.raygen);
+  VkStridedDeviceAddressRegionKHR miss = GetStridedDeviceAddressRegion(m_device, shader_tables.miss);
+  VkStridedDeviceAddressRegionKHR hit = GetStridedDeviceAddressRegion(m_device, shader_tables.hit);
+  VkStridedDeviceAddressRegionKHR callable = GetStridedDeviceAddressRegion(m_device, shader_tables.callable);
+
   vkCmdTraceRaysKHR(
     m_command_list,
-    &GetStridedDeviceAddressRegion(m_device, shader_tables.raygen),
-    &GetStridedDeviceAddressRegion(m_device, shader_tables.miss),
-    &GetStridedDeviceAddressRegion(m_device, shader_tables.hit),
-    &GetStridedDeviceAddressRegion(m_device, shader_tables.callable),
+    &raygen,
+    &miss,
+    &hit,
+    &callable,
     width,
     height,
     depth);
@@ -290,11 +295,14 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
       continue;
 
     VkImageMemoryBarrier& image_memory_barrier = image_memory_barriers.emplace_back();
+    image_memory_barrier = {};
+    image_memory_barrier.sType = VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     image_memory_barrier.oldLayout = vk_state_before;
     image_memory_barrier.newLayout = vk_state_after;
     image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     image_memory_barrier.image = image.res;
+    image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 
     VkImageSubresourceRange& range = image_memory_barrier.subresourceRange;
     range.aspectMask = m_device.GetAspectFlags(image.format);
@@ -667,9 +675,9 @@ void VKCommandList::CopyBuffer(const std::shared_ptr<Resource>& src_buffer, cons
   std::vector<VkBufferCopy> vk_regions;
   for (const auto& region : regions)
   {
-    vk_regions.emplace_back(region.src_offset, region.dst_offset, region.num_bytes);
+    vk_regions.emplace_back(VkBufferCopy{region.src_offset, region.dst_offset, region.num_bytes});
   }
-  vkCmdCopyBuffer(m_command_list, vk_src_buffer.buffer.res, vk_dst_buffer.buffer.res, vk_regions.size(), vk_regions.data());
+  vkCmdCopyBuffer(m_command_list, vk_src_buffer.buffer.res, vk_dst_buffer.buffer.res, (ezUInt32)vk_regions.size(), vk_regions.data());
 }
 
 void VKCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buffer, const std::shared_ptr<Resource>& dst_texture,
@@ -710,7 +718,7 @@ void VKCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
     vk_src_buffer.buffer.res,
     vk_dst_texture.image.res,
     VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-    vk_regions.size(),
+    (ezUInt32)vk_regions.size(),
     vk_regions.data());
 }
 
@@ -743,7 +751,7 @@ void VKCommandList::CopyTexture(const std::shared_ptr<Resource>& src_texture, co
     vk_region.extent.height = region.extent.height;
     vk_region.extent.depth = region.extent.depth;
   }
-  vkCmdCopyImage(m_command_list, vk_src_texture.image.res, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk_dst_texture.image.res, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk_regions.size(), vk_regions.data());
+  vkCmdCopyImage(m_command_list, vk_src_texture.image.res, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk_dst_texture.image.res, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, (ezUInt32)vk_regions.size(), vk_regions.data());
 }
 
 void VKCommandList::WriteAccelerationStructuresProperties(
@@ -791,7 +799,7 @@ void VKCommandList::ResolveQueryData(
     VkQueryResultFlagBits::VK_QUERY_RESULT_WAIT_BIT);
 }
 
-VkCommandBuffer VKCommandList::GetCommandList()
+VkCommandBuffer& VKCommandList::GetCommandList()
 {
   return m_command_list;
 }

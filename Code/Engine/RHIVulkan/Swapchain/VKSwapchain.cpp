@@ -19,6 +19,7 @@ VKSwapchain::VKSwapchain(VKCommandQueue& command_queue, Window window, uint32_t 
   VKInstance& instance = adapter.GetInstance();
 
   VkWin32SurfaceCreateInfoKHR surface_desc = {};
+  surface_desc.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
   surface_desc.hinstance = GetModuleHandle(nullptr);
   surface_desc.hwnd = reinterpret_cast<HWND>(window);
   vkCreateWin32SurfaceKHR(instance.GetInstance(), &surface_desc, nullptr, &m_surface);

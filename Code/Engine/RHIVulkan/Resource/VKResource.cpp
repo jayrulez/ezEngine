@@ -13,6 +13,7 @@ void VKResource::CommitMemory(MemoryType memory_type)
 {
   MemoryRequirements mem_requirements = GetMemoryRequirements();
   VkMemoryDedicatedAllocateInfoKHR dedicated_allocate_info = {};
+  dedicated_allocate_info.sType = VkStructureType::VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
   VkMemoryDedicatedAllocateInfoKHR* p_dedicated_allocate_info = nullptr;
   if (resource_type == ResourceType::kBuffer)
   {
@@ -116,15 +117,18 @@ bool VKResource::AllowCommonStatePromotion(ResourceState state_after)
 MemoryRequirements VKResource::GetMemoryRequirements() const
 {
   VkMemoryRequirements2 mem_requirements = {};
+  mem_requirements.sType = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2;
   if (resource_type == ResourceType::kBuffer)
   {
     VkBufferMemoryRequirementsInfo2KHR buffer_mem_req = {};
+    buffer_mem_req.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2;
     buffer_mem_req.buffer = buffer.res;
     vkGetBufferMemoryRequirements2(m_device.GetDevice() , & buffer_mem_req, &mem_requirements);
   }
   else if (resource_type == ResourceType::kTexture)
   {
     VkImageMemoryRequirementsInfo2KHR image_mem_req = {};
+    image_mem_req.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2;
     image_mem_req.image = image.res;
     vkGetImageMemoryRequirements2(m_device.GetDevice() , & image_mem_req, &mem_requirements);
   }

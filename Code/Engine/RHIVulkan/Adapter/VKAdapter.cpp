@@ -27,7 +27,7 @@ VKInstance& VKAdapter::GetInstance()
     return m_instance;
 }
 
-VkPhysicalDevice VKAdapter::GetPhysicalDevice()
+VkPhysicalDevice& VKAdapter::GetPhysicalDevice()
 {
     return m_physical_device;
 }

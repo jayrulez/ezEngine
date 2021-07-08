@@ -57,6 +57,7 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
         {
           m_shader_ids[shader->GetId(entry_point.name)] = (ezUInt32)m_shader_stage_create_info.size();
             decltype(auto) shader_stage_create_info = m_shader_stage_create_info.emplace_back();
+          shader_stage_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
             shader_stage_create_info.stage = ExecutionModel2Bit(entry_point.kind);
             shader_stage_create_info.module = m_shader_modules.back();
             decltype(auto) name = entry_point_names.emplace_back(entry_point.name);

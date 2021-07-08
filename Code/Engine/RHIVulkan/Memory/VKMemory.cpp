@@ -5,6 +5,7 @@ VKMemory::VKMemory(VKDevice& device, uint64_t size, MemoryType memory_type, uint
   : m_memory_type(memory_type)
 {
   VkMemoryAllocateFlagsInfo alloc_flag_info = {};
+  alloc_flag_info.sType = VkStructureType::VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
   alloc_flag_info.pNext = dedicated_allocate_info;
   alloc_flag_info.flags = VkMemoryAllocateFlagBits::VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
 
