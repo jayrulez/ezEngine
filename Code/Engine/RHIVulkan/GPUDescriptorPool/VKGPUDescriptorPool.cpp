@@ -6,13 +6,13 @@ VKGPUDescriptorPool::VKGPUDescriptorPool(VKDevice& device)
 {
 }
 
-vk::UniqueDescriptorPool VKGPUDescriptorPool::CreateDescriptorPool(const std::map<vk::DescriptorType, size_t>& count)
+VkDescriptorPool VKGPUDescriptorPool::CreateDescriptorPool(const std::map<VkDescriptorType, size_t>& count)
 {
-    std::vector<vk::DescriptorPoolSize> pool_sizes;
+    std::vector<VkDescriptorPoolSize> pool_sizes;
     for (auto & x : count)
     {
         pool_sizes.emplace_back();
-        vk::DescriptorPoolSize& pool_size = pool_sizes.back();
+        VkDescriptorPoolSize& pool_size = pool_sizes.back();
         pool_size.type = x.first;
         pool_size.descriptorCount = (ezUInt32)x.second;
     }
@@ -21,31 +21,37 @@ vk::UniqueDescriptorPool VKGPUDescriptorPool::CreateDescriptorPool(const std::ma
     if (count.empty())
     {
         pool_sizes.emplace_back();
-        vk::DescriptorPoolSize& pool_size = pool_sizes.back();
-        pool_size.type = vk::DescriptorType::eSampler;
+        VkDescriptorPoolSize& pool_size = pool_sizes.back();
+        pool_size.type = VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
         pool_size.descriptorCount = 1;
     }
 
-    vk::DescriptorPoolCreateInfo pool_info = {};
+    VkDescriptorPoolCreateInfo pool_info = {};
+    pool_info.sType = VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info.poolSizeCount = (ezUInt32)pool_sizes.size();
     pool_info.pPoolSizes = pool_sizes.data();
     pool_info.maxSets = 1;
-    pool_info.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
+    pool_info.flags = VkDescriptorPoolCreateFlagBits::VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
-    return m_device.GetDevice().createDescriptorPoolUnique(pool_info);
+    VkDescriptorPool descriptorPool = {};
+    vkCreateDescriptorPool(m_device.GetDevice(), &pool_info, nullptr, &descriptorPool);
+    return descriptorPool;
 }
 
-DescriptorSetPool VKGPUDescriptorPool::AllocateDescriptorSet(const vk::DescriptorSetLayout& set_layout, const std::map<vk::DescriptorType, size_t>& count)
+DescriptorSetPool VKGPUDescriptorPool::AllocateDescriptorSet(const VkDescriptorSetLayout& set_layout, const std::map<VkDescriptorType, size_t>& count)
 {
     DescriptorSetPool res = {};
     res.pool = CreateDescriptorPool(count);
 
-    vk::DescriptorSetAllocateInfo alloc_info = {};
-    alloc_info.descriptorPool = res.pool.get();
+    VkDescriptorSetAllocateInfo alloc_info = {};
+    alloc_info.sType = VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    alloc_info.descriptorPool = res.pool;
     alloc_info.descriptorSetCount = 1;
     alloc_info.pSetLayouts = &set_layout;
-    auto descriptor_sets = m_device.GetDevice().allocateDescriptorSetsUnique(alloc_info);
-    res.set = std::move(descriptor_sets.front());
+
+    VkDescriptorSet descriptorSet = {};
+    vkAllocateDescriptorSets(m_device.GetDevice(), &alloc_info, &descriptorSet);
+    res.set = std::move(descriptorSet);
 
     return res;
 }
