@@ -12,8 +12,8 @@ VKResource::VKResource(VKDevice& device)
 void VKResource::CommitMemory(MemoryType memory_type)
 {
     MemoryRequirements mem_requirements = GetMemoryRequirements();
-    vk::MemoryDedicatedAllocateInfoKHR dedicated_allocate_info = {};
-    vk::MemoryDedicatedAllocateInfoKHR* p_dedicated_allocate_info = nullptr;
+    VkMemoryDedicatedAllocateInfoKHR dedicated_allocate_info = {};
+    VkMemoryDedicatedAllocateInfoKHR* p_dedicated_allocate_info = nullptr;
     if (resource_type == ResourceType::kBuffer)
     {
         dedicated_allocate_info.buffer = buffer.res.get();
@@ -78,7 +78,7 @@ uint64_t VKResource::GetAccelerationStructureHandle() const
 
 void VKResource::SetName(const std::string& name)
 {
-    vk::DebugUtilsObjectNameInfoEXT info = {};
+    VkDebugUtilsObjectNameInfoEXT info = {};
     info.pObjectName = name.c_str();
     if (resource_type == ResourceType::kBuffer)
     {
@@ -96,7 +96,7 @@ void VKResource::SetName(const std::string& name)
 uint8_t* VKResource::Map()
 {
     uint8_t* dst_data = nullptr;
-    vk::Result res = m_device.GetDevice().mapMemory(m_vk_memory, 0, VK_WHOLE_SIZE, {}, reinterpret_cast<void**>(&dst_data));
+    VkResult res = m_device.GetDevice().mapMemory(m_vk_memory, 0, VK_WHOLE_SIZE, {}, reinterpret_cast<void**>(&dst_data));
     return dst_data;
 }
 
@@ -112,16 +112,16 @@ bool VKResource::AllowCommonStatePromotion(ResourceState state_after)
 
 MemoryRequirements VKResource::GetMemoryRequirements() const
 {
-    vk::MemoryRequirements2 mem_requirements = {};
+    VkMemoryRequirements2 mem_requirements = {};
     if (resource_type == ResourceType::kBuffer)
     {
-        vk::BufferMemoryRequirementsInfo2KHR buffer_mem_req = {};
+        VkBufferMemoryRequirementsInfo2KHR buffer_mem_req = {};
         buffer_mem_req.buffer = buffer.res.get();
         m_device.GetDevice().getBufferMemoryRequirements2(&buffer_mem_req, &mem_requirements);
     }
     else if (resource_type == ResourceType::kTexture)
     {
-        vk::ImageMemoryRequirementsInfo2KHR image_mem_req = {};
+        VkImageMemoryRequirementsInfo2KHR image_mem_req = {};
         image_mem_req.image = image.res;
         m_device.GetDevice().getImageMemoryRequirements2(&image_mem_req, &mem_requirements);
     }

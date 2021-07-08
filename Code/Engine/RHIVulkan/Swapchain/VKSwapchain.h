@@ -24,13 +24,13 @@ public:
 private:
   VKCommandQueue& m_command_queue;
   VKDevice& m_device;
-  vk::UniqueSurfaceKHR m_surface;
-  vk::Format m_swapchain_color_format = vk::Format::eB8G8R8Unorm;
-  vk::UniqueSwapchainKHR m_swapchain;
+  VkSurfaceKHR m_surface;
+  VkFormat m_swapchain_color_format = VkFormat::VK_FORMAT_B8G8R8_UNORM;
+  VkSwapchainKHR m_swapchain;
   std::vector<std::shared_ptr<Resource>> m_back_buffers;
   uint32_t m_frame_index = 0;
-  vk::UniqueSemaphore m_image_available_semaphore;
-  vk::UniqueSemaphore m_rendering_finished_semaphore;
+  VkSemaphore m_image_available_semaphore;
+  VkSemaphore m_rendering_finished_semaphore;
   std::shared_ptr<CommandList> m_command_list;
   std::shared_ptr<Fence> m_fence;
 };

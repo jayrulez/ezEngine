@@ -5,7 +5,7 @@
 #include <RHIVulkan/RenderPass/VKRenderPass.h>
 #include <RHIVulkan/RHIVulkanDLL.h>
 
-vk::ShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind);
+VkShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind);
 
 class VKDevice;
 
@@ -15,12 +15,12 @@ public:
   VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineDesc& desc);
   PipelineType GetPipelineType() const override;
 
-  vk::RenderPass GetRenderPass() const;
+  VkRenderPass GetRenderPass() const;
 
 private:
-  void CreateInputLayout(std::vector<vk::VertexInputBindingDescription>& binding_desc, std::vector<vk::VertexInputAttributeDescription>& attribute_desc);
+  void CreateInputLayout(std::vector<VkVertexInputBindingDescription>& binding_desc, std::vector<VkVertexInputAttributeDescription>& attribute_desc);
 
   GraphicsPipelineDesc m_desc;
-  std::vector<vk::VertexInputBindingDescription> m_binding_desc;
-  std::vector<vk::VertexInputAttributeDescription> m_attribute_desc;
+  std::vector<VkVertexInputBindingDescription> m_binding_desc;
+  std::vector<VkVertexInputAttributeDescription> m_attribute_desc;
 };

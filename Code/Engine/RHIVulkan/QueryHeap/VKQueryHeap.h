@@ -11,11 +11,11 @@ public:
 
   QueryHeapType GetType() const override;
 
-  vk::QueryType GetQueryType() const;
-  vk::QueryPool GetQueryPool() const;
+  VkQueryType GetQueryType() const;
+  VkQueryPool GetQueryPool() const;
 
 private:
   VKDevice& m_device;
-  vk::UniqueQueryPool m_query_pool;
-  vk::QueryType m_query_type;
+  VkUniqueQueryPool m_query_pool;
+  VkQueryType m_query_type;
 };

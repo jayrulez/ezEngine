@@ -2,7 +2,7 @@
 #include <RHIVulkan/Device/VKDevice.h>
 #include <stdexcept>
 
-VKGPUBindlessDescriptorPoolTyped::VKGPUBindlessDescriptorPoolTyped(VKDevice& device, vk::DescriptorType type)
+VKGPUBindlessDescriptorPoolTyped::VKGPUBindlessDescriptorPoolTyped(VKDevice& device, VkDescriptorType type)
     : m_device(device)
     , m_type(type)
 {
@@ -18,42 +18,42 @@ void VKGPUBindlessDescriptorPoolTyped::ResizeHeap(uint32_t req_size)
 
     Descriptor descriptor;
 
-    vk::DescriptorPoolSize pool_size = {};
+    VkDescriptorPoolSize pool_size = {};
     pool_size.type = m_type;
     pool_size.descriptorCount = req_size;
 
-    vk::DescriptorPoolCreateInfo pool_info = {};
+    VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.poolSizeCount = 1;
     pool_info.pPoolSizes = &pool_size;
     pool_info.maxSets = 1;
-    pool_info.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
+    pool_info.flags = VkDescriptorPoolCreateFlagBits::eFreeDescriptorSet;
 
     descriptor.pool = m_device.GetDevice().createDescriptorPoolUnique(pool_info);
 
-    vk::DescriptorSetLayoutBinding binding = {};
+    VkDescriptorSetLayoutBinding binding = {};
     binding.binding = 0;
     binding.descriptorType = m_type;
     binding.descriptorCount = max_bindless_heap_size;
-    binding.stageFlags = vk::ShaderStageFlagBits::eAll;
+    binding.stageFlags = VkShaderStageFlagBits::eAll;
 
-    vk::DescriptorBindingFlags binding_flag = vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
+    VkDescriptorBindingFlags binding_flag = VkDescriptorBindingFlagBits::eVariableDescriptorCount;
 
-    vk::DescriptorSetLayoutBindingFlagsCreateInfo layout_flags_info = {};
+    VkDescriptorSetLayoutBindingFlagsCreateInfo layout_flags_info = {};
     layout_flags_info.bindingCount = 1;
     layout_flags_info.pBindingFlags = &binding_flag;
 
-    vk::DescriptorSetLayoutCreateInfo layout_info = {};
+    VkDescriptorSetLayoutCreateInfo layout_info = {};
     layout_info.bindingCount = 1;
     layout_info.pBindings = &binding;
     layout_info.pNext = &layout_flags_info;
 
     descriptor.set_layout = m_device.GetDevice().createDescriptorSetLayoutUnique(layout_info);
 
-    vk::DescriptorSetVariableDescriptorCountAllocateInfo variable_descriptor_count_info = {};
+    VkDescriptorSetVariableDescriptorCountAllocateInfo variable_descriptor_count_info = {};
     variable_descriptor_count_info.descriptorSetCount = 1;
     variable_descriptor_count_info.pDescriptorCounts = &req_size;
 
-    vk::DescriptorSetAllocateInfo alloc_info = {};
+    VkDescriptorSetAllocateInfo alloc_info = {};
     alloc_info.descriptorPool = descriptor.pool.get();
     alloc_info.descriptorSetCount = 1;
     alloc_info.pSetLayouts = &descriptor.set_layout.get();
@@ -63,7 +63,7 @@ void VKGPUBindlessDescriptorPoolTyped::ResizeHeap(uint32_t req_size)
 
     if (m_size)
     {
-        vk::CopyDescriptorSet copy_descriptors;
+        VkCopyDescriptorSet copy_descriptors;
         copy_descriptors.srcSet = m_descriptor.set.get();
         copy_descriptors.dstSet = descriptor.set.get();
         copy_descriptors.descriptorCount = m_size;
@@ -97,7 +97,7 @@ void VKGPUBindlessDescriptorPoolTyped::OnRangeDestroy(uint32_t offset, uint32_t 
     m_empty_ranges.emplace(size, offset);
 }
 
-vk::DescriptorSet VKGPUBindlessDescriptorPoolTyped::GetDescriptorSet() const
+VkDescriptorSet VKGPUBindlessDescriptorPoolTyped::GetDescriptorSet() const
 {
     return m_descriptor.set.get();
 }

@@ -7,8 +7,8 @@ VKFramebuffer::VKFramebuffer(VKDevice& device, const FramebufferDesc& desc)
     : FramebufferBase(desc)
     , m_extent(desc.width, desc.height)
 {
-    vk::FramebufferCreateInfo framebuffer_info = {};
-    std::vector<vk::ImageView> attachment_views;
+    VkFramebufferCreateInfo framebuffer_info = {};
+    std::vector<VkImageView> attachment_views;
     framebuffer_info.layers = 1;
     auto add_view = [&](const std::shared_ptr<View>& view)
     {
@@ -38,12 +38,12 @@ VKFramebuffer::VKFramebuffer(VKDevice& device, const FramebufferDesc& desc)
     m_framebuffer = device.GetDevice().createFramebufferUnique(framebuffer_info);
 }
 
-vk::Framebuffer VKFramebuffer::GetFramebuffer() const
+VkFramebuffer VKFramebuffer::GetFramebuffer() const
 {
     return m_framebuffer.get();
 }
 
-vk::Extent2D VKFramebuffer::GetExtent() const
+VkExtent2D VKFramebuffer::GetExtent() const
 {
     return m_extent;
 }

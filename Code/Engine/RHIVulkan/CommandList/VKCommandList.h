@@ -80,13 +80,13 @@ public:
         const std::shared_ptr<Resource>& dst_buffer,
         uint64_t dst_offset) override;
 
-    vk::CommandBuffer GetCommandList();
+    VkCommandBuffer GetCommandList();
 
 private:
-    void BuildAccelerationStructure(vk::AccelerationStructureCreateInfoKHR& build_info, const vk::Buffer& instance_data, uint64_t instance_offset, const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::shared_ptr<Resource>& scratch, uint64_t scratch_offset);
+    void BuildAccelerationStructure(VkAccelerationStructureCreateInfoKHR& build_info, const VkBuffer& instance_data, uint64_t instance_offset, const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::shared_ptr<Resource>& scratch, uint64_t scratch_offset);
 
     VKDevice& m_device;
-    vk::UniqueCommandBuffer m_command_list;
+    VkUniqueCommandBuffer m_command_list;
     bool m_closed = false;
     std::shared_ptr<VKPipeline> m_state;
     std::shared_ptr<BindingSet> m_binding_set;

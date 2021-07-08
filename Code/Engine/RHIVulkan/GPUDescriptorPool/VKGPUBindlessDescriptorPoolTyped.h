@@ -11,23 +11,23 @@ class VKDevice;
 class VKGPUBindlessDescriptorPoolTyped
 {
 public:
-    VKGPUBindlessDescriptorPoolTyped(VKDevice& device, vk::DescriptorType type);
+    VKGPUBindlessDescriptorPoolTyped(VKDevice& device, VkDescriptorType type);
     VKGPUDescriptorPoolRange Allocate(uint32_t count);
     void OnRangeDestroy(uint32_t offset, uint32_t size);
-    vk::DescriptorSet GetDescriptorSet() const;
+    VkDescriptorSet GetDescriptorSet() const;
 
 private:
     void ResizeHeap(uint32_t req_size);
 
     VKDevice& m_device;
-    vk::DescriptorType m_type;
+    VkDescriptorType m_type;
     uint32_t m_size = 0;
     uint32_t m_offset = 0;
     struct Descriptor
     {
-        vk::UniqueDescriptorPool pool;
-        vk::UniqueDescriptorSetLayout set_layout;
-        vk::UniqueDescriptorSet set;
+        VkUniqueDescriptorPool pool;
+        VkUniqueDescriptorSetLayout set_layout;
+        VkUniqueDescriptorSet set;
     } m_descriptor;
     std::multimap<uint32_t, uint32_t> m_empty_ranges;
 };

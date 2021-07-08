@@ -14,10 +14,10 @@ public:
 
     VKDevice& GetDevice();
     uint32_t GetQueueFamilyIndex();
-    vk::Queue GetQueue();
+    VkQueue GetQueue();
 
 private:
     VKDevice& m_device;
     uint32_t m_queue_family_index;
-    vk::Queue m_queue;
+    VkQueue m_queue;
 };

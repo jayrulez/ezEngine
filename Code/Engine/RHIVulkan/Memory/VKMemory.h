@@ -8,11 +8,11 @@ class VKDevice;
 class VKMemory : public Memory
 {
 public:
-    VKMemory(VKDevice& device, uint64_t size, MemoryType memory_type, uint32_t memory_type_bits, const vk::MemoryDedicatedAllocateInfoKHR* dedicated_allocate_info);
+    VKMemory(VKDevice& device, uint64_t size, MemoryType memory_type, uint32_t memory_type_bits, const VkMemoryDedicatedAllocateInfoKHR* dedicated_allocate_info);
     MemoryType GetMemoryType() const override;
-    vk::DeviceMemory GetMemory() const;
+    VkDeviceMemory GetMemory() const;
 
 private:
     MemoryType m_memory_type;
-    vk::UniqueDeviceMemory m_memory;
+    VkUniqueDeviceMemory m_memory;
 };

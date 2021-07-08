@@ -2,34 +2,34 @@
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>
 
-vk::ShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind)
+VkShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind)
 {
     switch (kind)
     {
     case ShaderKind::kVertex:
-        return vk::ShaderStageFlagBits::eVertex;
+        return VkShaderStageFlagBits::eVertex;
     case ShaderKind::kPixel:
-        return vk::ShaderStageFlagBits::eFragment;
+        return VkShaderStageFlagBits::eFragment;
     case ShaderKind::kCompute:
-        return vk::ShaderStageFlagBits::eCompute;
+        return VkShaderStageFlagBits::eCompute;
     case ShaderKind::kGeometry:
-        return vk::ShaderStageFlagBits::eGeometry;
+        return VkShaderStageFlagBits::eGeometry;
     case ShaderKind::kAmplification:
-        return vk::ShaderStageFlagBits::eTaskNV;
+        return VkShaderStageFlagBits::eTaskNV;
     case ShaderKind::kMesh:
-        return vk::ShaderStageFlagBits::eMeshNV;
+        return VkShaderStageFlagBits::eMeshNV;
     case ShaderKind::kRayGeneration:
-        return vk::ShaderStageFlagBits::eRaygenKHR;
+        return VkShaderStageFlagBits::eRaygenKHR;
     case ShaderKind::kIntersection:
-        return vk::ShaderStageFlagBits::eIntersectionKHR;
+        return VkShaderStageFlagBits::eIntersectionKHR;
     case ShaderKind::kAnyHit:
-        return vk::ShaderStageFlagBits::eAnyHitKHR;
+        return VkShaderStageFlagBits::eAnyHitKHR;
     case ShaderKind::kClosestHit:
-        return vk::ShaderStageFlagBits::eClosestHitKHR;
+        return VkShaderStageFlagBits::eClosestHitKHR;
     case ShaderKind::kMiss:
-        return vk::ShaderStageFlagBits::eMissKHR;
+        return VkShaderStageFlagBits::eMissKHR;
     case ShaderKind::kCallable:
-        return vk::ShaderStageFlagBits::eCallableKHR;
+        return VkShaderStageFlagBits::eCallableKHR;
     }
     assert(false);
     return {};
@@ -45,7 +45,7 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
     for (const auto& shader : shaders)
     {
         decltype(auto) blob = shader->GetBlob();
-        vk::ShaderModuleCreateInfo shader_module_info = {};
+        VkShaderModuleCreateInfo shader_module_info = {};
         shader_module_info.codeSize = blob.size();
         shader_module_info.pCode = (uint32_t*)blob.data();
         m_shader_modules.emplace_back(m_device.GetDevice().createShaderModuleUnique(shader_module_info));
@@ -64,12 +64,12 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
     }
 }
 
-vk::Pipeline VKPipeline::GetPipeline() const
+VkPipeline VKPipeline::GetPipeline() const
 {
     return m_pipeline.get();
 }
 
-vk::PipelineLayout VKPipeline::GetPipelineLayout() const
+VkPipelineLayout VKPipeline::GetPipelineLayout() const
 {
     return m_pipeline_layout;
 }

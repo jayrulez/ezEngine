@@ -10,9 +10,9 @@ public:
     VKRenderPass(VKDevice& device, const RenderPassDesc& desc);
     const RenderPassDesc& GetDesc() const override;
 
-    vk::RenderPass GetRenderPass() const;
+    VkRenderPass GetRenderPass() const;
 
 private:
     RenderPassDesc m_desc;
-    vk::UniqueRenderPass m_render_pass;
+    VkRenderPass m_render_pass;
 };

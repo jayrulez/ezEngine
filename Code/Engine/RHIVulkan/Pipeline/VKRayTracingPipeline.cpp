@@ -11,7 +11,7 @@ VKRayTracingPipeline::VKRayTracingPipeline(VKDevice& device, const RayTracingPip
   : VKPipeline(device, desc.program, desc.layout)
   , m_desc(desc)
 {
-  std::vector<vk::RayTracingShaderGroupCreateInfoKHR> groups(m_desc.groups.size());
+  std::vector<VkRayTracingShaderGroupCreateInfoKHR> groups(m_desc.groups.size());
 
   auto get = [&](uint64_t id) -> uint32_t {
     auto it = m_shader_ids.find(id);
@@ -33,22 +33,22 @@ VKRayTracingPipeline::VKRayTracingPipeline(VKDevice& device, const RayTracingPip
     switch (m_desc.groups[i].type)
     {
       case RayTracingShaderGroupType::kGeneral:
-        group.type = vk::RayTracingShaderGroupTypeKHR::eGeneral;
+        group.type = VkRayTracingShaderGroupTypeKHR::eGeneral;
         group.generalShader = get(m_desc.groups[i].general);
         break;
       case RayTracingShaderGroupType::kTrianglesHitGroup:
-        group.type = vk::RayTracingShaderGroupTypeKHR::eTrianglesHitGroup;
+        group.type = VkRayTracingShaderGroupTypeKHR::eTrianglesHitGroup;
         group.closestHitShader = get(m_desc.groups[i].closest_hit);
         group.anyHitShader = get(m_desc.groups[i].any_hit);
         break;
       case RayTracingShaderGroupType::kProceduralHitGroup:
-        group.type = vk::RayTracingShaderGroupTypeKHR::eProceduralHitGroup;
+        group.type = VkRayTracingShaderGroupTypeKHR::eProceduralHitGroup;
         group.intersectionShader = get(m_desc.groups[i].intersection);
         break;
     }
   }
 
-  vk::RayTracingPipelineCreateInfoKHR ray_pipeline_info{};
+  VkRayTracingPipelineCreateInfoKHR ray_pipeline_info{};
   ray_pipeline_info.stageCount = static_cast<uint32_t>(m_shader_stage_create_info.size());
   ray_pipeline_info.pStages = m_shader_stage_create_info.data();
   ray_pipeline_info.groupCount = static_cast<uint32_t>(groups.size());
@@ -67,6 +67,6 @@ PipelineType VKRayTracingPipeline::GetPipelineType() const
 std::vector<uint8_t> VKRayTracingPipeline::GetRayTracingShaderGroupHandles(uint32_t first_group, uint32_t group_count) const
 {
   std::vector<uint8_t> shader_handles_storage(group_count * m_device.GetShaderGroupHandleSize());
-  vk::Result res = m_device.GetDevice().getRayTracingShaderGroupHandlesKHR(m_pipeline.get(), first_group, group_count, (ezUInt32)shader_handles_storage.size(), shader_handles_storage.data());
+  VkResult res = m_device.GetDevice().getRayTracingShaderGroupHandlesKHR(m_pipeline.get(), first_group, group_count, (ezUInt32)shader_handles_storage.size(), shader_handles_storage.data());
   return shader_handles_storage;
 }

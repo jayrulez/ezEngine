@@ -14,20 +14,20 @@
 VKCommandList::VKCommandList(VKDevice& device, CommandListType type)
     : m_device(device)
 {
-    vk::CommandBufferAllocateInfo cmd_buf_alloc_info = {};
+    VkCommandBufferAllocateInfo cmd_buf_alloc_info = {};
     cmd_buf_alloc_info.commandPool = device.GetCmdPool(type);
     cmd_buf_alloc_info.commandBufferCount = 1;
-    cmd_buf_alloc_info.level = vk::CommandBufferLevel::ePrimary;
-    std::vector<vk::UniqueCommandBuffer> cmd_bufs = device.GetDevice().allocateCommandBuffersUnique(cmd_buf_alloc_info);
+    cmd_buf_alloc_info.level = VkCommandBufferLevel::ePrimary;
+    std::vector<VkUniqueCommandBuffer> cmd_bufs = device.GetDevice().allocateCommandBuffersUnique(cmd_buf_alloc_info);
     m_command_list = std::move(cmd_bufs.front());
-    vk::CommandBufferBeginInfo begin_info = {};
+    VkCommandBufferBeginInfo begin_info = {};
     m_command_list->begin(begin_info);
 }
 
 void VKCommandList::Reset()
 {
     Close();
-    vk::CommandBufferBeginInfo begin_info = {};
+    VkCommandBufferBeginInfo begin_info = {};
     m_command_list->begin(begin_info);
     m_closed = false;
     m_state.reset();
@@ -43,16 +43,16 @@ void VKCommandList::Close()
     }
 }
 
-vk::PipelineBindPoint GetPipelineBindPoint(PipelineType type)
+VkPipelineBindPoint GetPipelineBindPoint(PipelineType type)
 {
     switch (type)
     {
     case PipelineType::kGraphics:
-        return vk::PipelineBindPoint::eGraphics;
+        return VkPipelineBindPoint::eGraphics;
     case PipelineType::kCompute:
-        return vk::PipelineBindPoint::eCompute;
+        return VkPipelineBindPoint::eCompute;
     case PipelineType::kRayTracing:
-        return vk::PipelineBindPoint::eRayTracingKHR;
+        return VkPipelineBindPoint::eRayTracingKHR;
     }
     assert(false);
     return {};
@@ -82,11 +82,11 @@ void VKCommandList::BeginRenderPass(const std::shared_ptr<RenderPass>& render_pa
 {
     decltype(auto) vk_framebuffer = framebuffer->As<VKFramebuffer>();
     decltype(auto) vk_render_pass = render_pass->As<VKRenderPass>();
-    vk::RenderPassBeginInfo render_pass_info = {};
+    VkRenderPassBeginInfo render_pass_info = {};
     render_pass_info.renderPass = vk_render_pass.GetRenderPass();
     render_pass_info.framebuffer = vk_framebuffer.GetFramebuffer();
     render_pass_info.renderArea.extent = vk_framebuffer.GetExtent();
-    std::vector<vk::ClearValue> clear_values;
+    std::vector<VkClearValue> clear_values;
     for (size_t i = 0; i < clear_desc.colors.size(); ++i)
     {
         auto& clear_value = clear_values.emplace_back();
@@ -98,14 +98,14 @@ void VKCommandList::BeginRenderPass(const std::shared_ptr<RenderPass>& render_pa
     clear_values.resize(vk_render_pass.GetDesc().colors.size());
     if (vk_render_pass.GetDesc().depth_stencil.format != ezRHIResourceFormat::UNKNOWN)
     {
-        vk::ClearValue clear_value = {};
+        VkClearValue clear_value = {};
         clear_value.depthStencil.depth = clear_desc.depth;
         clear_value.depthStencil.stencil = clear_desc.stencil;
         clear_values.emplace_back(clear_value);
     }
     render_pass_info.clearValueCount = (ezUInt32)clear_values.size();
     render_pass_info.pClearValues = clear_values.data();
-    m_command_list->beginRenderPass(render_pass_info, vk::SubpassContents::eInline);
+    m_command_list->beginRenderPass(render_pass_info, VkSubpassContents::eInline);
 }
 
 void VKCommandList::EndRenderPass()
@@ -115,7 +115,7 @@ void VKCommandList::EndRenderPass()
 
 void VKCommandList::BeginEvent(const std::string& name)
 {
-    vk::DebugUtilsLabelEXT label = {};
+    VkDebugUtilsLabelEXT label = {};
     label.pLabelName = name.c_str();
     m_command_list->beginDebugUtilsLabelEXT(&label);
 }
@@ -230,14 +230,14 @@ void VKCommandList::DispatchMesh(uint32_t thread_group_count_x)
     m_command_list->drawMeshTasksNV(thread_group_count_x, 0);
 }
 
-static vk::StridedDeviceAddressRegionKHR GetStridedDeviceAddressRegion(VKDevice& device, const RayTracingShaderTable& table)
+static VkStridedDeviceAddressRegionKHR GetStridedDeviceAddressRegion(VKDevice& device, const RayTracingShaderTable& table)
 {
     if (!table.resource)
     {
         return {};
     }
     decltype(auto) vk_resource = table.resource->As<VKResource>();
-    vk::StridedDeviceAddressRegionKHR vk_table = {};
+    VkStridedDeviceAddressRegionKHR vk_table = {};
     vk_table.deviceAddress = device.GetDevice().getBufferAddress({ vk_resource.buffer.res.get() }) + table.offset;
     vk_table.size = table.size;
     vk_table.stride = table.stride;
@@ -259,7 +259,7 @@ void VKCommandList::DispatchRays(const RayTracingShaderTables& shader_tables, ui
 
 void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barriers)
 {
-    std::vector<vk::ImageMemoryBarrier> image_memory_barriers;
+    std::vector<VkImageMemoryBarrier> image_memory_barriers;
     for (const auto& barrier : barriers)
     {
         if (!barrier.resource)
@@ -273,19 +273,19 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
         if (!image.res)
             continue;
 
-        vk::ImageLayout vk_state_before = ConvertState(barrier.state_before);
-        vk::ImageLayout vk_state_after = ConvertState(barrier.state_after);
+        VkImageLayout vk_state_before = ConvertState(barrier.state_before);
+        VkImageLayout vk_state_after = ConvertState(barrier.state_after);
         if (vk_state_before == vk_state_after)
             continue;
 
-        vk::ImageMemoryBarrier& image_memory_barrier = image_memory_barriers.emplace_back();
+        VkImageMemoryBarrier& image_memory_barrier = image_memory_barriers.emplace_back();
         image_memory_barrier.oldLayout = vk_state_before;
         image_memory_barrier.newLayout = vk_state_after;
         image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         image_memory_barrier.image = image.res;
 
-        vk::ImageSubresourceRange& range = image_memory_barrier.subresourceRange;
+        VkImageSubresourceRange& range = image_memory_barrier.subresourceRange;
         range.aspectMask = m_device.GetAspectFlags(image.format);
         range.baseMipLevel = barrier.base_mip_level;
         range.levelCount = barrier.level_count;
@@ -297,46 +297,46 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
         // before it will be transitioned to the new layout
         switch (image_memory_barrier.oldLayout)
         {
-        case vk::ImageLayout::eUndefined:
+        case VkImageLayout::eUndefined:
             // Image layout is undefined (or does not matter)
             // Only valid as initial layout
             // No flags required, listed only for completeness
             image_memory_barrier.srcAccessMask = {};
             break;
-        case vk::ImageLayout::ePreinitialized:
+        case VkImageLayout::ePreinitialized:
             // Image is preinitialized
             // Only valid as initial layout for linear images, preserves memory contents
             // Make sure host writes have been finished
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eHostWrite;
             break;
-        case vk::ImageLayout::eColorAttachmentOptimal:
+        case VkImageLayout::eColorAttachmentOptimal:
             // Image is a color attachment
             // Make sure any writes to the color buffer have been finished
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eColorAttachmentWrite;
             break;
-        case vk::ImageLayout::eDepthAttachmentOptimal:
+        case VkImageLayout::eDepthAttachmentOptimal:
             // Image is a depth/stencil attachment
             // Make sure any writes to the depth/stencil buffer have been finished
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eDepthStencilAttachmentWrite;
             break;
-        case vk::ImageLayout::eTransferSrcOptimal:
+        case VkImageLayout::eTransferSrcOptimal:
             // Image is a transfer source 
             // Make sure any reads from the image have been finished
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eTransferRead;
             break;
-        case vk::ImageLayout::eTransferDstOptimal:
+        case VkImageLayout::eTransferDstOptimal:
             // Image is a transfer destination
             // Make sure any writes to the image have been finished
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eTransferWrite;
             break;
 
-        case vk::ImageLayout::eShaderReadOnlyOptimal:
+        case VkImageLayout::eShaderReadOnlyOptimal:
             // Image is read by a shader
             // Make sure any shader reads from the image have been finished
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eShaderRead;
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eShaderRead;
             break;
-        case vk::ImageLayout::eFragmentShadingRateAttachmentOptimalKHR:
-            image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eFragmentShadingRateAttachmentReadKHR;
+        case VkImageLayout::eFragmentShadingRateAttachmentOptimalKHR:
+            image_memory_barrier.srcAccessMask = VkAccessFlagBits::eFragmentShadingRateAttachmentReadKHR;
         default:
             // Other source layouts aren't handled (yet)
             break;
@@ -346,41 +346,41 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
         // Destination access mask controls the dependency for the new image layout
         switch (image_memory_barrier.newLayout)
         {
-        case vk::ImageLayout::eTransferDstOptimal:
+        case VkImageLayout::eTransferDstOptimal:
             // Image will be used as a transfer destination
             // Make sure any writes to the image have been finished
-            image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+            image_memory_barrier.dstAccessMask = VkAccessFlagBits::eTransferWrite;
             break;
 
-        case vk::ImageLayout::eTransferSrcOptimal:
+        case VkImageLayout::eTransferSrcOptimal:
             // Image will be used as a transfer source
             // Make sure any reads from the image have been finished
-            image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+            image_memory_barrier.dstAccessMask = VkAccessFlagBits::eTransferRead;
             break;
 
-        case vk::ImageLayout::eColorAttachmentOptimal:
+        case VkImageLayout::eColorAttachmentOptimal:
             // Image will be used as a color attachment
             // Make sure any writes to the color buffer have been finished
-            image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+            image_memory_barrier.dstAccessMask = VkAccessFlagBits::eColorAttachmentWrite;
             break;
 
-        case vk::ImageLayout::eDepthAttachmentOptimal:
+        case VkImageLayout::eDepthAttachmentOptimal:
             // Image layout will be used as a depth/stencil attachment
             // Make sure any writes to depth/stencil buffer have been finished
-            image_memory_barrier.dstAccessMask = image_memory_barrier.dstAccessMask | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+            image_memory_barrier.dstAccessMask = image_memory_barrier.dstAccessMask | VkAccessFlagBits::eDepthStencilAttachmentWrite;
             break;
 
-        case vk::ImageLayout::eShaderReadOnlyOptimal:
+        case VkImageLayout::eShaderReadOnlyOptimal:
             // Image will be read in a shader (sampler, input attachment)
             // Make sure any writes to the image have been finished
             if (!image_memory_barrier.srcAccessMask)
             {
-                image_memory_barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eTransferWrite;
+                image_memory_barrier.srcAccessMask = VkAccessFlagBits::eHostWrite | VkAccessFlagBits::eTransferWrite;
             }
-            image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+            image_memory_barrier.dstAccessMask = VkAccessFlagBits::eShaderRead;
             break;
-        case vk::ImageLayout::eFragmentShadingRateAttachmentOptimalKHR:
-            image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eFragmentShadingRateAttachmentReadKHR;
+        case VkImageLayout::eFragmentShadingRateAttachmentOptimalKHR:
+            image_memory_barrier.dstAccessMask = VkAccessFlagBits::eFragmentShadingRateAttachmentReadKHR;
             break;
         default:
             // Other source layouts aren't handled (yet)
@@ -391,8 +391,8 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
     if (!image_memory_barriers.empty())
     {
         m_command_list->pipelineBarrier(
-            vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands,
-            vk::DependencyFlagBits::eByRegion,
+            VkPipelineStageFlagBits::eAllCommands, VkPipelineStageFlagBits::eAllCommands,
+            VkDependencyFlagBits::eByRegion,
             0, nullptr,
             0, nullptr,
             (ezUInt32)image_memory_barriers.size(), image_memory_barriers.data());
@@ -401,18 +401,18 @@ void VKCommandList::ResourceBarrier(const std::vector<ResourceBarrierDesc>& barr
 
 void VKCommandList::UAVResourceBarrier(const std::shared_ptr<Resource>& /*resource*/)
 {
-    vk::MemoryBarrier memory_barrier = {};
-    memory_barrier.srcAccessMask = vk::AccessFlagBits::eAccelerationStructureWriteKHR
-                                 | vk::AccessFlagBits::eAccelerationStructureReadKHR
-                                 | vk::AccessFlagBits::eShaderWrite
-                                 | vk::AccessFlagBits::eShaderRead;
+    VkMemoryBarrier memory_barrier = {};
+    memory_barrier.srcAccessMask = VkAccessFlagBits::eAccelerationStructureWriteKHR
+                                 | VkAccessFlagBits::eAccelerationStructureReadKHR
+                                 | VkAccessFlagBits::eShaderWrite
+                                 | VkAccessFlagBits::eShaderRead;
     memory_barrier.dstAccessMask = memory_barrier.srcAccessMask;
-    m_command_list->pipelineBarrier(vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, vk::DependencyFlagBits::eByRegion, 1, &memory_barrier, 0, 0, 0, 0);
+    m_command_list->pipelineBarrier(VkPipelineStageFlagBits::eAllCommands, VkPipelineStageFlagBits::eAllCommands, VkDependencyFlagBits::eByRegion, 1, &memory_barrier, 0, 0, 0, 0);
 }
 
 void VKCommandList::SetViewport(float x, float y, float width, float height)
 {
-    vk::Viewport viewport = {};
+    VkViewport viewport = {};
     viewport.x = 0;
     viewport.y = height - y;
     viewport.width = width;
@@ -424,7 +424,7 @@ void VKCommandList::SetViewport(float x, float y, float width, float height)
 
 void VKCommandList::SetScissorRect(int32_t left, int32_t top, uint32_t right, uint32_t bottom)
 {
-    vk::Rect2D rect = {};
+    VkRect2D rect = {};
     rect.offset.x = left;
     rect.offset.y = top;
     rect.extent.width = right;
@@ -432,15 +432,15 @@ void VKCommandList::SetScissorRect(int32_t left, int32_t top, uint32_t right, ui
     m_command_list->setScissor(0, 1, &rect);
 }
 
-static vk::IndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
+static VkIndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
 {
-  vk::Format vk_format = VKUtils::ToVkFormat(format);
+  VkFormat vk_format = VKUtils::ToVkFormat(format);
     switch (vk_format)
     {
-    case vk::Format::eR16Uint:
-        return vk::IndexType::eUint16;
-    case vk::Format::eR32Uint:
-        return vk::IndexType::eUint32;
+    case VkFormat::eR16Uint:
+        return VkIndexType::eUint16;
+    case VkFormat::eR32Uint:
+        return VkIndexType::eUint32;
     default:
         assert(false);
         return {};
@@ -450,21 +450,21 @@ static vk::IndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
 void VKCommandList::IASetIndexBuffer(const std::shared_ptr<Resource>& resource, ezRHIResourceFormat::Enum format)
 {
     decltype(auto) vk_resource = resource->As<VKResource>();
-    vk::IndexType index_type = GetVkIndexType(format);
+    VkIndexType index_type = GetVkIndexType(format);
     m_command_list->bindIndexBuffer(vk_resource.buffer.res.get(), 0, index_type);
 }
 
 void VKCommandList::IASetVertexBuffer(uint32_t slot, const std::shared_ptr<Resource>& resource)
 {
     decltype(auto) vk_resource = resource->As<VKResource>();
-    vk::Buffer vertex_buffers[] = { vk_resource.buffer.res.get() };
-    vk::DeviceSize offsets[] = { 0 };
+    VkBuffer vertex_buffers[] = { vk_resource.buffer.res.get() };
+    VkDeviceSize offsets[] = { 0 };
     m_command_list->bindVertexBuffers(slot, 1, vertex_buffers, offsets);
 }
 
 void VKCommandList::RSSetShadingRate(ShadingRate shading_rate, const std::array<ShadingRateCombiner, 2>& combiners)
 {
-    vk::Extent2D fragment_size = { 1, 1 };
+    VkExtent2D fragment_size = { 1, 1 };
     switch (shading_rate)
     {
     case ShadingRate::k1x1:
@@ -500,25 +500,25 @@ void VKCommandList::RSSetShadingRate(ShadingRate shading_rate, const std::array<
         break;
     }
 
-    std::array<vk::FragmentShadingRateCombinerOpKHR, 2> vk_combiners;
+    std::array<VkFragmentShadingRateCombinerOpKHR, 2> vk_combiners;
     for (size_t i = 0; i < vk_combiners.size(); ++i)
     {
         switch (combiners[i])
         {
         case ShadingRateCombiner::kPassthrough:
-            vk_combiners[i] = vk::FragmentShadingRateCombinerOpKHR::eKeep;
+            vk_combiners[i] = VkFragmentShadingRateCombinerOpKHR::eKeep;
             break;
         case ShadingRateCombiner::kOverride:
-            vk_combiners[i] = vk::FragmentShadingRateCombinerOpKHR::eReplace;
+            vk_combiners[i] = VkFragmentShadingRateCombinerOpKHR::eReplace;
             break;
         case ShadingRateCombiner::kMin:
-            vk_combiners[i] = vk::FragmentShadingRateCombinerOpKHR::eMin;
+            vk_combiners[i] = VkFragmentShadingRateCombinerOpKHR::eMin;
             break;
         case ShadingRateCombiner::kMax:
-            vk_combiners[i] = vk::FragmentShadingRateCombinerOpKHR::eMax;
+            vk_combiners[i] = VkFragmentShadingRateCombinerOpKHR::eMax;
             break;
         case ShadingRateCombiner::kSum:
-            vk_combiners[i] = vk::FragmentShadingRateCombinerOpKHR::eMul;
+            vk_combiners[i] = VkFragmentShadingRateCombinerOpKHR::eMul;
             break;
         default:
             assert(false);
@@ -537,7 +537,7 @@ void VKCommandList::BuildBottomLevelAS(
     const std::vector<RaytracingGeometryDesc>& descs,
     BuildAccelerationStructureFlags flags)
 {
-    std::vector<vk::AccelerationStructureGeometryKHR> geometry_descs;
+    std::vector<VkAccelerationStructureGeometryKHR> geometry_descs;
     for (const auto& desc : descs)
     {
         geometry_descs.emplace_back(m_device.FillRaytracingGeometryTriangles(desc.vertex, desc.index, desc.flags));
@@ -546,35 +546,35 @@ void VKCommandList::BuildBottomLevelAS(
     decltype(auto) vk_dst = dst->As<VKResource>();
     decltype(auto) vk_scratch = scratch->As<VKResource>();
 
-    vk::AccelerationStructureKHR vk_src_as = {};
+    VkAccelerationStructureKHR vk_src_as = {};
     if (src)
     {
         decltype(auto) vk_src = src->As<VKResource>();
         vk_src_as = vk_src.acceleration_structure_handle.get();
     }
 
-    std::vector<vk::AccelerationStructureBuildRangeInfoKHR> ranges;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
     for (const auto& desc : descs)
     {
-        vk::AccelerationStructureBuildRangeInfoKHR& offset = ranges.emplace_back();
+        VkAccelerationStructureBuildRangeInfoKHR& offset = ranges.emplace_back();
         if (desc.index.res)
             offset.primitiveCount = desc.index.count / 3;
         else
             offset.primitiveCount = desc.vertex.count / 3;
     }
-    std::vector<const vk::AccelerationStructureBuildRangeInfoKHR*> range_infos(ranges.size());
+    std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> range_infos(ranges.size());
     for (size_t i = 0; i < ranges.size(); ++i)
         range_infos[i] = &ranges[i];
 
-    vk::AccelerationStructureBuildGeometryInfoKHR infos = {};
-    infos.type = vk::AccelerationStructureTypeKHR::eBottomLevel;
+    VkAccelerationStructureBuildGeometryInfoKHR infos = {};
+    infos.type = VkAccelerationStructureTypeKHR::eBottomLevel;
     infos.flags = Convert(flags);
     infos.dstAccelerationStructure = vk_dst.acceleration_structure_handle.get();
     infos.srcAccelerationStructure = vk_src_as;
     if (vk_src_as)
-        infos.mode = vk::BuildAccelerationStructureModeKHR::eUpdate;
+        infos.mode = VkBuildAccelerationStructureModeKHR::eUpdate;
     else
-        infos.mode = vk::BuildAccelerationStructureModeKHR::eBuild;
+        infos.mode = VkBuildAccelerationStructureModeKHR::eBuild;
     infos.scratchData = m_device.GetDevice().getBufferAddress({ vk_scratch.buffer.res.get() }) + scratch_offset;
     infos.pGeometries = geometry_descs.data();
     infos.geometryCount = (ezUInt32)geometry_descs.size();
@@ -593,10 +593,10 @@ void VKCommandList::BuildTopLevelAS(
     BuildAccelerationStructureFlags flags)
 {
     decltype(auto) vk_instance_data = instance_data->As<VKResource>();
-    vk::DeviceAddress instance_address = m_device.GetDevice().getBufferAddress(vk_instance_data.buffer.res.get()) + instance_offset;
+    VkDeviceAddress instance_address = m_device.GetDevice().getBufferAddress(vk_instance_data.buffer.res.get()) + instance_offset;
 
-    vk::AccelerationStructureGeometryKHR top_as_geometry = {};
-    top_as_geometry.geometryType = vk::GeometryTypeKHR::eInstances;
+    VkAccelerationStructureGeometryKHR top_as_geometry = {};
+    top_as_geometry.geometryType = VkGeometryTypeKHR::eInstances;
     top_as_geometry.geometry.setInstances({});
     top_as_geometry.geometry.instances.arrayOfPointers = VK_FALSE;
     top_as_geometry.geometry.instances.data = instance_address;
@@ -604,26 +604,26 @@ void VKCommandList::BuildTopLevelAS(
     decltype(auto) vk_dst = dst->As<VKResource>();
     decltype(auto) vk_scratch = scratch->As<VKResource>();
 
-    vk::AccelerationStructureKHR vk_src_as = {};
+    VkAccelerationStructureKHR vk_src_as = {};
     if (src)
     {
         decltype(auto) vk_src = src->As<VKResource>();
         vk_src_as = vk_src.acceleration_structure_handle.get();
     }
 
-    vk::AccelerationStructureBuildRangeInfoKHR acceleration_structure_build_range_info = {};
+    VkAccelerationStructureBuildRangeInfoKHR acceleration_structure_build_range_info = {};
     acceleration_structure_build_range_info.primitiveCount = instance_count;
-    std::vector<vk::AccelerationStructureBuildRangeInfoKHR*> offset_infos = { &acceleration_structure_build_range_info };
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR*> offset_infos = { &acceleration_structure_build_range_info };
 
-    vk::AccelerationStructureBuildGeometryInfoKHR infos = {};
-    infos.type = vk::AccelerationStructureTypeKHR::eTopLevel;
+    VkAccelerationStructureBuildGeometryInfoKHR infos = {};
+    infos.type = VkAccelerationStructureTypeKHR::eTopLevel;
     infos.flags = Convert(flags);
     infos.dstAccelerationStructure = vk_dst.acceleration_structure_handle.get();
     infos.srcAccelerationStructure = vk_src_as;
     if (vk_src_as)
-        infos.mode = vk::BuildAccelerationStructureModeKHR::eUpdate;
+        infos.mode = VkBuildAccelerationStructureModeKHR::eUpdate;
     else
-        infos.mode = vk::BuildAccelerationStructureModeKHR::eBuild;
+        infos.mode = VkBuildAccelerationStructureModeKHR::eBuild;
     infos.scratchData = m_device.GetDevice().getBufferAddress({ vk_scratch.buffer.res.get() }) + scratch_offset;
     infos.pGeometries = &top_as_geometry;
     infos.geometryCount = 1;
@@ -635,18 +635,18 @@ void VKCommandList::CopyAccelerationStructure(const std::shared_ptr<Resource>& s
 {
     decltype(auto) vk_src = src->As<VKResource>();
     decltype(auto) vk_dst = dst->As<VKResource>();
-    vk::CopyAccelerationStructureInfoKHR info = {};
+    VkCopyAccelerationStructureInfoKHR info = {};
     switch (mode)
     {
     case CopyAccelerationStructureMode::kClone:
-        info.mode = vk::CopyAccelerationStructureModeKHR::eClone;
+        info.mode = VkCopyAccelerationStructureModeKHR::eClone;
         break;
     case CopyAccelerationStructureMode::kCompact:
-        info.mode = vk::CopyAccelerationStructureModeKHR::eCompact;
+        info.mode = VkCopyAccelerationStructureModeKHR::eCompact;
         break;
     default:
         assert(false);
-        info.mode = vk::CopyAccelerationStructureModeKHR::eClone;
+        info.mode = VkCopyAccelerationStructureModeKHR::eClone;
         break;
     }
     info.dst = vk_dst.acceleration_structure_handle.get();
@@ -659,7 +659,7 @@ void VKCommandList::CopyBuffer(const std::shared_ptr<Resource>& src_buffer, cons
 {
     decltype(auto) vk_src_buffer = src_buffer->As<VKResource>();
     decltype(auto) vk_dst_buffer = dst_buffer->As<VKResource>();
-    std::vector<vk::BufferCopy> vk_regions;
+    std::vector<VkBufferCopy> vk_regions;
     for (const auto& region : regions)
     {
         vk_regions.emplace_back(region.src_offset, region.dst_offset, region.num_bytes);
@@ -672,7 +672,7 @@ void VKCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
 {
     decltype(auto) vk_src_buffer = src_buffer->As<VKResource>();
     decltype(auto) vk_dst_texture = dst_texture->As<VKResource>();
-    std::vector<vk::BufferImageCopy> vk_regions;
+    std::vector<VkBufferImageCopy> vk_regions;
     auto format = dst_texture->GetFormat();
     for (const auto& region : regions)
     {
@@ -689,7 +689,7 @@ void VKCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
             vk_region.bufferRowLength = region.buffer_row_pitch / ezRHIResourceFormat::GetFormatStride(format);
             vk_region.bufferImageHeight = region.texture_extent.height;
         }
-        vk_region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        vk_region.imageSubresource.aspectMask = VkImageAspectFlagBits::eColor;
         vk_region.imageSubresource.mipLevel = region.texture_mip_level;
         vk_region.imageSubresource.baseArrayLayer = region.texture_array_layer;
         vk_region.imageSubresource.layerCount = 1;
@@ -703,7 +703,7 @@ void VKCommandList::CopyBufferToTexture(const std::shared_ptr<Resource>& src_buf
     m_command_list->copyBufferToImage(
         vk_src_buffer.buffer.res.get(),
         vk_dst_texture.image.res,
-        vk::ImageLayout::eTransferDstOptimal,
+        VkImageLayout::eTransferDstOptimal,
         vk_regions);
 }
 
@@ -712,11 +712,11 @@ void VKCommandList::CopyTexture(const std::shared_ptr<Resource>& src_texture, co
 {
     decltype(auto) vk_src_texture = src_texture->As<VKResource>();
     decltype(auto) vk_dst_texture = dst_texture->As<VKResource>();
-    std::vector<vk::ImageCopy> vk_regions;
+    std::vector<VkImageCopy> vk_regions;
     for (const auto& region : regions)
     {
         auto& vk_region = vk_regions.emplace_back();
-        vk_region.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        vk_region.srcSubresource.aspectMask = VkImageAspectFlagBits::eColor;
         vk_region.srcSubresource.mipLevel = region.src_mip_level;
         vk_region.srcSubresource.baseArrayLayer = region.src_array_layer;
         vk_region.srcSubresource.layerCount = 1;
@@ -724,7 +724,7 @@ void VKCommandList::CopyTexture(const std::shared_ptr<Resource>& src_texture, co
         vk_region.srcOffset.y = region.src_offset.y;
         vk_region.srcOffset.z = region.src_offset.z;
 
-        vk_region.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        vk_region.dstSubresource.aspectMask = VkImageAspectFlagBits::eColor;
         vk_region.dstSubresource.mipLevel = region.dst_mip_level;
         vk_region.dstSubresource.baseArrayLayer = region.dst_array_layer;
         vk_region.dstSubresource.layerCount = 1;
@@ -736,7 +736,7 @@ void VKCommandList::CopyTexture(const std::shared_ptr<Resource>& src_texture, co
         vk_region.extent.height = region.extent.height;
         vk_region.extent.depth = region.extent.depth;
     }
-    m_command_list->copyImage(vk_src_texture.image.res, vk::ImageLayout::eTransferSrcOptimal, vk_dst_texture.image.res, vk::ImageLayout::eTransferDstOptimal, vk_regions);
+    m_command_list->copyImage(vk_src_texture.image.res, VkImageLayout::eTransferSrcOptimal, vk_dst_texture.image.res, VkImageLayout::eTransferDstOptimal, vk_regions);
 }
 
 void VKCommandList::WriteAccelerationStructuresProperties(
@@ -744,7 +744,7 @@ void VKCommandList::WriteAccelerationStructuresProperties(
     const std::shared_ptr<QueryHeap>& query_heap,
     uint32_t first_query)
 {
-    std::vector<vk::AccelerationStructureKHR> vk_acceleration_structures;
+    std::vector<VkAccelerationStructureKHR> vk_acceleration_structures;
     vk_acceleration_structures.reserve(acceleration_structures.size());
     for (const auto& acceleration_structure : acceleration_structures)
     {
@@ -752,7 +752,7 @@ void VKCommandList::WriteAccelerationStructuresProperties(
     }
     decltype(auto) vk_query_heap = query_heap->As<VKQueryHeap>();
     auto query_type = vk_query_heap.GetQueryType();
-    assert(query_type == vk::QueryType::eAccelerationStructureCompactedSizeKHR);
+    assert(query_type == VkQueryType::eAccelerationStructureCompactedSizeKHR);
     m_command_list->resetQueryPool(vk_query_heap.GetQueryPool(), first_query, (ezUInt32)acceleration_structures.size());
     m_command_list->writeAccelerationStructuresPropertiesKHR(
         (ezUInt32)vk_acceleration_structures.size(),
@@ -772,7 +772,7 @@ void VKCommandList::ResolveQueryData(
 {
     decltype(auto) vk_query_heap = query_heap->As<VKQueryHeap>();
     auto query_type = vk_query_heap.GetQueryType();
-    assert(query_type == vk::QueryType::eAccelerationStructureCompactedSizeKHR);
+    assert(query_type == VkQueryType::eAccelerationStructureCompactedSizeKHR);
     m_command_list->copyQueryPoolResults(
         vk_query_heap.GetQueryPool(),
         first_query,
@@ -780,11 +780,11 @@ void VKCommandList::ResolveQueryData(
         dst_buffer->As<VKResource>().buffer.res.get(),
         dst_offset,
         sizeof(uint64_t),
-        vk::QueryResultFlagBits::eWait
+        VkQueryResultFlagBits::eWait
     );
 }
 
-vk::CommandBuffer VKCommandList::GetCommandList()
+VkCommandBuffer VKCommandList::GetCommandList()
 {
     return m_command_list.get();
 }

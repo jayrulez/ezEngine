@@ -1,22 +1,22 @@
 #include <RHIVulkan/Memory/VKMemory.h>
 #include <RHIVulkan/Device/VKDevice.h>
 
-VKMemory::VKMemory(VKDevice& device, uint64_t size, MemoryType memory_type, uint32_t memory_type_bits, const vk::MemoryDedicatedAllocateInfoKHR* dedicated_allocate_info)
+VKMemory::VKMemory(VKDevice& device, uint64_t size, MemoryType memory_type, uint32_t memory_type_bits, const VkMemoryDedicatedAllocateInfoKHR* dedicated_allocate_info)
     : m_memory_type(memory_type)
 {
-    vk::MemoryAllocateFlagsInfo alloc_flag_info = {};
+    VkMemoryAllocateFlagsInfo alloc_flag_info = {};
     alloc_flag_info.pNext = dedicated_allocate_info;
-    alloc_flag_info.flags = vk::MemoryAllocateFlagBits::eDeviceAddress;
+    alloc_flag_info.flags = VkMemoryAllocateFlagBits::eDeviceAddress;
 
-    vk::MemoryPropertyFlags properties = {};
+    VkMemoryPropertyFlags properties = {};
     if (memory_type == MemoryType::kDefault)
-        properties = vk::MemoryPropertyFlagBits::eDeviceLocal;
+        properties = VkMemoryPropertyFlagBits::eDeviceLocal;
     else if (memory_type == MemoryType::kUpload)
-        properties = vk::MemoryPropertyFlagBits::eHostVisible;
+        properties = VkMemoryPropertyFlagBits::eHostVisible;
     else if (memory_type == MemoryType::kReadback)
-        properties = vk::MemoryPropertyFlagBits::eHostVisible;
+        properties = VkMemoryPropertyFlagBits::eHostVisible;
 
-    vk::MemoryAllocateInfo alloc_info = {};
+    VkMemoryAllocateInfo alloc_info = {};
     alloc_info.pNext = &alloc_flag_info;
     alloc_info.allocationSize = size;
     alloc_info.memoryTypeIndex = device.FindMemoryType(memory_type_bits, properties);
@@ -28,7 +28,7 @@ MemoryType VKMemory::GetMemoryType() const
     return m_memory_type;
 }
 
-vk::DeviceMemory VKMemory::GetMemory() const
+VkDeviceMemory VKMemory::GetMemory() const
 {
     return m_memory.get();
 }

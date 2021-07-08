@@ -2,10 +2,10 @@
 #include <RHIVulkan/GPUDescriptorPool/VKGPUBindlessDescriptorPoolTyped.h>
 
 VKGPUDescriptorPoolRange::VKGPUDescriptorPoolRange(VKGPUBindlessDescriptorPoolTyped& pool,
-                                                   vk::DescriptorSet descriptor_set,
+                                                   VkDescriptorSet descriptor_set,
                                                    uint32_t offset,
                                                    uint32_t size,
-                                                   vk::DescriptorType type)
+                                                   VkDescriptorType type)
     : m_pool(pool)
     , m_descriptor_set(descriptor_set)
     , m_offset(offset)
@@ -15,7 +15,7 @@ VKGPUDescriptorPoolRange::VKGPUDescriptorPoolRange(VKGPUBindlessDescriptorPoolTy
 {
 }
 
-vk::DescriptorSet VKGPUDescriptorPoolRange::GetDescriptoSet() const
+VkDescriptorSet VKGPUDescriptorPoolRange::GetDescriptoSet() const
 {
     return m_descriptor_set;
 }

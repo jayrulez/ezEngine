@@ -10,7 +10,7 @@ public:
   VkInstance& GetInstance();
 
 private:
-  //vk::DynamicLoader m_dl;
+  //VkDynamicLoader m_dl;
   VkInstance m_instance;
   VkDebugReportCallbackEXT m_callback;
 };
