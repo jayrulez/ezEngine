@@ -44,30 +44,30 @@ public:
     RaytracingASPrebuildInfo GetTLASPrebuildInfo(uint32_t instance_count, BuildAccelerationStructureFlags flags) const override;
 
     VKAdapter& GetAdapter();
-    vk::Device GetDevice();
+    VkDevice GetDevice();
     CommandListType GetAvailableCommandListType(CommandListType type);
-    vk::CommandPool GetCmdPool(CommandListType type);
-    vk::ImageAspectFlags GetAspectFlags(vk::Format format) const;
-    VKGPUBindlessDescriptorPoolTyped& GetGPUBindlessDescriptorPool(vk::DescriptorType type);
+    VkCommandPool GetCmdPool(CommandListType type);
+    VkImageAspectFlags GetAspectFlags(VkFormat format) const;
+    VKGPUBindlessDescriptorPoolTyped& GetGPUBindlessDescriptorPool(VkDescriptorType type);
     VKGPUDescriptorPool& GetGPUDescriptorPool();
-    uint32_t FindMemoryType(uint32_t type_filter, vk::MemoryPropertyFlags properties);
-    vk::AccelerationStructureGeometryKHR FillRaytracingGeometryTriangles(const BufferDesc& vertex, const BufferDesc& index, RaytracingGeometryFlags flags) const;
+    uint32_t FindMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties);
+    VkAccelerationStructureGeometryKHR FillRaytracingGeometryTriangles(const BufferDesc& vertex, const BufferDesc& index, RaytracingGeometryFlags flags) const;
 
 private:
-    RaytracingASPrebuildInfo GetAccelerationStructurePrebuildInfo(const vk::AccelerationStructureBuildGeometryInfoKHR& acceleration_structure_info, const std::vector<uint32_t>& max_primitive_counts) const;
+    RaytracingASPrebuildInfo GetAccelerationStructurePrebuildInfo(const VkAccelerationStructureBuildGeometryInfoKHR& acceleration_structure_info, const std::vector<uint32_t>& max_primitive_counts) const;
 
     VKAdapter& m_adapter;
-    const vk::PhysicalDevice& m_physical_device;
-    vk::UniqueDevice m_device;
+    const VkPhysicalDevice& m_physical_device;
+    VkDevice m_device;
     struct QueueInfo
     {
         uint32_t queue_family_index;
         uint32_t queue_count;
     };
     std::map<CommandListType, QueueInfo> m_queues_info;
-    std::map<CommandListType, vk::UniqueCommandPool> m_cmd_pools;
+    std::map<CommandListType, VkCommandPool> m_cmd_pools;
     std::map<CommandListType, std::shared_ptr<VKCommandQueue>> m_command_queues;
-    std::map<vk::DescriptorType, VKGPUBindlessDescriptorPoolTyped> m_gpu_bindless_descriptor_pool;
+    std::map<VkDescriptorType, VKGPUBindlessDescriptorPoolTyped> m_gpu_bindless_descriptor_pool;
     VKGPUDescriptorPool m_gpu_descriptor_pool;
     bool m_is_variable_rate_shading_supported = false;
     uint32_t m_shading_rate_image_tile_size = 0;
@@ -79,5 +79,5 @@ private:
     uint32_t m_shader_table_alignment = 0;
 };
 
-vk::ImageLayout ConvertState(ResourceState state);
-vk::BuildAccelerationStructureFlagsKHR Convert(BuildAccelerationStructureFlags flags);
+VkImageLayout ConvertState(ResourceState state);
+VkBuildAccelerationStructureFlagsKHR Convert(BuildAccelerationStructureFlags flags);

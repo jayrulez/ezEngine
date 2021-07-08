@@ -4,8 +4,8 @@
 
 namespace VKUtils
 {
-  vk::Format ToVkFormat(ezRHIResourceFormat::Enum value);
-  ezRHIResourceFormat::Enum ToEngineFormat(vk::Format value);
+  VkFormat ToVkFormat(ezRHIResourceFormat::Enum value);
+  ezRHIResourceFormat::Enum ToEngineFormat(VkFormat value);
 }
 
 //#define CUSTOM_FAILED(hr) ((static_cast<VkResult>((hr))) != VK_SUCCESS)

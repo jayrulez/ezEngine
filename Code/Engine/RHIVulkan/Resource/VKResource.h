@@ -32,10 +32,10 @@ public:
 
     struct Image
     {
-        vk::Image res;
-        vk::UniqueImage res_owner;
-        vk::Format format = vk::Format::eUndefined;
-        vk::Extent2D size = {};
+        VkImage res;
+        VkImage res_owner;
+        VkFormat format = VkFormat::VK_FORMAT_UNDEFINED;
+        VkExtent2D size = {};
         uint32_t level_count = 1;
         uint32_t sample_count = 1;
         uint32_t array_layers = 1;
@@ -43,18 +43,18 @@ public:
 
     struct Buffer
     {
-        vk::UniqueBuffer res;
+        VkBuffer res;
         uint32_t size = 0;
     } buffer;
 
     struct Sampler
     {
-        vk::UniqueSampler res;
+        VkSampler res;
     } sampler;
 
-    vk::UniqueAccelerationStructureKHR acceleration_structure_handle = {};
+    VkAccelerationStructureKHR acceleration_structure_handle = {};
 
 private:
     VKDevice& m_device;
-    vk::DeviceMemory m_vk_memory;
+    VkDeviceMemory m_vk_memory;
 };

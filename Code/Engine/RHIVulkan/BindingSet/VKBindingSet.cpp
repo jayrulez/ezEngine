@@ -44,7 +44,7 @@ void VKBindingSet::WriteBindings(const std::vector<BindingDesc>& bindings)
 
     if (!descriptors.empty())
     {
-        m_device.GetDevice().updateDescriptorSets((ezUInt32)descriptors.size(), descriptors.data(), 0, nullptr);
+      vkUpdateDescriptorSets(m_device.GetDevice(), (ezUInt32)descriptors.size(), descriptors.data(), 0, nullptr);
     }
 }
 

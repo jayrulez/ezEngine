@@ -2,7 +2,7 @@
 
 namespace VKUtils
 {
-  vk::Format ToVkFormat(ezRHIResourceFormat::Enum value)
+  VkFormat ToVkFormat(ezRHIResourceFormat::Enum value)
   {
     switch (value)
     {
@@ -214,7 +214,7 @@ namespace VKUtils
     return vk::Format::eUndefined;
   }
 
-  ezRHIResourceFormat::Enum ToEngineFormat(vk::Format value)
+  ezRHIResourceFormat::Enum ToEngineFormat(VkFormat value)
   {
     switch (value)
     {
