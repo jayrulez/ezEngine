@@ -27,21 +27,6 @@ bool operator==(const VkExtent2D& lhs, const VkExtent2D& rhs)
   return lhs.width == rhs.width && lhs.height == rhs.height;
 }
 
-static VkIndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
-{
-  VkFormat vk_format = VKUtils::ToVkFormat(format);
-  switch (vk_format)
-  {
-    case VkFormat::VK_FORMAT_R16_UINT:
-      return VkIndexType::VK_INDEX_TYPE_UINT16;
-    case VkFormat::VK_FORMAT_R32_UINT:
-      return VkIndexType::VK_INDEX_TYPE_UINT32;
-    default:
-      assert(false);
-      return {};
-  }
-}
-
 VkImageLayout ConvertState(ResourceState state)
 {
   static std::pair<ResourceState, VkImageLayout> mapping[] = {
@@ -596,7 +581,7 @@ VkAccelerationStructureGeometryKHR VKDevice::FillRaytracingGeometryTriangles(con
 
     auto index_stride = ezRHIResourceFormat::GetFormatStride(index.format);
     geometry_desc.geometry.triangles.indexData.deviceAddress = vkGetBufferDeviceAddress(m_device, &indexBufferInfo) + index.offset * index_stride;
-    geometry_desc.geometry.triangles.indexType = GetVkIndexType(index.format);
+    geometry_desc.geometry.triangles.indexType =VKUtils::GetVkIndexType(index.format);
   }
   else
   {

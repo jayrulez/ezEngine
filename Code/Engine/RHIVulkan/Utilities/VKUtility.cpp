@@ -413,4 +413,19 @@ namespace VKUtils
     }
     return ezRHIResourceFormat::UNKNOWN;
   }
+
+    VkIndexType GetVkIndexType(ezRHIResourceFormat::Enum format)
+  {
+    VkFormat vk_format = VKUtils::ToVkFormat(format);
+    switch (vk_format)
+    {
+      case VkFormat::VK_FORMAT_R16_UINT:
+        return VkIndexType::VK_INDEX_TYPE_UINT16;
+      case VkFormat::VK_FORMAT_R32_UINT:
+        return VkIndexType::VK_INDEX_TYPE_UINT32;
+      default:
+        EZ_ASSERT_NOT_IMPLEMENTED;
+        return {};
+    }
+  }
 } // namespace VKUtils

@@ -6,6 +6,7 @@ namespace VKUtils
 {
   VkFormat ToVkFormat(ezRHIResourceFormat::Enum value);
   ezRHIResourceFormat::Enum ToEngineFormat(VkFormat value);
+  VkIndexType GetVkIndexType(ezRHIResourceFormat::Enum format);
 }
 
 //#define CUSTOM_FAILED(hr) ((static_cast<VkResult>((hr))) != VK_SUCCESS)
