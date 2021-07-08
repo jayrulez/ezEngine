@@ -5,7 +5,7 @@
 
 class Resource;
 
-class View : public QueryInterface
+class EZ_RHI_DLL View : public QueryInterface
 {
 public:
     virtual ~View() = default;

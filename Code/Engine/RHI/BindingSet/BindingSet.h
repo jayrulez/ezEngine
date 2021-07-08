@@ -1,10 +1,11 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <memory>
 #include <vector>
 
-class BindingSet : public QueryInterface
+class EZ_RHI_DLL BindingSet : public QueryInterface
 {
 public:
     virtual ~BindingSet() = default;

@@ -1,5 +1,6 @@
 #pragma once
-#include <RHI/HighLevelRenderer/RenderDevice.h>
+#include <RHIHighLevelRenderer/RHIHighLevelRendererDLL.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderDevice.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <RHI/Instance/Instance.h>
 #include <memory>
@@ -9,13 +10,13 @@
 #include <set>
 #include <deque>
 
-#include <Resource/Resource.h>
+#include <RHI/Resource/Resource.h>
 
-#include <RHI/HighLevelRenderer/RenderCommandList.h>
-#include <RHI/HighLevelRenderer/RenderDevice.h>
-#include <RHI/HighLevelRenderer/ObjectCache.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderCommandList.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderDevice.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/ObjectCache.h>
 
-class RenderDeviceImpl : public RenderDevice
+class EZ_RHIHIGHLEVELRENDERER_DLL RenderDeviceImpl : public RenderDevice
 {
 public:
     RenderDeviceImpl(const RenderDeviceDesc& settings, ezWindowBase* window);

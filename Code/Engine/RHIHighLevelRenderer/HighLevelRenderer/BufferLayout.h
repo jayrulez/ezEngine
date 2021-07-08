@@ -1,8 +1,8 @@
 #pragma once
-#include <RHI/RHIDLL.h>
-#include <RHI/HighLevelRenderer/RenderDevice.h>
+#include <RHIHighLevelRenderer/RHIHighLevelRendererDLL.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderDevice.h>
 
-struct BufferLayout
+struct EZ_RHIHIGHLEVELRENDERER_DLL BufferLayout
 {
     size_t dst_buffer_size;
     std::vector<size_t> data_size;
@@ -10,7 +10,7 @@ struct BufferLayout
     std::vector<size_t> dst_offset;
 };
 
-class EZ_RHI_DLL ViewProvider : public DeferredView
+class EZ_RHIHIGHLEVELRENDERER_DLL ViewProvider : public DeferredView
 {
 public:
     ViewProvider(RenderDevice& device, const uint8_t* src_data, BufferLayout& layout);
@@ -24,8 +24,8 @@ private:
     const uint8_t* m_src_data;
     BufferLayout& m_layout;
     std::vector<uint8_t> m_dst_data;
-    std::shared_ptr<ResourceLazyViewDesc> m_last_view;
     std::vector<std::shared_ptr<Resource>> m_free_resources;
+    std::shared_ptr<ResourceLazyViewDesc> m_last_view;
 };
 
 template<typename T>

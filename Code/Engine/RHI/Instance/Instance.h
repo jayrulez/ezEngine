@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-class Instance : public QueryInterface
+class EZ_RHI_DLL Instance : public QueryInterface
 {
 public:
     virtual ~Instance() = default;

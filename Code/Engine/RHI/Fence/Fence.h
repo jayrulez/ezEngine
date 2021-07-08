@@ -1,9 +1,10 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <cstdint>
 
-class Fence : public QueryInterface
+class EZ_RHI_DLL Fence : public QueryInterface
 {
 public:
     virtual ~Fence() = default;

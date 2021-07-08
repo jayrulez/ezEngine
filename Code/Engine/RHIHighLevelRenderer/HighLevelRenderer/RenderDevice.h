@@ -1,6 +1,7 @@
 #pragma once
 #include <RHI/RHIDLL.h>
-#include <RHI/HighLevelRenderer/RenderCommandList.h>
+#include <RHIHighLevelRenderer/RHIHighLevelRendererDLL.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderCommandList.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <RHI/Swapchain/Swapchain.h>
@@ -18,7 +19,7 @@
 
 class ezWindowBase;
 
-class RenderDevice : public QueryInterface
+class EZ_RHIHIGHLEVELRENDERER_DLL RenderDevice : public QueryInterface
 {
 public:
     virtual ~RenderDevice() = default;
@@ -47,4 +48,4 @@ public:
     virtual void Resize(uint32_t width, uint32_t height) = 0;
 };
 
-EZ_RHI_DLL std::shared_ptr<RenderDevice> CreateRenderDevice(const RenderDeviceDesc& settings, ezWindowBase* window);
+EZ_RHIHIGHLEVELRENDERER_DLL std::shared_ptr<RenderDevice> CreateRenderDevice(const RenderDeviceDesc& settings, ezWindowBase* window);

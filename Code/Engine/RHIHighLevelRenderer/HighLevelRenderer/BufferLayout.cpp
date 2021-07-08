@@ -1,4 +1,4 @@
-#include <RHI/HighLevelRenderer/BufferLayout.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/BufferLayout.h>
 
 ViewProvider::ViewProvider(RenderDevice& device, const uint8_t* src_data, BufferLayout& layout)
     : m_device(device)

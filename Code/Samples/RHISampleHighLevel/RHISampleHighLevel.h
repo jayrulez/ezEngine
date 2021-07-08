@@ -4,11 +4,11 @@
 #include <Foundation/Application/Application.h>
 #include <Foundation/Types/UniquePtr.h>
 
-#include <RHI/HighLevelRenderer/RenderDevice.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderDevice.h>
 #include <RHI/Swapchain/Swapchain.h>
 #include <RHI/Fence/Fence.h>
 #include <RHI/Instance/Instance.h>
-#include <RHI/HighLevelRenderer/ProgramHolder.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/ProgramHolder.h>
 #include <RHIShaderCompilerHLSL/Compiler.h>
 #include <RHIShaderCompilerHLSL/ShaderReflection.h>
 

@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 #include <functional>
-#include <RHI/HighLevelRenderer/RenderDevice.h>
-#include <RHI/HighLevelRenderer/BufferLayout.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderDevice.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/BufferLayout.h>
 
 template<ShaderType, typename T> class ShaderHolderImpl {};
 

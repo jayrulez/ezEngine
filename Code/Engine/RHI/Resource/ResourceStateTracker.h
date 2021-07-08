@@ -5,7 +5,7 @@
 
 class Resource;
 
-class ResourceStateTracker
+class EZ_RHI_DLL ResourceStateTracker
 {
 public:
     ResourceStateTracker(Resource& resource);

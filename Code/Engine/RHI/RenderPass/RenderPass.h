@@ -1,9 +1,10 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <memory>
 
-class RenderPass : public QueryInterface
+class EZ_RHI_DLL RenderPass : public QueryInterface
 {
 public:
     virtual ~RenderPass() = default;

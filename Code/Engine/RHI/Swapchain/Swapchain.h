@@ -6,7 +6,7 @@
 
 using Window = void*;
 
-class Swapchain : public QueryInterface
+class EZ_RHI_DLL Swapchain : public QueryInterface
 {
 public:
     virtual ~Swapchain() = default;

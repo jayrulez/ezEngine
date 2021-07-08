@@ -694,6 +694,7 @@ struct ResourceLazyViewDesc;
 class EZ_RHI_DLL DeferredView
 {
 public:
+  virtual ~DeferredView() = default;
   virtual std::shared_ptr<ResourceLazyViewDesc> GetView(RenderCommandList& command_list) = 0;
   virtual void OnDestroy(ResourceLazyViewDesc& view_desc) = 0;
 };

@@ -1,10 +1,11 @@
 #pragma once
+#include <RHIHighLevelRenderer/RHIHighLevelRendererDLL.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <RHI/Pipeline/Pipeline.h>
 #include <RHI/Device/Device.h>
 #include <map>
 
-class ObjectCache
+class EZ_RHIHIGHLEVELRENDERER_DLL ObjectCache
 {
 public:
     ObjectCache(Device& device);

@@ -24,7 +24,7 @@ enum class ShaderKind
     kAmplification,
 };
 
-struct EntryPoint
+struct EZ_RHI_DLL EntryPoint
 {
     std::string name;
     ShaderKind kind;
@@ -57,14 +57,14 @@ inline bool operator< (const ResourceBindingDesc& lhs, const ResourceBindingDesc
     return MakeTie(lhs) < MakeTie(rhs);
 }
 
-struct InputParameterDesc
+struct EZ_RHI_DLL InputParameterDesc
 {
     uint32_t location;
     std::string semantic_name;
     ezRHIResourceFormat::Enum format;
 };
 
-struct OutputParameterDesc
+struct EZ_RHI_DLL OutputParameterDesc
 {
     uint32_t slot;
 };
@@ -78,7 +78,7 @@ enum class VariableType
     kBool,
 };
 
-struct VariableLayout
+struct EZ_RHI_DLL VariableLayout
 {
     std::string name;
     VariableType type;
@@ -105,13 +105,13 @@ inline bool operator< (const VariableLayout& lhs, const VariableLayout& rhs)
     return MakeTie(lhs) < MakeTie(rhs);
 }
 
-struct ShaderFeatureInfo
+struct EZ_RHI_DLL ShaderFeatureInfo
 {
     bool resource_descriptor_heap_indexing = false;
     bool sampler_descriptor_heap_indexing = false;
 };
 
-class ShaderReflection : public QueryInterface
+class EZ_RHI_DLL ShaderReflection : public QueryInterface
 {
 public:
     virtual ~ShaderReflection() = default;

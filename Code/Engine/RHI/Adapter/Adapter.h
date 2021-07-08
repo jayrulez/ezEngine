@@ -1,10 +1,11 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Device/Device.h>
 #include <string>
 #include <memory>
 
-class Adapter : public QueryInterface
+class EZ_RHI_DLL Adapter : public QueryInterface
 {
 public:
     virtual ~Adapter() = default;

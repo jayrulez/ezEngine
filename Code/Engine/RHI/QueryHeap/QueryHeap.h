@@ -1,8 +1,9 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
 
-class QueryHeap : public QueryInterface
+class EZ_RHI_DLL QueryHeap : public QueryInterface
 {
 public:
     virtual ~QueryHeap() = default;

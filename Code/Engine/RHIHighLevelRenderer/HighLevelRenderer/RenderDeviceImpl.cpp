@@ -1,5 +1,5 @@
-#include <RHI/HighLevelRenderer/RenderCommandListImpl.h>
-#include <RHI/HighLevelRenderer/RenderDeviceImpl.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderCommandListImpl.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderDeviceImpl.h>
 #include <RHI/Resource/ResourceBase.h>
 
 #include <Core/System/Window.h>

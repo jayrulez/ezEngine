@@ -1,4 +1,5 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/BindingSet/BindingSet.h>
 #include <RHI/Framebuffer/Framebuffer.h>
 #include <RHI/Instance/BaseTypes.h>
@@ -11,7 +12,7 @@
 #include <array>
 #include <memory>
 
-class CommandList : public QueryInterface
+class EZ_RHI_DLL CommandList : public QueryInterface
 {
 public:
   virtual ~CommandList() = default;

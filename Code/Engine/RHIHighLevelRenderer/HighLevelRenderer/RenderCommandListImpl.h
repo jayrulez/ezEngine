@@ -1,9 +1,10 @@
 #pragma once
-#include <RHI/HighLevelRenderer/RenderCommandList.h>
+#include <RHIHighLevelRenderer/RHIHighLevelRendererDLL.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/RenderCommandList.h>
 #include <RHI/Device/Device.h>
-#include <RHI/HighLevelRenderer/ObjectCache.h>
+#include <RHIHighLevelRenderer/HighLevelRenderer/ObjectCache.h>
 
-struct LazyResourceBarrierDesc
+struct EZ_RHIHIGHLEVELRENDERER_DLL LazyResourceBarrierDesc
 {
     std::shared_ptr<Resource> resource;
     ResourceState state;
@@ -15,7 +16,7 @@ struct LazyResourceBarrierDesc
 
 constexpr bool kUseFakeClose = true;
 
-class RenderCommandListImpl : public RenderCommandList
+class EZ_RHIHIGHLEVELRENDERER_DLL RenderCommandListImpl : public RenderCommandList
 {
 public:
     RenderCommandListImpl(Device& device, ObjectCache& object_cache, CommandListType type);

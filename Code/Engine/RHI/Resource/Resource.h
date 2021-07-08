@@ -7,7 +7,7 @@
 #include <string>
 #include <RHI/RHIDLL.h>
 
-struct MemoryRequirements
+struct EZ_RHI_DLL MemoryRequirements
 {
     uint64_t size;
     uint64_t alignment;

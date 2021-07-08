@@ -1,9 +1,10 @@
 #pragma once
+#include <RHI/RHIDLL.h>
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Fence/Fence.h>
 #include <RHI/CommandList/CommandList.h>
 
-class CommandQueue : public QueryInterface
+class EZ_RHI_DLL CommandQueue : public QueryInterface
 {
 public:
     virtual ~CommandQueue() = default;
