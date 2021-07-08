@@ -1,7 +1,6 @@
 #pragma once
 
 #include <RHIVulkan/RHIVulkanDLL.h>
-#include <vulkan/vulkan.hpp>
 
 namespace VKUtils
 {

@@ -7,7 +7,7 @@
 #include <sstream>
 #include <string>
 
-VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
+//ULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 std::shared_ptr<Instance> CreateVKInstance()
 {
@@ -70,37 +70,46 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportCallback(
   static size_t error_count = 0;
   if (error_count >= error_limit || SkipIt(flags, objectType, pMessage))
     return VK_FALSE;
-#ifdef _WIN32
   if (error_count < error_limit)
   {
-    std::stringstream buf;
-    buf << pLayerPrefix << " " << to_string(static_cast<vk::DebugReportFlagBitsEXT>(flags)) << " " << pMessage << std::endl;
-    ezLog::Error(buf.str().c_str());
+    ezStringBuilder builder;
+    builder.Format("{} {} {}", pLayerPrefix, static_cast<VkDebugReportFlagBitsEXT>(flags), pMessage);
+
+    ezLog::Debug(builder.GetData());
   }
-#endif
+
   ++error_count;
   return VK_FALSE;
 }
 
 VKInstance::VKInstance()
 {
-  PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = m_dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-  VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
+  ezUInt32 layerCount = 0;
+  vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
-  auto layers = vk::enumerateInstanceLayerProperties();
+  ezDynamicArray<VkLayerProperties> availableLayers;
+  availableLayers.SetCountUninitialized(layerCount);
+
+  vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.GetData());
 
   std::set<std::string> req_layers;
-  static const bool debug_enabled = true; // IsDebuggerPresent();
+  static const bool debug_enabled = IsDebuggerPresent();
   if (debug_enabled)
     req_layers.insert("VK_LAYER_KHRONOS_validation");
   std::vector<const char*> found_layers;
-  for (const auto& layer : layers)
+  for (const auto& layerProperties : availableLayers)
   {
-    if (req_layers.count(layer.layerName.data()))
-      found_layers.push_back(layer.layerName);
+    if (req_layers.count(layerProperties.layerName))
+      found_layers.push_back(layerProperties.layerName);
   }
 
-  auto extensions = vk::enumerateInstanceExtensionProperties();
+  ezUInt32 extensionCount = 0;
+  vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+
+  ezDynamicArray<VkExtensionProperties> availableExtensions;
+  availableExtensions.SetCountUninitialized(extensionCount);
+
+  vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.GetData());
 
   std::set<std::string> req_extension = {
     VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
@@ -116,55 +125,78 @@ VKInstance::VKInstance()
     VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
   };
   std::vector<const char*> found_extension;
-  for (const auto& extension : extensions)
+  for (const auto& extension : availableExtensions)
   {
-    if (req_extension.count(extension.extensionName.data()))
+    if (req_extension.count(extension.extensionName))
       found_extension.push_back(extension.extensionName);
   }
 
-  vk::ApplicationInfo app_info = {};
+  VkApplicationInfo app_info = {};
   app_info.apiVersion = VK_API_VERSION_1_2;
+  app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 
-  vk::InstanceCreateInfo create_info;
+  VkInstanceCreateInfo create_info;
+  create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   create_info.pApplicationInfo = &app_info;
   create_info.enabledLayerCount = static_cast<uint32_t>(found_layers.size());
   create_info.ppEnabledLayerNames = found_layers.data();
   create_info.enabledExtensionCount = static_cast<uint32_t>(found_extension.size());
   create_info.ppEnabledExtensionNames = found_extension.data();
 
-  m_instance = vk::createInstanceUnique(create_info);
-  VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance.get());
+  if (vkCreateInstance(&create_info, nullptr, &m_instance) != VK_SUCCESS)
+  {
+    EZ_REPORT_FAILURE("Failed to create Vulkan instance.");
+  }
+
   if (debug_enabled)
   {
-    vk::DebugReportCallbackCreateInfoEXT callback_create_info = {};
-    callback_create_info.flags = vk::DebugReportFlagBitsEXT::eWarning |
-                                 vk::DebugReportFlagBitsEXT::ePerformanceWarning |
-                                 vk::DebugReportFlagBitsEXT::eError |
-                                 vk::DebugReportFlagBitsEXT::eDebug;
+    VkDebugReportCallbackCreateInfoEXT callback_create_info = {};
+    callback_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+    callback_create_info.flags = VkDebugReportFlagBitsEXT::VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                                 VkDebugReportFlagBitsEXT::VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+                                 VkDebugReportFlagBitsEXT::VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                                 VkDebugReportFlagBitsEXT::VK_DEBUG_REPORT_DEBUG_BIT_EXT;
     callback_create_info.pfnCallback = &DebugReportCallback;
     callback_create_info.pUserData = this;
-    m_callback = m_instance->createDebugReportCallbackEXTUnique(callback_create_info);
+
+    vkCreateDebugReportCallbackEXT(m_instance, &callback_create_info, nullptr, &m_callback);
   }
 }
 
 std::vector<std::shared_ptr<Adapter>> VKInstance::EnumerateAdapters()
 {
   std::vector<std::shared_ptr<Adapter>> adapters;
-  auto devices = m_instance->enumeratePhysicalDevices();
-  for (const auto& device : devices)
-  {
-    vk::PhysicalDeviceProperties device_properties = device.getProperties();
 
-    if (device_properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu ||
-        device_properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu)
+  ezUInt32 physicalDeviceCount = 0;
+  vkEnumeratePhysicalDevices(m_instance, &physicalDeviceCount, nullptr);
+
+  if (physicalDeviceCount == 0)
+  {
+    EZ_REPORT_FAILURE("No device supporting Vulkan was found.");
+    return {};
+  }
+
+  ezDynamicArray<VkPhysicalDevice> physicalDevices;
+  physicalDevices.SetCountUninitialized(physicalDeviceCount);
+  vkEnumeratePhysicalDevices(m_instance, &physicalDeviceCount, physicalDevices.GetData());
+
+  for (const VkPhysicalDevice& physicalDevice : physicalDevices)
+  {
+    VkPhysicalDeviceProperties properties = {};
+
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+    if (properties.deviceType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ||
+        properties.deviceType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
     {
-      adapters.emplace_back(std::make_shared<VKAdapter>(*this, device));
+      adapters.emplace_back(std::make_shared<VKAdapter>(*this, physicalDevice));
     }
   }
+
   return adapters;
 }
 
-vk::Instance& VKInstance::GetInstance()
+VkInstance& VKInstance::GetInstance()
 {
-  return m_instance.get();
+  return m_instance;
 }

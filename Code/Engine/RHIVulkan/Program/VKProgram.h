@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 
 class VKDevice;
 

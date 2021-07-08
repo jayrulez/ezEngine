@@ -1,6 +1,6 @@
 #pragma once
 #include <RHI/Resource/ResourceBase.h>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 #include <map>
 
 static bool operator<(const VkImageSubresourceRange& lhs, const VkImageSubresourceRange& rhs)

@@ -3,7 +3,7 @@
 #include <RHI/ShaderReflection/ShaderReflection.h>
 #include <RHIVulkan/Pipeline/VKPipeline.h>
 #include <RHIVulkan/RenderPass/VKRenderPass.h>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 
 vk::ShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind);
 

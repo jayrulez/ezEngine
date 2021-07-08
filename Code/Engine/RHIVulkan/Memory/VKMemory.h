@@ -1,7 +1,7 @@
 #pragma once
 #include <RHI/Memory/Memory.h>
 #include <RHI/Instance/BaseTypes.h>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 
 class VKDevice;
 

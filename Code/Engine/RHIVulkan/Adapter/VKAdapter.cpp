@@ -1,11 +1,15 @@
+#include <RHIVulkan/RHIVulkanPCH.h>
+
 #include <RHIVulkan/Adapter/VKAdapter.h>
 #include <RHIVulkan/Device/VKDevice.h>
 
-VKAdapter::VKAdapter(VKInstance& instance, const vk::PhysicalDevice& physical_device)
+VKAdapter::VKAdapter(VKInstance& instance, VkPhysicalDevice physical_device)
     : m_instance(instance)
     , m_physical_device(physical_device)
-    , m_name(physical_device.getProperties().deviceName.data())
 {
+  VkPhysicalDeviceProperties properties;
+  vkGetPhysicalDeviceProperties(physical_device, &properties);
+  m_name = properties.deviceName;
 }
 
 const std::string& VKAdapter::GetName() const
@@ -23,7 +27,7 @@ VKInstance& VKAdapter::GetInstance()
     return m_instance;
 }
 
-vk::PhysicalDevice& VKAdapter::GetPhysicalDevice()
+VkPhysicalDevice VKAdapter::GetPhysicalDevice()
 {
     return m_physical_device;
 }

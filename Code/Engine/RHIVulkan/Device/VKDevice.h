@@ -1,6 +1,5 @@
 #pragma once
 #include <RHI/Device/Device.h>
-#include <vulkan/vulkan.hpp>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPool.h>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUBindlessDescriptorPoolTyped.h>
 

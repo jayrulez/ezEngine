@@ -1,3 +1,5 @@
+#include <RHIVulkan/RHIVulkanPCH.h>
+
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/Swapchain/VKSwapchain.h>
 #include <RHIVulkan/CommandList/VKCommandList.h>
@@ -18,7 +20,6 @@
 #include <RHIVulkan/View/VKView.h>
 #include <RHIVulkan/Adapter/VKAdapter.h>
 #include <RHIVulkan/Utilities/VKUtility.h>
-#include <vulkan/vulkan.hpp>
 #include <set>
 
 static vk::IndexType GetVkIndexType(ezRHIResourceFormat::Enum format)

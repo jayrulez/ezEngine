@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <algorithm>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPoolRange.h>
 
 constexpr uint32_t max_bindless_heap_size = 10000;

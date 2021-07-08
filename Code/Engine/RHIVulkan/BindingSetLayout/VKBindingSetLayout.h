@@ -1,6 +1,7 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/BindingSetLayout/BindingSetLayout.h>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 

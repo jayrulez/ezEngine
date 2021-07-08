@@ -3,7 +3,7 @@
 #include <RHIVulkan/Resource/VKResource.h>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 
 class VKDevice;
 class VKCommandQueue;

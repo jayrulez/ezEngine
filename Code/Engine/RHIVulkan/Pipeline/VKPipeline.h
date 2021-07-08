@@ -2,7 +2,7 @@
 #include <RHI/Pipeline/Pipeline.h>
 #include <RHI/Program/Program.h>
 #include <deque>
-#include <vulkan/vulkan.hpp>
+#include <RHIVulkan/RHIVulkanDLL.h>
 
 class VKDevice;
 
