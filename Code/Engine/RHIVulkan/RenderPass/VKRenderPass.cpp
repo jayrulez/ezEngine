@@ -8,14 +8,14 @@ VkAttachmentLoadOp Convert(RenderPassLoadOp op)
     switch (op)
     {
     case RenderPassLoadOp::kLoad:
-        return VkAttachmentLoadOp::eLoad;
+        return VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_LOAD;
     case RenderPassLoadOp::kClear:
-        return VkAttachmentLoadOp::eClear;
+        return VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR;
     case RenderPassLoadOp::kDontCare:
-        return VkAttachmentLoadOp::eDontCare;
+        return VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     }
     assert(false);
-    return VkAttachmentLoadOp::eLoad;
+    return VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_LOAD;
 }
 
 VkAttachmentStoreOp Convert(RenderPassStoreOp op)
@@ -23,12 +23,12 @@ VkAttachmentStoreOp Convert(RenderPassStoreOp op)
     switch (op)
     {
     case RenderPassStoreOp::kStore:
-        return VkAttachmentStoreOp::eStore;
+        return VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
     case RenderPassStoreOp::kDontCare:
-        return VkAttachmentStoreOp::eDontCare;
+        return VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
     }
     assert(false);
-    return VkAttachmentStoreOp::eStore;
+    return VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
 }
 
 VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
@@ -60,12 +60,12 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
     };
 
     VkSubpassDescription2 sub_pass = {};
-    sub_pass.pipelineBindPoint = VkPipelineBindPoint::eGraphics;
+    sub_pass.pipelineBindPoint = VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
 
     std::vector<VkAttachmentReference2> color_attachment_references;
     for (auto& rtv : m_desc.colors)
     {
-        add_attachment(color_attachment_references.emplace_back(), rtv.format, VkImageLayout::eColorAttachmentOptimal, rtv.load_op, rtv.store_op);
+        add_attachment(color_attachment_references.emplace_back(), rtv.format, VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, rtv.load_op, rtv.store_op);
     }
 
     sub_pass.colorAttachmentCount = (ezUInt32)color_attachment_references.size();
@@ -74,7 +74,7 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
     VkAttachmentReference2 depth_attachment_reference = {};
     if (m_desc.depth_stencil.format != ezRHIResourceFormat::UNKNOWN)
     {
-        add_attachment(depth_attachment_reference, m_desc.depth_stencil.format, VkImageLayout::eDepthStencilAttachmentOptimal, m_desc.depth_stencil.depth_load_op, m_desc.depth_stencil.depth_store_op);
+        add_attachment(depth_attachment_reference, m_desc.depth_stencil.format, VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL, m_desc.depth_stencil.depth_load_op, m_desc.depth_stencil.depth_store_op);
         if (depth_attachment_reference.attachment != VK_ATTACHMENT_UNUSED)
         {
             VkAttachmentDescription2& description = attachment_descriptions[depth_attachment_reference.attachment];
@@ -90,7 +90,7 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
         add_attachment(
             shading_rate_image_attachment_reference,
             m_desc.shading_rate_format,
-            VkImageLayout::eFragmentShadingRateAttachmentOptimalKHR,
+            VkImageLayout::VK_IMAGE_LAYOUT_FRAGMENT_SHADING_RATE_ATTACHMENT_OPTIMAL_KHR,
             RenderPassLoadOp::kLoad,
             RenderPassStoreOp::kStore
         );
@@ -103,12 +103,13 @@ VKRenderPass::VKRenderPass(VKDevice& device, const RenderPassDesc& desc)
     }
 
     VkRenderPassCreateInfo2 render_pass_info = {};
+    render_pass_info.sType = VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     render_pass_info.attachmentCount = (ezUInt32)attachment_descriptions.size();
     render_pass_info.pAttachments = attachment_descriptions.data();
     render_pass_info.subpassCount = 1;
     render_pass_info.pSubpasses = &sub_pass;
 
-    m_render_pass = device.GetDevice().createRenderPass2Unique(render_pass_info);
+    vkCreateRenderPass2(device.GetDevice(), &render_pass_info, nullptr, &m_render_pass);
 }
 
 const RenderPassDesc& VKRenderPass::GetDesc() const
@@ -118,5 +119,5 @@ const RenderPassDesc& VKRenderPass::GetDesc() const
 
 VkRenderPass VKRenderPass::GetRenderPass() const
 {
-    return m_render_pass.get();
+    return m_render_pass;
 }
