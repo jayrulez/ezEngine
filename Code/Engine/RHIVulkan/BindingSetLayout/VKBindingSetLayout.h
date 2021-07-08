@@ -11,16 +11,16 @@ class VKBindingSetLayout
 public:
     VKBindingSetLayout(VKDevice& device, const std::vector<BindKey>& descs);
 
-    const std::map<uint32_t, vk::DescriptorType>& GetBindlessType() const;
-    const std::vector<vk::UniqueDescriptorSetLayout>& GetDescriptorSetLayouts() const;
-    const std::vector<std::map<vk::DescriptorType, size_t>>& GetDescriptorCountBySet() const;
-    vk::PipelineLayout GetPipelineLayout() const;
+    const std::map<uint32_t, VkDescriptorType>& GetBindlessType() const;
+    const std::vector<VkDescriptorSetLayout>& GetDescriptorSetLayouts() const;
+    const std::vector<std::map<VkDescriptorType, size_t>>& GetDescriptorCountBySet() const;
+    VkPipelineLayout GetPipelineLayout() const;
 
 private:
-    std::map<uint32_t, vk::DescriptorType> m_bindless_type;
-    std::vector<vk::UniqueDescriptorSetLayout> m_descriptor_set_layouts;
-    std::vector<std::map<vk::DescriptorType, size_t>> m_descriptor_count_by_set;
-    vk::UniquePipelineLayout m_pipeline_layout;
+    std::map<uint32_t, VkDescriptorType> m_bindless_type;
+    std::vector<VkDescriptorSetLayout> m_descriptor_set_layouts;
+    std::vector<std::map<VkDescriptorType, size_t>> m_descriptor_count_by_set;
+    VkPipelineLayout m_pipeline_layout;
 };
 
-vk::DescriptorType GetDescriptorType(ViewType view_type);
+VkDescriptorType GetDescriptorType(ViewType view_type);
