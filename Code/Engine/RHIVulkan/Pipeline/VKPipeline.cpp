@@ -7,31 +7,31 @@ VkShaderStageFlagBits ExecutionModel2Bit(ShaderKind kind)
     switch (kind)
     {
     case ShaderKind::kVertex:
-        return VkShaderStageFlagBits::eVertex;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
     case ShaderKind::kPixel:
-        return VkShaderStageFlagBits::eFragment;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
     case ShaderKind::kCompute:
-        return VkShaderStageFlagBits::eCompute;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_COMPUTE_BIT;
     case ShaderKind::kGeometry:
-        return VkShaderStageFlagBits::eGeometry;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_GEOMETRY_BIT;
     case ShaderKind::kAmplification:
-        return VkShaderStageFlagBits::eTaskNV;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_TASK_BIT_NV;
     case ShaderKind::kMesh:
-        return VkShaderStageFlagBits::eMeshNV;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_MESH_BIT_NV;
     case ShaderKind::kRayGeneration:
-        return VkShaderStageFlagBits::eRaygenKHR;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_RAYGEN_BIT_KHR;
     case ShaderKind::kIntersection:
-        return VkShaderStageFlagBits::eIntersectionKHR;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
     case ShaderKind::kAnyHit:
-        return VkShaderStageFlagBits::eAnyHitKHR;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
     case ShaderKind::kClosestHit:
-        return VkShaderStageFlagBits::eClosestHitKHR;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     case ShaderKind::kMiss:
-        return VkShaderStageFlagBits::eMissKHR;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_MISS_BIT_KHR;
     case ShaderKind::kCallable:
-        return VkShaderStageFlagBits::eCallableKHR;
+        return VkShaderStageFlagBits::VK_SHADER_STAGE_CALLABLE_BIT_KHR;
     }
-    assert(false);
+    EZ_ASSERT_NOT_IMPLEMENTED;
     return {};
 }
 
@@ -46,9 +46,10 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
     {
         decltype(auto) blob = shader->GetBlob();
         VkShaderModuleCreateInfo shader_module_info = {};
+        shader_module_info.sType = VkStructureType::VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         shader_module_info.codeSize = blob.size();
         shader_module_info.pCode = (uint32_t*)blob.data();
-        m_shader_modules.emplace_back(m_device.GetDevice().createShaderModuleUnique(shader_module_info));
+        vkCreateShaderModule(m_device.GetDevice(), &shader_module_info, nullptr, &m_shader_modules.emplace_back());
 
         decltype(auto) reflection = shader->GetReflection();
         decltype(auto) entry_points = reflection->GetEntryPoints();
@@ -57,7 +58,7 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
           m_shader_ids[shader->GetId(entry_point.name)] = (ezUInt32)m_shader_stage_create_info.size();
             decltype(auto) shader_stage_create_info = m_shader_stage_create_info.emplace_back();
             shader_stage_create_info.stage = ExecutionModel2Bit(entry_point.kind);
-            shader_stage_create_info.module = m_shader_modules.back().get();
+            shader_stage_create_info.module = m_shader_modules.back();
             decltype(auto) name = entry_point_names.emplace_back(entry_point.name);
             shader_stage_create_info.pName = name.c_str();
         }
@@ -66,7 +67,7 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
 
 VkPipeline VKPipeline::GetPipeline() const
 {
-    return m_pipeline.get();
+    return m_pipeline;
 }
 
 VkPipelineLayout VKPipeline::GetPipelineLayout() const
