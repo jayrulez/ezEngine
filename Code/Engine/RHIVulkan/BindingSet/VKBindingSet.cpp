@@ -26,11 +26,11 @@ VKBindingSet::VKBindingSet(VKDevice& device, const std::shared_ptr<VKBindingSetL
 
 void VKBindingSet::WriteBindings(const std::vector<BindingDesc>& bindings)
 {
-    std::vector<vk::WriteDescriptorSet> descriptors;
+    std::vector<VkWriteDescriptorSet> descriptors;
     for (const auto& binding : bindings)
     {
         decltype(auto) vk_view = binding.view->As<VKView>();
-        vk::WriteDescriptorSet descriptor = vk_view.GetDescriptor();
+        VkWriteDescriptorSet descriptor = vk_view.GetDescriptor();
         descriptor.descriptorType = GetDescriptorType(binding.bind_key.view_type);
         descriptor.dstSet = m_descriptor_sets[binding.bind_key.space];
         descriptor.dstBinding = binding.bind_key.slot;
@@ -48,7 +48,7 @@ void VKBindingSet::WriteBindings(const std::vector<BindingDesc>& bindings)
     }
 }
 
-const std::vector<vk::DescriptorSet>& VKBindingSet::GetDescriptorSets() const
+const std::vector<VkDescriptorSet>& VKBindingSet::GetDescriptorSets() const
 {
     return m_descriptor_sets;
 }
