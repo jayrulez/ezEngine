@@ -86,7 +86,7 @@ private:
     void BuildAccelerationStructure(VkAccelerationStructureCreateInfoKHR& build_info, const VkBuffer& instance_data, uint64_t instance_offset, const std::shared_ptr<Resource>& src, const std::shared_ptr<Resource>& dst, const std::shared_ptr<Resource>& scratch, uint64_t scratch_offset);
 
     VKDevice& m_device;
-    VkUniqueCommandBuffer m_command_list;
+    VkCommandBuffer m_command_list;
     bool m_closed = false;
     std::shared_ptr<VKPipeline> m_state;
     std::shared_ptr<BindingSet> m_binding_set;

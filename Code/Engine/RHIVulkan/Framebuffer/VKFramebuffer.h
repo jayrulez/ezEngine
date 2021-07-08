@@ -14,6 +14,6 @@ public:
     VkExtent2D GetExtent() const;
 
 private:
-    VkUniqueFramebuffer m_framebuffer;
+    VkFramebuffer m_framebuffer;
     VkExtent2D m_extent;
 };

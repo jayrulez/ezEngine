@@ -16,6 +16,6 @@ public:
 
 private:
   VKDevice& m_device;
-  VkUniqueQueryPool m_query_pool;
+  VkQueryPool m_query_pool;
   VkQueryType m_query_type;
 };

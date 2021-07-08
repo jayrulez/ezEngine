@@ -18,7 +18,7 @@ VKCommandList::VKCommandList(VKDevice& device, CommandListType type)
     cmd_buf_alloc_info.commandPool = device.GetCmdPool(type);
     cmd_buf_alloc_info.commandBufferCount = 1;
     cmd_buf_alloc_info.level = VkCommandBufferLevel::ePrimary;
-    std::vector<VkUniqueCommandBuffer> cmd_bufs = device.GetDevice().allocateCommandBuffersUnique(cmd_buf_alloc_info);
+    std::vector<VkCommandBuffer> cmd_bufs = device.GetDevice().allocateCommandBuffersUnique(cmd_buf_alloc_info);
     m_command_list = std::move(cmd_bufs.front());
     VkCommandBufferBeginInfo begin_info = {};
     m_command_list->begin(begin_info);

@@ -14,5 +14,5 @@ public:
 
 private:
     MemoryType m_memory_type;
-    VkUniqueDeviceMemory m_memory;
+    VkDeviceMemory m_memory;
 };

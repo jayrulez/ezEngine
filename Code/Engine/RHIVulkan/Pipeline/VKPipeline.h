@@ -18,8 +18,8 @@ protected:
   VKDevice& m_device;
   std::deque<std::string> entry_point_names;
   std::vector<VkPipelineShaderStageCreateInfo> m_shader_stage_create_info;
-  std::vector<VkUniqueShaderModule> m_shader_modules;
-  VkUniquePipeline m_pipeline;
+  std::vector<VkShaderModule> m_shader_modules;
+  VkPipeline m_pipeline;
   VkPipelineLayout m_pipeline_layout;
   std::map<uint64_t, uint32_t> m_shader_ids;
 };

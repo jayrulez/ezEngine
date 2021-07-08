@@ -25,9 +25,9 @@ private:
     uint32_t m_offset = 0;
     struct Descriptor
     {
-        VkUniqueDescriptorPool pool;
-        VkUniqueDescriptorSetLayout set_layout;
-        VkUniqueDescriptorSet set;
+        VkDescriptorPool pool;
+        VkDescriptorSetLayout set_layout;
+        VkDescriptorSet set;
     } m_descriptor;
     std::multimap<uint32_t, uint32_t> m_empty_ranges;
 };

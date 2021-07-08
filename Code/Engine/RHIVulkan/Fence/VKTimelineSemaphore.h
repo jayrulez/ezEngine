@@ -16,5 +16,5 @@ public:
 
 private:
     VKDevice& m_device;
-    VkUniqueSemaphore m_timeline_semaphore;
+    VkSemaphore m_timeline_semaphore;
 };
