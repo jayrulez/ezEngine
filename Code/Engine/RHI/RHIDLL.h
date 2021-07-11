@@ -42,6 +42,119 @@ class ShaderReflection;
 class Swapchain;
 class View;
 
+// Handles
+namespace ezRHI
+{
+  typedef ezGenericId<16, 16> ez16_16Id;
+  typedef ezGenericId<18, 14> ez18_14Id;
+  typedef ezGenericId<20, 12> ez20_12Id;
+} // namespace ezRHI
+
+class ezRHIMemoryHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIMemoryHandle, ezRHI::ez20_12Id);
+
+  friend class Device;
+};
+
+class ezRHICommandQueueHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHICommandQueueHandle, ezRHI::ez16_16Id);
+
+  friend class Device;
+};
+
+class ezRHISwapChainHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHISwapChainHandle, ezRHI::ez16_16Id);
+
+  friend class Device;
+};
+
+class ezRHICommandListHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHICommandListHandle, ezRHI::ez18_14Id);
+
+  friend class LDevice;
+};
+
+class ezRHIFenceHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIFenceHandle, ezRHI::ez20_12Id);
+
+  friend class Device;
+};
+
+class ezRHIResourceHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIResourceHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezRHIViewHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIViewHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezRHIBindingSetLayoutHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIBindingSetLayoutHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezRHIBindingSetHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIBindingSetHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezRHIRenderPassHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIRenderPassHandle, ezRHI::ez20_12Id);
+
+  friend class Device;
+};
+
+class ezRHIFramebufferHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIFramebufferHandle, ezRHI::ez20_12Id);
+
+  friend class Device;
+};
+
+class ezRHIShaderHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIShaderHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezRHIProgramHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIProgramHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezRHIPipelineHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezRHIPipelineHandle, ezRHI::ez18_14Id);
+
+  friend class Device;
+};
+
+class ezGALQueryHeapHandle
+{
+  EZ_DECLARE_HANDLE_TYPE(ezGALQueryHeapHandle, ezRHI::ez20_12Id);
+
+  friend class Device;
+};
+
 struct EZ_RHI_DLL ezRHIResourceFormat
 {
   typedef ezUInt32 StorageType;
