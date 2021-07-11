@@ -113,10 +113,10 @@ void VKCommandList::EndRenderPass()
     m_command_list->endRenderPass();
 }
 
-void VKCommandList::BeginEvent(const std::string& name)
+void VKCommandList::BeginEvent(const ezString& name)
 {
     vk::DebugUtilsLabelEXT label = {};
-    label.pLabelName = name.c_str();
+    label.pLabelName = name.GetData();
     m_command_list->beginDebugUtilsLabelEXT(&label);
 }
 

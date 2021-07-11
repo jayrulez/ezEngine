@@ -29,7 +29,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
         for (const auto& entry_point : shader->GetReflection()->GetEntryPoints())
         {
             uint64_t shader_id = shader->GetId(entry_point.name);
-            std::wstring shader_name = ezStringWChar(entry_point.name.c_str()).GetData();
+            std::wstring shader_name = ezStringWChar(entry_point.name).GetData();
             if (m_shader_names.count(shader_name))
             {
                 std::wstring new_shader_name = GenerateUniqueName(shader_name + L"_renamed_" + std::to_wstring(shader_id));

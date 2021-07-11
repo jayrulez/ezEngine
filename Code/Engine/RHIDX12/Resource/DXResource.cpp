@@ -116,11 +116,11 @@ uint64_t DXResource::GetAccelerationStructureHandle() const
   return acceleration_structure_handle;
 }
 
-void DXResource::SetName(const std::string& name)
+void DXResource::SetName(const ezString& name)
 {
   if (resource)
   {
-    resource->SetName(ezStringWChar(name.c_str()).GetData());
+    resource->SetName(ezStringWChar(name).GetData());
   }
 }
 

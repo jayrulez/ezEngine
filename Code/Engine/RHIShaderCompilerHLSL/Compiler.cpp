@@ -10,26 +10,26 @@
 #include <wrl.h>
 using namespace Microsoft::WRL;
 
-static std::string GetShaderTarget(ShaderType type, const std::string& model)
+static ezString GetShaderTarget(ShaderType type, const ezString& model)
 {
   switch (type)
   {
     case ShaderType::kPixel:
-      return "ps_" + model;
+      return ezStringBuilder("ps_", model);
     case ShaderType::kVertex:
-      return "vs_" + model;
+      return ezStringBuilder("vs_", model);
     case ShaderType::kGeometry:
-      return "gs_" + model;
+      return ezStringBuilder("gs_", model);
     case ShaderType::kCompute:
-      return "cs_" + model;
+      return ezStringBuilder("cs_", model);
     case ShaderType::kAmplification:
-      return "as_" + model;
+      return ezStringBuilder("as_", model);
     case ShaderType::kMesh:
-      return "ms_" + model;
+      return ezStringBuilder("ms_", model);
     case ShaderType::kLibrary:
-      return "lib_" + model;
+      return ezStringBuilder("lib_", model);
     default:
-      assert(false);
+      EZ_ASSERT_NOT_IMPLEMENTED;
       return "";
   }
 }
@@ -71,7 +71,7 @@ std::vector<uint8_t> Compile(const ShaderDesc& shader, ShaderBlobType blob_type)
 {
   decltype(auto) dxc_support = GetDxcSupport(blob_type);
 
-  std::wstring shader_path = ezStringWChar(shader.shader_path.c_str()).GetData();
+  std::wstring shader_path = ezStringWChar(shader.shader_path).GetData();
   std::wstring shader_dir = shader_path.substr(0, shader_path.find_last_of(L"\\/") + 1);
 
   ComPtr<IDxcLibrary> library;
@@ -84,13 +84,13 @@ std::vector<uint8_t> Compile(const ShaderDesc& shader, ShaderBlobType blob_type)
                      &source) == S_OK,
     "");
 
-  std::wstring target = ezStringWChar(GetShaderTarget(shader.type, shader.model).c_str()).GetData();
-  std::wstring entrypoint = ezStringWChar(shader.entrypoint.c_str()).GetData();
+  std::wstring target = ezStringWChar(GetShaderTarget(shader.type, shader.model)).GetData();
+  std::wstring entrypoint = ezStringWChar(shader.entrypoint).GetData();
   std::vector<std::pair<std::wstring, std::wstring>> defines_store;
   std::vector<DxcDefine> defines;
   for (const auto& define : shader.define)
   {
-    defines_store.emplace_back(ezStringWChar(define.first.c_str()).GetData(), ezStringWChar(define.second.c_str()).GetData());
+    defines_store.emplace_back(ezStringWChar(define.first).GetData(), ezStringWChar(define.second).GetData());
     defines.push_back({defines_store.back().first.c_str(), defines_store.back().second.c_str()});
   }
 

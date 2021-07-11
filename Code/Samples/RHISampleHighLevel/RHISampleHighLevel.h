@@ -16,7 +16,7 @@ class ezRHISampleWindow;
 
 constexpr uint32_t frame_count = 3;
 
-std::string GetShaderPath(const std::string& shaderFile)
+ezString GetShaderPath(const ezString& shaderFile)
 {
   ezStringBuilder projectDirAbsolutePath;
   if (!ezFileSystem::ResolveSpecialDirectory(">project", projectDirAbsolutePath).Succeeded())
@@ -25,7 +25,7 @@ std::string GetShaderPath(const std::string& shaderFile)
     return {};
   }
 
-  ezStringBuilder shaderPath(projectDirAbsolutePath, shaderFile.data());
+  ezStringBuilder shaderPath(projectDirAbsolutePath, shaderFile);
   shaderPath.MakeCleanPath();
 
   return shaderPath.GetData();
@@ -34,7 +34,7 @@ std::string GetShaderPath(const std::string& shaderFile)
 struct VertexShaderDesc
 {
   static constexpr ShaderType type = ShaderType::kVertex;
-  ShaderDesc desc = {GetShaderPath("/shaders/TriangleVertexShader.hlsl"), "main", type, "6_0"};
+  ShaderDesc desc = {GetShaderPath("/shaders/Triangle/VertexShader.hlsl"), "main", type, "6_0"};
 
   struct IA
   {
@@ -67,7 +67,7 @@ private:
 struct PixelShaderDesc
 {
   static constexpr ShaderType type = ShaderType::kPixel;
-  ShaderDesc desc = {GetShaderPath("/shaders/TrianglePixelShader.hlsl"), "main", type, "6_0"};
+  ShaderDesc desc = {GetShaderPath("/shaders/Triangle/PixelShader.hlsl"), "main", type, "6_0"};
 
   struct CBV
   {

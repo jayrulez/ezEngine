@@ -19,7 +19,7 @@ public:
     uint16_t GetLevelCount() const override;
     uint32_t GetSampleCount() const override;
     uint64_t GetAccelerationStructureHandle() const override;
-    void SetName(const std::string& name) override;
+    void SetName(const ezString& name) override;
     uint8_t* Map() override;
     void Unmap() override;
     bool AllowCommonStatePromotion(ResourceState state_after) override;

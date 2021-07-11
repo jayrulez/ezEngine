@@ -154,7 +154,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
     EZ_REPORT_FAILURE("Project directory could not be resolved.");
   }
 
-  ezStringBuilder vsShaderPath(projectDirAbsolutePath, "/shaders/TriangleVertexShader.hlsl");
+  ezStringBuilder vsShaderPath(projectDirAbsolutePath, "/shaders/Triangle/VertexShader.hlsl");
   vsShaderPath.MakeCleanPath();
   ShaderDesc vsDesc{vsShaderPath.GetData(), "main", ShaderType::kVertex, "6_0"};
   auto vsBlob = Compile(vsDesc, shaderBlobType);
@@ -162,7 +162,7 @@ void ezRHISampleApp::AfterCoreSystemsStartup()
   vertex_shader = device->CreateShader(vsDesc, vsBlob, vsReflection);
 
 
-  ezStringBuilder psShaderPath(projectDirAbsolutePath, "/shaders/TrianglePixelShader.hlsl");
+  ezStringBuilder psShaderPath(projectDirAbsolutePath, "/shaders/Triangle/PixelShader.hlsl");
   psShaderPath.MakeCleanPath();
   ShaderDesc psDesc{psShaderPath.GetData(), "main", ShaderType::kPixel, "6_0"};
   auto psBlob = Compile(psDesc, shaderBlobType);

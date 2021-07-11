@@ -19,7 +19,7 @@ public:
     virtual void UseProgram(const std::shared_ptr<Program>& program) = 0;
     virtual void BeginRenderPass(const RenderPassBeginDesc& desc) = 0;
     virtual void EndRenderPass() = 0;
-    virtual void BeginEvent(const std::string& name) = 0;
+    virtual void BeginEvent(const ezString& name) = 0;
     virtual void EndEvent() = 0;
     virtual void Draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) = 0;
     virtual void DrawIndexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance) = 0;

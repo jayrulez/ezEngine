@@ -76,10 +76,10 @@ uint64_t VKResource::GetAccelerationStructureHandle() const
     return m_device.GetDevice().getAccelerationStructureAddressKHR({ acceleration_structure_handle.get() });
 }
 
-void VKResource::SetName(const std::string& name)
+void VKResource::SetName(const ezString& name)
 {
     vk::DebugUtilsObjectNameInfoEXT info = {};
-    info.pObjectName = name.c_str();
+    info.pObjectName = name.GetData();
     if (resource_type == ResourceType::kBuffer)
     {
         info.objectType = buffer.res.get().objectType;

@@ -164,7 +164,7 @@ void RenderCommandListImpl::RSSetShadingRateImage(const std::shared_ptr<View>& v
   m_shading_rate_image = view;
 }
 
-void RenderCommandListImpl::BeginEvent(const std::string& name)
+void RenderCommandListImpl::BeginEvent(const ezString& name)
 {
   m_command_list->BeginEvent(name);
 }

@@ -8,7 +8,7 @@ VKAdapter::VKAdapter(VKInstance& instance, const vk::PhysicalDevice& physical_de
 {
 }
 
-const std::string& VKAdapter::GetName() const
+const ezString& VKAdapter::GetName() const
 {
     return m_name;
 }

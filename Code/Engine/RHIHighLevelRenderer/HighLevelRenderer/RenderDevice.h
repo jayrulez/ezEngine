@@ -40,7 +40,7 @@ public:
     virtual uint32_t GetFrameIndex() const = 0;
     virtual ezRHIResourceFormat::Enum GetFormat() const = 0;
     virtual std::shared_ptr<Resource> GetBackBuffer(uint32_t buffer) = 0;
-    virtual const std::string& GetGpuName() const = 0;
+    virtual const ezString& GetGpuName() const = 0;
     virtual void ExecuteCommandLists(const std::vector<std::shared_ptr<RenderCommandList>>& command_lists) = 0;
     virtual void Present() = 0;
     virtual void Wait(uint64_t fence_value) = 0;

@@ -39,7 +39,7 @@ public:
     uint32_t GetFrameIndex() const override;
     ezRHIResourceFormat::Enum GetFormat() const override;
     std::shared_ptr<Resource> GetBackBuffer(uint32_t buffer) override;
-    const std::string& GetGpuName() const override;
+    const ezString& GetGpuName() const override;
     void ExecuteCommandLists(const std::vector<std::shared_ptr<RenderCommandList>>& command_lists) override;
     void Present() override;
     void Wait(uint64_t fence_value) override;

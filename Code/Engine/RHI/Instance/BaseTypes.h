@@ -293,13 +293,13 @@ struct ShaderDesc
   //std::vector<uint8_t> blob;
   //std::shared_ptr<ShaderReflection> reflection;
 
-  std::string shader_path;
-  std::string entrypoint;
+  ezString shader_path;
+  ezString entrypoint;
   ShaderType type;
-  std::string model;
-  std::map<std::string, std::string> define;
+  ezString model;
+  std::map<ezString, ezString> define;
 
-  ShaderDesc(const std::string& shader_path, const std::string& entrypoint, ShaderType type, const std::string& model)
+  ShaderDesc(const ezString& shader_path, const ezString& entrypoint, ShaderType type, const ezString& model)
     : shader_path(shader_path)
     , entrypoint(entrypoint)
     , type(type)
@@ -312,13 +312,13 @@ struct ShaderDesc
 
 //struct ShaderDesc
 //{
-//  std::string shader_path;
-//  std::string entrypoint;
+//  ezString shader_path;
+//  ezString entrypoint;
 //  ShaderType type;
-//  std::string model;
-//  std::map<std::string, std::string> define;
+//  ezString model;
+//  std::map<ezString, ezString> define;
 //
-//  ShaderDesc(const std::string& shader_path, const std::string& entrypoint, ShaderType type, const std::string& model)
+//  ShaderDesc(const ezString& shader_path, const ezString& entrypoint, ShaderType type, const ezString& model)
 //    : shader_path(shader_path)
 //    , entrypoint(entrypoint)
 //    , type(type)
@@ -330,7 +330,7 @@ struct ShaderDesc
 struct InputLayoutDesc
 {
   uint32_t slot = 0;
-  std::string semantic_name;
+  ezString semantic_name;
   ezRHIResourceFormat::Enum format = ezRHIResourceFormat::UNKNOWN;
   uint32_t stride = 0;
 
@@ -519,7 +519,7 @@ enum class ReturnType
 
 struct ResourceBindingDesc
 {
-  std::string name;
+  ezString name;
   ViewType type;
   uint32_t slot;
   uint32_t space;

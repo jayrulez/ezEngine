@@ -10,6 +10,6 @@ class EZ_RHI_DLL Adapter : public QueryInterface
 {
 public:
   virtual ~Adapter() = default;
-  virtual const std::string& GetName() const = 0;
+  virtual const ezString& GetName() const = 0;
   virtual std::shared_ptr<Device> CreateDevice() = 0;
 };

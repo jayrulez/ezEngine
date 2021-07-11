@@ -48,12 +48,12 @@ const std::vector<uint8_t>& ShaderBase::GetBlob() const
     return m_blob;
 }
 
-uint64_t ShaderBase::GetId(const std::string& entry_point) const
+uint64_t ShaderBase::GetId(const ezString& entry_point) const
 {
     return m_ids.at(entry_point);
 }
 
-const BindKey& ShaderBase::GetBindKey(const std::string& name) const
+const BindKey& ShaderBase::GetBindKey(const ezString& name) const
 {
     return m_bind_keys.at(name);
 }
@@ -73,7 +73,7 @@ const std::vector<InputLayoutDesc>& ShaderBase::GetInputLayouts() const
     return m_input_layout_descs;
 }
 
-uint32_t ShaderBase::GetInputLayoutLocation(const std::string& semantic_name) const
+uint32_t ShaderBase::GetInputLayoutLocation(const ezString& semantic_name) const
 {
     return m_locations.at(semantic_name);
 }

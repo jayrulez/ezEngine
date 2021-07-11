@@ -59,7 +59,7 @@ VKPipeline::VKPipeline(VKDevice& device, const std::shared_ptr<Program>& program
             shader_stage_create_info.stage = ExecutionModel2Bit(entry_point.kind);
             shader_stage_create_info.module = m_shader_modules.back().get();
             decltype(auto) name = entry_point_names.emplace_back(entry_point.name);
-            shader_stage_create_info.pName = name.c_str();
+            shader_stage_create_info.pName = name.GetData();
         }
     }
 }

@@ -13,7 +13,7 @@ DXAdapter::DXAdapter(DXInstance& instance, const ComPtr<IDXGIAdapter1>& adapter)
     m_name = ezStringUtf8(desc.Description);
 }
 
-const std::string& DXAdapter::GetName() const
+const ezString& DXAdapter::GetName() const
 {
     return m_name;
 }

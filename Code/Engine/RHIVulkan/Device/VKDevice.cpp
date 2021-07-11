@@ -99,38 +99,38 @@ VKDevice::VKDevice(VKAdapter& adapter)
     }
 
     auto extensions = m_physical_device.enumerateDeviceExtensionProperties();
-    std::set<std::string> req_extension = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-        VK_KHR_RAY_QUERY_EXTENSION_NAME,
-        VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-        VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-        VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-        VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-        VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
-        VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME,
-        VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
-        VK_KHR_MAINTENANCE1_EXTENSION_NAME,
-        VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
-        VK_EXT_MEMORY_BUDGET_EXTENSION_NAME,
-        VK_NV_MESH_SHADER_EXTENSION_NAME,
-        VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
-    };
+    ezSet<ezString> req_extension;
 
-    std::vector<const char*> found_extension;
+    req_extension.Insert(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+    req_extension.Insert(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
+    req_extension.Insert(VK_NV_MESH_SHADER_EXTENSION_NAME);
+    req_extension.Insert(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME);
+
+    ezDynamicArray<const char*> found_extension;
     for (const auto& extension : extensions)
     {
-        if (req_extension.count(extension.extensionName.data()))
-            found_extension.push_back(extension.extensionName);
+        if (req_extension.Contains(extension.extensionName.data()))
+            found_extension.PushBack(extension.extensionName);
 
-        if (std::string(extension.extensionName.data()) == VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)
+        if (ezStringUtils::IsEqual(extension.extensionName.data(), VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME))
             m_is_variable_rate_shading_supported = true;
-        if (std::string(extension.extensionName.data()) == VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)
+        if (ezStringUtils::IsEqual(extension.extensionName.data(), VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME))
             m_is_dxr_supported = true;
-        if (std::string(extension.extensionName.data()) == VK_NV_MESH_SHADER_EXTENSION_NAME)
+        if (ezStringUtils::IsEqual(extension.extensionName.data(), VK_NV_MESH_SHADER_EXTENSION_NAME))
             m_is_mesh_shading_supported = true;
-        if (std::string(extension.extensionName.data()) == VK_KHR_RAY_QUERY_EXTENSION_NAME)
+        if (ezStringUtils::IsEqual(extension.extensionName.data(), VK_KHR_RAY_QUERY_EXTENSION_NAME))
             m_is_ray_query_supported = true;
     }
 
@@ -190,10 +190,10 @@ VKDevice::VKDevice(VKAdapter& adapter)
     }
 
     const float queue_priority = 1.0f;
-    std::vector<vk::DeviceQueueCreateInfo> queues_create_info;
+    ezDynamicArray<vk::DeviceQueueCreateInfo> queues_create_info;
     for (const auto& queue_info : m_queues_info)
     {
-        vk::DeviceQueueCreateInfo& queue_create_info = queues_create_info.emplace_back();
+        vk::DeviceQueueCreateInfo& queue_create_info = queues_create_info.ExpandAndGetRef();
         queue_create_info.queueFamilyIndex = queue_info.second.queue_family_index;
         queue_create_info.queueCount = 1;
         queue_create_info.pQueuePriorities = &queue_priority;
@@ -248,11 +248,11 @@ VKDevice::VKDevice(VKAdapter& adapter)
 
     vk::DeviceCreateInfo device_create_info = {};
     device_create_info.pNext = device_create_info_next;
-    device_create_info.queueCreateInfoCount = (ezUInt32)queues_create_info.size();
-    device_create_info.pQueueCreateInfos = queues_create_info.data();
+    device_create_info.queueCreateInfoCount = queues_create_info.GetCount();
+    device_create_info.pQueueCreateInfos = queues_create_info.GetData();
     device_create_info.pEnabledFeatures = &device_features;
-    device_create_info.enabledExtensionCount = (ezUInt32)found_extension.size();
-    device_create_info.ppEnabledExtensionNames = found_extension.data();
+    device_create_info.enabledExtensionCount = found_extension.GetCount();
+    device_create_info.ppEnabledExtensionNames = found_extension.GetData();
 
     m_device = m_physical_device.createDeviceUnique(device_create_info);
     VULKAN_HPP_DEFAULT_DISPATCHER.init(m_device.get());

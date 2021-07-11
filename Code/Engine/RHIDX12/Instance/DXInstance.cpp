@@ -30,9 +30,9 @@ ON_CORESYSTEMS_SHUTDOWN
 EZ_END_SUBSYSTEM_DECLARATION;
 // clang-format on
 
-bool EnableAgilitySDKIfExist(uint32_t version, const std::string_view& path)
+bool EnableAgilitySDKIfExist(uint32_t version, const ezString& path)
 {
-  ezStringBuilder d3d12_core(ezOSFile::GetApplicationDirectory(), "/", path.data(), "/D3D12Core.dll");
+  ezStringBuilder d3d12_core(ezOSFile::GetApplicationDirectory(), "/", path, "/D3D12Core.dll");
   if (!ezOSFile::ExistsFile(d3d12_core))
   {
     return false;
@@ -51,7 +51,7 @@ bool EnableAgilitySDKIfExist(uint32_t version, const std::string_view& path)
   {
     return false;
   }
-  if (FAILED(sdk_configuration->SetSDKVersion(version, path.data())))
+  if (FAILED(sdk_configuration->SetSDKVersion(version, path)))
   {
     return false;
   }

@@ -134,7 +134,7 @@ void RenderDeviceImpl::ExecuteCommandLists(const std::vector<std::shared_ptr<Ren
   m_command_queue->Signal(m_fence, ++m_fence_value);
 }
 
-const std::string& RenderDeviceImpl::GetGpuName() const
+const ezString& RenderDeviceImpl::GetGpuName() const
 {
   return m_adapter->GetName();
 }

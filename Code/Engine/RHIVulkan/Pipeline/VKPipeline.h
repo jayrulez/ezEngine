@@ -16,7 +16,7 @@ public:
 
 protected:
   VKDevice& m_device;
-  std::deque<std::string> entry_point_names;
+  std::deque<ezString> entry_point_names;
   std::vector<vk::PipelineShaderStageCreateInfo> m_shader_stage_create_info;
   std::vector<vk::UniqueShaderModule> m_shader_modules;
   vk::UniquePipeline m_pipeline;

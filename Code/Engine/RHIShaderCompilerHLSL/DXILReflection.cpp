@@ -68,7 +68,7 @@ ComPtr<IDiaTable> FindTable(ComPtr<IDiaSession> session, const std::wstring& nam
   return nullptr;
 }
 
-std::string FindStrValue(ComPtr<IDiaTable> table, const std::wstring& name)
+ezString FindStrValue(ComPtr<IDiaTable> table, const std::wstring& name)
 {
   LONG count = 0;
   table->get_Count(&count);
@@ -386,7 +386,7 @@ ResourceBindingDesc GetBindingDesc(const D3D12_SHADER_INPUT_BIND_DESC& bind_desc
   return desc;
 }
 
-VariableLayout GetVariableLayout(const std::string& name, uint32_t offset, uint32_t size, ID3D12ShaderReflectionType* variable_type)
+VariableLayout GetVariableLayout(const ezString& name, uint32_t offset, uint32_t size, ID3D12ShaderReflectionType* variable_type)
 {
   D3D12_SHADER_TYPE_DESC type_desc = {};
   variable_type->GetDesc(&type_desc);
@@ -492,9 +492,12 @@ std::vector<InputParameterDesc> ParseInputParameters(const D3D12_SHADER_DESC& de
     D3D12_SIGNATURE_PARAMETER_DESC param_desc = {};
     EZ_ASSERT_ALWAYS(shader_reflection->GetInputParameterDesc(i, &param_desc) == S_OK, "");
     decltype(auto) input = input_parameters.emplace_back();
-    input.semantic_name = param_desc.SemanticName;
+    ezStringBuilder semanticName(param_desc.SemanticName);
     if (param_desc.SemanticIndex)
-      input.semantic_name += std::to_string(param_desc.SemanticIndex);
+    {
+      semanticName.AppendFormat("{}", param_desc.SemanticIndex);
+    }
+    input.semantic_name = semanticName.GetData();
     input.location = i;
     if (param_desc.Mask == 1)
     {
@@ -574,7 +577,7 @@ void DXILReflection::ParseLibraryReflection(ComPtr<ID3D12LibraryReflection> libr
 {
   D3D12_LIBRARY_DESC library_desc = {};
   EZ_ASSERT_ALWAYS(library_reflection->GetDesc(&library_desc) == S_OK, "");
-  std::map<std::string, size_t> exist;
+  std::map<ezString, size_t> exist;
   for (uint32_t i = 0; i < library_desc.FunctionCount; ++i)
   {
     ID3D12FunctionReflection* function_reflection = library_reflection->GetFunctionByIndex(i);

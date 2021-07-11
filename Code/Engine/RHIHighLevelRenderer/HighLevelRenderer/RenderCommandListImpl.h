@@ -36,7 +36,7 @@ public:
     void UseProgram(const std::shared_ptr<Program>& program) override;
     void BeginRenderPass(const RenderPassBeginDesc& desc) override;
     void EndRenderPass() override;
-    void BeginEvent(const std::string& name) override;
+    void BeginEvent(const ezString& name) override;
     void EndEvent() override;
     void Draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) override;
     void DrawIndexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance) override;

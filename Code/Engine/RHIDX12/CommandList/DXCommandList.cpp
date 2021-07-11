@@ -258,11 +258,11 @@ void DXCommandList::EndRenderPass()
   m_command_list4->EndRenderPass();
 }
 
-void DXCommandList::BeginEvent(const std::string& name)
+void DXCommandList::BeginEvent(const ezString& name)
 {
   if (!m_device.IsUnderGraphicsDebugger())
     return;
-  std::wstring wname = ezStringWChar(name.c_str()).GetData();
+  std::wstring wname = ezStringWChar(name).GetData();
   PIXBeginEvent(m_command_list.Get(), 0, wname.c_str());
 }
 

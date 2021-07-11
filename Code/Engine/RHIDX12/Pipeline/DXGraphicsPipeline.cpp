@@ -247,19 +247,19 @@ void DXGraphicsPipeline::ParseInputLayout(const std::shared_ptr<Shader>& shader)
   for (auto& vertex : m_desc.input)
   {
     D3D12_INPUT_ELEMENT_DESC layout = {};
-    std::string semantic_name = vertex.semantic_name;
-    uint32_t semantic_slot = 0;
-    uint32_t pow = 1;
-    while (!semantic_name.empty() && std::isdigit(semantic_name.back()))
+    ezStringBuilder semanticName = vertex.semantic_name.GetData();
+    ezUInt32 semanticSlot = 0;
+    ezUInt32 pow = 1;
+    while (!semanticName.IsEmpty() && ezStringUtils::IsDecimalDigit(semanticName[semanticName.GetCharacterCount() -1]))
     {
-      semantic_slot = (semantic_name.back() - '0') * pow + semantic_slot;
-      semantic_name.pop_back();
+      semanticSlot = (semanticName[semanticName.GetCharacterCount() - 1] - '0') * pow + semanticSlot;
+      semanticName.Remove(semanticName.GetData() + semanticName.GetCharacterCount() -1, semanticName.GetData() + semanticName.GetCharacterCount());
       pow *= 10;
     }
     m_input_layout_stride[vertex.slot] = vertex.stride;
-    m_input_layout_desc_names[vertex.slot] = semantic_name;
-    layout.SemanticName = m_input_layout_desc_names[vertex.slot].c_str();
-    layout.SemanticIndex = semantic_slot;
+    m_input_layout_desc_names[vertex.slot] = semanticName.GetData();
+    layout.SemanticName = m_input_layout_desc_names[vertex.slot].GetData();
+    layout.SemanticIndex = semanticSlot;
     layout.InputSlot = vertex.slot;
     layout.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
     layout.InstanceDataStepRate = 0;

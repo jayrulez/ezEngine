@@ -35,16 +35,17 @@ ShaderKind ConvertShaderKind(spv::ExecutionModel execution_model)
 
 std::vector<InputParameterDesc> ParseInputParameters(const spirv_cross::Compiler& compiler)
 {
+  ezString s;
   spirv_cross::ShaderResources resources = compiler.get_shader_resources();
   std::vector<InputParameterDesc> input_parameters;
   for (const auto& resource : resources.stage_inputs)
   {
     decltype(auto) input = input_parameters.emplace_back();
     input.location = compiler.get_decoration(resource.id, spv::DecorationLocation);
-    input.semantic_name = compiler.get_decoration_string(resource.id, spv::DecorationHlslSemanticGOOGLE);
-    if (!input.semantic_name.empty() && input.semantic_name.back() == '0')
+    input.semantic_name = compiler.get_decoration_string(resource.id, spv::DecorationHlslSemanticGOOGLE).data();
+    if (!input.semantic_name.IsEmpty() && input.semantic_name.EndsWith("0"))
     {
-      input.semantic_name.pop_back();
+      input.semantic_name = input.semantic_name.GetSubString(0, input.semantic_name.GetCharacterCount() - 1);
     }
     decltype(auto) type = compiler.get_type(resource.base_type_id);
     if (type.basetype == spirv_cross::SPIRType::Float)
@@ -276,7 +277,7 @@ ResourceBindingDesc GetBindingDesc(const spirv_cross::CompilerHLSL& compiler, co
 {
   ResourceBindingDesc desc = {};
   decltype(auto) type = compiler.get_type(resource.type_id);
-  desc.name = compiler.get_name(resource.id);
+  desc.name = compiler.get_name(resource.id).data();
   desc.type = GetViewType(compiler, type, resource.id);
   desc.slot = compiler.get_decoration(resource.id, spv::DecorationBinding);
   desc.space = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
@@ -348,13 +349,13 @@ VariableLayout GetBufferLayout(ViewType view_type, const spirv_cross::CompilerHL
 
   VariableLayout layout = {};
   decltype(auto) type = compiler.get_type(resource.base_type_id);
-  layout.name = compiler.get_name(resource.id);
+  layout.name = compiler.get_name(resource.id).data();
   layout.size = (ezUInt32)compiler.get_declared_struct_size(type);
   assert(type.basetype == spirv_cross::SPIRType::BaseType::Struct);
   for (ezUInt32 i = 0; i < (ezUInt32)type.member_types.size(); ++i)
   {
     auto& member = layout.members.emplace_back(GetBufferMemberLayout(compiler, type.member_types[i]));
-    member.name = compiler.get_member_name(resource.base_type_id, i);
+    member.name = compiler.get_member_name(resource.base_type_id, i).data();
     member.offset = compiler.type_struct_member_offset(type, i);
     member.size = (ezUInt32)compiler.get_declared_struct_member_size(type, i);
   }
