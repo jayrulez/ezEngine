@@ -14,6 +14,11 @@ VKTimelineSemaphore::VKTimelineSemaphore(VKDevice& device, uint64_t initial_valu
   vkCreateSemaphore(device.GetDevice(), &create_info, nullptr, &m_timeline_semaphore);
 }
 
+VKTimelineSemaphore::~VKTimelineSemaphore()
+{
+  vkDestroySemaphore(m_device.GetDevice(), m_timeline_semaphore, nullptr);
+}
+
 uint64_t VKTimelineSemaphore::GetCompletedValue()
 {
   ezUInt64 ret = 0;

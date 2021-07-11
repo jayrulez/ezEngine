@@ -214,6 +214,11 @@ VKGraphicsPipeline::VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineD
   vkCreateGraphicsPipelines(m_device.GetDevice(), {}, 1, &pipeline_info, nullptr, &m_pipeline);
 }
 
+VKGraphicsPipeline::~VKGraphicsPipeline()
+{
+  vkDestroyPipeline(m_device.GetDevice(), m_pipeline, nullptr);
+}
+
 PipelineType VKGraphicsPipeline::GetPipelineType() const
 {
   return PipelineType::kGraphics;

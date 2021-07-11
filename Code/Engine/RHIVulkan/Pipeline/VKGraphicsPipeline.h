@@ -13,6 +13,7 @@ class VKGraphicsPipeline : public VKPipeline
 {
 public:
   VKGraphicsPipeline(VKDevice& device, const GraphicsPipelineDesc& desc);
+  ~VKGraphicsPipeline();
   PipelineType GetPipelineType() const override;
 
   VkRenderPass GetRenderPass() const;

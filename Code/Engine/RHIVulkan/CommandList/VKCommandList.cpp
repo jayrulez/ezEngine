@@ -28,6 +28,10 @@ VKCommandList::VKCommandList(VKDevice& device, CommandListType type)
   vkBeginCommandBuffer(m_command_list, &begin_info);
 }
 
+VKCommandList::~VKCommandList()
+{
+}
+
 void VKCommandList::Reset()
 {
   Close();

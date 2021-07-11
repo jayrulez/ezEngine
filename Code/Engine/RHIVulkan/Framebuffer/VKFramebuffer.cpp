@@ -5,6 +5,7 @@
 
 VKFramebuffer::VKFramebuffer(VKDevice& device, const FramebufferDesc& desc)
   : FramebufferBase(desc)
+  , m_device{device}
   , m_extent{desc.width, desc.height}
 {
   VkFramebufferCreateInfo framebuffer_info = {};
@@ -37,6 +38,11 @@ VKFramebuffer::VKFramebuffer(VKDevice& device, const FramebufferDesc& desc)
   framebuffer_info.pAttachments = attachment_views.data();
 
   vkCreateFramebuffer(device.GetDevice(), &framebuffer_info, nullptr, &m_framebuffer);
+}
+
+VKFramebuffer::~VKFramebuffer()
+{
+  vkDestroyFramebuffer(m_device.GetDevice(), m_framebuffer, nullptr);
 }
 
 VkFramebuffer VKFramebuffer::GetFramebuffer() const

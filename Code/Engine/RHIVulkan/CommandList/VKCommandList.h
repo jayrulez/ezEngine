@@ -9,6 +9,7 @@ class VKCommandList : public CommandList
 {
 public:
     VKCommandList(VKDevice& device, CommandListType type);
+  ~VKCommandList();
     void Reset() override;
     void Close() override;
     void BindPipeline(const std::shared_ptr<Pipeline>& state) override;

@@ -30,6 +30,18 @@ VKView::VKView(VKDevice& device, const std::shared_ptr<VKResource>& resource, co
   }
 }
 
+VKView::~VKView()
+{
+  if (m_image_view != VK_NULL_HANDLE)
+  {
+    vkDestroyImageView(m_device.GetDevice(), m_image_view, nullptr);
+  }
+  if (m_buffer_view != VK_NULL_HANDLE)
+  {
+    vkDestroyBufferView(m_device.GetDevice(), m_buffer_view, nullptr);
+  }
+}
+
 VkImageViewType GetImageViewType(ViewDimension dimension)
 {
   switch (dimension)

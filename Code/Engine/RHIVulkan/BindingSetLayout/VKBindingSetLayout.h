@@ -10,6 +10,7 @@ class VKBindingSetLayout
 {
 public:
     VKBindingSetLayout(VKDevice& device, const std::vector<BindKey>& descs);
+  ~VKBindingSetLayout();
 
     const std::map<uint32_t, VkDescriptorType>& GetBindlessType() const;
     const std::vector<VkDescriptorSetLayout>& GetDescriptorSetLayouts() const;
@@ -21,6 +22,7 @@ private:
     std::vector<VkDescriptorSetLayout> m_descriptor_set_layouts;
     std::vector<std::map<VkDescriptorType, size_t>> m_descriptor_count_by_set;
     VkPipelineLayout m_pipeline_layout;
+    VKDevice& m_device;
 };
 
 VkDescriptorType GetDescriptorType(ViewType view_type);
