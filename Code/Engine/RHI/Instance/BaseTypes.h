@@ -1,6 +1,7 @@
 #pragma once
-#include <RHI/Instance/EnumUtils.h>
 #include <RHI/RHIDLL.h>
+
+#include <RHI/Instance/EnumUtils.h>
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -9,8 +10,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-
-class Resource;
 
 namespace enum_class
 {
@@ -289,7 +288,6 @@ struct ViewDesc
   }
 };
 
-class ShaderReflection;
 struct ShaderDesc
 {
   //std::vector<uint8_t> blob;
@@ -306,8 +304,8 @@ struct ShaderDesc
     , entrypoint(entrypoint)
     , type(type)
     , model(model)
-    //, blob{}
-    //, reflection{}
+  //, blob{}
+  //, reflection{}
   {
   }
 };
@@ -394,9 +392,6 @@ struct RenderPassDesc
   }
 };
 
-class RenderPass;
-class View;
-
 struct FramebufferDesc
 {
   std::shared_ptr<RenderPass> render_pass;
@@ -411,11 +406,6 @@ struct FramebufferDesc
     return std::tie(render_pass, width, height, colors, depth_stencil, shading_rate_image);
   }
 };
-
-class Program;
-class BindingSetLayout;
-class View;
-class RenderPass;
 
 struct GraphicsPipelineDesc
 {

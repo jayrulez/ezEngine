@@ -1,9 +1,9 @@
 #pragma once
+#include <RHI/RHIDLL.h>
+
 #include <RHI/Instance/BaseTypes.h>
 #include <map>
 #include <functional>
-
-class Resource;
 
 class EZ_RHI_DLL ResourceStateTracker
 {

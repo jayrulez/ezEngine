@@ -1,5 +1,6 @@
 #pragma once
 #include <RHI/RHIDLL.h>
+
 #include <RHI/Instance/QueryInterface.h>
 #include <RHI/Instance/BaseTypes.h>
 #include <RHI/Adapter/Adapter.h>

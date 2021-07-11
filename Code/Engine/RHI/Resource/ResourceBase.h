@@ -1,5 +1,6 @@
 #pragma once
 #include <RHI/RHIDLL.h>
+
 #include <RHI/Resource/Resource.h>
 
 class EZ_RHI_DLL ResourceBase : public Resource

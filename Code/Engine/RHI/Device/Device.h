@@ -1,4 +1,6 @@
 #pragma once
+#include <RHI/RHIDLL.h>
+
 #include <RHI/BindingSetLayout/BindingSetLayout.h>
 #include <RHI/CommandList/CommandList.h>
 #include <RHI/CommandQueue/CommandQueue.h>
@@ -10,7 +12,6 @@
 #include <RHI/Pipeline/Pipeline.h>
 #include <RHI/Program/Program.h>
 #include <RHI/QueryHeap/QueryHeap.h>
-#include <RHI/RHIDLL.h>
 #include <RHI/RenderPass/RenderPass.h>
 #include <RHI/Shader/Shader.h>
 #include <RHI/Swapchain/Swapchain.h>

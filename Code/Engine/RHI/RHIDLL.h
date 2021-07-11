@@ -16,6 +16,32 @@
 #  define EZ_RHI_DLL
 #endif
 
+class Adapter;
+class BindingSet;
+class BindingSetLayout;
+class CommandList;
+class CommandQueue;
+class Device;
+class Fence;
+class Framebuffer;
+class FramebufferBase;
+class Instance;
+class QueryInterface;
+class Memory;
+class Pipeline;
+class Program;
+class ProgramBase;
+class QueryHeap;
+class RenderPass;
+class Resource;
+class ResourceBase;
+class ResourceStateTracker;
+class Shader;
+class ShaderBase;
+class ShaderReflection;
+class Swapchain;
+class View;
+
 struct EZ_RHI_DLL ezRHIResourceFormat
 {
   typedef ezUInt32 StorageType;
