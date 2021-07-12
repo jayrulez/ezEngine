@@ -4,7 +4,6 @@
 #include <RHIDX12/GPUDescriptorPool/DXGPUDescriptorPoolTyped.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <algorithm>
-#include <map>
 #include <memory>
 #include <wrl.h>
 #include <directx/d3d12.h>

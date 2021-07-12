@@ -7,7 +7,6 @@
 #include <RHIVulkan/Pipeline/VKGraphicsPipeline.h>
 #include <RHIVulkan/Pipeline/VKRayTracingPipeline.h>
 #include <RHIVulkan/Program/VKProgram.h>
-#include <map>
 
 VKRayTracingPipeline::VKRayTracingPipeline(VKDevice& device, const RayTracingPipelineDesc& desc)
   : VKPipeline(device, desc.program, desc.layout)

@@ -3,7 +3,6 @@
 #include <RHI/Instance/BaseTypes.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <algorithm>
-#include <map>
 #include <memory>
 #include <wrl.h>
 #include <directx/d3dx12.h>

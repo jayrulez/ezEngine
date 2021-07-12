@@ -1,7 +1,5 @@
 #pragma once
 #include <RHIVulkan/RHIVulkanDLL.h>
-
-#include <map>
 #include <algorithm>
 
 class VKDevice;

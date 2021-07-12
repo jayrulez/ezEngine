@@ -2,8 +2,6 @@
 #include <RHI/Instance/BaseTypes.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <algorithm>
-#include <functional>
-#include <map>
 #include <memory>
 #include <wrl.h>
 #include <directx/d3d12.h>
@@ -52,5 +50,5 @@ private:
   ezUInt32 m_size;
   uint32_t m_increment_size;
   D3D12_DESCRIPTOR_HEAP_TYPE m_type;
-  std::unique_ptr<DXGPUDescriptorPoolRange, std::function<void(DXGPUDescriptorPoolRange*)>> m_callback;
+  //std::unique_ptr<DXGPUDescriptorPoolRange, std::function<void(DXGPUDescriptorPoolRange*)>> m_callback;
 };

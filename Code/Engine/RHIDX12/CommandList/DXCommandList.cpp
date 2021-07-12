@@ -262,8 +262,7 @@ void DXCommandList::BeginEvent(const ezString& name)
 {
   if (!m_device.IsUnderGraphicsDebugger())
     return;
-  std::wstring wname = ezStringWChar(name).GetData();
-  PIXBeginEvent(m_command_list.Get(), 0, wname.c_str());
+  PIXBeginEvent(m_command_list.Get(), 0, ezStringWChar(name).GetData());
 }
 
 void DXCommandList::EndEvent()

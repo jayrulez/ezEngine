@@ -3,10 +3,10 @@
 #include <RHI/Instance/BaseTypes.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <algorithm>
-#include <map>
 #include <memory>
 #include <wrl.h>
 #include <directx/d3d12.h>
+#include <Foundation/Containers/ArrayMap.h>
 using namespace Microsoft::WRL;
 
 class DXDevice;
@@ -31,5 +31,5 @@ private:
     D3D12_GPU_DESCRIPTOR_HANDLE m_gpu_handle;
     ComPtr<ID3D12DescriptorHeap> m_heap_readable;
     D3D12_CPU_DESCRIPTOR_HANDLE m_cpu_handle_readable;
-    std::multimap<ezUInt32, ezUInt32> m_empty_ranges;
+    ezArrayMap<ezUInt32, ezUInt32> m_empty_ranges;
 };

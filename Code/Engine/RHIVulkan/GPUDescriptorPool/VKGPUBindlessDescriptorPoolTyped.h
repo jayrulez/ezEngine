@@ -2,8 +2,8 @@
 #include <RHIVulkan/RHIVulkanDLL.h>
 
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPoolRange.h>
+#include <Foundation/Containers/ArrayMap.h>
 #include <algorithm>
-#include <map>
 
 constexpr uint32_t max_bindless_heap_size = 10000;
 
@@ -30,5 +30,5 @@ private:
     vk::UniqueDescriptorSetLayout set_layout;
     vk::UniqueDescriptorSet set;
   } m_descriptor;
-  std::multimap<uint32_t, uint32_t> m_empty_ranges;
+  ezArrayMap<uint32_t, uint32_t> m_empty_ranges;
 };

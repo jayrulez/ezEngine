@@ -2,7 +2,6 @@
 #include <RHIVulkan/RHIVulkanDLL.h>
 
 #include <RHI/Resource/ResourceBase.h>
-#include <map>
 
 static bool operator<(const VkImageSubresourceRange& lhs, const VkImageSubresourceRange& rhs)
 {

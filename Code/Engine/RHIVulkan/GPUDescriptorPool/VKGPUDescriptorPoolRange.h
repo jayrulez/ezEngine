@@ -1,9 +1,7 @@
 #pragma once
 #include <RHIVulkan/RHIVulkanDLL.h>
 
-#include <functional>
 #include <memory>
-#include <vulkan/vulkan.hpp>
 
 class VKGPUBindlessDescriptorPoolTyped;
 
