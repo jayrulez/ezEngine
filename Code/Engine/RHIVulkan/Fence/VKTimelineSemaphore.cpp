@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/Fence/VKTimelineSemaphore.h>
 #include <RHIVulkan/Device/VKDevice.h>
 

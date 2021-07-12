@@ -51,7 +51,7 @@ void DXCommandList::Reset()
   m_heaps.clear();
   m_state.reset();
   m_binding_set.reset();
-  m_lazy_vertex.clear();
+  m_lazy_vertex.Clear();
   m_shading_rate_image_view.reset();
 }
 
@@ -79,11 +79,11 @@ void DXCommandList::BindPipeline(const std::shared_ptr<Pipeline>& state)
     m_command_list->SetPipelineState(dx_state.GetPipeline().Get());
     for (const auto& x : dx_state.GetStrideMap())
     {
-      auto it = m_lazy_vertex.find(x.first);
-      if (it != m_lazy_vertex.end())
-        IASetVertexBufferImpl(x.first, it->second, x.second);
+      auto it = m_lazy_vertex.Find(x.Key());
+      if (it != end(m_lazy_vertex))
+        IASetVertexBufferImpl(x.Key(), it.Value(), x.Key());
       else
-        IASetVertexBufferImpl(x.first, {}, 0);
+        IASetVertexBufferImpl(x.Key(), {}, 0);
     }
   }
   else if (type == PipelineType::kCompute)
@@ -505,9 +505,9 @@ void DXCommandList::IASetVertexBuffer(uint32_t slot, const std::shared_ptr<Resou
   {
     decltype(auto) dx_state = m_state->As<DXGraphicsPipeline>();
     auto& strides = dx_state.GetStrideMap();
-    auto it = strides.find(slot);
-    if (it != strides.end())
-      IASetVertexBufferImpl(slot, resource, it->second);
+    auto it = strides.Find(slot);
+    if (it != end(strides))
+      IASetVertexBufferImpl(slot, resource, it.Value());
     else
       IASetVertexBufferImpl(slot, {}, 0);
   }

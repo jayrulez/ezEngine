@@ -17,8 +17,8 @@
 #include <RHIDX12/Swapchain/DXSwapchain.h>
 #include <RHIDX12/Utilities/DXUtility.h>
 #include <RHIDX12/View/DXView.h>
-#include <dxgi1_6.h>
 #include <directx/d3dx12.h>
+#include <dxgi1_6.h>
 
 D3D12_RESOURCE_STATES ConvertState(ResourceState state)
 {
@@ -161,7 +161,7 @@ std::shared_ptr<Memory> DXDevice::AllocateMemory(uint64_t size, MemoryType memor
 
 std::shared_ptr<CommandQueue> DXDevice::GetCommandQueue(CommandListType type)
 {
-  return m_command_queues.at(type);
+  return m_command_queues[type];
 }
 
 uint32_t DXDevice::GetTextureDataPitchAlignment() const
@@ -171,7 +171,7 @@ uint32_t DXDevice::GetTextureDataPitchAlignment() const
 
 std::shared_ptr<Swapchain> DXDevice::CreateSwapchain(Window window, uint32_t width, uint32_t height, uint32_t frame_count, bool vsync)
 {
-  return std::make_shared<DXSwapchain>(*m_command_queues.at(CommandListType::kGraphics), window, width, height, frame_count, vsync);
+  return std::make_shared<DXSwapchain>(*m_command_queues[CommandListType::kGraphics], window, width, height, frame_count, vsync);
 }
 
 std::shared_ptr<CommandList> DXDevice::CreateCommandList(CommandListType type)
@@ -567,10 +567,10 @@ bool DXDevice::IsCreateNotZeroedAvailable() const
 
 ID3D12CommandSignature* DXDevice::GetCommandSignature(D3D12_INDIRECT_ARGUMENT_TYPE type, uint32_t stride)
 {
-  auto it = m_command_signature_cache.find({type, stride});
-  if (it != m_command_signature_cache.end())
+  auto it = m_command_signature_cache.Find(std::pair{type, stride});
+  if (it != end(m_command_signature_cache))
   {
-    return it->second.Get();
+    return it.Value().Get();
   }
 
   D3D12_INDIRECT_ARGUMENT_DESC arg = {};
@@ -586,8 +586,7 @@ ID3D12CommandSignature* DXDevice::GetCommandSignature(D3D12_INDIRECT_ARGUMENT_TY
                      IID_PPV_ARGS(&command_signature)) == S_OK,
     "");
 
-  m_command_signature_cache.emplace(std::piecewise_construct,
-    std::forward_as_tuple(type, stride),
-    std::forward_as_tuple(command_signature));
+  m_command_signature_cache.Insert(std::pair(type, stride), ComPtr<ID3D12CommandSignature>(command_signature));
+
   return command_signature.Get();
 }

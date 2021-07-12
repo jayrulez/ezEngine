@@ -111,6 +111,6 @@ private:
     std::vector<ComPtr<ID3D12DescriptorHeap>> m_heaps;
     std::shared_ptr<DXPipeline> m_state;
     std::shared_ptr<BindingSet> m_binding_set;
-    std::map<uint32_t, std::shared_ptr<Resource>> m_lazy_vertex;
+    ezMap<uint32_t, std::shared_ptr<Resource>> m_lazy_vertex;
     std::shared_ptr<View> m_shading_rate_image_view;
 };

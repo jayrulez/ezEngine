@@ -1,8 +1,9 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/Pipeline/Pipeline.h>
 #include <RHI/Program/Program.h>
 #include <deque>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 
@@ -21,5 +22,5 @@ protected:
   std::vector<vk::UniqueShaderModule> m_shader_modules;
   vk::UniquePipeline m_pipeline;
   vk::PipelineLayout m_pipeline_layout;
-  std::map<uint64_t, uint32_t> m_shader_ids;
+  ezMap<uint64_t, uint32_t> m_shader_ids;
 };

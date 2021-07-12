@@ -62,7 +62,7 @@ private:
     DXAdapter& m_adapter;
     ComPtr<ID3D12Device> m_device;
     ComPtr<ID3D12Device5> m_device5;
-    std::map<CommandListType, std::shared_ptr<DXCommandQueue>> m_command_queues;
+    ezMap<CommandListType, std::shared_ptr<DXCommandQueue>> m_command_queues;
     DXCPUDescriptorPool m_cpu_descriptor_pool;
     DXGPUDescriptorPool m_gpu_descriptor_pool;
     bool m_is_dxr_supported = false;
@@ -73,7 +73,7 @@ private:
     uint32_t m_shading_rate_image_tile_size = 0;
     bool m_is_under_graphics_debugger = false;
     bool m_is_create_not_zeroed_available = false;
-    std::map<std::pair<D3D12_INDIRECT_ARGUMENT_TYPE, uint32_t>, ComPtr<ID3D12CommandSignature>> m_command_signature_cache;
+    ezMap<std::pair<D3D12_INDIRECT_ARGUMENT_TYPE, uint32_t>, ComPtr<ID3D12CommandSignature>> m_command_signature_cache;
 };
 
 D3D12_RESOURCE_STATES ConvertState(ResourceState state);

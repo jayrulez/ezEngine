@@ -3,9 +3,6 @@
 #include <Foundation/Configuration/Startup.h>
 #include <RHIVulkan/Adapter/VKAdapter.h>
 #include <RHIVulkan/Instance/VKInstance.h>
-#include <set>
-#include <sstream>
-#include <string>
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -35,21 +32,20 @@ static bool SkipIt(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objec
 {
   if (object_type == VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT && flags != VK_DEBUG_REPORT_ERROR_BIT_EXT)
     return true;
-  static ezDynamicArray<ezString> muted_warnings;
-  if (muted_warnings.IsEmpty())
-  {
-    muted_warnings.PushBack("UNASSIGNED-CoreValidation-Shader-InconsistentSpirv");
-    muted_warnings.PushBack("VUID-vkCmdDrawIndexed-None-04007");
-    muted_warnings.PushBack("VUID-vkDestroyDevice-device-00378");
-    muted_warnings.PushBack("VUID-VkSubmitInfo-pWaitSemaphores-03243");
-    muted_warnings.PushBack("VUID-VkSubmitInfo-pSignalSemaphores-03244");
-    muted_warnings.PushBack("VUID-vkCmdPipelineBarrier-pDependencies-02285");
-    muted_warnings.PushBack("VUID-VkImageMemoryBarrier-oldLayout-01213");
-    muted_warnings.PushBack("VUID-vkCmdDrawIndexed-None-02721");
-    muted_warnings.PushBack("VUID-vkCmdDrawIndexed-None-02699");
-    muted_warnings.PushBack("VUID-vkCmdTraceRaysKHR-None-02699");
-    muted_warnings.PushBack("VUID-VkShaderModuleCreateInfo-pCode-04147");
-  }
+
+  static const char* muted_warnings[] = {
+    "UNASSIGNED-CoreValidation-Shader-InconsistentSpirv",
+    "VUID-vkCmdDrawIndexed-None-04007",
+    "VUID-vkDestroyDevice-device-00378",
+    "VUID-VkSubmitInfo-pWaitSemaphores-03243",
+    "VUID-VkSubmitInfo-pSignalSemaphores-03244",
+    "VUID-vkCmdPipelineBarrier-pDependencies-02285",
+    "VUID-VkImageMemoryBarrier-oldLayout-01213",
+    "VUID-vkCmdDrawIndexed-None-02721",
+    "VUID-vkCmdDrawIndexed-None-02699",
+    "VUID-vkCmdTraceRaysKHR-None-02699",
+    "VUID-VkShaderModuleCreateInfo-pCode-04147",
+  };
 
   for (auto& str : muted_warnings)
   {

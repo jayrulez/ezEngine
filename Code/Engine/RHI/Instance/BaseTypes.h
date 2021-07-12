@@ -495,6 +495,15 @@ struct BindKey
   {
     return std::tie(shader_type, view_type, slot, space, count);
   }
+
+  bool operator==(const BindKey& other) const
+  {
+    return shader_type == other.shader_type &&
+           view_type == other.view_type &&
+           slot == other.slot &&
+           space == other.space &&
+           count == other.count;
+  }
 };
 
 struct BindingDesc

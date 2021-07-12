@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHI/Shader/Shader.h>
 #include <RHIVulkan/Adapter/VKAdapter.h>
 #include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>
@@ -14,12 +16,12 @@ VKRayTracingPipeline::VKRayTracingPipeline(VKDevice& device, const RayTracingPip
   std::vector<vk::RayTracingShaderGroupCreateInfoKHR> groups(m_desc.groups.size());
 
   auto get = [&](uint64_t id) -> uint32_t {
-    auto it = m_shader_ids.find(id);
-    if (it == m_shader_ids.end())
+    auto it = m_shader_ids.Find(id);
+    if (it == end(m_shader_ids))
     {
       return VK_SHADER_UNUSED_KHR;
     }
-    return it->second;
+    return it.Value();
   };
 
   for (size_t i = 0; i < m_desc.groups.size(); ++i)

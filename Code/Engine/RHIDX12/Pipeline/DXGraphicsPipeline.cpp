@@ -296,7 +296,7 @@ const ComPtr<ID3D12RootSignature>& DXGraphicsPipeline::GetRootSignature() const
   return m_root_signature;
 }
 
-const std::map<ezUInt32, uint32_t>& DXGraphicsPipeline::GetStrideMap() const
+const ezMap<ezUInt32, uint32_t>& DXGraphicsPipeline::GetStrideMap() const
 {
   return m_input_layout_stride;
 }

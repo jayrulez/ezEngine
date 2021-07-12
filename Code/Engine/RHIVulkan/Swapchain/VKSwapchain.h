@@ -1,9 +1,10 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/Swapchain/Swapchain.h>
 #include <RHIVulkan/Resource/VKResource.h>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 class VKCommandQueue;

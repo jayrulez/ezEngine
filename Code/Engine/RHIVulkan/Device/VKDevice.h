@@ -1,6 +1,7 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/Device/Device.h>
-#include <vulkan/vulkan.hpp>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPool.h>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUBindlessDescriptorPoolTyped.h>
 
@@ -49,7 +50,7 @@ public:
     CommandListType GetAvailableCommandListType(CommandListType type);
     vk::CommandPool GetCmdPool(CommandListType type);
     vk::ImageAspectFlags GetAspectFlags(vk::Format format) const;
-    VKGPUBindlessDescriptorPoolTyped& GetGPUBindlessDescriptorPool(vk::DescriptorType type);
+    ezUniquePtr<VKGPUBindlessDescriptorPoolTyped>& GetGPUBindlessDescriptorPool(vk::DescriptorType type);
     VKGPUDescriptorPool& GetGPUDescriptorPool();
     uint32_t FindMemoryType(uint32_t type_filter, vk::MemoryPropertyFlags properties);
     vk::AccelerationStructureGeometryKHR FillRaytracingGeometryTriangles(const BufferDesc& vertex, const BufferDesc& index, RaytracingGeometryFlags flags) const;
@@ -65,10 +66,10 @@ private:
         uint32_t queue_family_index;
         uint32_t queue_count;
     };
-    std::map<CommandListType, QueueInfo> m_queues_info;
-    std::map<CommandListType, vk::UniqueCommandPool> m_cmd_pools;
-    std::map<CommandListType, std::shared_ptr<VKCommandQueue>> m_command_queues;
-    std::map<vk::DescriptorType, VKGPUBindlessDescriptorPoolTyped> m_gpu_bindless_descriptor_pool;
+    ezMap<CommandListType, QueueInfo> m_queues_info;
+    ezMap<CommandListType, vk::UniqueCommandPool> m_cmd_pools;
+    ezMap<CommandListType, std::shared_ptr<VKCommandQueue>> m_command_queues;
+    ezMap<vk::DescriptorType, ezUniquePtr<VKGPUBindlessDescriptorPoolTyped>> m_gpu_bindless_descriptor_pool;
     VKGPUDescriptorPool m_gpu_descriptor_pool;
     bool m_is_variable_rate_shading_supported = false;
     uint32_t m_shading_rate_image_tile_size = 0;

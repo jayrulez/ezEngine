@@ -1,6 +1,7 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/GPUDescriptorPool/VKGPUBindlessDescriptorPoolTyped.h>
 #include <RHIVulkan/Device/VKDevice.h>
-#include <stdexcept>
 
 VKGPUBindlessDescriptorPoolTyped::VKGPUBindlessDescriptorPoolTyped(VKDevice& device, vk::DescriptorType type)
     : m_device(device)
@@ -10,8 +11,11 @@ VKGPUBindlessDescriptorPoolTyped::VKGPUBindlessDescriptorPoolTyped(VKDevice& dev
 
 void VKGPUBindlessDescriptorPoolTyped::ResizeHeap(uint32_t req_size)
 {
-    if (req_size > max_bindless_heap_size)
-        throw std::runtime_error("Requested size for bindless pool more than max_bindless_heap_size");
+  if (req_size > max_bindless_heap_size)
+  {
+    EZ_REPORT_FAILURE("Requested size for bindless pool more than max_bindless_heap_size");
+    return;
+  }
 
     if (m_size >= req_size)
         return;

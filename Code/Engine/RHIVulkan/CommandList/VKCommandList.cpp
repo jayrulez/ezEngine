@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/CommandList/VKCommandList.h>
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/Adapter/VKAdapter.h>

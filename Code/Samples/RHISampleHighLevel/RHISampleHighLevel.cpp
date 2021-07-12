@@ -7,6 +7,7 @@
 #include <Foundation/Logging/VisualStudioWriter.h>
 #include <Foundation/Time/Clock.h>
 #include <RHISampleHighLevel/RHISampleHighLevel.h>
+#include <Foundation/Containers/ArrayMap.h>
 
 #include <Core/System/Window.h>
 

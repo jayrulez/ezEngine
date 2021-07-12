@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/Pipeline/VKPipeline.h>
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>

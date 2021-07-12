@@ -26,8 +26,8 @@ private:
     RayTracingPipelineDesc m_desc;
     ComPtr<ID3D12RootSignature> m_root_signature;
     ComPtr<ID3D12StateObject> m_pipeline_state;
-    std::map<uint64_t, std::wstring> m_shader_ids;
-    std::set<std::wstring> m_shader_names;
-    std::map<uint64_t, std::wstring> m_group_names;
+    ezMap<uint64_t, std::wstring> m_shader_ids;
+    ezSet<std::wstring> m_shader_names;
+    ezMap<ezUInt64, std::wstring> m_group_names;
     ComPtr<ID3D12StateObjectProperties> m_state_ojbect_props;
 };

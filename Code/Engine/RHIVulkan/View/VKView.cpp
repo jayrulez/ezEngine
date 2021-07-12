@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/View/VKView.h>
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/Resource/VKResource.h>
@@ -18,7 +20,7 @@ VKView::VKView(VKDevice& device, const std::shared_ptr<VKResource>& resource, co
     {
         vk::DescriptorType type = GetDescriptorType(view_desc.view_type);
         decltype(auto) pool = device.GetGPUBindlessDescriptorPool(type);
-        m_range = std::make_shared<VKGPUDescriptorPoolRange>(pool.Allocate(1));
+        m_range = std::make_shared<VKGPUDescriptorPoolRange>(pool->Allocate(1));
 
         m_descriptor.dstSet = m_range->GetDescriptoSet();
         m_descriptor.dstArrayElement = m_range->GetOffset();

@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/CommandQueue/VKCommandQueue.h>
 #include <RHIVulkan/CommandList/VKCommandList.h>
 #include <RHIVulkan/Fence/VKTimelineSemaphore.h>

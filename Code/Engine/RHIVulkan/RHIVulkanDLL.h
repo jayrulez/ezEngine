@@ -1,7 +1,10 @@
 #pragma once
 
 #include <Foundation/Basics.h>
+#include <Foundation/Types/UniquePtr.h>
 #include <RHI/RHIDLL.h>
+
+#include <vulkan/vulkan.hpp>
 
 // Configure the DLL Import/Export Define
 #if EZ_ENABLED(EZ_COMPILE_ENGINE_AS_DLL)

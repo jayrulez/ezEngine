@@ -1,7 +1,8 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/BindingSet/BindingSet.h>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPool.h>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 class VKBindingSetLayout;

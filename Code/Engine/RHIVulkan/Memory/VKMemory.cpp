@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/Memory/VKMemory.h>
 #include <RHIVulkan/Device/VKDevice.h>
 

@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/BindingSetLayout/VKBindingSetLayout.h>
 #include <RHIVulkan/Device/VKDevice.h>
 
@@ -55,8 +57,8 @@ vk::ShaderStageFlagBits ShaderType2Bit(ShaderType type)
 
 VKBindingSetLayout::VKBindingSetLayout(VKDevice& device, const std::vector<BindKey>& descs)
 {
-    std::map<uint32_t, std::vector<vk::DescriptorSetLayoutBinding>> bindings_by_set;
-    std::map<uint32_t, std::vector<vk::DescriptorBindingFlags>> bindings_flags_by_set;
+    ezMap<uint32_t, std::vector<vk::DescriptorSetLayoutBinding>> bindings_by_set;
+    ezMap<uint32_t, std::vector<vk::DescriptorBindingFlags>> bindings_flags_by_set;
 
     for (const auto& bind_key : descs)
     {
@@ -71,7 +73,7 @@ VKBindingSetLayout::VKBindingSetLayout(VKDevice& device, const std::vector<BindK
         {
             binding.descriptorCount = max_bindless_heap_size;
             binding_flag = vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
-            m_bindless_type.emplace(bind_key.space, binding.descriptorType);
+            m_bindless_type.Insert(bind_key.space, binding.descriptorType);
             binding.stageFlags = vk::ShaderStageFlagBits::eAll;
         }
     }
@@ -79,15 +81,15 @@ VKBindingSetLayout::VKBindingSetLayout(VKDevice& device, const std::vector<BindK
     for (const auto& set_desc : bindings_by_set)
     {
         vk::DescriptorSetLayoutCreateInfo layout_info = {};
-      layout_info.bindingCount = (ezUInt32)set_desc.second.size();
-        layout_info.pBindings = set_desc.second.data();
+      layout_info.bindingCount = (ezUInt32)set_desc.Value().size();
+        layout_info.pBindings = set_desc.Value().data();
 
         vk::DescriptorSetLayoutBindingFlagsCreateInfo layout_flags_info = {};
-        layout_flags_info.bindingCount = (ezUInt32)bindings_flags_by_set[set_desc.first].size();
-        layout_flags_info.pBindingFlags = bindings_flags_by_set[set_desc.first].data();
+        layout_flags_info.bindingCount = (ezUInt32)bindings_flags_by_set[set_desc.Key()].size();
+        layout_flags_info.pBindingFlags = bindings_flags_by_set[set_desc.Key()].data();
         layout_info.pNext = &layout_flags_info;
 
-        size_t set_num = set_desc.first;
+        size_t set_num = set_desc.Key();
         if (m_descriptor_set_layouts.size() <= set_num)
         {
             m_descriptor_set_layouts.resize(set_num + 1);
@@ -98,7 +100,7 @@ VKBindingSetLayout::VKBindingSetLayout(VKDevice& device, const std::vector<BindK
         descriptor_set_layout = device.GetDevice().createDescriptorSetLayoutUnique(layout_info);
 
         decltype(auto) descriptor_count = m_descriptor_count_by_set[set_num];
-        for (const auto& binding : set_desc.second)
+        for (const auto& binding : set_desc.Value())
         {
             descriptor_count[binding.descriptorType] += binding.descriptorCount;
         }
@@ -123,7 +125,7 @@ VKBindingSetLayout::VKBindingSetLayout(VKDevice& device, const std::vector<BindK
     m_pipeline_layout = device.GetDevice().createPipelineLayoutUnique(pipeline_layout_info);
 }
 
-const std::map<uint32_t, vk::DescriptorType>& VKBindingSetLayout::GetBindlessType() const
+const ezMap<uint32_t, vk::DescriptorType>& VKBindingSetLayout::GetBindlessType() const
 {
     return m_bindless_type;
 }
@@ -133,7 +135,7 @@ const std::vector<vk::UniqueDescriptorSetLayout>& VKBindingSetLayout::GetDescrip
     return m_descriptor_set_layouts;
 }
 
-const std::vector<std::map<vk::DescriptorType, size_t>>& VKBindingSetLayout::GetDescriptorCountBySet() const
+const std::vector<ezMap<vk::DescriptorType, size_t>>& VKBindingSetLayout::GetDescriptorCountBySet() const
 {
     return m_descriptor_count_by_set;
 }

@@ -1,6 +1,7 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/QueryHeap/QueryHeap.h>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 

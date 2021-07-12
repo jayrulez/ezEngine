@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/Framebuffer/VKFramebuffer.h>
 #include <RHIVulkan/Device/VKDevice.h>
 #include <RHIVulkan/View/VKView.h>

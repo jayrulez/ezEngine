@@ -78,8 +78,8 @@ DXBindingSetLayout::DXBindingSetLayout(DXDevice& device, const std::vector<BindK
 {
   std::vector<D3D12_ROOT_PARAMETER> root_parameters;
   using RootKey = std::pair<D3D12_DESCRIPTOR_HEAP_TYPE, ShaderType>;
-  std::map<RootKey, std::vector<D3D12_DESCRIPTOR_RANGE>> descriptor_table_ranges;
-  std::map<RootKey, ezUInt32> descriptor_table_offset;
+  ezMap<RootKey, std::vector<D3D12_DESCRIPTOR_RANGE>> descriptor_table_ranges;
+  ezMap<RootKey, ezUInt32> descriptor_table_offset;
   std::deque<D3D12_DESCRIPTOR_RANGE> bindless_ranges;
 
   auto add_root_table = [&](ShaderType shader_type, ezUInt32 range_count, const D3D12_DESCRIPTOR_RANGE* ranges) {
@@ -128,7 +128,7 @@ DXBindingSetLayout::DXBindingSetLayout(DXDevice& device, const std::vector<BindK
     layout.heap_offset = m_heap_descs[heap_type];
 
     RootKey key = {heap_type, bind_key.shader_type};
-    if (!descriptor_table_offset.count(key))
+    if (!descriptor_table_offset.Contains(key))
     {
       descriptor_table_offset[key] = m_heap_descs[heap_type];
     }
@@ -145,10 +145,10 @@ DXBindingSetLayout::DXBindingSetLayout(DXDevice& device, const std::vector<BindK
 
   for (const auto& ranges : descriptor_table_ranges)
   {
-    ezUInt32 root_param_index = add_root_table(ranges.first.second, (ezUInt32)ranges.second.size(), ranges.second.data());
-    m_descriptor_tables[root_param_index].heap_type = ranges.first.first;
-    m_descriptor_tables[root_param_index].heap_offset = descriptor_table_offset[ranges.first];
-    switch (ranges.first.second)
+    ezUInt32 root_param_index = add_root_table(ranges.Key().second, (ezUInt32)ranges.Value().size(), ranges.Value().data());
+    m_descriptor_tables[root_param_index].heap_type = ranges.Key().first;
+    m_descriptor_tables[root_param_index].heap_offset = descriptor_table_offset[ranges.Key()];
+    switch (ranges.Key().second)
     {
       case ShaderType::kCompute:
       case ShaderType::kLibrary:
@@ -176,17 +176,17 @@ DXBindingSetLayout::DXBindingSetLayout(DXDevice& device, const std::vector<BindK
   EZ_ASSERT_ALWAYS(device.GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_root_signature)) == S_OK, "");
 }
 
-const std::map<D3D12_DESCRIPTOR_HEAP_TYPE, ezUInt32>& DXBindingSetLayout::GetHeapDescs() const
+const ezMap<D3D12_DESCRIPTOR_HEAP_TYPE, ezUInt32>& DXBindingSetLayout::GetHeapDescs() const
 {
   return m_heap_descs;
 }
 
-const std::map<BindKey, BindingLayout>& DXBindingSetLayout::GetLayout() const
+const ezMap<BindKey, BindingLayout>& DXBindingSetLayout::GetLayout() const
 {
   return m_layout;
 }
 
-const std::map<uint32_t, DescriptorTableDesc>& DXBindingSetLayout::GetDescriptorTables() const
+const ezMap<uint32_t, DescriptorTableDesc>& DXBindingSetLayout::GetDescriptorTables() const
 {
   return m_descriptor_tables;
 }

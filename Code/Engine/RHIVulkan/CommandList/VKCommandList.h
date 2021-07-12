@@ -1,6 +1,7 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/CommandList/CommandList.h>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 class VKPipeline;

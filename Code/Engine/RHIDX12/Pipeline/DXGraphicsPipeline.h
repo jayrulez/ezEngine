@@ -17,7 +17,7 @@ public:
 
     const GraphicsPipelineDesc& GetDesc() const;
     const ComPtr<ID3D12PipelineState>& GetPipeline() const;
-    const std::map<ezUInt32, uint32_t>& GetStrideMap() const;
+    const ezMap<ezUInt32, uint32_t>& GetStrideMap() const;
 
 private:
     void ParseInputLayout(const std::shared_ptr<Shader>& shader);
@@ -26,8 +26,8 @@ private:
     DXDevice& m_device;
     GraphicsPipelineDesc m_desc;
     std::vector<D3D12_INPUT_ELEMENT_DESC> m_input_layout_desc;
-    std::map<ezUInt32, ezString> m_input_layout_desc_names;
-    std::map<ezUInt32, uint32_t> m_input_layout_stride;
+    ezMap<ezUInt32, ezString> m_input_layout_desc_names;
+    ezMap<ezUInt32, uint32_t> m_input_layout_stride;
     ComPtr<ID3D12RootSignature> m_root_signature;
     ComPtr<ID3D12PipelineState> m_pipeline_state;
 };

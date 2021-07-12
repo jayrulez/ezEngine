@@ -30,7 +30,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
         {
             uint64_t shader_id = shader->GetId(entry_point.name);
             std::wstring shader_name = ezStringWChar(entry_point.name).GetData();
-            if (m_shader_names.count(shader_name))
+            if (m_shader_names.Contains(shader_name))
             {
                 std::wstring new_shader_name = GenerateUniqueName(shader_name + L"_renamed_" + std::to_wstring(shader_id));
                 library->DefineExport(new_shader_name.c_str(), shader_name.c_str());
@@ -40,7 +40,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
             {
                 library->DefineExport(shader_name.c_str());
             }
-            m_shader_names.insert(shader_name);
+            m_shader_names.Insert(shader_name);
             m_shader_ids[shader_id] = shader_name;
         }
     }
@@ -50,7 +50,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
     {
         if (m_desc.groups[i].type == RayTracingShaderGroupType::kGeneral)
         {
-            m_group_names[i] = m_shader_ids.at(m_desc.groups[i].general);
+          m_group_names[i] = m_shader_ids[m_desc.groups[i].general];
             continue;
         }
         decltype(auto) hit_group = subobjects.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
@@ -61,17 +61,17 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
         case RayTracingShaderGroupType::kTrianglesHitGroup:
             if (m_desc.groups[i].any_hit)
             {
-                hit_group->SetAnyHitShaderImport(m_shader_ids.at(m_desc.groups[i].any_hit).c_str());
+              hit_group->SetAnyHitShaderImport(m_shader_ids[m_desc.groups[i].any_hit].c_str());
             }
             if (m_desc.groups[i].closest_hit)
             {
-                hit_group->SetClosestHitShaderImport(m_shader_ids.at(m_desc.groups[i].closest_hit).c_str());
+              hit_group->SetClosestHitShaderImport(m_shader_ids[m_desc.groups[i].closest_hit].c_str());
             }
             break;
         case RayTracingShaderGroupType::kProceduralHitGroup:
             if (m_desc.groups[i].intersection)
             {
-                hit_group->SetIntersectionShaderImport(m_shader_ids.at(m_desc.groups[i].intersection).c_str());
+              hit_group->SetIntersectionShaderImport(m_shader_ids[m_desc.groups[i].intersection].c_str());
             }
             break;
         }
@@ -104,7 +104,7 @@ DXRayTracingPipeline::DXRayTracingPipeline(DXDevice& device, const RayTracingPip
 std::wstring DXRayTracingPipeline::GenerateUniqueName(std::wstring name)
 {
     static uint64_t id = 0;
-    while (m_shader_names.count(name))
+    while (m_shader_names.Contains(name))
     {
         name += L"_" + std::to_wstring(++id);
     }
@@ -136,7 +136,7 @@ std::vector<uint8_t> DXRayTracingPipeline::GetRayTracingShaderGroupHandles(uint3
     std::vector<uint8_t> shader_handles_storage(group_count * m_device.GetShaderGroupHandleSize());
     for (uint32_t i = 0; i < group_count; ++i)
     {
-        memcpy(shader_handles_storage.data() + i * m_device.GetShaderGroupHandleSize(), m_state_ojbect_props->GetShaderIdentifier(m_group_names.at(i + first_group).c_str()), m_device.GetShaderGroupHandleSize());
+        memcpy(shader_handles_storage.data() + i * m_device.GetShaderGroupHandleSize(), m_state_ojbect_props->GetShaderIdentifier((*m_group_names.GetValue(i + first_group)).c_str()), m_device.GetShaderGroupHandleSize());
     }
     return shader_handles_storage;
 }

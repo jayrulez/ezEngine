@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPool.h>
 #include <RHIVulkan/Device/VKDevice.h>
 
@@ -6,19 +8,19 @@ VKGPUDescriptorPool::VKGPUDescriptorPool(VKDevice& device)
 {
 }
 
-vk::UniqueDescriptorPool VKGPUDescriptorPool::CreateDescriptorPool(const std::map<vk::DescriptorType, size_t>& count)
+vk::UniqueDescriptorPool VKGPUDescriptorPool::CreateDescriptorPool(const ezMap<vk::DescriptorType, size_t>& count)
 {
     std::vector<vk::DescriptorPoolSize> pool_sizes;
     for (auto & x : count)
     {
         pool_sizes.emplace_back();
         vk::DescriptorPoolSize& pool_size = pool_sizes.back();
-        pool_size.type = x.first;
-        pool_size.descriptorCount = (ezUInt32)x.second;
+        pool_size.type = x.Key();
+        pool_size.descriptorCount = (ezUInt32)x.Value();
     }
 
     // TODO: fix me
-    if (count.empty())
+    if (count.IsEmpty())
     {
         pool_sizes.emplace_back();
         vk::DescriptorPoolSize& pool_size = pool_sizes.back();
@@ -35,7 +37,7 @@ vk::UniqueDescriptorPool VKGPUDescriptorPool::CreateDescriptorPool(const std::ma
     return m_device.GetDevice().createDescriptorPoolUnique(pool_info);
 }
 
-DescriptorSetPool VKGPUDescriptorPool::AllocateDescriptorSet(const vk::DescriptorSetLayout& set_layout, const std::map<vk::DescriptorType, size_t>& count)
+DescriptorSetPool VKGPUDescriptorPool::AllocateDescriptorSet(const vk::DescriptorSetLayout& set_layout, const ezMap<vk::DescriptorType, size_t>& count)
 {
     DescriptorSetPool res = {};
     res.pool = CreateDescriptorPool(count);

@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/GPUDescriptorPool/VKGPUDescriptorPoolRange.h>
 #include <RHIVulkan/GPUDescriptorPool/VKGPUBindlessDescriptorPoolTyped.h>
 
@@ -11,8 +13,13 @@ VKGPUDescriptorPoolRange::VKGPUDescriptorPoolRange(VKGPUBindlessDescriptorPoolTy
     , m_offset(offset)
     , m_size(size)
     , m_type(type)
-    , m_callback(this, [m_offset = m_offset, m_size = m_size, m_pool = m_pool](auto) { m_pool.get().OnRangeDestroy(m_offset, m_size); })
+    //, m_callback(this, [m_offset = m_offset, m_size = m_size, m_pool = m_pool](auto) { m_pool.get().OnRangeDestroy(m_offset, m_size); })
 {
+}
+
+VKGPUDescriptorPoolRange::~VKGPUDescriptorPoolRange()
+{
+  m_pool.get().OnRangeDestroy(m_offset, m_size); 
 }
 
 vk::DescriptorSet VKGPUDescriptorPoolRange::GetDescriptoSet() const

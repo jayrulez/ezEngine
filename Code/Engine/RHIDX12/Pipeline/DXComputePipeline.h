@@ -21,7 +21,7 @@ private:
     DXDevice& m_device;
     ComputePipelineDesc m_desc;
     std::vector<D3D12_INPUT_ELEMENT_DESC> m_input_layout_desc;
-    std::map<size_t, std::string> m_input_layout_desc_names;
+    ezMap<size_t, std::string> m_input_layout_desc_names;
     ComPtr<ID3D12RootSignature> m_root_signature;
     ComPtr<ID3D12PipelineState> m_pipeline_state;
 };

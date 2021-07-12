@@ -1,6 +1,7 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/Adapter/Adapter.h>
-#include <vulkan/vulkan.hpp>
 
 class VKInstance;
 

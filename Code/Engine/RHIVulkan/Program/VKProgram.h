@@ -1,10 +1,11 @@
 #pragma once
+#include <RHIVulkan/RHIVulkanDLL.h>
+
 #include <RHI/Program/ProgramBase.h>
 #include <RHI/Shader/Shader.h>
 #include <map>
 #include <set>
 #include <vector>
-#include <vulkan/vulkan.hpp>
 
 class VKDevice;
 

@@ -22,5 +22,5 @@ public:
 private:
     DXDevice& m_device;
     std::shared_ptr<DXBindingSetLayout> m_layout;
-    std::map<D3D12_DESCRIPTOR_HEAP_TYPE, std::shared_ptr<DXGPUDescriptorPoolRange>> m_descriptor_ranges;
+    ezMap<D3D12_DESCRIPTOR_HEAP_TYPE, std::shared_ptr<DXGPUDescriptorPoolRange>> m_descriptor_ranges;
 };

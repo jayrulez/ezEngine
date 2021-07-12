@@ -1,3 +1,5 @@
+#include <RHIVulkanPCH.h>
+
 #include <RHIVulkan/Utilities/VKUtility.h>
 
 namespace VKUtils
